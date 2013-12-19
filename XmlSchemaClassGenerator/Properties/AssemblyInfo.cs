@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("XmlSchemaClassGenerator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A console program and library to generate XmlSerializer compatible C# classes from XML Schema files.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Michael Ganss")]
 [assembly: AssemblyProduct("XmlSchemaClassGenerator")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Copyright © 2013 Michael Ganss")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
