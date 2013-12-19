@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- 
+  CHANGE JUDICIOUSLY! 
+  Common schema which will be used over all API contexts, so be very careful with
+  incompatible changes. In case of doubt please contact Team API for support.
+  
+  The HTTP response code for each MessageCode enum value is defined in property files:
+  - "messages.properties"
+  - "errors.properties"
+-->
+<xs:schema 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xlink="http://www.w3.org/1999/xlink" 
+	elementFormDefault="unqualified" 
+	attributeFormDefault="unqualified" 
+	version="1.0">
+	
+	<xs:import namespace="http://www.w3.org/1999/xlink"/>
+
+	<xs:element name="messages">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Represents a sequence of information or error messages.</xs:documentation>
+			<xs:documentation xml:lang="de-DE">Repräsentiert eine Sequenz von Informations- oder Fehlermeldungen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="message" type="Message" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">Represents an information or error message.</xs:documentation>
+						<xs:documentation xml:lang="de-DE">Repräsentiert eine Informations- oder Fehlermeldung.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="Message">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Defines an information or error message.</xs:documentation>
+			<xs:documentation xml:lang="de-DE">Definiert eine Informations- oder Fehlermeldung.</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="messageCode" type="MessageCode">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">An unique code identifying the message.</xs:documentation>
+					<xs:documentation xml:lang="de-DE">Eindeutiger Kennzeichner der die Mitteilung identifiziert.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="message" type="xs:string">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">An information or error message.</xs:documentation>
+					<xs:documentation xml:lang="de-DE">Informations- oder eine Fehlermeldung.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	
+	<xs:simpleType name="MessageCode">
+		<xs:restriction base="xs:string">
+			<!-- START MESSAGES -->
+			<xs:enumeration value="MESSAGE_RESOURCE_CREATED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wurde erfolgreich angelegt (beinhaltet Name und Id der Resource).</xs:documentation>
+					<xs:documentation xml:lang="en">Resource was successful created (includes name and id of the resource).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MESSAGE_RESOURCE_UPDATED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wurde erfolgreich aktualisiert (beinhaltet Name und Id der Resource).</xs:documentation>
+					<xs:documentation xml:lang="en">Resource was successful updated (includes name and id of the resource).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MESSAGE_RESOURCE_DELETED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wurde erfolgreich gelöscht (beinhaltet Name und Id der Resource).</xs:documentation>
+					<xs:documentation xml:lang="en">Resource was successful deleted (includes name and id of the resource).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="MESSAGE_OPERATION_SUCCESSFUL">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Operation wurde erfolgreich ausgeführt.</xs:documentation>
+					<xs:documentation xml:lang="en">Operation successful executed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<!-- END MESSAGES -->
+			<!-- START HEADER ERRORS -->
+			<xs:enumeration value="ERROR_COMMON_HEADER_PARAMETER_VALIDATION_FAILED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Operation wurde erfolgreich ausgeführt.</xs:documentation>
+					<xs:documentation xml:lang="en">Operation successful executed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<!-- END HEADER ERRORS -->
+			<!-- START COMMON ERRORS -->
+			<xs:enumeration value="ERROR_COMMON_RESOURCE_REQUIRED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Der Request ist nur im Kontext einer bestimmten Resource gültig (beinhaltet Name der benötigten Resource).</xs:documentation>
+					<xs:documentation xml:lang="en">Request is only valid within the context of an specific resource (includes name of the required resource).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_REQUEST_CONFLICT">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Eine Operation (z.B. auf einer Ressource) führte zu einem Konflikt.</xs:documentation>
+					<xs:documentation xml:lang="en">A conflict occured during execution of an operation (e.g. on a resource).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_AUTHENTICATION_REQUIRED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Keine Authorisierung fÃ¼r die gewÃ¼nschte Aktion.</xs:documentation>
+					<xs:documentation xml:lang="en">No authorization for the requested operation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_AUTHENTICATION_OAUTH_NONCE_EXPIRED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Der Nonce für OAuth ist abgelaufen.</xs:documentation>
+					<xs:documentation xml:lang="en">The OAuth Nonce has expired.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_ACCESS_DENIED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Keine Authorisierung für die gewünschte Aktion.</xs:documentation>
+					<xs:documentation xml:lang="en">No authorization for the requested operation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_SCHEMA_VALIDATION_FAILED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Schema-Validierung ist fehlgeschlagen. (enthält Beschreibung des Fehlers)</xs:documentation>
+					<xs:documentation xml:lang="en">Validation according the schema failed (includes the description of the failure).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_URL_PARAMETER_REQUIRED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Ein benötigter Parameter fehlt in der Anfrage (enthält den Namen des Parameters).</xs:documentation>
+					<xs:documentation xml:lang="en">A required parameter is missing in the request (contains the name of the parameter).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_URL_PARAMETER_VALIDATION_FAILED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Ein Parameter in der Anfrage hat einen ungültigen Wert (enthält den Names des Parameters und den Wert).</xs:documentation>
+					<xs:documentation xml:lang="en">At least one request parameter contains an invalid value (contains the name and the value of the parameter).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_URL_MULTIPLE_PARAMETERS_NOT_ALLOWED">
+			  <xs:annotation>
+			    <xs:documentation xml:lang="de">Mehrere Parameter sind nicht erlaubt.</xs:documentation>
+			    <xs:documentation xml:lang="en">Multiple parameters are not allowed.</xs:documentation>
+			  </xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_URL_PARAMETER_NOT_SUPPORTED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Ein Parameter in der Anfrage wird nicht unterstützt (enthält den Namen des Parameters).</xs:documentation>
+					<xs:documentation xml:lang="en">A request parameter is not supported (contains the name of the parameter).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_NOT_IMPLEMENTED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">HTTP 501: Die Methode ist noch nicht implementiert.</xs:documentation>
+					<xs:documentation xml:lang="en">HTTP 501: The method is not yet implemented.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_SERVICE_UNAVAILABLE">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">HTTP 503: Der Server ist überlastet</xs:documentation>
+					<xs:documentation xml:lang="en">HTTP 503: Service Unavailable</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_INTERNAL_SERVER_ERROR">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">HTTP 500: Interner Server Fehler</xs:documentation>
+					<xs:documentation xml:lang="en">HTTP 500: Internal Server Error</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_RESOURCE_NOT_FOUND">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wurde nicht gefunden.</xs:documentation>
+					<xs:documentation xml:lang="en">Resource was not found.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_METHOD_NOT_ALLOWED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Methode ist für diese Ressource nicht erlaubt.</xs:documentation>
+					<xs:documentation xml:lang="en">Method not allowed for this resource.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_ACCEPT_TYPE_NOT_APPLICABLE">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Der Accept-Type wird nicht unterstüzt.</xs:documentation>
+					<xs:documentation xml:lang="en">Accept type not applicable. </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_MEDIA_TYPE_UNSUPPORTED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Der Media-Type wird nicht unterstüzt.</xs:documentation>
+					<xs:documentation xml:lang="en">Media type is not supported.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_COMMON_BAD_REQUEST">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Der HTTP Request ist ungültig (überprüfen Sie die Url oder den body content).</xs:documentation>
+					<xs:documentation xml:lang="en">The http request is invalid (check the url or body content).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<!-- END COMMON ERRORS -->
+			<!-- START RESOURCE ERRORS -->
+			<xs:enumeration value="ERROR_RESOURCE_NOT_SUPPORTED">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wird nicht unterstützt im angeforderten Kontext (beinhaltet Name der unberechtigten und nicht verfügbaren Resource).</xs:documentation>
+					<xs:documentation xml:lang="en">The resource is not supported within the context of the request (includes name of the unauthorized and unavailable resource e.g. savedsearch is only for searchers).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_RESOURCE_NOT_FOUND">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wurde nicht gefunden (beinhaltet Name und Id der Resource).</xs:documentation>
+					<xs:documentation xml:lang="en">Resource was not found (includes name and id of the resource).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+      <xs:enumeration value="ERROR_RESOURCE_NOT_FOUND_FOR_MULTIPLE_PARAMETERS">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Resource wurde fÃ¼r mindestens einen der Parameter nicht gefunden.</xs:documentation>
+					<xs:documentation xml:lang="en">Resource was not found for at least one of the given parameters.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_RESOURCE_VALIDATION">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Nicht alle Werte für die Resource sind gültig (beinhaltet Beschreibung des Fehlers).</xs:documentation>
+					<xs:documentation xml:lang="en">Not all of the data for the resource are valid (includes the description of the failure).</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ERROR_REQUESTED_DATA_NOT_FOUND">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die angefragten Daten wurden nicht gefunden.</xs:documentation>
+					<xs:documentation xml:lang="en">The requested data was not found.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+     		<xs:enumeration value="ERROR_RESOURCE_NOT_UNIQUE">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Unerwarteterweise ist die angefragte Resource nicht eindeutig.</xs:documentation>
+					<xs:documentation xml:lang="en">The requested resource is not unique, but is expected to be unique.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<!-- END RESOURCE ERRORS -->
+			<!-- internal -->
+			<xs:enumeration value="ERROR_DB_NOT_AVAILABLE">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die DB is nicht erreichbar.</xs:documentation>
+					<xs:documentation xml:lang="en">The DB ist not reachable.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<!-- business errors -->
+			<xs:enumeration value="ERROR_CONTACT_DETAILS_MISSING">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Die Kontaktdaten sind unvollständig angegeben.</xs:documentation>
+					<xs:documentation xml:lang="en">Contact data is missing some attributes.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+      <xs:enumeration value="ERROR_INVALID_COORDINATES">
+        <xs:annotation>
+          <xs:documentation xml:lang="de">Die angegebenen Koordinaten sind ungültig.</xs:documentation>
+          <xs:documentation xml:lang="en">The given coordinates are invalid.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ERROR_GEOCODING_FAILED">
+        <xs:annotation>
+          <xs:documentation xml:lang="de">Die Geocodierung war nicht erfolgreich.</xs:documentation>
+          <xs:documentation xml:lang="en">The geocoding was not successful.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>

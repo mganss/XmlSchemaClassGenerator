@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Shortlist schema which will be used within the search API context, so be very careful with incompatible changes. In
+  case of doubt please contact PMI2-A for support.
+-->
+<xs:schema xmlns="http://rest.immobilienscout24.de/schema/search/shortlist/1.0"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           jaxb:version="2.0"
+           xmlns:annox="http://annox.dev.java.net"
+           jaxb:extensionBindingPrefixes="annox"
+           targetNamespace="http://rest.immobilienscout24.de/schema/search/shortlist/1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:common="http://rest.immobilienscout24.de/schema/common/1.0"
+           xmlns:search="http://rest.immobilienscout24.de/schema/search/common/1.0"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified" version="1.0">
+
+    <xs:import namespace="http://rest.immobilienscout24.de/schema/search/common/1.0" schemaLocation="common-1.0.xsd"/>
+    <xs:import namespace="http://rest.immobilienscout24.de/schema/common/1.0"/>
+
+
+    <xs:element name="shortlists">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">List of all shortlists.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Liste aller Merkzettel.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="shortlist" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">References a specific shortlist of an user.
+                            </xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Referenziert einen spezifischen Merkzettel eines
+                                Benutzers.
+                            </xs:documentation>
+                        </xs:annotation>
+                        <xs:attributeGroup ref="common:Reference"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="shortlist">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Shortlist with all information.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Merkzettel mit allen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:long" use="required">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">ID of the shortlist.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">ID des Merkzettels.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="shortlistEntries">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">List of all entries of the shortlist (Note: includes also often used
+                data).
+            </xs:documentation>
+            <xs:documentation xml:lang="de-DE">Liste aller Einträge des Merkzettels (Hinweis: enthält auch oft genutzte
+                Informationen).
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="shortlistEntry" type="ShortlistEntry" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="shortlistEntry" type="ShortlistEntry">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">An entry of the shortlist</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Ein Eintrag des Merkzettels</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <xs:complexType name="ShortlistEntry">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">An entry of the shortlist.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Ein Eintrag des Merkzettels.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+
+            <xs:element name="realEstateId" type="xs:long">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The id of the real estate to remember (id will be ignored while
+                        update process).
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Die Id der gemerkten Immobilie (beim Update Prozess wird die Id
+                        ignoriert).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:element name="realEstate" type="search:RealEstateForList" form="qualified" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The real estate of the short list entry. (contains at least the id
+                        while creation of this shortlistentry).
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Die Immobilie zu dem Merkzetteleintrag (enthält wenigstens die ID
+                        der Immobilie während der Erzeugung eines neuen shortlistentry)
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="memo" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Memo</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Notiz</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="common:TextField">
+                        <xs:maxLength value="2000"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="address" type="common:Address" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The address of the real estate visitation.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Die Besichtigungsadresse.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="dateOfInspection" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The date of the real estate inspection.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Der Besichtigungstermin.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="relocationDate" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Date when i relocate to this apartment/House.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Umzugsdatum.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="applicationDate" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The date when i applied for this apartment.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Bewerbungsdatum.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="tags" type="Tags" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A list of tags like realtor was connected.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">'Eine Liste von Tags wie z.B. Anbieter kontaktiert.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" maxOccurs="1" name="rating">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="ownerRating" type="shortlistEntryRatingType" minOccurs="0" maxOccurs="1">
+                            <xs:annotation>
+                                <xs:documentation xml:lang="en">The rating of this real estate from the side of the person who saved
+                                    this real estate in their shortlist.
+                                </xs:documentation>
+                                <xs:documentation xml:lang="de-DE">Die Bewertung von der Immobilie vom Nutzer, der diese Immobilie
+                                    dem Merkzettel hinzugefügt hat.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="invitedUsersRatingList" type="invitedUsersRatingList" minOccurs="0" maxOccurs="1"/>
+                    </xs:all>
+                </xs:complexType> 
+            </xs:element>        
+            <xs:element name="creationDate" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The date of shortlist entry creation. Not changable by the client.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Erstelldatum des Merkzetteleintrags. Nicht vom Client änderbar.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="lastModificationDate" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The date of the last modification of the shortlist entry. Not
+                        changable by the client.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Letztes Änderungsdatum. Nicht vom Client änderbar.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:element name="attachments" minOccurs="0" type="common:Attachments">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Attachments of short list entry</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anhänge des Merkzetteleintrags</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="numberOfComments" minOccurs="0" type="numberOfComments">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Number of chat-Comments for this shared shortlist entry.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anzahl der Kommentare für Merkzetteleintrag</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attributeGroup ref="common:Reference"/>
+        <xs:attribute type="xs:boolean" name="isShortlistEntryOwner"/>
+    </xs:complexType>
+
+    <xs:complexType name="Tags">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">A list of tags like realtor was connected.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Eine Liste von Tags wie z.B. Anbieter kontaktiert.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="tag" type="TagName" minOccurs="0" maxOccurs="5">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A specific tag like realtor was connected.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Ein spezifischer Tag wie z.B. Anbieter kontaktiert.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="numberOfComments">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Number of comments for this shortlist entry (from both members of sharedShortlistGroup).</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Anzahl der Kommentare für diesen Merkzetteleintrag (von beiden Beteiligten an der gemeinsamen Suche: gemeinsamer Merkzettel).</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="notRead" type="xs:long" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Number of not read comments.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anzahl der ungelesenen Kommentare
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="notReadByRequester" type="xs:long" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Number of not read comments by requester(not requester partner).</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anzahl der ungelesenen Kommentare
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="total" type="xs:long" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Total number of comments.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anzahl der ommentare insgesamt zu diesem Merkzetteleintrag.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="TagName">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">A specific tag like realtor was connected.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Ein spezifischer Tag wie z.B. Anbieter kontaktiert.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="REALTOR_CONTACTED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Realor was contacted.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anbieter kontaktiert.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="REAL_ESTATE_VISITED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Real estate was visited.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Immobilie besichtigt.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="APPLIED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Applied for real estate.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Beworben.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GOT_ACCEPTED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Got accepted after the application for this particular real estate.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Die Zusage nach der Bewerbung bekommen.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GOT_REJECTED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Got rejected after the application for this particular real estate.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Die Absage nach der Bewerbung bekommen.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="REAL_ESTATE_ACCEPTED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Real estate is considered to be accepted as mine/ours.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Meine/Unsere Immobilie.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:complexType name="ShortlistStrictEntry">
+        <xs:complexContent>
+            <xs:extension base="common:StrictEntry">
+                <xs:sequence>
+                    <xs:element name="realEstateId" type="xs:long"/>
+                    <xs:element name="state" type="common:RealEstateState"/>
+                    <xs:element name="realEstateType" type="common:RealEstateType"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="sharedShortlistGroup" type="sharedShortlistGroup"/>
+    <xs:complexType name="sharedShortlistGroup">
+        <xs:all>
+            <xs:element name="isRequesterGroupOwner" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Returns boolean value, whether request user is a group owner.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Gibt zurueck, ob der anfragende Nutzer ein Gruppenbesitzer ist.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="invitedUsers" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="sharedShortlistGroupUser" type="sharedShortlistGroupUser" maxOccurs="3"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ownerFirstName" minOccurs="0" maxOccurs="1" type="firstName">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">First name of the user, who sends the email invitation.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Vorname von dem Nutzer, der die Einladung verschickt.
+                    </xs:documentation>
+                </xs:annotation>
+
+            </xs:element>
+            <xs:element name="invitationAcceptedDate" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The date of the last modification of the shortlist group (invitation accepted). Not
+                        changable by the client.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Letztes Änderungsdatum (einladung angenommen). Nicht vom Client änderbar.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="invitationDate" type="xs:dateTime" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The date of  group entry creation. Not changable by the client.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Erstelldatum des Merkzettelgruppe. Nicht vom Client änderbar.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+        <xs:attribute name="id" type="xs:long" use="optional">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">ID of the group.</xs:documentation>
+                <xs:documentation xml:lang="de-DE">ID der Gruppe.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="sharedShortlistGroupUser">
+        <xs:sequence>
+            <xs:element name="email" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">An Email to send an invitation to join the group and share the
+                        shortlist.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Eine Email Adresse, an die Die Einladung verschickt wird. Dadurch
+                        können die Nutzer gemeinsames Merkzettel teilen.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="common:Email">
+                        <xs:maxLength value="150" />
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="invitedUserFirstName" type="firstName" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">First name of the invited user, who confirms the invitation.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Vorname von dem eingeladenen Nutzer.
+                    </xs:documentation>
+                </xs:annotation>
+
+            </xs:element>
+            <xs:element name="verifierHash" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">An Email to send an invitation to join the group and share the
+                        shortlist.
+                    </xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Eine Email Adresse, an die Die Einladung verschickt wird. Dadurch
+                        können die Nutzer gemeinsames Merkzettel teilen.
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType xml:base="xs:string">
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="16"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+   
+    
+    
+    <xs:element name="sharedEntryId">
+        <xs:complexType>
+            <xs:sequence maxOccurs="1" minOccurs="1">
+                <xs:element name="id" type="xs:long" maxOccurs="1" minOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="shortlistEntryRating">
+        <xs:complexType>
+            <xs:sequence maxOccurs="1" minOccurs="1">
+                <xs:element name="ratingType" type="shortlistEntryRatingType" maxOccurs="1" minOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+  
+    <xs:complexType name="invitedUsersRatingList">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Invited users data including rating of the real estate, that is on the shared
+                shortlist. It is not changeable for PUT.
+            </xs:documentation>
+            <xs:documentation xml:lang="de-DE">Die  Bewertungen der Immobilie von Nutzern, deie zum gemeinsamen
+                Merkzettel eingeladen wurde. Beim PUT ist nicht änderbar.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="1">
+            <xs:element name="rating" type="shortlistEntryRatingType" minOccurs="1" maxOccurs="2"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="shortlistEntryRatingType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BAD">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Bad.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Schlecht.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UNSURE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Unsure about the rating.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Ich weiss nicht.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GOOD">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Good.</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Gut.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:simpleType name="firstName">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">in Bezug auf XML ungültige Zeichen werden bei der Ausgabe ausgefiltert</xs:documentation>
+            <xs:documentation xml:lang="de-DE">invalid characters w.r.t. XML will be filtered out on outgoing responses</xs:documentation>
+            <xs:appinfo>
+                <jaxb:javaType name="java.lang.String"
+                               parseMethod="de.is24.common.xml.XmlSafeCharacterAdapter.unmarshal"
+                               printMethod="de.is24.common.xml.XmlSafeCharacterAdapter.marshal"/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:element name="sharedEntryCommentList">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="entry" type="sharedEntryComment"  maxOccurs="100" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="sharedEntryComment" type="sharedEntryComment"/>
+
+     <xs:complexType name="sharedEntryComment">
+            <xs:sequence maxOccurs="1" minOccurs="1">
+                <xs:element name="textMessage"  minOccurs="0" maxOccurs="1"  >
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:maxLength value="221"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+                <xs:element name="id" type="xs:long" minOccurs="0" maxOccurs="1" >
+                </xs:element>
+
+                <xs:element name="isRequesterComment" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                </xs:element>
+
+                <xs:element name="searcherFirstName" type="common:TextField" minOccurs="0" maxOccurs="1">
+                </xs:element>
+
+                <xs:element name="date" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+                </xs:element>
+
+                <xs:element name="readStatus" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                </xs:element>
+            </xs:sequence>
+     </xs:complexType>
+
+    
+</xs:schema>

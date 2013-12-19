@@ -1,0 +1,1960 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Common schema which will be used within the search API context, so be very careful with incompatible changes. 
+    In case of doubt please contact DEV2-API for support.
+-->
+<xs:schema
+    xmlns="http://rest.immobilienscout24.de/schema/search/savedSearch/1.0"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:common="http://rest.immobilienscout24.de/schema/common/1.0"
+    targetNamespace="http://rest.immobilienscout24.de/schema/search/savedSearch/1.0"
+    elementFormDefault="unqualified"
+    attributeFormDefault="unqualified"
+    version="1.0">
+
+  <xs:import namespace="http://rest.immobilienscout24.de/schema/search/common/1.0" 
+  	schemaLocation="common-1.0.xsd" />
+  <xs:import namespace="http://rest.immobilienscout24.de/schema/common/1.0"/>
+
+  <xs:element name="savedSearches">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Represents all persisted searches of an user.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Repräsentiert alle gespeicherten Gesuche eines Benutzers.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="savedSearch" type="SavedSearch" minOccurs="0" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="savedSearch" type="SavedSearch">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Saved search with all informations.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Ein gespeichertes Gesuch.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="SavedSearch">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Saved search with all informations</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Gesuch mit allen Informationen.</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="searchQuery" type="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen Informationen.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="fulfillmentActivated" type="xs:boolean" minOccurs="0" default="false">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates whether the fulfillment process is acticated.
+          </xs:documentation>
+          <xs:documentation xml:lang="de-DE">Gibt an of der Benachrichtungsservice aktiviert ist.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="name" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Name of this saved search.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Name der Gesuchsspeicherung.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="common:TextField">
+            <xs:maxLength value="60" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:all>
+    <xs:attributeGroup ref="common:Reference" />
+  </xs:complexType>
+
+
+<!-- Query definitions -->
+
+
+  <xs:complexType name="AbstractSearchQuery" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="geoCriteria" type="AbstractGeoCriteria">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Geoinformations of the underlying search.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Geoinformationen der zugrundeliegenden Suche.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+       <xs:element name="fullText" type="common:TextField" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">query for full text search.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Wert für Volltextsuche.</xs:documentation>
+        </xs:annotation>
+      </xs:element>        
+       <xs:element name="strict" type="xs:boolean" minOccurs="0" default="false">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">output as URIs</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Ausgabe als URIs</xs:documentation>
+        </xs:annotation>       
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ApartmentQuery" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Query with all general apartment informations.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Suche mit allen generellen Wohninformationen.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">price rent / buy</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Preis (Miete / Kaufpreis)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="heatingTypes" type="HeatingTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">heating types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Heizungsarttypen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="apartmentTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">apartment types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Wohntypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="apartmentType" type="common:ApartmentType" minOccurs="0" maxOccurs="10">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">apartment type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Wohntyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="livingCriteria" type="LivingCriteria" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">criterias for all living real estates.</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kriterien für alle Wohnimmobilien.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ApartmentRentQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the apartment rent realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Wohnung-Miete Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="ApartmentQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general apartment informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Wohninformationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="promotion" type="common:YesNoBothType" default="BOTH"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">certificate of eligibility needed</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Wohnberechtigungsschein erforderlich</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ApartmentBuyQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the apartment buy realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Wohnung-Kauf Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="ApartmentQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general apartment informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Wohninformationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+	      <xs:element name="rented" type="common:YesNoBothType" default="BOTH">
+	        <xs:annotation>
+	          <xs:documentation xml:lang="en">rented</xs:documentation>
+	          <xs:documentation xml:lang="de-DE">vermietet</xs:documentation>
+	        </xs:annotation>
+	      </xs:element>
+          <xs:element name="buildingProject" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+                      minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">building project</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Neubau-Projekt</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="HouseQuery" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Query with all general house informations.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Suche mit allen generellen Hausinformationen.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">price (rent/buy)</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Preis (Miete / Kaufpreis)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="heatingTypes" type="HeatingTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">heating types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Heizungsarttypen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="buildingTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">building types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gebäudearten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="buildingType" type="common:BuildingType" minOccurs="0" maxOccurs="11">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">building type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Gebäudeart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="livingCriteria" type="LivingCriteria" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">criterias for all living real estates.</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kriterien für alle Wohnimmobilien.</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="areaSize" type="common:AreaRange" minOccurs="0">
+	        <xs:annotation>
+	          <xs:documentation xml:lang="en">plot area</xs:documentation>
+	          <xs:documentation xml:lang="de-DE">Grundstücksfläche</xs:documentation>
+	        </xs:annotation>
+	      </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="HouseRentQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the house rent realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Haus-Miete Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="HouseQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general house informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Hausinformationen.</xs:documentation>
+        </xs:annotation>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="HouseBuyQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the house buy realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Haus-Kauf Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="HouseQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general house informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Hausinformationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+	      <xs:element name="rented" type="common:YesNoBothType" default="BOTH">
+	        <xs:annotation>
+	          <xs:documentation xml:lang="en">rented</xs:documentation>
+	          <xs:documentation xml:lang="de-DE">vermietet</xs:documentation>
+	        </xs:annotation>
+	      </xs:element>
+          <xs:element name="constructionPhaseTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">construction phase types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Bauphasen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="constructionPhaseType" type="common:ConstructionPhaseType" minOccurs="0"
+                  maxOccurs="4">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">construction phase type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Bauphase</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="lodgerFlat" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">lodger flat</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Einliegerwohnung</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="buildingProject" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+                      minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">building project</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Neubau-Projekt</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ShortTermAccommodationQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the short term accommodation realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Wohnen auf Zeit Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="shortTermAccommodationType" type="common:ShortTermAccommodationType" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">short term accommodation types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Art der Unterkunft</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="startRentalDate" type="xs:date" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">start rental date</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Bezugsfrei ab</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">total rent</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesamtmiete</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="rentInterval" type="common:DurationType" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">rent interval per day, week or month</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Miete pro Tag/Woche/Monat</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="furniture" type="common:YesNoBothType" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">has furniture</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Möbliert</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="smokingAllowed" type="common:YesNoBothType" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">smoker</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Rauchen erlaubt</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="minNumberOfPersons" type="common:Number1.0Type" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">minimum numbers of persons</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Belegung mindestens für ... Personen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="cellar" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">cellar</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Keller</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="guestToilet" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">guest toilet</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gästetoilette</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="parking" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">parking space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Garage / Stellplatz</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeDuration" type="common:Number1.0Type" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free duration</xs:documentation>
+              <xs:documentation xml:lang="de-DE">frei für mindestens</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeInterval" type="common:DurationType" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free interval</xs:documentation>
+              <xs:documentation xml:lang="de-DE">frei für ... Tag / Woche / Monat</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="FlatShareRoomQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the flat share room realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den WG-Zimmer Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">base rent</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kaltmiete</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="roomSize" type="common:AreaRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">room size</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Zimmergröße</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeFrom" type="xs:date" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free from</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Bezugsfrei ab</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="rentDuration" type="common:FlatShareRentDuration" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">rent duration</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Mietdauer</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="furnishing" type="common:YesNoNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">furnishing</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Möbliert</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="smokingAllowed" type="common:SmokingAllowedType" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">smoking allowed</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Rauchen erlaubt</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="flatMateGenderTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">flat mate gender types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesuchte Mitbewohner</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="flatMateGenderType" type="common:FlatMateGenderType" minOccurs="0" maxOccurs="2">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">flat mate gender type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Gesuchter Mitbewohner</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="flatShareSize" type="common:FlatShareSearchSize" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">flat share size</xs:documentation>
+              <xs:documentation xml:lang="de-DE">WG-Größe</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="internetConnectionTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">internet connection types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Internet Typen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="internetConnectionType" type="common:InternetConnectionType" minOccurs="0"
+                  maxOccurs="2">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">internet connection type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Internet Typ</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="petsAllowedTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">pets allowed types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Haustiere erlaubt Typen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="petsAllowedType" type="common:PetsAllowedType" minOccurs="0" maxOccurs="2">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">pets allowed type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Haustiere erlaubt</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="cooker" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">cooker</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Herd</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="fridge" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">fridge</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kühlschrank</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="oven" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">oven</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Backofen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="dishwasher" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">dishwasher</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Spülmaschine</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="handicappedAccessible" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">handicapped accessible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Barrierefrei</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="GarageBuyQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the garage buy realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Garage-Kauf Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">purchase Price</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kaufpreis</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="garageTypes" type="GarageTypes">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">garage types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Garagentypen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="GarageRentQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the garage rent realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Garage-Miete Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">base rent</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesamtmiete</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="garageTypes" type="GarageTypes">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">garage types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Garagentypen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="GarageTypes">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">garage types</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Garagentypen</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="garageType" type="common:GarageQueryType" minOccurs="0" maxOccurs="2">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">garage type</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Garagentyp</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="LivingRentSiteQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the living rent site realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Wohngründstück-Miete Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="SiteQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general site informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Grundstücksinformationen.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="commercializationTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">commercialization types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Vermarktungsarten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="commercializationType" type="common:CommercializationType" minOccurs="0"
+                  maxOccurs="3">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">commercialization type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Vermarktungsart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="LivingBuySiteQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the living buy site realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Wohngründstück-Kauf Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="SiteQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general site informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Grundstücksinformationen.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="commercializationTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">commercialization types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Vermarktungsarten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="commercializationType" type="common:CommercializationType" minOccurs="0"
+                  maxOccurs="3">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">commercialization type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Vermarktungsart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="TradeSiteQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the trade site realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Gewerbegründstück-Miete Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="SiteQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general site informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Grundstücksinformationen.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="commercializationTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">commercialization types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Vermarktungsarten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="commercializationType" type="common:CommercializationType" minOccurs="0"
+                  maxOccurs="4">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">commercialization type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Vermarktungsart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="utilizationTradeSites" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">utilization trade site</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nutzungsarten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="utilizationTradeSite" type="common:UtilizationTradeSite" minOccurs="0" maxOccurs="3">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">utilization trade site</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Nutzungsart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="SiteQuery" abstract="true">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Query with all general site informations.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Suche mit allen generellen Grundstücksinformationen.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">price (rent/buy/lease/long lease)</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Preis (Kauf / Miete/ Pacht / Erbpacht)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="areaSize" type="common:AreaRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">area Size</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Grundstücksfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="siteDevelopmentTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">site development types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Erschließungsarten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="siteDevelopmentType" type="common:SiteDevelopmentType" minOccurs="0" maxOccurs="3">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">site development type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Erschließungsart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="siteConstructibleTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">site constructible types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Bebaubar nach</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="siteConstructibleType" type="common:SiteConstructibleType" minOccurs="0"
+                  maxOccurs="3">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">site constructible type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Bebaubar nach</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="shortTermConstructible" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">short term constructible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kurzfristig bebaubar</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="buildingLicence" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+            minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">building allowed</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Baugenehmigung</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="CommercialQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the commercial realestate types.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für kommerzielle Immobilientypen.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+	  <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">price (rent per month/sqm,  purchase price)</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Preis (Miete pro Monat/qm, Kaufpreis)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="priceType" type="common:PriceType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">pricetpye (rent per month/sqm,  purchase price)</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Preistyp (Miete pro Monat/qm, Kaufpreis)</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+      	</xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>	
+
+  <xs:complexType name="OfficeQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the office realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Büro/Praxis Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CommercialQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="officeTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">office types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Bürotypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="officeType" type="common:OfficeType" minOccurs="0" maxOccurs="14">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">office type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Bürotyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="officeRentDurations" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">rent duarations</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Mietdauer</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="officeRentDuration" type="common:OfficeRentDuration" minOccurs="0" maxOccurs="4">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">rent duration</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Mietdauer</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="netFloorSpace" type="common:AreaRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">net floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Büro/Praxis Fläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="areaDivisible" type="common:YesNotApplicableType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">area divisible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">auch teilbare Angebote</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="barrierfree" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">barrierfree</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Barrierefrei</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="heavyCurrent" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">heavy current</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Starkstrom</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="itInfrastructureTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">IT infrastructure types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">DV-Verkabelung</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="itInfrastructureType" type="common:ItInfrastructureType" minOccurs="0" maxOccurs="4">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">IT infrastructure type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">DV-Verkabelung</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="airConditioningTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">air conditioning types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Klimaanlage Typen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="airConditioningType" type="common:AirConditioningType" minOccurs="0" maxOccurs="4">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">air conditioning type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Klimaanlage Typ</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="numberOfParkingSpaces" type="common:ParkingSpaceRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">number of parking spaces</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Anzahl Parkplätze</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="StoreQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the store realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Einzelhandel Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CommercialQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="storeTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">store types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Einzelhandelstypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="storeType" type="common:StoreType" minOccurs="0" maxOccurs="10">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">store type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Einzelhandelstyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="netFloorSpace" type="common:AreaRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">net floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Verkaufsfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="totalFloorSpace" type="common:AreaRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">total floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesamtfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="cellar" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">cellar</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Keller</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="areaDivisible" type="common:YesNotApplicableType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">area divisible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">auch teilbare Angebote</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="locationClassificationTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">location classification types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Lagearten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="locationClassificationType" type="common:LocationClassificationType" minOccurs="0"
+                  maxOccurs="4">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">location classification type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Lageart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="GastronomyQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the gastronomy realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Gastronomie Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CommercialQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="totalFloorSpace" type="common:AreaRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">total floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesamtfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="gastronomyTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">gastronomy types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gastronomietypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="gastronomyType" type="common:GastronomyType" minOccurs="0" maxOccurs="11">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">gastronomy typ</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Gastronomietyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="numberBeds" type="NumberOfRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">number of beds</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Anzahl Betten</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="numberSeats" type="NumberOfRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">number of seats</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Anzahl Plätze im Gastraum</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="cellar" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">cellar</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Keller</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="IndustryQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the industry realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Industrie Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CommercialQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="industryTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">industry types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Industrietypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="industryType" type="common:IndustryType" minOccurs="0" maxOccurs="14">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">industry typ</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Industrietyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="netFloorSpace" type="common:AreaRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">net floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Lager / Produktionsfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="totalFloorSpace" type="common:AreaRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">total floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesamtfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="goodsLift" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">goods lift</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Lastenaufzug</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="autoLift" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">auto lift</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Hebebühne</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ramp" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">ramp</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Rampe</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="craneRunway" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">crane runway</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Krahnbahn</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="areaDivisible" type="common:YesNotApplicableType" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">area divisible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">auch teilbare Angebote</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="SpecialPurposeQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the special purpose realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Spezialgewerbe Immobilientyp.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="CommercialQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="totalFloorSpace" type="common:AreaRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">total floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Gesamtfläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="specialPurposeTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">special purpose types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Spezialgewerbearten</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="specialPurposeType" type="common:SpecialPurposeType" minOccurs="0"
+                  maxOccurs="10">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">special purpose type</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Spezialgewerbeart</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="cellar" type="common:YesNotApplicableType">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">cellar</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Keller</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="InvestmentQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the investment realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Analgen Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="price" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">purchase price</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kaufpreis</xs:documentation>
+            </xs:annotation>
+          </xs:element>        
+          <xs:element name="investmentTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">investment types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Anlagetypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="investmentType" type="common:InvestmentType" minOccurs="0" maxOccurs="19">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">investment typ</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Anlagetyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="netFloorSpace" type="common:AreaRange">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">net floor space</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Vermietbare Fläche</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="pricePerSqm" type="common:PriceRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">price per sqm</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Quadratmeterpreis</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="priceMultiplier" type="PriceMultiplierRange" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">price multiplier</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Preismultiplizierer</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="freeOfCourtageOnly" type="common:YesNotApplicableType"
+             default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">free of courtage only</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Nur provisionsfreie Objekte</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+   <xs:complexType name="CompulsoryAuctionQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the compulsory auction realestate type.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Zwangsversteigerung Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="auctionObjectTypes" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">compulsory auction types</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Zwangsversteigerungstypen</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="auctionObjectType" type="common:CompulsoryAuctionType" minOccurs="0" maxOccurs="5">
+                  <xs:annotation>
+                    <xs:documentation xml:lang="en">compulsory auction</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Zwangsversteigerungstyp</xs:documentation>
+                  </xs:annotation>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="marketValue" type="common:PriceRange" minOccurs="0">
+	        <xs:annotation>
+	          <xs:documentation xml:lang="en">market value</xs:documentation>
+	          <xs:documentation xml:lang="de-DE">Verkehrswert</xs:documentation>
+	        </xs:annotation>
+	      </xs:element>
+	      <xs:element name="recurrenceAppointment" type="common:YesNotApplicableType" minOccurs="0">
+	        <xs:annotation>
+	          <xs:documentation xml:lang="en">recurrence appointment</xs:documentation>
+	          <xs:documentation xml:lang="de-DE">Zweitversteigerung</xs:documentation>
+	        </xs:annotation>
+	      </xs:element>
+	      <xs:element name="splittingAuction" type="common:YesNotApplicableType" minOccurs="0">
+	        <xs:annotation>
+	          <xs:documentation xml:lang="en">splitting auction</xs:documentation>
+	          <xs:documentation xml:lang="de-DE">Teilungsversteigerung</xs:documentation>
+	        </xs:annotation>
+	      </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>  
+  <xs:complexType name="AssistedLivingQuery">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Search elements for the assisted living realestate type.
+      </xs:documentation>
+      <xs:documentation xml:lang="de-DE">Sucheigenschaften für den Seniorenwohnen Immobilientyp.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="AbstractSearchQuery">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Query with all general informations.</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Suche mit allen generellen Informationen.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence> 
+          <xs:element name="forPurchase" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">for purchase</xs:documentation>
+              <xs:documentation xml:lang="de-DE">zum Kauf</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="forRent" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">for sale</xs:documentation>
+              <xs:documentation xml:lang="de-DE">zur Miete</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="cookingFacilities" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">cooking facilities available</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Kochmöglichkeit vorhanden</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="balcony" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">balcony</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Balkon/Terrasse</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="parking" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">parking available</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Garage/Stellplatz</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="garden" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">garden available</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Garten/Parkanlage</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="barrierFree" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">barrierfree</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Barrierefrei</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ownFurniture" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">own furniture possible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Mitnahme eigener Möbel</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="petsAllowed" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">pets allowed</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Haustiere erlaubt</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="trialLiving" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">trial living possible</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Probewohnen</xs:documentation>
+            </xs:annotation>
+          </xs:element>
+          <xs:element name="ambulantNursingService" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">ambulant nursing service available</xs:documentation>
+              <xs:documentation xml:lang="de-DE">Ambulanter Pflegedienst</xs:documentation>
+            </xs:annotation>
+          </xs:element>    
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+	<xs:complexType name="SeniorCareQuery">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Search properties for
+				senior care facilities.</xs:documentation>
+			<xs:documentation xml:lang="de-DE">Sucheigenschaften für
+				Altenpflegeeinrichtungen.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="AbstractSearchQuery">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Query with general
+						information.</xs:documentation>
+					<xs:documentation xml:lang="de-DE">Suche mit generellen
+						Wohninformationen.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+
+					<xs:element name="seniorCareLevels" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care level
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflegestufe
+							</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="seniorCareLevel" type="common:CareLevel"
+									minOccurs="0" maxOccurs="3">
+									<xs:annotation>
+										<xs:documentation xml:lang="en">Care Level
+										</xs:documentation>
+										<xs:documentation xml:lang="de-DE">Versorgung der Pflegestufe
+										</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+
+					<xs:element name="roomTypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Room type
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Zimmertyp
+							</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="roomType" type="common:RoomType"
+									minOccurs="0" maxOccurs="2">
+									<xs:annotation>
+										<xs:documentation xml:lang="en">Room type
+										</xs:documentation>
+										<xs:documentation xml:lang="de-DE">Zimmertyp
+										</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+
+					<xs:element name="careTypes" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care type
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflegeplatztyp
+							</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="careType" type="common:CareType"
+									minOccurs="0" maxOccurs="4">
+									<xs:annotation>
+										<xs:documentation xml:lang="en">Care type
+										</xs:documentation>
+										<xs:documentation xml:lang="de-DE">Pflegeplatztyp
+										</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+
+					<xs:element name="balcony" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Balcony/ Patio
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Balkon/ Terrasse
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="petsAllowed" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Pets allowed
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Haustiere erlaubt
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfAlzheimer" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Alzheimer
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von
+								Alzheimer-Patienten
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfParkinson" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Parkinson
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von
+								Parkinson-Patienten
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfMultipleSclerosis" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Multiple
+								Sclerosis (MS)
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von Patienten
+								mit Multipler Sklerose (MS)
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfComaVigil" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Coma Vigil
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von
+								Wachkoma-Patienten
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfDementia" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Dementia
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von
+								demenzkranken Menschen
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfArtificialRespiration" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Artificial
+								Respiration
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von
+								beatmungspflichtigen Menschen
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+					<xs:element name="careOfStroke" type="common:YesNotApplicableType"
+						default="NOT_APPLICABLE" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">Care of Stroke
+							</xs:documentation>
+							<xs:documentation xml:lang="de-DE">Pflege von
+								Schlaganfall-Patienten
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+
+<!-- Criteria definitons -->
+
+
+  <xs:complexType name="LivingCriteria">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">criterias for all living real estates.</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Kriterien für alle Wohnimmobilien.</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="numberOfRooms" type="common:NumberOfRoomsRange" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">number of rooms</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Anzahl Räume</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="livingSpace" type="common:AreaRange" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">living space</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Wohnfläche</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="constructionYear" type="common:YearRange" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">construction year</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Baujahr</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="handicappedAccessible" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">is handicapped accessible</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Barrierefrei</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="cellar" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">cellar</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Keller</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="builtInKitchen" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">built-in kitchen</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Einbauküche</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="parkingSpace" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">parking space</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Garage/Stellplatz</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="balcony" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">balcony</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Balkon</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="garden" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">garden</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Garten</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="lift" type="common:YesNotApplicableType" default="NOT_APPLICABLE" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">lift</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Personenaufzug</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="guestToilet" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">guest toilet</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Gästetoilette</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="assistedLiving" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">assisted living</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Seniorengerechtes Wohnen</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="newBuilding" type="common:YesNotApplicableType" default="NOT_APPLICABLE"
+        minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">new building</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Neubau</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="floor" type="common:FloorRange" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">floor</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Etage</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+
+
+
+  <xs:complexType name="NumberOfRange">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">range for several number ranges</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Bereich verschiedene Nummernbereiche</xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="minimal" type="common:Number4.0Type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">minimal number</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Minimale Nummer</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maximal" type="common:Number4.0Type" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">maximal number</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Maximale Nummer</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="PriceMultiplierRange">
+    <xs:all>
+      <xs:element name="minimal" type="common:PriceMultiplierType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">minimal price multiplier</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Minimaler Preismultiplikator</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="maximal" type="common:PriceMultiplierType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">maximal price multiplier</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Maximaler Preismultiplikator</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+
+<!-- Other definitions -->
+
+
+  <xs:complexType name="HeatingTypes">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">heating types</xs:documentation>
+      <xs:documentation xml:lang="de-DE">Heizungsarten</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="heatingType" type="common:HeatingType" minOccurs="0" maxOccurs="3">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">heating type</xs:documentation>
+          <xs:documentation xml:lang="de-DE">Heizungsart</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+    <xs:complexType name="AbstractGeoCriteria" abstract="true">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">general type for geo criteria</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Generelles Element für die Geo Criterias</xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+
+    <xs:complexType name="RadiusCriteria">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">radius criteria</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Kriterien für die Umkreissuche</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="AbstractGeoCriteria">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">general type for geo criteria</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Generelles Element für die Geo Criterias</xs:documentation>
+                </xs:annotation>
+                <xs:all>
+                    <xs:element name="wgs84" type="common:Wgs84Coordinate">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">WGS84 Coordinate (GPS)</xs:documentation>
+                            <xs:documentation xml:lang="de-DE">WGS84-Koordinate (GPS)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="radiusKm">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">radius for the radius search</xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Radius der Umkreissuche</xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:double">
+                                <xs:minExclusive value="0" />
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:all>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RegionCriteria">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">region criteria</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Kriterien für die Regionssuche</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="AbstractGeoCriteria">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">general type for geo criteria</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Generelles Element für die Geo Criterias</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="geoInfoNodeCriteria" type="GeoInfoNodeCriteria" maxOccurs="unbounded">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">list of is24 geo ids.</xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Liste der IS24 Geo-Ids.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="GeoInfoNodeCriteria">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">list of is24 geo ids.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Liste der IS24 Geo-Ids.</xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="continentId" type="xs:long">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">continent id</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Kontinent Id</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="countryId" type="xs:long">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">country id</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Land Id</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="regionId" type="xs:long" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">region id</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Bundesland Id</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="cityId" type="xs:long" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">city id</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Stadt Id</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="districtId" type="xs:long" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">district id</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Stadtteil/Bezirk Id</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+
+
+
+</xs:schema>
