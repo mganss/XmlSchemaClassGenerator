@@ -58,7 +58,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 return;
             }
 
-            files = files.SelectMany(f => Directory.GetFiles(Path.GetDirectoryName(f), Path.GetFileName(f))).ToList();
+            files = files.SelectMany(f => Glob.Glob.ExpandNames(f)).ToList();
 
             SimpleModel.IntegerDataType = integerType;
 
@@ -84,7 +84,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
         {
             System.Console.WriteLine("Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...");
             System.Console.WriteLine("Generate C# classes from XML Schema files.");
-            System.Console.WriteLine("xsdFiles may contain wildcards in the file part.");
+            System.Console.WriteLine(@"xsdFiles may contain globs, e.g. ""content\{schema,xsd}\**\*.xsd"".");
             System.Console.WriteLine();
             System.Console.WriteLine("Options:");
             p.WriteOptionDescriptions(System.Console.Out);
