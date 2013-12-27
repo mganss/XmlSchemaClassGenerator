@@ -299,7 +299,7 @@ namespace XmlSchemaClassGenerator
 
             member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
-            if (DefaultValue == null && IsNullable && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType)))
+            if (DefaultValue == null && IsNullable && !(IsCollection || isArray) && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType)))
             {
                 var specifiedMember = new CodeMemberField(typeof(bool), Name + "Specified { get; set; }");
                 var ignoreAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute)));
