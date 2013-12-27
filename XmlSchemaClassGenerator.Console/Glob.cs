@@ -183,12 +183,36 @@ namespace Glob
             return regexOrString;
         }
 
+        private static char[] GlobCharacters = "*?[]{}".ToCharArray();
+
         private IEnumerable<FileSystemInfo> Expand(string path, bool dirOnly)
         {
             if (Cancelled) yield break;
 
             if (string.IsNullOrEmpty(path))
             {
+                yield break;
+            }
+
+            // stop looking if there are no more glob characters in the path.
+            // but only if ignoring case because FileSystemInfo.Exists always ignores case.
+            if (IgnoreCase && path.IndexOfAny(GlobCharacters) < 0)
+            {
+                FileSystemInfo fsi = null;
+                bool exists = false;
+
+                try
+                {
+                    fsi = dirOnly ? (FileSystemInfo)new DirectoryInfo(path) : new FileInfo(path);
+                    exists = fsi.Exists;
+                }
+                catch (Exception ex)
+                {
+                    Log("Error getting FileSystemInfo for '{0}': {1}", path, ex);
+                    if (ThrowOnError) throw;
+                }
+
+                if (exists) yield return fsi;
                 yield break;
             }
 
