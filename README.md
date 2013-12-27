@@ -28,7 +28,7 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-xsdFiles may contain wildcards in the file part.
+xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd".
 
 Options:
   -h, --help                 show this message and exit
