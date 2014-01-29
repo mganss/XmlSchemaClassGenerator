@@ -206,6 +206,8 @@ namespace XmlSchemaClassGenerator
 
     public class PropertyModel
     {
+        public static bool GenerateNullables { get; set; }
+
         public TypeModel OwningType { get; set; }
         public string Name { get; set; }
         public bool IsAttribute { get; set; }
@@ -238,12 +240,16 @@ namespace XmlSchemaClassGenerator
             var typeClassModel = Type as ClassModel;
             var isArray = !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1;
             var propertyType = !isArray ? Type : typeClassModel.Properties[0].Type;
+            var isNullableValueType = DefaultValue == null 
+                && IsNullable && !(IsCollection || isArray) 
+                && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType));
 
             var typeReference = propertyType.GetReferenceFor(OwningType.Namespace, IsCollection || isArray);
 
             if (DefaultValue == null)
             {
-                member = new CodeMemberField(typeReference, Name);
+                var propertyName = isNullableValueType && GenerateNullables ? Name + "Value" : Name;
+                member = new CodeMemberField(typeReference, propertyName);
                 // hack to generate automatic property
                 member.Name += IsCollection || isArray ? " { get; private set; }" : " { get; set; }";
             }
@@ -299,9 +305,10 @@ namespace XmlSchemaClassGenerator
 
             member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
-            if (DefaultValue == null && IsNullable && !(IsCollection || isArray) && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType)))
+            if (isNullableValueType)
             {
-                var specifiedMember = new CodeMemberField(typeof(bool), Name + "Specified { get; set; }");
+                var specifiedName = GenerateNullables ? Name + "Value" : Name;
+                var specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
                 var ignoreAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute)));
                 specifiedMember.CustomAttributes.Add(ignoreAttribute);
                 specifiedMember.Attributes = (specifiedMember.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
@@ -309,6 +316,52 @@ namespace XmlSchemaClassGenerator
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
                 specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
                 typeDeclaration.Members.Add(specifiedMember);
+
+                if (GenerateNullables)
+                {
+                    // public X? Name
+                    // {
+                    //      get { return NameSpecified ? NameValue : null; }
+                    //      set 
+                    //      { 
+                    //          NameValue = value.GetValueOrDefault();
+                    //          NameSpecified = value.HasValue;
+                    //      }
+                    // }
+
+                    var nullableType = new CodeTypeReference(typeof(Nullable<>));
+                    nullableType.TypeArguments.Add(typeReference);
+                    var nullableMember = new CodeMemberProperty
+                    {
+                        Type = nullableType,
+                        Name = Name,
+                        HasSet = true,
+                        HasGet = true,
+                    };
+                    nullableMember.Attributes = (nullableMember.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
+                    nullableMember.CustomAttributes.Add(ignoreAttribute);
+                    nullableMember.Comments.AddRange(member.Comments);
+
+                    var specifiedExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), specifiedName + "Specified");
+                    var valueExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name + "Value");
+                    var conditionStatement = new CodeConditionStatement(specifiedExpression,
+                        new[] { new CodeMethodReturnStatement(valueExpression) },
+                        new[] { new CodeMethodReturnStatement(new CodePrimitiveExpression(null)) });
+                    nullableMember.GetStatements.Add(conditionStatement);
+
+                    var getValueOrDefaultExpression = new CodeMethodInvokeExpression(new CodePropertySetValueReferenceExpression(), "GetValueOrDefault");
+                    var setValueStatement = new CodeAssignStatement(valueExpression, getValueOrDefaultExpression);
+                    var hasValueExpression = new CodePropertyReferenceExpression(new CodePropertySetValueReferenceExpression(), "HasValue");
+                    var setSpecifiedStatement = new CodeAssignStatement(specifiedExpression, hasValueExpression);
+                    nullableMember.SetStatements.AddRange(new[] { setValueStatement, setSpecifiedStatement });
+
+                    typeDeclaration.Members.Add(nullableMember);
+
+                    var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute)));
+                    editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(EditorBrowsableState)), "Never")));
+                    specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
+                    member.CustomAttributes.Add(editorBrowsableAttribute);
+                }
             }
             else if ((IsCollection || isArray) && IsNullable && !IsAttribute)
             {

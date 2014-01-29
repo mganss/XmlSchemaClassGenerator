@@ -20,6 +20,7 @@ namespace XmlSchemaClassGenerator.Console
             var integerType = typeof(string);
             var namespacePrefix = "";
             var verbose = false;
+            var nullables = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -47,7 +48,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                          }
                                      } },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
-                { "v|verbose", "print generated file names on stdout", v => verbose = v != null }
+                { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
+                { "0|nullable", "generate nullable accessor properties for optional elements/attributes w/o default values", v => nullables = v != null },
             };
 
             var files = options.Parse(args);
@@ -76,6 +78,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             };
 
             if (verbose) generator.Log = s => System.Console.Out.WriteLine(s);
+
+            PropertyModel.GenerateNullables = nullables;
 
             generator.Generate(files);
         }
