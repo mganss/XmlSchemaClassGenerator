@@ -24,6 +24,19 @@ namespace XmlSchemaClassGenerator
         public string OutputFolder { get; set; }
         public Action<string> Log { get; set; }
 
+        public bool GenerateNullables
+        {
+            get
+            {
+                return PropertyModel.GenerateNullables;
+            }
+
+            set
+            {
+                PropertyModel.GenerateNullables = value;
+            }
+        }
+
         private XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<string, NamespaceModel> Namespaces = new Dictionary<string, NamespaceModel>();

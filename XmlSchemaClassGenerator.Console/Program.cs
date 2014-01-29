@@ -74,12 +74,11 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                     return name;
                 },
                 NamespaceMapping = namespaces.Select(n => n.Split('=')).ToDictionary(n => n[0], n => n[1]),
-                OutputFolder = outputFolder
+                OutputFolder = outputFolder,
+                GenerateNullables = nullables,
             };
 
             if (verbose) generator.Log = s => System.Console.Out.WriteLine(s);
-
-            PropertyModel.GenerateNullables = nullables;
 
             generator.Generate(files);
         }
