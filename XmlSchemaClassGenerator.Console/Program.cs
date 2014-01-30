@@ -49,7 +49,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                      } },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
                 { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
-                { "0|nullable", "generate nullable accessor properties for optional elements/attributes w/o default values", v => nullables = v != null },
+                { "0|nullable", "generate nullable adapter properties for optional elements/attributes w/o default values", v => nullables = v != null },
             };
 
             var files = options.Parse(args);
