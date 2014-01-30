@@ -81,7 +81,7 @@ with "Specified" appended to the name to signal if the original property should 
 For example:
 
 ```xml
-<xs:attribute name="id" type="xs:int">...</xs:attribute>
+<xs:attribute name="id" type="xs:int" use="optional">...</xs:attribute>
 ```
 
 ```C#
