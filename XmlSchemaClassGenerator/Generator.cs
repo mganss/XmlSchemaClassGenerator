@@ -250,7 +250,7 @@ namespace XmlSchemaClassGenerator
                 var attributes = classModel.BaseClass != null ? ((XmlSchemaComplexContentExtension)complexType.ContentModel.Content).Attributes
                     : complexType.Attributes;
                 foreach (var attribute in attributes.OfType<XmlSchemaAttribute>()
-                    .Concat(complexType.Attributes.OfType<XmlSchemaAttributeGroupRef>().SelectMany(r => AttributeGroups[r.RefName].Attributes.Cast<XmlSchemaAttribute>()))
+                    .Concat(attributes.OfType<XmlSchemaAttributeGroupRef>().SelectMany(r => AttributeGroups[r.RefName].Attributes.Cast<XmlSchemaAttribute>()))
                     .Where(a => a.Use != XmlSchemaUse.Prohibited))
                 {
                     var attributeName = ToTitleCase(attribute.QualifiedName.Name);
