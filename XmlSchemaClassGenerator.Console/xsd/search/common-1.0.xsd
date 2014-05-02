@@ -280,13 +280,24 @@
 		<xs:complexContent>
 			<xs:extension base="RealEstateForList">
 				<xs:sequence>
-					<xs:group ref="common:BaseSeniorCareGroup"></xs:group>
-				</xs:sequence>
+					<xs:group ref="common:BaseSenior"></xs:group>
+
+                    <!-- maxOccurs makes not sense, but the fucking is24 cxf json fix dreaded the careTypes attribute as array anyway. -->
+                    <xs:element name="careTypes" type="common:CareTypes" minOccurs="0" maxOccurs="unbounded"/>
+
+                    <xs:element name="balcony" type="xs:boolean">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">has a balcony</xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Balkon</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+
+                </xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:complexType name="RealEstateForList" abstract="true">
+    <xs:complexType name="RealEstateForList" abstract="true">
 		<xs:annotation>
 			<xs:documentation xml:lang="en">General elements for all real estates within the search context.
       </xs:documentation>
@@ -301,21 +312,148 @@
 							<xs:documentation xml:lang="de-DE">Veröffentlichungsstatus der Immobilie.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="titlePicture" type="common:Picture">
+					<xs:element name="titlePicture" type="SearchPicture">
 						<xs:annotation>
 							<xs:documentation xml:lang="en">The first picture attachment of this real estate</xs:documentation>
 							<xs:documentation xml:lang="de-DE">Der erste Bildanhang dieser Immobilie</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-		      <xs:element name="floorplan" type="xs:boolean" minOccurs="0">
-		        <xs:annotation>
-		          <xs:documentation xml:lang="en">has as attachment a floorplan</xs:documentation>
-		          <xs:documentation xml:lang="de-DE">Grundriss als Objektbild vorhanden</xs:documentation>
-		        </xs:annotation>
-		      </xs:element>
+                      <xs:element name="floorplan" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                          <xs:documentation xml:lang="en">has as attachment a floorplan</xs:documentation>
+                          <xs:documentation xml:lang="de-DE">Grundriss als Objektbild vorhanden</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="streamingVideo" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                          <xs:documentation xml:lang="en">has a streaming video attached.</xs:documentation>
+                          <xs:documentation xml:lang="de-DE">Ein Streaming Video ist vorhanden.</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="listingType" type="ListingTypes" minOccurs="1" default="S">
+                        <xs:annotation>
+                          <xs:documentation xml:lang="en">The VIA-Power listing type. (S, M, L or XL)</xs:documentation>
+                          <xs:documentation xml:lang="de-DE">Der VIA-Power Listing Typ. (S, M, L oder XL)</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="showcasePlacementColor" type="xs:string" minOccurs="0">
+                        <xs:annotation>
+                          <xs:documentation xml:lang="en">Color of title bar for showcase. Default: #343434</xs:documentation>
+                          <xs:documentation xml:lang="de-DE">Farbe der Titleleiste bei Schaufenster. Default: #343434</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="privateOffer" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                          <xs:documentation xml:lang="en">is a property listing by a private person.</xs:documentation>
+                          <xs:documentation xml:lang="de-DE">Ist ein Inserat von einer Privatperson.</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                      <xs:element name="realtorLogo" type="xs:anyURI" minOccurs="0">
+                        <xs:annotation>
+                          <xs:documentation xml:lang="en">The logo of a realtor.</xs:documentation>
+                          <xs:documentation xml:lang="de-DE">Das Logo des Anbieters.</xs:documentation>
+                        </xs:annotation>
+                      </xs:element>
+                    <xs:element name="additionalPictures" minOccurs="0" type="common:Attachments">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">Additional pictures for the object. The values floorplan and titlePicture are always false to ensure downward compatibility.</xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Weitere Bilder für das Objekt. Die Werte floorplan und titlePicture sind immer false, um die Abwärtskompatibilität zu gewährleisten.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+
+    <xs:complexType name="SearchPicture">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">A single picture.</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Ein Bild</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="common:Attachment">
+                <xs:sequence>
+                    <xs:element name="floorplan" type="xs:boolean" default="false">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">Indicates whether this picture represents a floorplan.
+                            </xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Gibt an ob dieses Bild einen Grundriss darstellt.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="titlePicture" type="xs:boolean" default="false">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">Indicates whether this picture is the titlepicture of this
+                                real estate.
+                            </xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Gibt an, ob dieses Bild das Titelbild dieser Immobilie
+                                ist.
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <!-- maxOccurs makes not sense, but the fucking is24 cxf json fix dreaded the urls attribute as array anyway. -->
+                    <xs:element name="urls" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="url" minOccurs="1" maxOccurs="unbounded">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en">URL for the picture.</xs:documentation>
+                                        <xs:documentation xml:lang="de-DE">URL des Bildes.</xs:documentation>
+                                    </xs:annotation>
+                                    <xs:complexType>
+                                        <xs:attribute name="scale" type="common:PictureScaleType">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en">picture scale</xs:documentation>
+                                                <xs:documentation xml:lang="de-DE">Bildergröße</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:attribute>
+                                        <xs:attribute name="href" type="xs:anyURI">
+                                            <xs:annotation>
+                                                <xs:documentation xml:lang="en">URL to scaled picture</xs:documentation>
+                                                <xs:documentation xml:lang="de-DE">URL zum skaliertem Bild</xs:documentation>
+                                            </xs:annotation>
+                                        </xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    
+    <xs:simpleType name="ListingTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="de-DE">Enum für die verschiedenen Listing-Typen in der Ergebnisliste.</xs:documentation>
+            <xs:documentation xml:lang="en">Enum for the different listing types on the resultlist.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="S">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de-DE">Listing Typ: S. Das kleinste Listing..</xs:documentation>
+                    <xs:documentation xml:lang="en">Listing type: S: The smallest listing.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="M">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de-DE">Listing Typ: M. Das zweit kleinste Listing.</xs:documentation>
+                    <xs:documentation xml:lang="en">Listing type: M. The second smallest listing.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="L">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de-DE">Listing Typ: L. Das zweit größte Listing.</xs:documentation>
+                    <xs:documentation xml:lang="en">Listing type: L. The second largest listing.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="XL">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de-DE">Listing Typ: XL. Das größte Listing.</xs:documentation>
+                    <xs:documentation xml:lang="en">Listing type: XL. The largest listing.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
 
 </xs:schema>

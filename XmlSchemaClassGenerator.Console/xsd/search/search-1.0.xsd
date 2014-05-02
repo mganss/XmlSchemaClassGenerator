@@ -20,10 +20,54 @@
       <xs:sequence>
       	<xs:element name="paging" type="common:Paging" minOccurs="0"/>
         <xs:element name="matchCountList" type="common:MatchCountList" minOccurs="0"/>
-  	  	<xs:element name="resultlistEntries" type="ResultlistEntries"/>  		      
+        <!-- max Occurs 2 makes not sense, BUT!!! a bug in our Json Workaround Code treat resultlistEntries as list. -->
+  	  	<xs:element name="resultlistEntries" type="ResultlistEntries" minOccurs="1" maxOccurs="2"/>
+        <xs:element name="description" type="ResultlistDescription" minOccurs="0"/>
+        <xs:element name="recommendations" type="ResultlistRecommendations" minOccurs="0"/>
+        <xs:element name="advertisement" type="ResultlistAdvertisement" minOccurs="0"/>
       </xs:sequence>
     </xs:complexType>   
   </xs:element>
+
+  <xs:simpleType name="ResultlistRecommendationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="COURTAGE"/>
+      <xs:enumeration value="GEO"/>
+      <xs:enumeration value="PRICE"/>
+      <xs:enumeration value="ROOM"/>
+      <xs:enumeration value="AREA"/>
+      <xs:enumeration value="POTENTIAL_HOMES"/>
+      <xs:enumeration value="PLANNED_HOMES"/>
+      <xs:enumeration value="JOINED_RECOMMENDATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="ResultlistAdvertisement">
+    <xs:sequence>
+      <xs:element name="keyValues" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ResultlistRecommendation">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="sampleResultlistEntry" type="ResultlistEntry"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="ResultlistRecommendationType"/>
+    <xs:attribute name="numberOfHits" type="xs:int"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResultlistRecommendations">
+    <xs:sequence>
+      <xs:element name="recommendation" type="ResultlistRecommendation" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ResultlistDescription">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" minOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
 
   <xs:complexType name="ResultlistEntries">
     <xs:annotation>
@@ -103,11 +147,32 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="publishedAfterRequestedDate" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="attributes" type="ResultListEntryAttributes" minOccurs="0"/>
+      <xs:element name="realEstateTags" type="RealEstateTags" minOccurs="0" />
 
-      </xs:sequence>
+    </xs:sequence>
 
+    <xs:attributeGroup ref="common:Reference" />
+  </xs:complexType>
 
-      <xs:attributeGroup ref="common:Reference" />
-    </xs:complexType>
+  <xs:complexType name="ResultListEntryAttributes">
+    <xs:sequence>
+      <xs:element name="attribute" type="ResultListEntryAttribute" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
 
-   </xs:schema>
+  <xs:complexType name="ResultListEntryAttribute">
+    <xs:sequence>
+      <xs:element name="label" type="xs:string">
+      </xs:element>
+      <xs:element name="value" type="xs:string">
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="RealEstateTags">
+    <xs:sequence>
+      <xs:element name="tag" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

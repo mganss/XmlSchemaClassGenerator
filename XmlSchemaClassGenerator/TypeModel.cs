@@ -474,6 +474,7 @@ namespace XmlSchemaClassGenerator
 
     public class EnumValueModel
     {
+        public string Name { get; set; }
         public string Value { get; set; }
         public bool IsDeprecated { get; set; }
         public List<DocumentationModel> Documentation { get; private set; }
@@ -500,8 +501,15 @@ namespace XmlSchemaClassGenerator
 
             foreach (var val in Values)
             {
-                var member = new CodeMemberField { Name = val.Value };
+                var member = new CodeMemberField { Name = val.Name };
                 var docs = new List<DocumentationModel>(val.Documentation);
+
+                if (val.Name != val.Value) // illegal identifier chars in value
+                {
+                    var enumAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlEnumAttribute)),
+                        new CodeAttributeArgument(new CodePrimitiveExpression(val.Value)));
+                    member.CustomAttributes.Add(enumAttribute);
+                }
 
                 if (val.IsDeprecated)
                 {

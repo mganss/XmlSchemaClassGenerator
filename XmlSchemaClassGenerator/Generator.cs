@@ -97,10 +97,95 @@ namespace XmlSchemaClassGenerator
             throw new Exception(string.Format("Namespace {0} not in namespace map and GenerateNamespaceName not provided.", xmlNamespace));
         }
 
+        private static Dictionary<char, string> InvalidChars = CreateInvalidChars();
+
+        private static Dictionary<char, string> CreateInvalidChars()
+        {
+            var invalidChars = new Dictionary<char, string>();
+
+            invalidChars['\x00'] = "Null";
+            invalidChars['\x01'] = "StartOfHeading";
+            invalidChars['\x02'] = "StartOfText";
+            invalidChars['\x03'] = "EndOfText";
+            invalidChars['\x04'] = "EndOfTransmission";
+            invalidChars['\x05'] = "Enquiry";
+            invalidChars['\x06'] = "Acknowledge";
+            invalidChars['\x07'] = "Bell";
+            invalidChars['\x08'] = "Backspace";
+            invalidChars['\x09'] = "HorizontalTab";
+            invalidChars['\x0A'] = "LineFeed";
+            invalidChars['\x0B'] = "VerticalTab";
+            invalidChars['\x0C'] = "FormFeed";
+            invalidChars['\x0D'] = "CarriageReturn";
+            invalidChars['\x0E'] = "ShiftOut";
+            invalidChars['\x0F'] = "ShiftIn";
+            invalidChars['\x10'] = "DataLinkEscape";
+            invalidChars['\x11'] = "DeviceControl1";
+            invalidChars['\x12'] = "DeviceControl2";
+            invalidChars['\x13'] = "DeviceControl3";
+            invalidChars['\x14'] = "DeviceControl4";
+            invalidChars['\x15'] = "NegativeAcknowledge";
+            invalidChars['\x16'] = "SynchronousIdle";
+            invalidChars['\x17'] = "EndOfTransmissionBlock";
+            invalidChars['\x18'] = "Cancel";
+            invalidChars['\x19'] = "EndOfMedium";
+            invalidChars['\x1A'] = "Substitute";
+            invalidChars['\x1B'] = "Escape";
+            invalidChars['\x1C'] = "FileSeparator";
+            invalidChars['\x1D'] = "GroupSeparator";
+            invalidChars['\x1E'] = "RecordSeparator";
+            invalidChars['\x1F'] = "UnitSeparator";
+            //invalidChars['\x20'] = "Space";
+            invalidChars['\x21'] = "ExclamationMark";
+            invalidChars['\x22'] = "Quote";
+            invalidChars['\x23'] = "Hash";
+            invalidChars['\x24'] = "Dollar";
+            invalidChars['\x25'] = "Percent";
+            invalidChars['\x26'] = "Ampersand";
+            invalidChars['\x27'] = "SingleQuote";
+            invalidChars['\x28'] = "LeftParenthesis";
+            invalidChars['\x29'] = "RightParenthesis";
+            invalidChars['\x2A'] = "Asterisk";
+            invalidChars['\x2B'] = "Plus";
+            invalidChars['\x2C'] = "Comma";
+            //invalidChars['\x2D'] = "Minus";
+            invalidChars['\x2E'] = "Period";
+            invalidChars['\x2F'] = "Slash";
+            invalidChars['\x3A'] = "Colon";
+            invalidChars['\x3B'] = "Semicolon";
+            invalidChars['\x3C'] = "LessThan";
+            invalidChars['\x3D'] = "Equal";
+            invalidChars['\x3E'] = "GreaterThan";
+            invalidChars['\x3F'] = "QuestionMark";
+            invalidChars['\x40'] = "At";
+            invalidChars['\x5B'] = "LeftSquareBracket";
+            invalidChars['\x5C'] = "Backslash";
+            invalidChars['\x5D'] = "RightSquareBracket";
+            invalidChars['\x5E'] = "Caret";
+            //invalidChars['\x5F'] = "Underscore";
+            invalidChars['\x60'] = "Backquote";
+            invalidChars['\x7B'] = "LeftCurlyBrace";
+            invalidChars['\x7C'] = "Pipe";
+            invalidChars['\x7D'] = "RightCurlyBrace";
+            invalidChars['\x7E'] = "Tilde";
+            invalidChars['\x7F'] = "Delete";
+
+            return invalidChars;
+        }
+
+        private static Regex InvalidCharsRegex = CreateInvalidCharsRegex();
+
+        private static Regex CreateInvalidCharsRegex()
+        {
+            var r = string.Join("", InvalidChars.Keys.Select(c => string.Format(@"\x{0:x2}", (int)c)).ToArray());
+            return new Regex("[" + r + "]", RegexOptions.Compiled);
+        }
+
         private static CodeDomProvider Provider = new Microsoft.CSharp.CSharpCodeProvider();
         public static string MakeValidIdentifier(string s)
         {
-            return Provider.CreateValidIdentifier(Regex.Replace(s, @"\W+", "_"));
+            var id = InvalidCharsRegex.Replace(s, m => InvalidChars[m.Value[0]]);
+            return Provider.CreateValidIdentifier(Regex.Replace(id, @"\W+", "_"));
         }
 
         public static string ToTitleCase(string s)
@@ -306,6 +391,7 @@ namespace XmlSchemaClassGenerator
                             {
                                 var value = new EnumValueModel
                                 {
+                                    Name = ToTitleCase(facet.Value),
                                     Value = facet.Value
                                 };
 
