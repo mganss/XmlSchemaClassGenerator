@@ -287,7 +287,8 @@ namespace XmlSchemaClassGenerator
                     : complexType.ContentTypeParticle;
                 var items = GetElements(particle);
 
-                foreach (var item in items)
+                // ElementSchemaType must be non-null. This is not the case when maxOccurs="0".
+                foreach (var item in items.Where(i => i.ElementSchemaType != null))
                 {
                     var elementQualifiedName = item.ElementSchemaType.QualifiedName;
 

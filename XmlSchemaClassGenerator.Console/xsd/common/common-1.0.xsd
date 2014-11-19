@@ -278,6 +278,17 @@
                       <xs:documentation xml:lang="de-DE">ReferencePrice API Call</xs:documentation>
                     </xs:annotation>
                   </xs:element>
+                    <xs:element name="realEstateProjectId" type="xs:long" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                Read Only: Represents an id of real estate project.
+                            </xs:documentation>
+                            <xs:documentation xml:lang="de-DE">
+                                Nur lesend: Immobilien-Projekt Id 
+                            </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                   
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
@@ -372,15 +383,20 @@
             <xs:documentation xml:lang="de-DE">Definition der Basisfelder einer Adresse.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="street" type="TextField" minOccurs="0">
+            <xs:element name="street" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">Street without house number. Mandatory for germany, optional
                         for foreign real estates.</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Straße ohne Hausnummer. Pflichtfeld für Deutschland,
                         optional für Auslandsimmobilien.</xs:documentation>
                 </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>                
             </xs:element>
-            <xs:element name="houseNumber" type="TextField" minOccurs="0">
+            <xs:element name="houseNumber" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">House number. Mandatory for germany, optional for foreign
                         real estates. Also optional for LIVING_RENT_SITE, LIVING_BUY_SITE and TRADE_SITE</xs:documentation>
@@ -388,12 +404,22 @@
                         Auslandsimmobilien. Weiterhin optional für LIVING_RENT_SITE,
                         LIVING_BUY_SITE and TRADE_SITE</xs:documentation>
                 </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="30"/>
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:element>
-            <xs:element name="postcode" type="TextField" minOccurs="0">
+            <xs:element name="postcode" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">zip code</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Postleitzahl</xs:documentation>
                 </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="20"/>
+                    </xs:restriction>
+                </xs:simpleType>               
             </xs:element>
             <xs:element name="city" minOccurs="0">
                 <xs:annotation>
@@ -658,7 +684,7 @@
                 </xs:annotation>
                 <xs:simpleType>
                     <xs:restriction base="TextField">
-                        <xs:maxLength value="50"/>
+                        <xs:maxLength value="15"/>
                     </xs:restriction>
                 </xs:simpleType>
             </xs:element>
@@ -705,6 +731,17 @@
                        <xs:maxLength value="300"/>
                    </xs:restriction>
                </xs:simpleType>
+            </xs:element>
+            <xs:element name="position" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The position or function in the company</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Die Position oder Taetigkeit im Unternehmen</xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:element>
         </xs:sequence>
     </xs:complexType>
@@ -835,6 +872,12 @@
                                 Repräsentiert eine kundenspezifische Referenz einer Kontaktadresse.
                                 Der Kennzeichner muss eineindeutig in Verbindung mit der Kundennummer sein.
                             </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="showOnProfilePage" type="xs:boolean" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">Contact is visible on Profile Page</xs:documentation>
+                            <xs:documentation xml:lang="de-DE">Kontakt ist sichtbar in Profile Page</xs:documentation>
                         </xs:annotation>
                     </xs:element>
                 </xs:sequence>
@@ -1030,16 +1073,65 @@
         <xs:complexContent>
             <xs:extension base="Attachment">
                 <xs:sequence>
-                    <xs:element name="videoId" type="TextField" minOccurs="0">
+                    <xs:element name="videoId" type="TextField" minOccurs="0" maxOccurs="1">
                         <xs:annotation>
                             <xs:documentation xml:lang="en">the video identifier</xs:documentation>
                             <xs:documentation xml:lang="de-DE">Die Identifikationsnummer des Videos</xs:documentation>
                         </xs:annotation>
                     </xs:element>
+                    <xs:element name="videoInfo" type="VideoInfo" minOccurs="0" maxOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+
+
+    <xs:complexType name="VideoInfo">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">screen9 streaming video urls</xs:documentation>
+            <xs:documentation xml:lang="de-DE">streaming video urls von screen9</xs:documentation>
+        </xs:annotation>
+            <xs:sequence>
+                <xs:element name="videoUrlList" type="videoUrlList" minOccurs="1" maxOccurs="2">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">screen9 streaming video url list</xs:documentation>
+                        <xs:documentation xml:lang="de-DE">streaming video url Liste von screen9</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:int" name="duration" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">Video duration in ms</xs:documentation>
+                        <xs:documentation xml:lang="de-DE">Video Abspieldauer in ms</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:anyURI" name="teaserUrl" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">Picture teaser for this video</xs:documentation>
+                        <xs:documentation xml:lang="de-DE">Teaser Bild für das gegebene Video</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="TextField" name="title" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">Title of the video</xs:documentation>
+                        <xs:documentation xml:lang="de-DE">Titel vom Video</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="videoUrlList">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">screen9 single entity for one url</xs:documentation>
+            <xs:documentation xml:lang="de-DE">eine Entität einer screen9 streaming video url mit dem video Format</xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element type="xs:string" name="format"/>
+            <xs:element type="xs:string" name="url"/>
+        </xs:all>
+    </xs:complexType>
+
+
+
     <xs:complexType name="PDFDocument">
         <xs:annotation>
             <xs:documentation xml:lang="en">A pdf document</xs:documentation>
@@ -1347,8 +1439,20 @@
 
     <xs:complexType name="CountyCourt">
         <xs:all>
-            <xs:element name="courtNumber" type="TextField"/>
-            <xs:element name="name" type="TextField"/>
+            <xs:element name="courtNumber" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="16"/>
+                    </xs:restriction>
+                </xs:simpleType>            
+            </xs:element>
+            <xs:element name="name" minOccurs="0">
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="40"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
         </xs:all>
     </xs:complexType>
 
@@ -1373,7 +1477,7 @@
             <xs:documentation xml:lang="de-DE">wesentliche Energieträger</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="energySourceEnev2014" type="EnergySourceEnev2014" minOccurs="0" maxOccurs="20">
+            <xs:element name="energySourceEnev2014" type="EnergySourceEnev2014" minOccurs="0" maxOccurs="25">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">energy source</xs:documentation>
                     <xs:documentation xml:lang="de-DE">wesentliche Energieträger</xs:documentation>
@@ -3834,9 +3938,57 @@
                     <xs:documentation xml:lang="de-DE">Wärmelieferung</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <!-- new values -->
+            <xs:enumeration value="BIO_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">bio energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">BIO Energie</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="WIND_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">wind energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Windenergie</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="HYDRO_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">hydro energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Wasserenergie</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ENVIRONMENTAL_THERMAL_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">environmental thermal energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Umweltwärme</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="COMBINED_HEAT_AND_POWER_FOSSIL_FUELS">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">combined heat and power fossil fuels</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">KWK fossil</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="COMBINED_HEAT_AND_POWER_RENEWABLE_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">combined heat and power renewable energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">KWK erneuerbar</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="COMBINED_HEAT_AND_POWER_REGENERATIVE_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">combined heat and power regenerative energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">KWK regenerativ</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="COMBINED_HEAT_AND_POWER_BIO_ENERGY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">combined heat and power bio energy</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">KWK bio</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
-
     <xs:simpleType name="RealEstateCondition">
         <xs:restriction base="xs:string">
             <xs:enumeration value="NO_INFORMATION">
@@ -8934,6 +9086,27 @@
             </xs:element>
         </xs:all>
     </xs:complexType>
+    <xs:complexType name="PriceRangeMandatory">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">price range</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Bereich des Preises</xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="minimal" type="Number13.2Type" minOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">minimal price</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Minimaler Preis</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="maximal" type="Number13.2Type" minOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">maximal price</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Maximaler Preis</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+
 
     <xs:complexType name="AreaRange">
         <xs:annotation>
@@ -8955,6 +9128,28 @@
             </xs:element>
         </xs:all>
     </xs:complexType>
+
+    <xs:complexType name="AreaRangeMandatory">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">area range</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Bereich der Fläche</xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element name="minimal" type="Number8.2Type" minOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">minimal area</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Minimale Fläche</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="maximal" type="Number8.2Type" minOccurs="1">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">maximal area</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Maximale Fläche</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+
 
     <xs:complexType name="YearRange">
         <xs:annotation>
@@ -10172,7 +10367,7 @@
                     <xs:documentation xml:lang="de-DE">Aufhebungsdatum</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="recordationDate" type="xs:date">
+            <xs:element name="recordationDate" type="xs:date" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">date of recordation</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Erfassungsdatum</xs:documentation>
@@ -10190,24 +10385,34 @@
                     <xs:documentation xml:lang="de-DE">Objektart der Auktion</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="countyCourt" type="CountyCourt">
+            <xs:element name="countyCourt" type="CountyCourt" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">the county court responsible for the auction</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Das Amtsgericht das für die Auktion verantwortlich ist
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="fileReferenceAtCountyCourt" type="TextField">
+            <xs:element name="fileReferenceAtCountyCourt" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">the file reference at the county court</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Das Aktenzeichen beim Amtsgericht</xs:documentation>
                 </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="18"/>
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:element>
-            <xs:element name="numberOfFolio" type="TextField">
+            <xs:element name="numberOfFolio" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">number of folio</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Grundbuchsblatt-Nummer</xs:documentation>
                 </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="40"/>
+                    </xs:restriction>
+                </xs:simpleType>                
             </xs:element>
             <xs:element name="splittingAuction" type="xs:boolean" minOccurs="0" default="false">
                 <xs:annotation>
@@ -10215,17 +10420,16 @@
                     <xs:documentation xml:lang="de-DE">Teilungsversteigerung</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="owner" type="TextField">
+            <xs:element name="owner" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">Owner of the object to be auctioned</xs:documentation>
                     <xs:documentation xml:lang="de-DE">Besitzer des zu versteigernden Objekts</xs:documentation>
                 </xs:annotation>
-            </xs:element>
-            <xs:element name="courtage" type="CourtageInfo" minOccurs="0">
-                <xs:annotation>
-                    <xs:documentation xml:lang="en">courtage elements</xs:documentation>
-                    <xs:documentation xml:lang="de-DE">Provisionselemente</xs:documentation>
-                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="TextField">
+                        <xs:maxLength value="80"/>
+                    </xs:restriction>
+                </xs:simpleType>
             </xs:element>
 		    <xs:element name="energyCertificate" type="EnergyPerformanceCertificate" minOccurs="0">
 		        <xs:annotation>
@@ -10719,7 +10923,13 @@
             <xs:documentation xml:lang="en">energy certificate</xs:documentation>
             <xs:documentation xml:lang="de-DE">Energieausweis</xs:documentation>
         </xs:annotation>
-        <xs:all>
+        <xs:all>            
+            <xs:element name="energyCertificateAvailability" type="EnergyCertificateAvailability" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">availibility of the energy certificate</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">Verfügbarkeit vom Energieausweis</xs:documentation>
+                </xs:annotation>
+            </xs:element>
             <xs:element name="energyCertificateCreationDate" type="EnergyCertificateCreationDate" minOccurs="0">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">date of the creation of energy certificate</xs:documentation>
@@ -10901,5 +11111,41 @@
         </xs:restriction>
     </xs:simpleType>
     
-    
+    <xs:simpleType name="EnergyCertificateAvailability">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"></xs:documentation>
+            <xs:documentation xml:lang="de-DE"></xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="AVAILABLE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">certificate is available</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">vorhanden</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="NOT_AVAILABLE_YET">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">certificate is not available</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">noch nicht vorhanden</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="NOT_REQUIRED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">certificate is not required</xs:documentation>
+                    <xs:documentation xml:lang="de-DE">nicht notwendig</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>            
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Contingent">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Contingent information</xs:documentation>
+            <xs:documentation xml:lang="de-DE">Kontingent-Information</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="count" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="1" />
+            <xs:element name="tolerance" type="xs:nonNegativeInteger" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
