@@ -1539,7 +1539,7 @@ namespace Microsoft.Xml.XMLGen {
                         resultBuilder.Append(" ");
                     }             
                 }
-                return resultBuilder.ToString();
+                return resultBuilder.ToString().Trim();
             }
         }
 }

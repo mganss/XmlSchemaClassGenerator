@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Xunit;
 
 namespace XmlSchemaClassGenerator.Tests
@@ -39,6 +40,22 @@ namespace XmlSchemaClassGenerator.Tests
             if (type1.IsPrimitive || type1.IsEnum || type1 == typeof(string) || type1 == typeof(System.DateTime))
             {
                 Assert.Equal(o1, o2);
+            }
+            else if (type1 == typeof(XmlAttribute))
+            {
+                var a1 = (XmlAttribute)o1;
+                var a2 = (XmlAttribute)o2;
+
+                Assert.Equal(a1.Name, a1.Name);
+                Assert.Equal(a1.Value, a2.Value);
+            }
+            else if (type1 == typeof(XmlElement))
+            {
+                var e1 = (XmlElement)o1;
+                var e2 = (XmlElement)o2;
+
+                Assert.Equal(e1.Name, e1.Name);
+                Assert.Equal(e1.InnerXml, e2.InnerXml);
             }
             else if (typeof(IList).IsAssignableFrom(type1))
             {

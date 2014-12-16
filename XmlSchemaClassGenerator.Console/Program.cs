@@ -68,7 +68,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             {
                 GenerateNamespaceName = xn =>
                 {
-                    var name = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[a-z]+$") && p != "schema")
+                    var name = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
                         .Select(n => Generator.ToTitleCase(n)));
                     if (!string.IsNullOrEmpty(namespacePrefix)) name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name));
                     return name;

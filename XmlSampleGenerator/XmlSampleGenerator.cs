@@ -777,7 +777,7 @@ namespace Microsoft.Xml.XMLGen {
                     else {
                         writer.WriteStartAttribute(attr.QualifiedName.Name, attr.QualifiedName.Namespace);
                     }
-                    if(attr.HasDefault) {
+                    if(attr.HasDefault && !(attr.ValueGenerator is Generator_QName)) {
                         writer.WriteString(attr.DefaultValue);
                     } 
                     else if (attr.IsFixed) {

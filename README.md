@@ -21,7 +21,6 @@ from schema restrictions
 
 Unsupported:
 
-* Global elements and types that are restrictions of simple types
 * Some restriction types
 * Recursive choices and choices whose elements have minOccurs > 0
 * Possible name clashes and invalid identifiers when names contain non-alphanumeric characters
