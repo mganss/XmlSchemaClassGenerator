@@ -141,11 +141,11 @@ namespace XmlSchemaClassGenerator
             return typeDeclaration;
         }
 
-        public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection)
+        public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection, bool forInit = false)
         {
             var name = referencingNamespace == Namespace ? Name : string.Format("{0}.{1}", Namespace.Name, Name);
             if (collection)
-                name = SimpleModel.GetCollectionDefinitionName(name);
+                name = forInit ? SimpleModel.GetCollectionImplementationName(name) : SimpleModel.GetCollectionDefinitionName(name);
             return new CodeTypeReference(name);
         }
 
@@ -464,7 +464,8 @@ namespace XmlSchemaClassGenerator
                     typeDeclaration.Members.Add(constructor);
                 }
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
-                var initExpression = new CodeObjectCreateExpression(typeReference, new CodeExpression[] { });
+                var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, true, true);
+                var initExpression = new CodeObjectCreateExpression(initTypeReference, new CodeExpression[] { });
                 constructor.Statements.Add(new CodeAssignStatement(listReference, initExpression));
             }
 
@@ -614,6 +615,7 @@ namespace XmlSchemaClassGenerator
         private static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
         public static Type IntegerDataType { get; set; }
         public static Type CollectionType { get; set; }
+        public static Type CollectionImplementationType { get; set; }
 
         public Type ValueType { get; set; }
         public List<RestrictionModel> Restrictions { get; private set; }
@@ -644,12 +646,26 @@ namespace XmlSchemaClassGenerator
             return fullTypeName;
         }
 
+        public static string GetCollectionImplementationName(string typeName)
+        {
+            var typeRef = new CodeTypeReference(CollectionImplementationType ?? CollectionType);
+            if (CollectionType.IsGenericTypeDefinition)
+                typeRef.TypeArguments.Add(typeName);
+            var typeOfExpr = new CodeTypeOfExpression(typeRef);
+            var writer = new System.IO.StringWriter();
+            CSharpProvider.GenerateCodeFromExpression(typeOfExpr, writer, new CodeGeneratorOptions());
+            var fullTypeName = writer.ToString();
+            Debug.Assert(fullTypeName.StartsWith("typeof(") && fullTypeName.EndsWith(")"));
+            fullTypeName = fullTypeName.Substring(7, fullTypeName.Length - 8);
+            return fullTypeName;
+        }
+
         public override CodeTypeDeclaration Generate()
         {
             return null;
         }
 
-        public override CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection)
+        public override CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection, bool forInit = false)
         {
             var type = ValueType;
 
@@ -692,7 +708,13 @@ namespace XmlSchemaClassGenerator
                 }
             }
 
-            if (collection) type = CollectionType.MakeGenericType(type);
+            if (collection)
+            {
+                if (forInit)
+                    type = (CollectionImplementationType ?? CollectionType).MakeGenericType(type);
+                else
+                    type = CollectionType.MakeGenericType(type);
+            }
 
             return new CodeTypeReference(type);
         }

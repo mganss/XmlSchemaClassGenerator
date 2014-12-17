@@ -53,6 +53,18 @@ namespace XmlSchemaClassGenerator
             set { ClassModel.GenerateDesignerCategoryAttribute = value; }
         }
 
+        public Type CollectionType
+        {
+            get { return SimpleModel.CollectionType; }
+            set { SimpleModel.CollectionType = value; }
+        }
+
+        public Type CollectionImplementationType
+        {
+            get { return SimpleModel.CollectionImplementationType; }
+            set { SimpleModel.CollectionImplementationType = value; }
+        }
+
         private XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();

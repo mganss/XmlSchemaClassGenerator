@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Xunit;
@@ -14,6 +15,9 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 var gen = new Generator
                 {
+                    UseXElementForAny = true,
+                    CollectionType = typeof(IList<>),
+                    CollectionImplementationType = typeof(List<>),
                     GenerateDesignerCategoryAttribute = false,
                     GenerateNullables = true,
                     GenerateSerializableAttribute = false,
