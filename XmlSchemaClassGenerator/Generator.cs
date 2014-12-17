@@ -23,6 +23,10 @@ namespace XmlSchemaClassGenerator
         public Dictionary<string, string> NamespaceMapping { get; set; }
         public string OutputFolder { get; set; }
         public Action<string> Log { get; set; }
+        /// <summary>
+        /// Use XElement instead of XmlElement for Any nodes?
+        /// </summary>
+        public bool UseXElementForAny { get; set; }
 
         public bool GenerateNullables
         {
@@ -415,7 +419,7 @@ namespace XmlSchemaClassGenerator
                             {
                                 OwningType = classModel,
                                 Name = "Any",
-                                Type = new SimpleModel { ValueType = typeof(XmlElement), UseDataTypeAttribute = false },
+                                Type = new SimpleModel { ValueType = (UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
                                 IsNullable = item.MinOccurs < 1.0m,
                                 IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                                 IsAny = true
