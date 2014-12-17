@@ -21,6 +21,7 @@ namespace XmlSchemaClassGenerator.Tests
     public class XmlTests
     {
         [Fact]
+        [UseCulture("en-US")]
         public void CanDeserializeSampleXml()
         {
             var files = Directory.GetFiles(@"..\..\..\XmlSchemaClassGenerator.Console\xsd", "*.xsd", SearchOption.AllDirectories)
