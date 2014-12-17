@@ -17,7 +17,7 @@ namespace XmlSchemaClassGenerator
         public NamespaceKey(Uri source, string xmlSchemaNamespace)
         {
             Source = source;
-            XmlSchemaNamespace = xmlSchemaNamespace;
+            XmlSchemaNamespace = xmlSchemaNamespace ?? string.Empty;
         }
 
         public bool Equals(NamespaceKey other)
@@ -38,13 +38,7 @@ namespace XmlSchemaClassGenerator
                 if (result != 0)
                     return result;
             }
-            if (XmlSchemaNamespace == null && other.XmlSchemaNamespace != null)
-                return -1;
-            if (XmlSchemaNamespace != null && other.XmlSchemaNamespace == null)
-                return 1;
-            if (XmlSchemaNamespace != null)
-                return string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
-            return 0;
+            return string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)
