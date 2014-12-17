@@ -31,16 +31,20 @@ namespace XmlSchemaClassGenerator
                 return -1;
             if (Source != null && other.Source == null)
                 return 1;
-            int result;
             if (Source != null)
             {
-                result = Uri.Compare(Source, other.Source, CompareComponents, CompareFormat,
+                var result = Uri.Compare(Source, other.Source, CompareComponents, CompareFormat,
                     StringComparison.OrdinalIgnoreCase);
                 if (result != 0)
                     return result;
             }
-            result = string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
-            return result;
+            if (XmlSchemaNamespace == null && other.XmlSchemaNamespace != null)
+                return -1;
+            if (XmlSchemaNamespace != null && other.XmlSchemaNamespace == null)
+                return 1;
+            if (XmlSchemaNamespace != null)
+                return string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
+            return 0;
         }
 
         public override bool Equals(object obj)
@@ -53,8 +57,9 @@ namespace XmlSchemaClassGenerator
             var hashCode = 0;
             if (Source != null)
                 hashCode = Source.GetComponents(CompareComponents, CompareFormat).ToLower().GetHashCode();
-            return hashCode
-                   ^ XmlSchemaNamespace.GetHashCode();
+            if (XmlSchemaNamespace != null)
+                hashCode ^= XmlSchemaNamespace.GetHashCode();
+            return hashCode;
         }
 
         int IComparable.CompareTo(object obj)
