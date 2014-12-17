@@ -29,13 +29,15 @@ namespace XmlSchemaClassGenerator
             Types = new Dictionary<string, TypeModel>();
         }
 
-        public CodeNamespace Generate()
+        public static CodeNamespace Generate(string namespaceName, IEnumerable<NamespaceModel> parts)
         {
-            var codeNamespace = new CodeNamespace(Name);
+            var codeNamespace = new CodeNamespace(namespaceName);
+            codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections"));
+            codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
 
-            foreach (var typeModel in Types.Values)
+            foreach (var typeModel in parts.SelectMany(x => x.Types.Values))
             {
                 var type = typeModel.Generate();
                 if (type != null)
@@ -142,7 +144,8 @@ namespace XmlSchemaClassGenerator
         public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection)
         {
             var name = referencingNamespace == Namespace ? Name : string.Format("{0}.{1}", Namespace.Name, Name);
-            if (collection) name = string.Format("Collection<{0}>", name);
+            if (collection)
+                name = SimpleModel.GetCollectionDefinitionName(name);
             return new CodeTypeReference(name);
         }
 
@@ -608,15 +611,37 @@ namespace XmlSchemaClassGenerator
 
     public class SimpleModel : TypeModel
     {
+        private static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
         public static Type IntegerDataType { get; set; }
+        public static Type CollectionType { get; set; }
+
         public Type ValueType { get; set; }
         public List<RestrictionModel> Restrictions { get; private set; }
         public bool UseDataTypeAttribute { get; set; }
+
+        static SimpleModel()
+        {
+            CollectionType = typeof(Collection<>);
+        }
 
         public SimpleModel()
         {
             Restrictions = new List<RestrictionModel>();
             UseDataTypeAttribute = true;
+        }
+
+        public static string GetCollectionDefinitionName(string typeName)
+        {
+            var typeRef = new CodeTypeReference(CollectionType);
+            if (CollectionType.IsGenericTypeDefinition)
+                typeRef.TypeArguments.Add(typeName);
+            var typeOfExpr = new CodeTypeOfExpression(typeRef);
+            var writer = new System.IO.StringWriter();
+            CSharpProvider.GenerateCodeFromExpression(typeOfExpr, writer, new CodeGeneratorOptions());
+            var fullTypeName = writer.ToString();
+            Debug.Assert(fullTypeName.StartsWith("typeof(") && fullTypeName.EndsWith(")"));
+            fullTypeName = fullTypeName.Substring(7, fullTypeName.Length - 8);
+            return fullTypeName;
         }
 
         public override CodeTypeDeclaration Generate()
@@ -667,7 +692,7 @@ namespace XmlSchemaClassGenerator
                 }
             }
 
-            if (collection) type = typeof(Collection<>).MakeGenericType(type);
+            if (collection) type = CollectionType.MakeGenericType(type);
 
             return new CodeTypeReference(type);
         }
