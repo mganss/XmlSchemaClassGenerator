@@ -37,6 +37,18 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        public bool GenerateSerializableAttribute
+        {
+            get { return TypeModel.GenerateSerializableAttribute; }
+            set { TypeModel.GenerateSerializableAttribute = value; }
+        }
+
+        public bool GenerateDesignerCategoryAttribute
+        {
+            get { return ClassModel.GenerateDesignerCategoryAttribute; }
+            set { ClassModel.GenerateDesignerCategoryAttribute = value; }
+        }
+
         private XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();

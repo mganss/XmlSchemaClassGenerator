@@ -83,6 +83,8 @@ namespace XmlSchemaClassGenerator
 
     public abstract class TypeModel
     {
+        public static bool GenerateSerializableAttribute { get; set; }
+
         public NamespaceModel Namespace { get; set; }
         public XmlQualifiedName RootElementName { get; set; }
         public string Name { get; set; }
@@ -91,6 +93,11 @@ namespace XmlSchemaClassGenerator
         public static Dictionary<XmlQualifiedName, TypeModel> Types = new Dictionary<XmlQualifiedName, TypeModel>();
         public List<DocumentationModel> Documentation { get; private set; }
         public bool IsAnonymous { get; set; }
+
+        static TypeModel()
+        {
+            GenerateSerializableAttribute = true;
+        }
 
         public TypeModel()
         {
@@ -107,8 +114,12 @@ namespace XmlSchemaClassGenerator
                 typeof(AssemblyTitleAttribute))).Title;
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            var serializableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(SerializableAttribute)));
-            typeDeclaration.CustomAttributes.Add(serializableAttribute);
+            if (GenerateSerializableAttribute)
+            {
+                var serializableAttribute =
+                    new CodeAttributeDeclaration(new CodeTypeReference(typeof (SerializableAttribute)));
+                typeDeclaration.CustomAttributes.Add(serializableAttribute);
+            }
 
             var generatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(GeneratedCodeAttribute)),
                 new CodeAttributeArgument(new CodePrimitiveExpression(title)),
@@ -143,10 +154,17 @@ namespace XmlSchemaClassGenerator
 
     public class ClassModel : TypeModel
     {
+        public static bool GenerateDesignerCategoryAttribute { get; set; }
+
         public bool IsAbstract { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
+
+        static ClassModel()
+        {
+            GenerateDesignerCategoryAttribute = true;
+        }
 
         public ClassModel()
         {
@@ -182,11 +200,14 @@ namespace XmlSchemaClassGenerator
             foreach (var property in Properties)
                 property.AddMembers(classDeclaration);
 
-            classDeclaration.CustomAttributes.Insert(classDeclaration.CustomAttributes.Count - 1,
+            classDeclaration.CustomAttributes.Add(
                 new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute))));
-            classDeclaration.CustomAttributes.Insert(classDeclaration.CustomAttributes.Count - 1,
-                new CodeAttributeDeclaration(new CodeTypeReference(typeof(DesignerCategoryAttribute)),
-                    new CodeAttributeArgument(new CodePrimitiveExpression("code"))));
+            if (ClassModel.GenerateDesignerCategoryAttribute)
+            {
+                classDeclaration.CustomAttributes.Add(
+                    new CodeAttributeDeclaration(new CodeTypeReference(typeof (DesignerCategoryAttribute)),
+                        new CodeAttributeArgument(new CodePrimitiveExpression("code"))));
+            }
 
             if (RootElementName != null)
             {
