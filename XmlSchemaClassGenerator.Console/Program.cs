@@ -66,7 +66,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
             var generator = new Generator
             {
-                GenerateNamespaceName = xn =>
+                GenerateNamespaceName = (fileName, xn) =>
                 {
                     var name = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
                         .Select(n => Generator.ToTitleCase(n)));

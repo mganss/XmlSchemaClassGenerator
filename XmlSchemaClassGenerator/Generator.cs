@@ -19,7 +19,7 @@ namespace XmlSchemaClassGenerator
 {
     public class Generator
     {
-        public Func<string, string> GenerateNamespaceName { get; set; }
+        public GenerateNamespaceDelegate GenerateNamespaceName { get; set; }
         public Dictionary<string, string> NamespaceMapping { get; set; }
         public string OutputFolder { get; set; }
         public Action<string> Log { get; set; }
@@ -39,7 +39,7 @@ namespace XmlSchemaClassGenerator
 
         private XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
-        private Dictionary<string, NamespaceModel> Namespaces = new Dictionary<string, NamespaceModel>();
+        private Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
         private static XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
 
         public void Generate(IEnumerable<string> files)
@@ -89,10 +89,10 @@ namespace XmlSchemaClassGenerator
             return Namespaces.Values.Select(n => n.Generate());
         }
 
-        private string BuildNamespace(string xmlNamespace)
+        private string BuildNamespace(string fileName, string xmlNamespace)
         {
             if (NamespaceMapping != null && NamespaceMapping.ContainsKey(xmlNamespace)) return NamespaceMapping[xmlNamespace];
-            if (GenerateNamespaceName != null) return GenerateNamespaceName(xmlNamespace);
+            if (GenerateNamespaceName != null) return GenerateNamespaceName(fileName, xmlNamespace);
             
             throw new Exception(string.Format("Namespace {0} not in namespace map and GenerateNamespaceName not provided.", xmlNamespace));
         }
@@ -199,7 +199,7 @@ namespace XmlSchemaClassGenerator
             var objectModel = new SimpleModel
             {
                 Name = "AnyType",
-                Namespace = CreateNamespaceModel(AnyType),
+                Namespace = CreateNamespaceModel(string.Empty, AnyType),
                 XmlSchemaName = AnyType,
                 XmlSchemaType = null,
                 ValueType = typeof(object),
@@ -212,9 +212,10 @@ namespace XmlSchemaClassGenerator
 
             foreach (var rootElement in Set.GlobalElements.Values.Cast<XmlSchemaElement>())
             {
+                var fileName = rootElement.GetSchema().SourceUri;
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) qualifiedName = rootElement.QualifiedName;
-                var type = CreateTypeModel(rootElement.ElementSchemaType, qualifiedName);
+                var type = CreateTypeModel(fileName, rootElement.ElementSchemaType, qualifiedName);
 
                 if (type.RootElementName != null)
                 {
@@ -226,7 +227,7 @@ namespace XmlSchemaClassGenerator
                         var derivedClassModel = new ClassModel
                         {
                             Name = ToTitleCase(rootElement.QualifiedName.Name),
-                            Namespace = CreateNamespaceModel(rootElement.QualifiedName)
+                            Namespace = CreateNamespaceModel(fileName, rootElement.QualifiedName)
                         };
 
                         derivedClassModel.Documentation.AddRange(GetDocumentation(rootElement));
@@ -263,7 +264,8 @@ namespace XmlSchemaClassGenerator
 
             foreach (var globalType in Set.GlobalTypes.Values.Cast<XmlSchemaType>())
             {
-                var type = CreateTypeModel(globalType);
+                var fileName = globalType.GetSchema().SourceUri;
+                var type = CreateTypeModel(fileName, globalType);
             }
         }
 
@@ -289,14 +291,16 @@ namespace XmlSchemaClassGenerator
         private static HashSet<string> EnumTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
             { "string", "normalizedString", "token", "Name", "NCName", "ID", "ENTITY", "NMTOKEN" };
 
-        private TypeModel CreateTypeModel(XmlSchemaType type, XmlQualifiedName qualifiedName = null)
+        private TypeModel CreateTypeModel(string fileName, XmlSchemaType type, XmlQualifiedName qualifiedName = null)
         {
             if (qualifiedName == null) qualifiedName = type.QualifiedName;
 
             TypeModel typeModel = null;
             if (!qualifiedName.IsEmpty && TypeModel.Types.TryGetValue(qualifiedName, out typeModel)) return typeModel;
 
-            var namespaceModel = CreateNamespaceModel(qualifiedName);
+            if (fileName == null)
+                throw new ArgumentNullException("fileName");
+            var namespaceModel = CreateNamespaceModel(fileName, qualifiedName);
 
             var docs = GetDocumentation(type);
 
@@ -327,7 +331,7 @@ namespace XmlSchemaClassGenerator
 
                 if (complexType.BaseXmlSchemaType != null && complexType.BaseXmlSchemaType.QualifiedName != AnyType)
                 {
-                    var baseModel = CreateTypeModel(complexType.BaseXmlSchemaType);
+                    var baseModel = CreateTypeModel(fileName, complexType.BaseXmlSchemaType);
                     classModel.BaseClass = baseModel;
                     if (baseModel is ClassModel) ((ClassModel)classModel.BaseClass).DerivedTypes.Add(classModel);
                 }
@@ -378,7 +382,7 @@ namespace XmlSchemaClassGenerator
                             OwningType = classModel,
                             XmlSchemaName = element.QualifiedName,
                             Name = propertyName,
-                            Type = CreateTypeModel(element.ElementSchemaType, elementQualifiedName),
+                            Type = CreateTypeModel(fileName, element.ElementSchemaType, elementQualifiedName),
                             IsNillable = element.IsNillable,
                             IsNullable = item.MinOccurs < 1.0m,
                             IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
@@ -457,7 +461,7 @@ namespace XmlSchemaClassGenerator
                         OwningType = classModel,
                         Name = attributeName,
                         XmlSchemaName = attribute.QualifiedName,
-                        Type = CreateTypeModel(attribute.AttributeSchemaType, attributeQualifiedName),
+                        Type = CreateTypeModel(fileName, attribute.AttributeSchemaType, attributeQualifiedName),
                         IsAttribute = true,
                         IsNullable = attribute.Use != XmlSchemaUse.Required,
                         DefaultValue = attribute.DefaultValue,
@@ -579,16 +583,17 @@ namespace XmlSchemaClassGenerator
             throw new Exception(string.Format("Cannot build declaration for {0}", qualifiedName));
         }
 
-        private NamespaceModel CreateNamespaceModel(XmlQualifiedName qualifiedName)
+        private NamespaceModel CreateNamespaceModel(string fileName, XmlQualifiedName qualifiedName)
         {
             NamespaceModel namespaceModel = null;
             if (!qualifiedName.IsEmpty && qualifiedName.Namespace != XmlSchema.Namespace)
             {
-                if (!Namespaces.TryGetValue(qualifiedName.Namespace, out namespaceModel))
+                var key = new NamespaceKey(fileName, qualifiedName.Namespace);
+                if (!Namespaces.TryGetValue(key, out namespaceModel))
                 {
-                    var namespaceName = BuildNamespace(qualifiedName.Namespace);
-                    namespaceModel = new NamespaceModel { Name = namespaceName, XmlSchemaNamespace = qualifiedName.Namespace };
-                    Namespaces[qualifiedName.Namespace] = namespaceModel;
+                    var namespaceName = BuildNamespace(fileName, qualifiedName.Namespace);
+                    namespaceModel = new NamespaceModel(key) { Name = namespaceName };
+                    Namespaces.Add(key, namespaceModel);
                 }
             }
             return namespaceModel;
