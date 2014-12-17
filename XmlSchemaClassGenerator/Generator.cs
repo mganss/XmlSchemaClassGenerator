@@ -27,6 +27,7 @@ namespace XmlSchemaClassGenerator
         /// Use XElement instead of XmlElement for Any nodes?
         /// </summary>
         public bool UseXElementForAny { get; set; }
+        public NamingScheme NamingScheme { get; set; }
 
         public bool GenerateNullables
         {
@@ -69,6 +70,11 @@ namespace XmlSchemaClassGenerator
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
         private static XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
+
+        public Generator()
+        {
+            NamingScheme = NamingScheme.FirstCharUpperCase;
+        }
 
         public void Generate(IEnumerable<string> files)
         {
@@ -239,10 +245,21 @@ namespace XmlSchemaClassGenerator
             return Provider.CreateValidIdentifier(Regex.Replace(id, @"\W+", "_"));
         }
 
-        public static string ToTitleCase(string s)
+        public string ToTitleCase(string s)
+        {
+            return ToTitleCase(s, NamingScheme);
+        }
+
+        public static string ToTitleCase(string s, NamingScheme namingScheme)
         {
             if (string.IsNullOrEmpty(s)) return s;
-            return MakeValidIdentifier(char.ToUpperInvariant(s[0]) + s.Substring(1));
+            switch (namingScheme)
+            {
+                case NamingScheme.FirstCharUpperCase:
+                    s = char.ToUpperInvariant(s[0]) + s.Substring(1);
+                    break;
+            }
+            return MakeValidIdentifier(s);
         }
 
         private void BuildModel()
