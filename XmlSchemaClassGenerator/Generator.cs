@@ -20,7 +20,7 @@ namespace XmlSchemaClassGenerator
     public class Generator
     {
         public GenerateNamespaceDelegate GenerateNamespaceName { get; set; }
-        public Dictionary<string, string> NamespaceMapping { get; set; }
+        public Dictionary<NamespaceKey, string> NamespaceMapping { get; set; }
         public string OutputFolder { get; set; }
         public Action<string> Log { get; set; }
         /// <summary>
@@ -121,8 +121,15 @@ namespace XmlSchemaClassGenerator
 
         private string BuildNamespace(Uri source, string xmlNamespace)
         {
-            if (NamespaceMapping != null && NamespaceMapping.ContainsKey(xmlNamespace)) return NamespaceMapping[xmlNamespace];
-            if (GenerateNamespaceName != null) return GenerateNamespaceName(source, xmlNamespace);
+            var key = new NamespaceKey(source, xmlNamespace);
+            if (NamespaceMapping != null)
+            {
+                string result;
+                if (NamespaceMapping.TryGetValue(key, out result))
+                    return result;
+            }
+            if (GenerateNamespaceName != null) 
+                return GenerateNamespaceName(key);
             
             throw new Exception(string.Format("Namespace {0} not in namespace map and GenerateNamespaceName not provided.", xmlNamespace));
         }

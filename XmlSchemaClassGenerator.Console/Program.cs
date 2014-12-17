@@ -21,12 +21,14 @@ namespace XmlSchemaClassGenerator.Console
             var namespacePrefix = "";
             var verbose = false;
             var nullables = false;
+            var pclCompatible = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
                 { "n|namespace=", @"map an XML namespace to a C# namespace
 Separate XML namespace and C# namespace by '='.
 One option must be given for each namespace to be mapped.
+A file name may be given by appending a pipe sign (|) followed by a file name (like schema.xsd) to the XML namespace.
 If no mapping is found for an XML namespace, a name is generated automatically (may fail).", v => namespaces.Add(v) },
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
                 { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of string
@@ -47,6 +49,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                                  break;
                                          }
                                      } },
+                { "pcl", "PCL compatible output", v => pclCompatible = v != null },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
                 { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
                 { "0|nullable", "generate nullable adapter properties for optional elements/attributes w/o default values", v => nullables = v != null },
@@ -64,23 +67,44 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
             SimpleModel.IntegerDataType = integerType;
 
+            var namespaceMap = namespaces.Select(ParseNamespace).ToDictionary(x => x.Key, x => x.Value);
+
             var generator = new Generator
             {
-                GenerateNamespaceName = (fileName, xn) =>
+                GenerateNamespaceName = (key) =>
                 {
+                    var xn = key.XmlSchemaNamespace;
                     var name = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
                         .Select(n => Generator.ToTitleCase(n)));
                     if (!string.IsNullOrEmpty(namespacePrefix)) name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name));
                     return name;
                 },
-                NamespaceMapping = namespaces.Select(n => n.Split('=')).ToDictionary(n => n[0], n => n[1]),
+                NamespaceMapping = namespaceMap,
                 OutputFolder = outputFolder,
                 GenerateNullables = nullables,
             };
 
+            if (pclCompatible)
+            {
+                generator.UseXElementForAny = true;
+                generator.GenerateDesignerCategoryAttribute = false;
+                generator.GenerateSerializableAttribute = false;
+            }
+
             if (verbose) generator.Log = s => System.Console.Out.WriteLine(s);
 
             generator.Generate(files);
+        }
+
+        static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg)
+        {
+            var parts = nsArg.Split(new[] {'='}, 2);
+            var xmlNs = parts[0];
+            var netNs = parts[1];
+            var parts2 = xmlNs.Split(new[] {'|'}, 2);
+            var source = parts2.Length == 2 ? new Uri(parts2[1]) : null;
+            xmlNs = parts2[0];
+            return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
         static void ShowHelp(OptionSet p)

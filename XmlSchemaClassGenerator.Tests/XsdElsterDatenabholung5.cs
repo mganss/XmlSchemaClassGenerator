@@ -22,9 +22,9 @@ namespace XmlSchemaClassGenerator.Tests
                     GenerateNullables = true,
                     GenerateSerializableAttribute = false,
                     OutputFolder = OutputPath,
-                    GenerateNamespaceName = (fileName, xmlNs) =>
+                    GenerateNamespaceName = (key) =>
                     {
-                        switch (Path.GetFileName(fileName.LocalPath))
+                        switch (Path.GetFileName(key.Source.LocalPath))
                         {
                             case "th000008_extern.xsd":
                             case "ndh000010_extern.xsd":
@@ -32,15 +32,15 @@ namespace XmlSchemaClassGenerator.Tests
                                 return "Elster.Basis";
                             case "datenabholung_5.xsd":
                             case "elster0810_datenabholung_5.xsd":
-                                switch (xmlNs)
+                                switch (key.XmlSchemaNamespace)
                                 {
                                     case "http://www.elster.de/2002/XMLSchema":
                                         return "Elster.Datenabholung5";
                                     default:
-                                        throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", xmlNs, fileName));
+                                        throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
                                 }
                             default:
-                                throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", xmlNs, fileName));
+                                throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
                         }
                     }
                 };

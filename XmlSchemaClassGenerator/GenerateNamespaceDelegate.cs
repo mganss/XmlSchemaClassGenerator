@@ -9,8 +9,7 @@ namespace XmlSchemaClassGenerator
     /// <summary>
     /// Delegate to be called to generate a .NET namespace for a file name and XML namespace
     /// </summary>
-    /// <param name="source">File name to create the .NET namespace for</param>
-    /// <param name="ns">The XML Namespace to create the .NET namespace for</param>
+    /// <param name="key">The key to search for to create a .NET namespace</param>
     /// <returns>The corresponding .NET namespace</returns>
-    public delegate string GenerateNamespaceDelegate(Uri source, string ns);
+    public delegate string GenerateNamespaceDelegate(NamespaceKey key);
 }
