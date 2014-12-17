@@ -124,15 +124,23 @@ namespace XmlSchemaClassGenerator
             var key = new NamespaceKey(source, xmlNamespace);
             if (NamespaceMapping != null)
             {
-                string result;
-                if (NamespaceMapping.TryGetValue(key, out result))
-                    return result;
-                var tempKey = new NamespaceKey(source, null);
-                if (NamespaceMapping.TryGetValue(tempKey, out result))
-                    return result;
-                tempKey = new NamespaceKey(null, xmlNamespace);
-                if (NamespaceMapping.TryGetValue(tempKey, out result))
-                    return result;
+                var variants = new List<NamespaceKey>
+                {
+                    key,
+                };
+                if (source != null)
+                {
+                    variants.Add(new NamespaceKey(source, null));
+                    variants.Add(new NamespaceKey(new Uri(Path.GetFileName(source.LocalPath), UriKind.Relative), null));
+                }
+                variants.Add(new NamespaceKey(null, xmlNamespace));
+
+                foreach (var variant in variants)
+                {
+                    string result;
+                    if (NamespaceMapping.TryGetValue(variant, out result))
+                        return result;
+                }
             }
             if (GenerateNamespaceName != null) 
                 return GenerateNamespaceName(key);

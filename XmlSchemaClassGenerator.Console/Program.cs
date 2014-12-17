@@ -67,7 +67,9 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
             SimpleModel.IntegerDataType = integerType;
 
-            var namespaceMap = namespaces.Select(ParseNamespace).ToDictionary(x => x.Key, x => x.Value);
+            var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToDictionary(x => x.Key, x => x.Value);
+            if (!string.IsNullOrEmpty(outputFolder))
+                outputFolder = Path.GetFullPath(outputFolder);
 
             var generator = new Generator
             {
@@ -96,14 +98,16 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             generator.Generate(files);
         }
 
-        static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg)
+        static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
         {
             var parts = nsArg.Split(new[] {'='}, 2);
             var xmlNs = parts[0];
             var netNs = parts[1];
             var parts2 = xmlNs.Split(new[] {'|'}, 2);
-            var source = parts2.Length == 2 ? new Uri(parts2[1]) : null;
+            var source = parts2.Length == 2 ? new Uri(parts2[1], UriKind.RelativeOrAbsolute) : null;
             xmlNs = parts2[0];
+            if (!string.IsNullOrEmpty(namespacePrefix))
+                netNs = namespacePrefix + "." + netNs;
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 

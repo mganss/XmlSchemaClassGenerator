@@ -8,7 +8,7 @@ namespace XmlSchemaClassGenerator
 {
     public class NamespaceKey : IComparable<NamespaceKey>, IEquatable<NamespaceKey>, IComparable
     {
-        private const UriComponents CompareComponents = UriComponents.Host | UriComponents.Scheme | UriComponents.Path;
+        private const UriComponents CompareComponentsAbs = UriComponents.Host | UriComponents.Scheme | UriComponents.Path;
         private const UriFormat CompareFormat = UriFormat.Unescaped;
 
         public string XmlSchemaNamespace { get; private set; }
@@ -33,7 +33,7 @@ namespace XmlSchemaClassGenerator
                 return 1;
             if (Source != null)
             {
-                var result = Uri.Compare(Source, other.Source, CompareComponents, CompareFormat,
+                var result = Uri.Compare(Source, other.Source, CompareComponentsAbs, CompareFormat,
                     StringComparison.OrdinalIgnoreCase);
                 if (result != 0)
                     return result;
@@ -50,7 +50,12 @@ namespace XmlSchemaClassGenerator
         {
             var hashCode = 0;
             if (Source != null)
-                hashCode = Source.GetComponents(CompareComponents, CompareFormat).ToLower().GetHashCode();
+            {
+                if (Source.IsAbsoluteUri)
+                    hashCode = Source.GetComponents(CompareComponentsAbs, CompareFormat).ToLower().GetHashCode();
+                else
+                    hashCode = Source.OriginalString.ToLower().GetHashCode();
+            }
             if (XmlSchemaNamespace != null)
                 hashCode ^= XmlSchemaNamespace.GetHashCode();
             return hashCode;
