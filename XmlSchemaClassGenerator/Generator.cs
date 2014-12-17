@@ -98,7 +98,9 @@ namespace XmlSchemaClassGenerator
 
         private IEnumerable<CodeNamespace> GenerateCode()
         {
-            return Namespaces.Values.Select(n => n.Generate());
+            return Namespaces.Values
+                .GroupBy(x => x.Name)
+                .Select(n => NamespaceModel.Generate(n.Key, n));
         }
 
         private string BuildNamespace(Uri source, string xmlNamespace)
