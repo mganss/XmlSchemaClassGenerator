@@ -8,12 +8,15 @@ namespace XmlSchemaClassGenerator
 {
     public class NamespaceKey : IComparable<NamespaceKey>, IEquatable<NamespaceKey>, IComparable
     {
-        public string XmlSchemaNamespace { get; private set; }
-        public string FileName { get; private set; }
+        private const UriComponents CompareComponents = UriComponents.Host | UriComponents.Scheme | UriComponents.Path;
+        private const UriFormat CompareFormat = UriFormat.Unescaped;
 
-        public NamespaceKey(string fileName, string xmlSchemaNamespace)
+        public string XmlSchemaNamespace { get; private set; }
+        public Uri Source { get; private set; }
+
+        public NamespaceKey(Uri source, string xmlSchemaNamespace)
         {
-            FileName = fileName;
+            Source = source;
             XmlSchemaNamespace = xmlSchemaNamespace;
         }
 
@@ -24,7 +27,7 @@ namespace XmlSchemaClassGenerator
 
         public int CompareTo(NamespaceKey other)
         {
-            var result = String.Compare(FileName, other.FileName, StringComparison.OrdinalIgnoreCase);
+            var result = Uri.Compare(Source, other.Source, CompareComponents, CompareFormat, StringComparison.OrdinalIgnoreCase);
             if (result != 0)
                 return result;
             result = string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
@@ -38,7 +41,7 @@ namespace XmlSchemaClassGenerator
 
         public override int GetHashCode()
         {
-            return FileName.ToLower().GetHashCode()
+            return Source.GetComponents(CompareComponents, CompareFormat).ToLower().GetHashCode()
                    ^ XmlSchemaNamespace.GetHashCode();
         }
 
