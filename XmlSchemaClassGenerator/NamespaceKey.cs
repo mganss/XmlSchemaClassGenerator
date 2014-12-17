@@ -27,9 +27,18 @@ namespace XmlSchemaClassGenerator
 
         public int CompareTo(NamespaceKey other)
         {
-            var result = Uri.Compare(Source, other.Source, CompareComponents, CompareFormat, StringComparison.OrdinalIgnoreCase);
-            if (result != 0)
-                return result;
+            if (Source == null && other.Source != null)
+                return -1;
+            if (Source != null && other.Source == null)
+                return 1;
+            int result;
+            if (Source != null)
+            {
+                result = Uri.Compare(Source, other.Source, CompareComponents, CompareFormat,
+                    StringComparison.OrdinalIgnoreCase);
+                if (result != 0)
+                    return result;
+            }
             result = string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
             return result;
         }
@@ -41,7 +50,10 @@ namespace XmlSchemaClassGenerator
 
         public override int GetHashCode()
         {
-            return Source.GetComponents(CompareComponents, CompareFormat).ToLower().GetHashCode()
+            var hashCode = 0;
+            if (Source != null)
+                hashCode = Source.GetComponents(CompareComponents, CompareFormat).ToLower().GetHashCode();
+            return hashCode
                    ^ XmlSchemaNamespace.GetHashCode();
         }
 
