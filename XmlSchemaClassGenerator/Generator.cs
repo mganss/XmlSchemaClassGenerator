@@ -127,6 +127,12 @@ namespace XmlSchemaClassGenerator
                 string result;
                 if (NamespaceMapping.TryGetValue(key, out result))
                     return result;
+                var tempKey = new NamespaceKey(source, null);
+                if (NamespaceMapping.TryGetValue(tempKey, out result))
+                    return result;
+                tempKey = new NamespaceKey(null, xmlNamespace);
+                if (NamespaceMapping.TryGetValue(tempKey, out result))
+                    return result;
             }
             if (GenerateNamespaceName != null) 
                 return GenerateNamespaceName(key);
