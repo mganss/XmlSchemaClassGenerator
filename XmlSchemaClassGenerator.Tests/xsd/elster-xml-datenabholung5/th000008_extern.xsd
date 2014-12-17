@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!-- Version 8.23 -->
+<xs:schema xmlns:headerbasis="http://www.elster.de/headerbasis02/XMLSchema" xmlns:elster="http://www.elster.de/2002/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.elster.de/2002/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<xs:import namespace="http://www.elster.de/headerbasis02/XMLSchema" schemaLocation="./headerbasis000002.xsd"/>
+	<xs:element name="TransferHeader" type="elster:TransferHeaderCType"/>
+	<xs:complexType name="TransferHeaderCType">
+		<xs:sequence>
+			<xs:element name="Verfahren" type="headerbasis:VerfahrenSType">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Unter welchen Ablaufzusammenhang fallen die Daten.
+Durchgeführte Verarbeitungsart; Je nach Verfahren werden die Daten unterschiedlich verarbeitet. 
+Z.B. ElsterLohn für Lohndaten,
+ElsterAnmeldung für Anmeldungsteuerdaten, usw.</xs:documentation>
+					<xs:documentation xml:lang="de">Text; max. 42 Zeichen
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DatenArt" type="headerbasis:DatenArtSType">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Um welche Daten handelt es sich inhaltlich. Nur unterstützte Datentypen gelangen in die Nachverarbeitung.</xs:documentation>
+					<xs:documentation xml:lang="de">Text; max. 42 Zeichen
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Vorgang" type="headerbasis:VorgangSType">
+				<xs:annotation>
+					<xs:documentation>Art des Datentransfers/der Authentifizierung.
+Angabe 
+- ob und ggf. wie die Daten authentifiziert wurden
+- ob die Datenlieferung serverseitig online oder offline verarbeitet wird
+- ob die Verarbeitung der Daten partiell erfolgt, d.h. ob bei einer Datenlieferungen mit mehreren Datenpaketen bei einem Fehler die ganze Datenlieferung als fehlerhaft abgelehnt wird oder nur der fehlerhafte Teil
+
+Text; max. 42 Zeichen
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransferTicket" type="headerbasis:TransferTicketSType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Nicht von extern zu setzen!
+Element ist nur bei Ruecklieferungen aus der Clearingstelle vorhanden;  wird  in der Clearingstelle gesetzt und gefuellt;
+das Tag darf vom Datenlieferant nicht geliefert werden (auch nicht leer)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ETID" type="headerbasis:ETIDSType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Internes Element bei Vorgang send-Auth-Continue.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Testmerker" type="headerbasis:TestmerkerSType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Muss vom Datenlieferant gefuellt werden; wenn nicht vorhanden dann Echtfall ; Echfall aber auch wenn Testmerker = "0" oder = "000000000"</xs:documentation>
+					<xs:documentation xml:lang="de">gilt fuer die gesamte Datenlieferung !!!</xs:documentation>
+					<xs:documentation xml:lang="de">Kennzeichnung der Datenlieferung ob es sich um einen Echtfall oder einen Testfall handelt.</xs:documentation>
+					<xs:documentation xml:lang="de">Kennzeichnung der Datenlieferung ob es sich um einen Echtfall oder einen Testfall handelt.</xs:documentation>
+					<xs:documentation xml:lang="de">Ein Echtfall kann haben:
+- kein Element Testmerker
+- Element Testmerker mit Inhalt: 0 oder 000000000
+Ein Testfall muss mit einem Testmerker versehen werden, damit er nicht wie ein Echtfall verarbeitet wird.
+Handelt es sich um Daten, die nur zum Testen des Frontends versendet wurden, müssen sie nicht mehr weiter verarbeitet werden.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SigUser" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Der Inhalt des SigUser-Elements (ohne SigUser selbst) muss vor dem Versand an die Clearingstelle komplett verschlüsselt werden.
+Es muss mit dem gleichen Schlüssel, wie der DatenTeil verschlüsselt werden.
+Wichtig: Das Element ist in der Serverantwort nicht mehr enthalten! 
+</xs:documentation>
+				</xs:annotation>
+				<xs:complexType mixed="true">
+					<xs:complexContent>
+						<xs:restriction base="xs:anyType">
+							<xs:sequence>
+								<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Empfaenger" type="elster:EmpfaengerCType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Nicht von extern zu setzen!
+Ausnahme: Bei Versand von ERiC und Portal wird der Empfänger durch die Produkte gesetzt.
+ERiC setzt den Länderschlüssel grundsätzlich aufgrund der Empfängerinformationen im Nutzdatenheader. 
+
+In einer Lieferung dürfen nur Daten an einen Empfänger geliefert werden.
+Ausnahme: Verfahren ElsterLohn
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="HerstellerID" type="headerbasis:HerstellerIDSType"/>
+			<xs:element name="DatenLieferant">
+				<xs:annotation>
+					<xs:documentation xml:lang="DE">Datenlieferant ist derjenige, der die Datenlieferung an die Finanzverwaltung (Clearingstelle) uebermittelt. (ggf. Servicerechen-zentrum) 
+
+Der Inhalt des Tags "DatenLieferant" ist nach dem selben Verfahren und dem gleichen Schlüssel zu verschluesseln, wie die gesamte Datenlieferung;
+Der Inhalt wird online entschlüsselt, wenn dies nicht funktioniert, wird dem Anwender sofort ein Fehler zurückgegeben.
+
+Beispiele:
+- Bei LStB: Arbeitgeber oder Firma, welche/r die Daten liefert.
+- Bei ESt: Steuerpflichtiger oder Steuerberater/Firma 
+Beispielhafter Aufbau: Name des Lieferanten; Strasse; Hausnummer; Hausnummerzusatz; Adresszusatz; PLZ; Ort; Land; Telefon; E-Mail-Adresse
+
+Der Inhalt des Tags "DatenLieferant" darf vor Verschluesselung nicht laenger als 256 Zeichen sein;</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="EingangsDatum" type="headerbasis:EingangsDatumSType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="DE">Serverseitiges Eingangsdatum wird erst in der Clearingstelle eingefuegt;</xs:documentation>
+					<xs:documentation xml:lang="de">das TAG darf vom Datenlieferant nicht geliefert werden (auch nicht leer)</xs:documentation>
+					<xs:documentation xml:lang="DE">Datum, Uhrzeit, wann die Daten beim Server eingegangen sind; Wird serverseitig gefuellt</xs:documentation>
+					<xs:documentation xml:lang="DE">JJJJMMTThhmmss:Zahl, 14-stellig - extern nicht zu fuellen - </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Datei" type="elster:DateiCType">
+				<xs:annotation>
+					<xs:documentation>In den Unterelementen werden bestimmte Informationen zur Datenlieferung angegeben.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RC" type="elster:RCCType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Extern nicht zu setzen und zu füllen!</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="VersionClient" type="headerbasis:VersionClientSType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Produktversion</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Zusatz" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Info" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Freitext für Informationen
+
+Das Element Info kann mehrfach geliefert werden.
+</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:annotation>
+									<xs:documentation xml:lang="de">Kann vom Datenlieferant für eigene Zusaetze / Informationen genutzt werden;</xs:documentation>
+								</xs:annotation>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="ElsterInfo" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!</xs:documentation>
+								<xs:documentation xml:lang="de">Mitteilungen für den Datenlieferanten 
+NUR in der Antwort vom Server enthalten
+
+Nicht in jeder Serverantwort enthalten	
+Beispieltext:
+Ihr Authentifizierungszertifikat läuft am *.*.* ab, bitte loggen Sie sich im ElsterOnline-Portal ein um es zu verlängern.
+</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:annotation>
+									<xs:documentation xml:lang="de">Element ist nur bei Ruecklieferungen aus der Clearingstelle vorhanden;  wird  in der Clearingstelle gesetzt und gefuellt;
+das Tag darf vom Datenlieferant nicht geliefert werden (auch nicht leer)</xs:documentation>
+								</xs:annotation>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="version" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="de">Version des Transfer-Headers, zur Aktualitätsüberprüfung
+Numerisch; max. 6 stellig
+</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="headerbasis:BaseStringSType">
+					<xs:enumeration value="8"/>
+					<xs:enumeration value="000008"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- Definierung einfacher Elements________________________________________________________-->
+	<xs:complexType name="DateiCType">
+		<xs:sequence>
+			<xs:element name="Verschluesselung" type="headerbasis:VerschluesselungSType">
+				<xs:annotation>
+					<xs:documentation>Verwendetes Verschlüsselungsprotokoll</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Kompression" type="headerbasis:KompressionSType">
+				<xs:annotation>
+					<xs:documentation>Verwendetes Kompressionsverfahren</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DatenGroesse" type="headerbasis:DatenGroesseSType"/>
+			<xs:element name="TransportSchluessel" type="headerbasis:TransportSchluesselSType">
+				<xs:annotation>
+					<xs:documentation>Base 64-codierter String des X509- Zertifikats mit Öffentlichem RSA Schlüssel des Clients.
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Erstellung" type="elster:ErstellungType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Extern nicht zu setzen und zu füllen!</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmpfaengerCType">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">Extern nicht zu setzen und zu füllen!</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Ziel" type="headerbasis:BundeslandSType">
+				<xs:annotation>
+					<xs:documentation xml:lang="DE">Extern nicht zu setzen und zu füllen!
+Länderschlüssel oder Bundesfinanzamtsnumme.
+Kann aktuell nur mit einem Ziel-Bundesland gefuellt werdenl</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" use="required" fixed="L">
+			<xs:simpleType>
+				<xs:annotation>
+					<xs:documentation xml:lang="DE">Attribut, nur "L" fuer Angabe des Laenderschluessel erlaubt</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="headerbasis:BaseStringSType">
+					<xs:enumeration value="L"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="EricType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Extern nicht zu setzen und zu füllen!</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="xs:anyType">
+				<xs:sequence>
+					<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ErstellungType">
+		<xs:annotation>
+			<xs:documentation>Extern nicht zu setzen und zu füllen!</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Eric" type="elster:EricType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RCCType">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">Extern nicht zu setzen und zu füllen!</xs:documentation>
+			<xs:documentation xml:lang="DE">Rückgabewert einer SendeAktion (RC), in der Antwort vom Server enthalten.
+
+In den Unterelementen von RC kann man erkennen ob die Übermittlung der Daten geklappt hat.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:sequence minOccurs="0">
+				<xs:element name="SigIntern" type="headerbasis:SigInternSType"/>
+				<xs:element name="VerarbeitungsVersion" type="xs:string"/>
+			</xs:sequence>
+			<xs:element name="Rueckgabe">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Rückgabewert einer SendeAktion 
+
+Für den Endnutzer:
+Die verarbeitende Anwendung soll erkennen können, ob ein Fehler (9-stellige Fehlernummer) vorliegt oder nicht (0 = fehlerfreie Datenannahme) und ggf. Schritte einleiten können. 
+Beim Senden muss dieses Element nicht gesetzt werden; falls der Wert gefüllt übermittelt wird, wird dieser in der Serverantwort überschrieben.
+
+WICHTIGER HINWEIS:
+Wenn der Returncode _0_ im TransferHeader steht, muss bei DatenArten, bei denen das Element DatenTeil mit Inhalt zurückgeliefert wird, zusätzlich auch der Rückgabe Code im NutzdatenHeader geprüft werden!
+Nur dadurch kann man erkennen ob die Daten angenommen wurden von der Finanzverwaltung oder nicht.
+
+Numerisch -extern nicht zu setzen und zu füllen -
+
+</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:annotation>
+									<xs:documentation xml:lang="DE">Externer Fehlercode</xs:documentation>
+								</xs:annotation>
+								<xs:restriction base="xs:string"/>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Text" type="xs:string">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Die Fehlermeldung ist ein Text, der genaueren Aufschluss über einen Fehler gibt.
+
+Für den Endnutzer:
+der Text kann z.B. ausgegeben werden
+Beim Senden muss dieses Element nicht gesetzt werden; falls der Wert gefüllt übermittelt wird, wird dieser in der Serverantwort überschrieben.
+
+</xs:documentation>
+								<xs:documentation xml:lang="de">Text -extern nicht  setzen und zu füllen -
+</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Stack">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code">
+							<xs:annotation>
+								<xs:documentation>Rückgabewert einer SendeAktion
+
+Für den Softwarehersteller oder die Hotline 
+
+Numerisch -extern nicht zu setzen und zu füllen -</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:annotation>
+									<xs:documentation xml:lang="DE">Interner Fehlercode</xs:documentation>
+								</xs:annotation>
+								<xs:restriction base="xs:string"/>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="Text" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>Die Fehlermeldung ist ein Text, der genaueren Aufschluss über einen Fehler gibt.
+
+Für den Softwarehersteller oder die Hotline
+
+Text -extern nicht zu setzen und zu füllen -
+</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

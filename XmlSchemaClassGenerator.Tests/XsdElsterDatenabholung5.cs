@@ -1,0 +1,70 @@
+﻿using System;
+using System.Linq;
+using System.IO;
+using Xunit;
+
+namespace XmlSchemaClassGenerator.Tests
+{
+    public class XsdElsterDatenabholung5
+    {
+        [Fact]
+        public void CanGenerateClasses()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                var gen = new Generator
+                {
+                    GenerateDesignerCategoryAttribute = false,
+                    GenerateNullables = true,
+                    GenerateSerializableAttribute = false,
+                    OutputFolder = OutputPath,
+                    GenerateNamespaceName = (fileName, xmlNs) =>
+                    {
+                        switch (Path.GetFileName(fileName.LocalPath))
+                        {
+                            case "th000008_extern.xsd":
+                            case "ndh000010_extern.xsd":
+                            case "headerbasis000002.xsd":
+                                return "Elster.Basis";
+                            case "datenabholung_5.xsd":
+                            case "elster0810_datenabholung_5.xsd":
+                                switch (xmlNs)
+                                {
+                                    case "http://www.elster.de/2002/XMLSchema":
+                                        return "Elster.Datenabholung5";
+                                    default:
+                                        throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", xmlNs, fileName));
+                                }
+                            default:
+                                throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", xmlNs, fileName));
+                        }
+                    }
+                };
+                var xsdFiles = new[]
+                {
+                    "headerbasis000002.xsd",
+                    "ndh000010_extern.xsd",
+                    "th000008_extern.xsd",
+                    "datenabholung_5.xsd",
+                    "elster0810_datenabholung_5.xsd",
+                }.Select(x => Path.Combine(InputPath, x)).ToList();
+                gen.Generate(xsdFiles);
+            });
+        }
+
+        string InputPath
+        {
+            get { return Path.Combine(Directory.GetCurrentDirectory(), "xsd", "elster-xml-datenabholung5"); }
+        }
+
+        string OutputPath
+        {
+            get
+            {
+                var result = Path.Combine(Directory.GetCurrentDirectory(), "output", "elster-xml-datenabholung5");
+                Directory.CreateDirectory(result);
+                return result;
+            }
+        }
+    }
+}

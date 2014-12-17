@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!-- Version -  10.2 -->
+<xs:schema xmlns:headerbasis="http://www.elster.de/headerbasis02/XMLSchema" xmlns:elster="http://www.elster.de/2002/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.elster.de/2002/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+	<xs:import namespace="http://www.elster.de/headerbasis02/XMLSchema" schemaLocation="./headerbasis000002.xsd"/>
+	<xs:element name="NutzdatenHeader" type="elster:NutzdatenHeaderCType"/>
+	<xs:complexType name="NutzdatenHeaderCType">
+		<xs:sequence>
+			<xs:element name="NutzdatenTicket" type="headerbasis:NutzdatenBlockTicketSType">
+				<xs:annotation>
+					<xs:documentation>Eindeutiges Zuordnungskriterium der Nutzdaten zum gesendeten Fall</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Empfaenger" type="elster:NDH_EmpfaengerCType">
+				<xs:annotation>
+					<xs:documentation>BundesFinanz-amtsnummer bzw. Länderschlüssel</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SigUser" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Das Element SigUser wird nur beim Vorgang _send-Sig_ im Nutzdatenheder benötigt.
+Der Aufbau entspricht der Beschreibung im Transferheader.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType mixed="true">
+					<xs:complexContent>
+						<xs:restriction base="xs:anyType">
+							<xs:sequence>
+								<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Hersteller" type="elster:NDH_HerstellerCType"/>
+			<xs:element name="DatenLieferant" type="headerbasis:DatenLieferantSType">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Verantwortlicher für die Erstellung der gelieferten Nutzdaten (z.B. AG, Steuerpflichtiger, STB)
+Nicht zwangsläufig dieselbe Person, wie im TransferHeader.
+
+Enthält einen String der Lieferanteninformationen enthält. (Ansprechpartner im Fehlerfall)
+Ansprechpartner mit Telefon, E-Mail, etc.
+Beispiel:
+Bei ESt: Steuerpflichtiger oder Steuerberater/Firma  
+
+Text; max. 256 Zeichen
+Möglicher Aufbau: Name des Erstellers; Strasse; Hausnummer; Hausnummerzusatz; Adresszusatz; PLZ; Ort; Land; Telefon; E-Mail-Adresse
+
+Beispiel: "Hr. YY; Teststraße; 12; a; im Hinterhof; 80333; Muenchen;Deutschland; 089/1111 1111; tester@test.de"</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RC" type="elster:NDH_RCCType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Rückgabewert einer SendeAktion 
+Extern nicht zu setzen und zu füllen!
+
+In den Unterelementen von RC kann man erkennen ob die Daten verarbeitbar sind.
+Falls das Element (gefüllt) übermittelt wird, wird dieses in der Serverantwort überschrieben.
+</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Zusatz" type="elster:NDH_ZusatzCType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="version" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="de">Version des Nutzdaten-Headers
+
+Numerisch max. 6-stellig
+</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="headerbasis:BaseStringSType">
+					<xs:minLength value="2"/>
+					<xs:enumeration value="10"/>
+					<xs:enumeration value="000010"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- Definierung einfacher Elements________________________________________________________-->
+	<xs:complexType name="NDH_EmpfaengerCType">
+		<xs:annotation>
+			<xs:documentation xml:lang="DE">Ob als  Empfaenger ein Finanzamt oder ein Bundesland eingetragen werden muss, ist vom Verfahren abhaengig.
+Ankündigung: 
+Ab Einführung des ID-Merkmals muss in einigen Fachverfahren zwingend die Bundesfinanzamtsnummer als Empfänger verwendet werden, in welchen Fachverfahren das zutrifft kann aus der entsprechenden Dokumentation entnommen werden.
+
+Erste 4 Stellen der Steuernummer 
+bzw. 2-stelliger Länderschlüssel</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="headerbasis:EmpfaengerSType">
+				<xs:attribute name="id" type="headerbasis:EmpfaengerIDSType" use="required">
+					<xs:annotation>
+						<xs:documentation>Attribut, ob Länderschlüssel oder BundesFinanzamts-nummer angegeben wird.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="NDH_HerstellerCType">
+		<xs:sequence>
+			<xs:element name="ProduktName">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Copyright für die Datensatzerstellung
+Für evtl. Druck oder PDF-Anzeige, oder evtl. Rückgabemeldungen (ehem. Copyright).
+
+alphanumerisch; max. 50 Zeichen
+
+Beispiel:
+_Elsterformular 2001_
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:pattern value="[^\p{C}]*"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ProduktVersion">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Version des externen Programms
+Für evtl. Druck oder PDF-Anzeige
+
+alphanumerisch; max. 50 Zeichen
+Beispiel: "ElsterFormular V1.7"
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="50"/>
+						<xs:pattern value="[^\p{C}]*"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="NDH_RCCType">
+		<xs:annotation>
+			<xs:documentation>Extern nicht zu setzen und zu füllen!</xs:documentation>
+		</xs:annotation>
+		<xs:sequence minOccurs="0">
+			<xs:sequence minOccurs="0">
+				<xs:element name="SigIntern" type="headerbasis:SigInternSType">
+					<xs:annotation>
+						<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!
+Signatur der Serverseite
+Damit festgestellt werden kann, ob plausibilisierter XML-String vom Anwender verändert wurde.
+
+Text</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="VerarbeitungsVersion" type="xs:string">
+					<xs:annotation>
+						<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!
+Version der serverseitig verarbeitenden Programme zur Aktualitätsprüfung.
+
+Text
+Beispiel: "V.2001.123.123.123"
+</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:element name="Rueckgabe">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code" type="headerbasis:CodeExternSType">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!
+Rückgabewert einer SendeAktion (RC)	
+
+Für den Endnutzer:
+Anhand dieser Nummer erkennt man ob 
+- die Daten verarbeitbar sind und angenommen wurden 
+(Wert gleich 0) 
+Oder
+-  die Daten NICHT angenommen wurden und die Daten nochmal geschickt werden müssen. 
+(Wert ungleich 0)
+
+Beim Senden darf dieses Element nicht gesetzt werden;
+
+Numerisch</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="xs:string">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!
+Die Fehlermeldung ist ein Text, der genaueren Aufschluss über einen Fehler gibt.
+Für den Endnutzer.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Stack">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Code" type="headerbasis:CodeInternSType">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!
+Rückgabewert einer SendeAktion
+Für den Softwarehersteller oder die Hotline
+
+Numerisch</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Text" type="xs:string">
+							<xs:annotation>
+								<xs:documentation xml:lang="de">Extern nicht zu setzen und zu füllen!
+Die Fehlermeldung ist ein Text, der genaueren Aufschluss über einen Fehler gibt.
+Für den Softwarehersteller oder die Hotline</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="NDH_ZusatzCType">
+		<xs:sequence>
+			<xs:element name="Info" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="de">Freie Information	
+Zusatzfeld
+Das Element Info kann mehrfach übermittelt werden
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation xml:lang="de">kann vom Datenlieferant für eigene Zusaetze / Informationen genutzt werden</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ElsterInfo" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Extern nicht zu setzen und zu füllen!
+Mitteilungen für den Datenlieferanten 
+
+Nicht in jeder Serverantwort enthalten	
+
+Text
+Beispieltext: "Ihr Authentifizierungszertifikat läuft am *.*.* ab, bitte loggen Sie sich im ElsterOnline-Portal ein um es zu verlängern."
+</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation xml:lang="de">Element ist nur bei Ruecklieferungen aus der Clearingstelle vorhanden;  wird  in der Clearingstelle gesetzt und gefuellt;</xs:documentation>
+						<xs:documentation xml:lang="de">das TAG darf vom Datenlieferant nicht geliefert werden (auch nicht leer)</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
