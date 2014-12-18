@@ -20,12 +20,18 @@ namespace XmlSchemaClassGenerator
         public static string ToPascalCase(this string s)
         {
             if (string.IsNullOrEmpty(s)) return s;
+            return char.ToUpperInvariant(s[0]) + s.Substring(1);
+        }
+
+        public static string ToCamelCase(this string s)
+        {
+            if (string.IsNullOrEmpty(s)) return s;
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
         public static string ToBackingField(this string propertyName)
         {
-            return string.Format("_{0}{1}", char.ToLowerInvariant(propertyName[0]), propertyName.Substring(1));
+            return string.Concat("_", propertyName.ToCamelCase());
         }
 
         private static bool? IsDataTypeAttributeAllowed(XmlTypeCode typeCode)
