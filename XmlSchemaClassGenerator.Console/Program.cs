@@ -22,6 +22,8 @@ namespace XmlSchemaClassGenerator.Console
             var verbose = false;
             var nullables = false;
             var pclCompatible = false;
+            var enableDataBinding = false;
+            var emitOrder = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -49,6 +51,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                                  break;
                                          }
                                      } },
+                { "edb|enable-data-binding", "Enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
+                { "order", "Emit order for all class members stored as XML element", v => emitOrder = v != null },
                 { "pcl", "PCL compatible output", v => pclCompatible = v != null },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
                 { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
@@ -84,6 +88,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 NamespaceProvider = namespaceMap,
                 OutputFolder = outputFolder,
                 GenerateNullables = nullables,
+                EnableDataBinding = enableDataBinding,
+                EmitOrder = emitOrder,
             };
 
             if (pclCompatible)

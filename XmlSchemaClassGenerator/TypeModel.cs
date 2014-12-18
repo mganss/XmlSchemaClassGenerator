@@ -41,7 +41,11 @@ namespace XmlSchemaClassGenerator
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
 
-            foreach (var typeModel in parts.SelectMany(x => x.Types.Values))
+            var typeModels = parts.SelectMany(x => x.Types.Values).ToList();
+            if (typeModels.OfType<ClassModel>().Any(x => x.EnableDataBinding))
+                codeNamespace.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
+
+            foreach (var typeModel in typeModels)
             {
                 var type = typeModel.Generate();
                 if (type != null)
@@ -167,6 +171,7 @@ namespace XmlSchemaClassGenerator
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
+        public bool EnableDataBinding { get; set; }
 
         static ClassModel()
         {
@@ -184,6 +189,15 @@ namespace XmlSchemaClassGenerator
             var classDeclaration = base.Generate();
             classDeclaration.IsClass = true;
             classDeclaration.IsPartial = true;
+
+            if (EnableDataBinding)
+            {
+                classDeclaration.Members.Add(new CodeMemberEvent()
+                {
+                    Name = "PropertyChanged",
+                    Type = new CodeTypeReference("PropertyChangedEventHandler"),
+                });
+            }
 
             if (BaseClass != null)
             {
@@ -204,8 +218,11 @@ namespace XmlSchemaClassGenerator
                 }
             }
 
+            if (EnableDataBinding)
+                classDeclaration.BaseTypes.Add(new CodeTypeReference("INotifyPropertyChanged"));
+
             foreach (var property in Properties)
-                property.AddMembersTo(classDeclaration);
+                property.AddMembersTo(classDeclaration, EnableDataBinding);
 
             classDeclaration.CustomAttributes.Add(
                 new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute))));
@@ -294,7 +311,7 @@ namespace XmlSchemaClassGenerator
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
-        public void AddMembersTo(CodeTypeDeclaration typeDeclaration)
+        public void AddMembersTo(CodeTypeDeclaration typeDeclaration, bool withDataBinding)
         {
             CodeTypeMember member = null;
 
