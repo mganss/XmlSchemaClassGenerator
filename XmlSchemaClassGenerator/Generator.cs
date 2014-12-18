@@ -584,7 +584,7 @@ namespace XmlSchemaClassGenerator
                             {
                                 var value = new EnumValueModel
                                 {
-                                    Name = ToTitleCase(facet.Value),
+                                    Name = ToTitleCase(facet.Value).ToNormalizedEnumName(),
                                     Value = facet.Value
                                 };
 

@@ -22,6 +22,7 @@ namespace XmlSchemaClassGenerator.Tests
                     GenerateNullables = true,
                     GenerateSerializableAttribute = false,
                     OutputFolder = OutputPath,
+                    NamingScheme = NamingScheme.Direct,
                     NamespaceProvider = new NamespaceProvider()
                     {
                         GenerateNamespace = key =>
