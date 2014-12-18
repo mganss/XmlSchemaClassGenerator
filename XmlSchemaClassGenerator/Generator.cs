@@ -136,9 +136,10 @@ namespace XmlSchemaClassGenerator
 
         private IEnumerable<CodeNamespace> GenerateCode()
         {
-            return Namespaces.Values
-                .GroupBy(x => x.Name)
-                .Select(n => NamespaceModel.Generate(n.Key, n));
+            var hierarchy = NamespaceHierarchyItem.Build(Namespaces.Values.GroupBy(x => x.Name).SelectMany(x => x))
+                .MarkAmbiguousNamespaceTypes();
+            return hierarchy.Flatten()
+                .Select(nhi => NamespaceModel.Generate(nhi.FullName, nhi.Models));
         }
 
         private string BuildNamespace(Uri source, string xmlNamespace)
@@ -299,7 +300,7 @@ namespace XmlSchemaClassGenerator
 
                         if (derivedClassModel.Namespace != null)
                         {
-                            derivedClassModel.Name = derivedClassModel.Namespace.GetUniqueName(derivedClassModel.Name);
+                            derivedClassModel.Name = derivedClassModel.Namespace.GetUniqueTypeName(derivedClassModel.Name);
                             derivedClassModel.Namespace.Types[derivedClassModel.Name] = derivedClassModel;
                         }
 
@@ -374,7 +375,7 @@ namespace XmlSchemaClassGenerator
             if (complexType != null)
             {
                 var name = ToTitleCase(qualifiedName.Name);
-                if (namespaceModel != null) name = namespaceModel.GetUniqueName(name);
+                if (namespaceModel != null) name = namespaceModel.GetUniqueTypeName(name);
 
                 var classModel = new ClassModel
                 {
@@ -577,7 +578,7 @@ namespace XmlSchemaClassGenerator
                         {
                             // we got an enum
                             var name = ToTitleCase(qualifiedName.Name);
-                            if (namespaceModel != null) name = namespaceModel.GetUniqueName(name);
+                            if (namespaceModel != null) name = namespaceModel.GetUniqueTypeName(name);
 
                             var enumModel = new EnumModel
                             {
@@ -622,7 +623,7 @@ namespace XmlSchemaClassGenerator
                 }
 
                 var simpleModelName = ToTitleCase(qualifiedName.Name);
-                if (namespaceModel != null) simpleModelName = namespaceModel.GetUniqueName(simpleModelName);
+                if (namespaceModel != null) simpleModelName = namespaceModel.GetUniqueTypeName(simpleModelName);
 
                 var simpleModel = new SimpleModel
                 {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
@@ -6,7 +8,7 @@ namespace XmlSchemaClassGenerator
     public static class CodeUtilities
     {
         private const string Alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private const string Num = "0123456789";
+        //private const string Num = "0123456789";
 
         public static string ToNormalizedEnumName(this string name)
         {

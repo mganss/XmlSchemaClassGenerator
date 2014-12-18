@@ -22,6 +22,10 @@ namespace XmlSchemaClassGenerator
         public string Name { get; set; }
         public NamespaceKey Key { get; private set; }
         public Dictionary<string, TypeModel> Types { get; set; }
+        /// <summary>
+        /// Does the namespace of this type clashes with a class in the same or upper namespace?
+        /// </summary>
+        public bool IsAmbiguous { get; set; }
 
         public NamespaceModel(NamespaceKey key)
         {
@@ -47,7 +51,7 @@ namespace XmlSchemaClassGenerator
             return codeNamespace;
         }
 
-        public string GetUniqueName(string name)
+        public string GetUniqueTypeName(string name)
         {
             var n = name;
             var i = 2;
@@ -143,7 +147,7 @@ namespace XmlSchemaClassGenerator
 
         public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection, bool forInit = false)
         {
-            var name = referencingNamespace == Namespace ? Name : string.Format("{0}.{1}", Namespace.Name, Name);
+            var name = referencingNamespace == Namespace ? Name : string.Format("{2}{0}.{1}", Namespace.Name, Name, ((referencingNamespace ?? Namespace).IsAmbiguous ? "global::" : string.Empty));
             if (collection)
                 name = forInit ? SimpleModel.GetCollectionImplementationName(name) : SimpleModel.GetCollectionDefinitionName(name);
             return new CodeTypeReference(name);
@@ -201,7 +205,7 @@ namespace XmlSchemaClassGenerator
             }
 
             foreach (var property in Properties)
-                property.AddMembers(classDeclaration);
+                property.AddMembersTo(classDeclaration);
 
             classDeclaration.CustomAttributes.Add(
                 new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute))));
@@ -289,7 +293,7 @@ namespace XmlSchemaClassGenerator
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
-        public void AddMembers(CodeTypeDeclaration typeDeclaration)
+        public void AddMembersTo(CodeTypeDeclaration typeDeclaration)
         {
             CodeTypeMember member = null;
 

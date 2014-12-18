@@ -44,5 +44,52 @@ namespace XmlSchemaClassGenerator
                 };
             }
         }
+
+        public static IEnumerable<NamespaceHierarchyItem> Flatten(this IEnumerable<NamespaceHierarchyItem> hierarchyItems)
+        {
+            foreach (var hierarchyItem in hierarchyItems)
+            {
+                if (hierarchyItem.Models.Any())
+                    yield return hierarchyItem;
+                foreach (var subNamespaceItem in hierarchyItem.SubNamespaces.Flatten())
+                    yield return subNamespaceItem;
+            }
+        }
+
+        private static void MarkAmbiguousNamespaceTypes(NamespaceHierarchyItem item)
+        {
+            foreach (var nsModel in item.Models)
+                nsModel.IsAmbiguous = true;
+            foreach (var subItem in item.SubNamespaces)
+                MarkAmbiguousNamespaceTypes(subItem);
+        }
+
+        private static void MarkAmbiguousNamespaceTypes(string rootName, NamespaceHierarchyItem item, List<TypeModel> parentTypes)
+        {
+            var visibleTypes = new List<TypeModel>(parentTypes);
+            visibleTypes.AddRange(item.TypeModels);
+            var visibleTypesLookup = visibleTypes.ToLookup(x => x.Name);
+            var isAmbiguous = visibleTypesLookup.Contains(rootName);
+            if (isAmbiguous)
+            {
+                MarkAmbiguousNamespaceTypes(item);
+            }
+            else
+            {
+                foreach (var subItem in item.SubNamespaces)
+                    MarkAmbiguousNamespaceTypes(rootName, subItem, visibleTypes);
+            }
+        }
+
+        public static IEnumerable<NamespaceHierarchyItem> MarkAmbiguousNamespaceTypes(
+            this IEnumerable<NamespaceHierarchyItem> hierarchyItems)
+        {
+            var emptyTypes = new List<TypeModel>();
+            foreach (var hierarchyItem in hierarchyItems)
+            {
+                MarkAmbiguousNamespaceTypes(hierarchyItem.Name, hierarchyItem, emptyTypes);
+                yield return hierarchyItem;
+            }
+        }
     }
 }
