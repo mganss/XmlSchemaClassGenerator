@@ -676,36 +676,8 @@ namespace XmlSchemaClassGenerator
                 // http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlelementattribute.datatype(v=vs.110).aspx
                 // XmlSerializer is inconsistent: maps xs:decimal to decimal but xs:integer to string,
                 // even though xs:integer is a restriction of xs:decimal
-                switch (XmlSchemaType.TypeCode)
-                {
-                    case XmlTypeCode.AnyAtomicType:
-                        // union
-                        type = typeof(string);
-                        UseDataTypeAttribute = false;
-                        break;
-                    case XmlTypeCode.AnyUri:
-                    case XmlTypeCode.Duration:
-                    case XmlTypeCode.GDay:
-                    case XmlTypeCode.GMonth:
-                    case XmlTypeCode.GMonthDay:
-                    case XmlTypeCode.GYear:
-                    case XmlTypeCode.GYearMonth:
-                    case XmlTypeCode.Time:
-                        type = XmlSchemaType.Datatype.Variety == XmlSchemaDatatypeVariety.List ? typeof(string[]) : typeof(string);
-                        break;
-                    case XmlTypeCode.Integer:
-                    case XmlTypeCode.NegativeInteger:
-                    case XmlTypeCode.NonNegativeInteger:
-                    case XmlTypeCode.NonPositiveInteger:
-                    case XmlTypeCode.PositiveInteger:
-                        if (IntegerDataType == null || IntegerDataType == typeof(string)) type = typeof(string);
-                        else
-                        {
-                            type = IntegerDataType;
-                            UseDataTypeAttribute = false;
-                        }
-                        break;
-                }
+                type = XmlSchemaType.GetEffectiveType();
+                UseDataTypeAttribute = XmlSchemaType.IsDataTypeAttributeAllowed() ?? UseDataTypeAttribute;
             }
 
             if (collection)
