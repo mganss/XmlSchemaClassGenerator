@@ -19,14 +19,20 @@ namespace XmlSchemaClassGenerator
 {
     public class Generator
     {
-        public GenerateNamespaceDelegate GenerateNamespaceName { get; set; }
-        public Dictionary<NamespaceKey, string> NamespaceMapping { get; set; }
+        public NamespaceProvider NamespaceProvider { get; set; }
         public string OutputFolder { get; set; }
         public Action<string> Log { get; set; }
+        /// <summary>
+        /// Enable data binding with INotifyPropertyChanged
+        /// </summary>
+        public bool EnableDataBinding { get; set; }
         /// <summary>
         /// Use XElement instead of XmlElement for Any nodes?
         /// </summary>
         public bool UseXElementForAny { get; set; }
+        /// <summary>
+        /// How are the names of the created properties changed?
+        /// </summary>
         public NamingScheme NamingScheme { get; set; }
 
         public bool GenerateNullables
@@ -74,6 +80,7 @@ namespace XmlSchemaClassGenerator
         public Generator()
         {
             NamingScheme = NamingScheme.FirstCharUpperCase;
+            NamespaceProvider = new NamespaceProvider();
         }
 
         public void Generate(IEnumerable<string> files)
@@ -128,30 +135,11 @@ namespace XmlSchemaClassGenerator
         private string BuildNamespace(Uri source, string xmlNamespace)
         {
             var key = new NamespaceKey(source, xmlNamespace);
-            if (NamespaceMapping != null)
-            {
-                var variants = new List<NamespaceKey>
-                {
-                    key,
-                };
-                if (source != null)
-                {
-                    variants.Add(new NamespaceKey(source, null));
-                    variants.Add(new NamespaceKey(new Uri(Path.GetFileName(source.LocalPath), UriKind.Relative), null));
-                }
-                variants.Add(new NamespaceKey(null, xmlNamespace));
-
-                foreach (var variant in variants)
-                {
-                    string result;
-                    if (NamespaceMapping.TryGetValue(variant, out result))
-                        return result;
-                }
-            }
-            if (GenerateNamespaceName != null) 
-                return GenerateNamespaceName(key);
+            var result = NamespaceProvider.FindNamespace(key);
+            if (!string.IsNullOrEmpty(result))
+                return result;
             
-            throw new Exception(string.Format("Namespace {0} not in namespace map and GenerateNamespaceName not provided.", xmlNamespace));
+            throw new Exception(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
         }
 
         private static Dictionary<char, string> InvalidChars = CreateInvalidChars();

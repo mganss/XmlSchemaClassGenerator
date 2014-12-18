@@ -14,6 +14,24 @@ namespace XmlSchemaClassGenerator
         public string XmlSchemaNamespace { get; private set; }
         public Uri Source { get; private set; }
 
+        public NamespaceKey()
+            : this(null, null)
+        {
+
+        }
+
+        public NamespaceKey(Uri source)
+            : this(source, null)
+        {
+
+        }
+
+        public NamespaceKey(string xmlSchemaNamespace)
+            : this(null, xmlSchemaNamespace)
+        {
+
+        }
+
         public NamespaceKey(Uri source, string xmlSchemaNamespace)
         {
             Source = source;
