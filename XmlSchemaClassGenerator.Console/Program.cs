@@ -91,6 +91,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 generator.UseXElementForAny = true;
                 generator.GenerateDesignerCategoryAttribute = false;
                 generator.GenerateSerializableAttribute = false;
+                generator.DataAnnotationMode = DataAnnotationMode.None;
             }
 
             if (verbose) generator.Log = s => System.Console.Out.WriteLine(s);
