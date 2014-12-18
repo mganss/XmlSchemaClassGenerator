@@ -577,52 +577,51 @@ namespace XmlSchemaClassGenerator
                 var typeRestriction = simpleType.Content as XmlSchemaSimpleTypeRestriction;
                 if (typeRestriction != null)
                 {
-                    if (EnumTypes.Contains(typeRestriction.BaseTypeName.Name))
+                    var enumFacets = typeRestriction.Facets.OfType<XmlSchemaEnumerationFacet>().ToList();
+                    var isEnum = (enumFacets.Count == typeRestriction.Facets.Count && enumFacets.Count != 0)
+                                    || (EnumTypes.Contains(typeRestriction.BaseTypeName.Name) && enumFacets.Any());
+                    if (isEnum)
                     {
-                        var enumFacets = typeRestriction.Facets.OfType<XmlSchemaEnumerationFacet>();
-                        if (enumFacets.Any())
-                        {
-                            // we got an enum
-                            var name = ToTitleCase(qualifiedName.Name);
-                            if (namespaceModel != null) name = namespaceModel.GetUniqueTypeName(name);
+                        // we got an enum
+                        var name = ToTitleCase(qualifiedName.Name);
+                        if (namespaceModel != null) name = namespaceModel.GetUniqueTypeName(name);
 
-                            var enumModel = new EnumModel
+                        var enumModel = new EnumModel
+                        {
+                            Name = name,
+                            Namespace = namespaceModel,
+                            XmlSchemaName = qualifiedName,
+                            XmlSchemaType = type,
+                        };
+
+                        enumModel.Documentation.AddRange(docs);
+
+                        foreach (var facet in enumFacets)
+                        {
+                            var value = new EnumValueModel
                             {
-                                Name = name,
-                                Namespace = namespaceModel,
-                                XmlSchemaName = qualifiedName,
-                                XmlSchemaType = type,
+                                Name = ToTitleCase(facet.Value).ToNormalizedEnumName(),
+                                Value = facet.Value
                             };
 
-                            enumModel.Documentation.AddRange(docs);
+                            var valueDocs = GetDocumentation(facet);
+                            value.Documentation.AddRange(valueDocs);
 
-                            foreach (var facet in enumFacets)
-                            {
-                                var value = new EnumValueModel
-                                {
-                                    Name = ToTitleCase(facet.Value).ToNormalizedEnumName(),
-                                    Value = facet.Value
-                                };
+                            var deprecated = facet.Annotation == null ? false : facet.Annotation.Items.OfType<XmlSchemaAppInfo>()
+                                .Any(a => a.Markup.Any(m => m.Name == "annox:annotate" && m.HasChildNodes && m.FirstChild.Name == "jl:Deprecated"));
+                            value.IsDeprecated = deprecated;
 
-                                var valueDocs = GetDocumentation(facet);
-                                value.Documentation.AddRange(valueDocs);
-
-                                var deprecated = facet.Annotation == null ? false : facet.Annotation.Items.OfType<XmlSchemaAppInfo>()
-                                    .Any(a => a.Markup.Any(m => m.Name == "annox:annotate" && m.HasChildNodes && m.FirstChild.Name == "jl:Deprecated"));
-                                value.IsDeprecated = deprecated;
-
-                                enumModel.Values.Add(value);
-                            }
-
-                            if (namespaceModel != null)
-                            {
-                                namespaceModel.Types[enumModel.Name] = enumModel;
-                            }
-
-                            if (!qualifiedName.IsEmpty) TypeModel.Types[qualifiedName] = enumModel;
-
-                            return enumModel;
+                            enumModel.Values.Add(value);
                         }
+
+                        if (namespaceModel != null)
+                        {
+                            namespaceModel.Types[enumModel.Name] = enumModel;
+                        }
+
+                        if (!qualifiedName.IsEmpty) TypeModel.Types[qualifiedName] = enumModel;
+
+                        return enumModel;
                     }
 
                     restrictions = typeRestriction.Facets.Cast<XmlSchemaFacet>().Select(f => GetRestriction(simpleType, f)).Where(r => r != null).Sanitize().ToList();
