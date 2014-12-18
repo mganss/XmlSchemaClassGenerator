@@ -13,6 +13,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             var gen = new Generator
             {
+                IntegerDataType = typeof(int),
                 UseXElementForAny = true,
                 CollectionType = typeof(IList<>),
                 CollectionImplementationType = typeof(List<>),

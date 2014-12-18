@@ -81,6 +81,12 @@ namespace XmlSchemaClassGenerator
             set { SimpleModel.CollectionImplementationType = value; }
         }
 
+        public Type IntegerDataType
+        {
+            get { return SimpleModel.IntegerDataType; }
+            set { SimpleModel.IntegerDataType = value; }
+        }
+
         private XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
