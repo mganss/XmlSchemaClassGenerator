@@ -313,7 +313,7 @@ namespace XmlSchemaClassGenerator
                 var propertyName = isNullableValueType && GenerateNullables ? Name + "Value" : Name;
                 member = new CodeMemberField(typeReference, propertyName);
                 // hack to generate automatic property
-                member.Name += IsCollection ? " { get; private set; }" : " { get; set; }";
+                member.Name += IsCollection || isArray ? " { get; private set; }" : " { get; set; }";
             }
             else
             {
