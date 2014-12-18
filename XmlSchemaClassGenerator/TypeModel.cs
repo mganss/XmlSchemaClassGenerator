@@ -39,6 +39,7 @@ namespace XmlSchemaClassGenerator
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
+            codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
 
             var typeModels = parts.SelectMany(x => x.Types.Values).ToList();
@@ -196,7 +197,30 @@ namespace XmlSchemaClassGenerator
                 {
                     Name = "PropertyChanged",
                     Type = new CodeTypeReference("PropertyChangedEventHandler"),
+                    Attributes = MemberAttributes.Public,
                 });
+
+                var onPropChangedMethod = new CodeMemberMethod
+                {
+                    Name = "OnPropertyChanged",
+                    Attributes = MemberAttributes.Family,
+                };
+                var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName");
+                onPropChangedMethod.Parameters.Add(param);
+                onPropChangedMethod.Statements.Add(
+                    new CodeConditionStatement(
+                        new CodeBinaryOperatorExpression(
+                            new CodeEventReferenceExpression(null, "PropertyChanged"),
+                            CodeBinaryOperatorType.IdentityInequality,
+                            new CodePrimitiveExpression(null)),
+                        new CodeExpressionStatement(new CodeDelegateInvokeExpression(
+                            new CodeEventReferenceExpression(null, "PropertyChanged"),
+                            new CodeThisReferenceExpression(),
+                            new CodeObjectCreateExpression(
+                                "PropertyChangedEventArgs",
+                                new CodeArgumentReferenceExpression("propertyName"))
+                            ))));
+                classDeclaration.Members.Add(onPropChangedMethod);
             }
 
             if (BaseClass != null)
@@ -206,10 +230,27 @@ namespace XmlSchemaClassGenerator
                 else
                 {
                     var typeReference = BaseClass.GetReferenceFor(Namespace, collection: false);
-                    var member = new CodeMemberField(typeReference, "Value");
-                    // hack to generate automatic property
-                    member.Name += " { get; set; }";
-                    member.Attributes = (member.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
+
+                    var member = new CodeMemberField(typeReference, "Value")
+                    {
+                        Attributes = MemberAttributes.Public,
+                    };
+
+                    if (EnableDataBinding)
+                    {
+                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField())
+                        {
+                            Attributes = MemberAttributes.Private
+                        };
+                        member.Name += PropertyModel.GetAccessors(member.Name, backingFieldMember.Name, BaseClass.GetPropertyValueTypeCode(), false);
+                        classDeclaration.Members.Add(backingFieldMember);
+                    }
+                    else
+                    {
+                        // hack to generate automatic property
+                        member.Name += " { get; set; }";
+                    }
+
                     var docs = new[] { new DocumentationModel { Language = "en", Text = "Gets or sets the text value." },
                         new DocumentationModel { Language = "de", Text = "Ruft den Text ab oder legt diesen fest." } };
                     member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
@@ -305,10 +346,52 @@ namespace XmlSchemaClassGenerator
             Documentation = new List<DocumentationModel>();
         }
 
-        public string ToCamelCase(string s)
+        internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter)
         {
-            if (string.IsNullOrEmpty(s)) return s;
-            return char.ToLowerInvariant(s[0]) + s.Substring(1);
+            switch (typeCode)
+            {
+                case PropertyValueTypeCode.ValueType:
+                    return string.Format(@" {{
+    get {{
+        return {0};
+    }}
+    {2}set {{
+        if (!{0}.Equals(value)) {{
+            {0} = value;
+            OnPropertyChanged(""{1}"");
+        }}
+    }}
+}}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+                case PropertyValueTypeCode.Other:
+                    return string.Format(@" {{
+    get {{
+        return {0};
+    }}
+    {2}set {{
+        if ({0} == value)
+            return;
+        if ({0} == null || value == null || !{0}.Equals(value)) {{
+            {0} = value;
+            OnPropertyChanged(""{1}"");
+        }}
+    }}
+}}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+                case PropertyValueTypeCode.Array:
+                    return string.Format(@" {{
+    get {{
+        return {0};
+    }}
+    {2}set {{
+        if ({0} == value)
+            return;
+        if ({0} == null || value == null || !{0}.SequenceEqual(value)) {{
+            {0} = value;
+            OnPropertyChanged(""{1}"");
+        }}
+    }}
+}}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+            }
+            throw new NotSupportedException();
         }
 
         public void AddMembersTo(CodeTypeDeclaration typeDeclaration, bool withDataBinding)
@@ -334,7 +417,7 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
-                var backingField = new CodeMemberField(typeReference, "_" + ToCamelCase(Name));
+                var backingField = new CodeMemberField(typeReference, Name.ToBackingField());
                 backingField.Attributes = (backingField.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Private;
                 var ignoreAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute)));
                 backingField.CustomAttributes.Add(ignoreAttribute);

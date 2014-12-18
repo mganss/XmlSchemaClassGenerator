@@ -13,6 +13,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             var gen = new Generator
             {
+                EnableDataBinding = true,
                 IntegerDataType = typeof(int),
                 UseXElementForAny = true,
                 CollectionType = typeof(IList<>),

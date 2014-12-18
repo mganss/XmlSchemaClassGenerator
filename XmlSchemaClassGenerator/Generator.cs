@@ -99,7 +99,7 @@ namespace XmlSchemaClassGenerator
 
         public Generator()
         {
-            NamingScheme = NamingScheme.FirstCharUpperCase;
+            NamingScheme = NamingScheme.PascalCase;
             NamespaceProvider = new NamespaceProvider();
         }
 
@@ -264,8 +264,8 @@ namespace XmlSchemaClassGenerator
             if (string.IsNullOrEmpty(s)) return s;
             switch (namingScheme)
             {
-                case NamingScheme.FirstCharUpperCase:
-                    s = char.ToUpperInvariant(s[0]) + s.Substring(1);
+                case NamingScheme.PascalCase:
+                    s = s.ToPascalCase();
                     break;
             }
             return MakeValidIdentifier(s);

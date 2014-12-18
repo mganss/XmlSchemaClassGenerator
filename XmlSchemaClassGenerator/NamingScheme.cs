@@ -9,6 +9,6 @@ namespace XmlSchemaClassGenerator
     public enum NamingScheme
     {
         Direct,
-        FirstCharUpperCase
+        PascalCase
     }
 }

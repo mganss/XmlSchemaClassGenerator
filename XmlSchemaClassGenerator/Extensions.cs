@@ -15,5 +15,17 @@ namespace XmlSchemaClassGenerator
                 xmlSchemaObject = xmlSchemaObject.Parent;
             return (XmlSchema)xmlSchemaObject;
         }
+
+        public static PropertyValueTypeCode GetPropertyValueTypeCode(this TypeModel model)
+        {
+            var simpleType = model as SimpleModel;
+            if (simpleType == null)
+                return PropertyValueTypeCode.Other;
+            if (simpleType.ValueType.IsArray)
+                return PropertyValueTypeCode.Array;
+            if (simpleType.ValueType.IsValueType)
+                return PropertyValueTypeCode.ValueType;
+            return PropertyValueTypeCode.Other;
+        }
     }
 }
