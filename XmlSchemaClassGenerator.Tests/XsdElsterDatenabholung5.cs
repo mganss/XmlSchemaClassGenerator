@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -8,48 +9,45 @@ namespace XmlSchemaClassGenerator.Tests
 {
     public class XsdElsterDatenabholung5
     {
-        [Fact]
-        public void CanGenerateClasses()
+        private void GenerateOutput(string outputPath)
         {
-            Assert.DoesNotThrow(() =>
+            var gen = new Generator
             {
-                var gen = new Generator
+                UseXElementForAny = true,
+                CollectionType = typeof(IList<>),
+                CollectionImplementationType = typeof(List<>),
+                GenerateDesignerCategoryAttribute = false,
+                GenerateNullables = true,
+                GenerateSerializableAttribute = false,
+                OutputFolder = outputPath,
+                NamingScheme = NamingScheme.Direct,
+                DataAnnotationMode = DataAnnotationMode.None,
+                NamespaceProvider = new NamespaceProvider()
                 {
-                    UseXElementForAny = true,
-                    CollectionType = typeof(IList<>),
-                    CollectionImplementationType = typeof(List<>),
-                    GenerateDesignerCategoryAttribute = false,
-                    GenerateNullables = true,
-                    GenerateSerializableAttribute = false,
-                    OutputFolder = OutputPath,
-                    NamingScheme = NamingScheme.Direct,
-                    DataAnnotationMode = DataAnnotationMode.None,
-                    NamespaceProvider = new NamespaceProvider()
+                    GenerateNamespace = key =>
                     {
-                        GenerateNamespace = key =>
+                        switch (Path.GetFileName(key.Source.LocalPath))
                         {
-                            switch (Path.GetFileName(key.Source.LocalPath))
-                            {
-                                case "th000008_extern.xsd":
-                                case "ndh000010_extern.xsd":
-                                case "headerbasis000002.xsd":
-                                    return "Elster.Basis";
-                                case "datenabholung_5.xsd":
-                                case "elster0810_datenabholung_5.xsd":
-                                    switch (key.XmlSchemaNamespace)
-                                    {
-                                        case "http://www.elster.de/2002/XMLSchema":
-                                            return "Elster.Datenabholung5";
-                                        default:
-                                            throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
-                                    }
-                                default:
-                                    throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
-                            }
+                            case "th000008_extern.xsd":
+                            case "ndh000010_extern.xsd":
+                            case "headerbasis000002.xsd":
+                                return "Elster.Basis";
+                            case "datenabholung_5.xsd":
+                            case "elster0810_datenabholung_5.xsd":
+                                switch (key.XmlSchemaNamespace)
+                                {
+                                    case "http://www.elster.de/2002/XMLSchema":
+                                        return "Elster.Datenabholung5";
+                                    default:
+                                        throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
+                                }
+                            default:
+                                throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
                         }
                     }
-                };
-                var xsdFiles = new[]
+                }
+            };
+            var xsdFiles = new[]
                 {
                     "headerbasis000002.xsd",
                     "ndh000010_extern.xsd",
@@ -57,8 +55,43 @@ namespace XmlSchemaClassGenerator.Tests
                     "datenabholung_5.xsd",
                     "elster0810_datenabholung_5.xsd",
                 }.Select(x => Path.Combine(InputPath, x)).ToList();
-                gen.Generate(xsdFiles);
+            gen.Generate(xsdFiles);
+        }
+
+        [Fact]
+        public void CanGenerateClasses()
+        {
+            Assert.DoesNotThrow(() =>
+            {
+                GenerateOutput(GetOutputPath("CanGenerateClasses"));
             });
+        }
+
+        [Fact]
+        public void CanCompileClasses()
+        {
+            var outputPath = GetOutputPath("CanCompileClasses");
+            Assert.DoesNotThrow(() =>
+            {
+                new DirectoryInfo(outputPath).GetFiles("*.cs").ToList().ForEach(x => x.Delete());
+                GenerateOutput(outputPath);
+            });
+            var provider = CodeDomProvider.CreateProvider("CSharp");
+            var assemblies = new[]
+            {
+                "System.dll",
+                "System.Core.dll",
+                "System.Xml.dll",
+                "System.Xml.Linq.dll",
+                "System.Xml.Serialization.dll",
+                "System.ServiceModel.dll",
+            };
+            var outputName = Path.Combine(outputPath, "Elster.Test.dll");
+            var fileNames = new DirectoryInfo(outputPath).GetFiles("*.cs").Select(x => x.FullName).ToArray();
+            var results = provider.CompileAssemblyFromFile(new CompilerParameters(assemblies, outputName), fileNames);
+            Assert.Equal(0, results.Errors.Count);
+            Assert.DoesNotThrow(() => results.CompiledAssembly.GetType("Elster.Datenabholung5.Elster", true));
+            Assert.DoesNotThrow(() => results.CompiledAssembly.GetType("Elster.Basis.TransferHeaderCType", true));
         }
 
         string InputPath
@@ -66,14 +99,11 @@ namespace XmlSchemaClassGenerator.Tests
             get { return Path.Combine(Directory.GetCurrentDirectory(), "xsd", "elster-xml-datenabholung5"); }
         }
 
-        string OutputPath
+        private string GetOutputPath(string testCaseId)
         {
-            get
-            {
-                var result = Path.Combine(Directory.GetCurrentDirectory(), "output", "elster-xml-datenabholung5");
-                Directory.CreateDirectory(result);
-                return result;
-            }
+            var result = Path.Combine(Directory.GetCurrentDirectory(), "output", "elster-xml-datenabholung5", testCaseId);
+            Directory.CreateDirectory(result);
+            return result;
         }
     }
 }
