@@ -618,7 +618,7 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    restrictions = typeRestriction.Facets.Cast<XmlSchemaFacet>().Select(f => GetRestriction(simpleType, f)).Where(r => r != null).ToList();
+                    restrictions = typeRestriction.Facets.Cast<XmlSchemaFacet>().Select(f => GetRestriction(simpleType, f)).Where(r => r != null).Sanitize().ToList();
                 }
 
                 var simpleModelName = ToTitleCase(qualifiedName.Name);

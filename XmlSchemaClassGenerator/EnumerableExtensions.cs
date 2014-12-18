@@ -19,5 +19,30 @@ namespace XmlSchemaClassGenerator
                 result.Add(item.Key, item.Value);
             return result;
         }
+
+        public static IEnumerable<RestrictionModel> Sanitize(this IEnumerable<RestrictionModel> input)
+        {
+            var patterns = new List<PatternRestrictionModel>();
+            foreach (var item in input)
+            {
+                var pattern = item as PatternRestrictionModel;
+                if (pattern != null)
+                    patterns.Add(pattern);
+                else
+                    yield return item;
+            }
+            if (patterns.Count == 1)
+            {
+                yield return patterns[0];
+            }
+            else if (patterns.Count > 1)
+            {
+                var pattern = string.Join("|", patterns.Select(x => string.Format("({0})", x.Value)));
+                yield return new PatternRestrictionModel()
+                {
+                    Value = pattern,
+                };
+            }
+        }
     }
 }
