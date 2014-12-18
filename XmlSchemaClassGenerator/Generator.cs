@@ -34,6 +34,11 @@ namespace XmlSchemaClassGenerator
         /// How are the names of the created properties changed?
         /// </summary>
         public NamingScheme NamingScheme { get; set; }
+        /// <summary>
+        /// Emit the "Order" attribute value for XmlElementAttribute to ensure the correct order
+        /// of the serialized XML elements.
+        /// </summary>
+        public bool EmitOrder { get; set; }
 
         /// <summary>
         /// Determines the kind of annotations to emit
@@ -421,6 +426,7 @@ namespace XmlSchemaClassGenerator
 
                 var items = GetElements(particle);
 
+                var order = 0;
                 foreach (var item in items)
                 {
                     PropertyModel property = null;
@@ -476,7 +482,7 @@ namespace XmlSchemaClassGenerator
                                 Type = new SimpleModel { ValueType = (UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
                                 IsNullable = item.MinOccurs < 1.0m,
                                 IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                                IsAny = true
+                                IsAny = true,
                             };
                         }
                     }
@@ -486,6 +492,8 @@ namespace XmlSchemaClassGenerator
                         var itemDocs = GetDocumentation(item.XmlParticle);
                         property.Documentation.AddRange(itemDocs);
 
+                        if (EmitOrder)
+                            property.Order = order++;
                         property.IsDeprecated = itemDocs.Any(d => d.Text.StartsWith("DEPRECATED"));
 
                         classModel.Properties.Add(property);

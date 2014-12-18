@@ -23,7 +23,8 @@ namespace XmlSchemaClassGenerator.Tests
                 OutputFolder = outputPath,
                 NamingScheme = NamingScheme.Direct,
                 DataAnnotationMode = DataAnnotationMode.None,
-                NamespaceProvider = new NamespaceProvider()
+                EmitOrder = true,
+                NamespaceProvider = new NamespaceProvider
                 {
                     GenerateNamespace = key =>
                     {

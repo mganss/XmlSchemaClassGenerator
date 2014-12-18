@@ -281,6 +281,7 @@ namespace XmlSchemaClassGenerator
         public bool IsDeprecated { get; set; }
         public XmlQualifiedName XmlSchemaName { get; set; }
         public bool IsAny { get; set; }
+        public int? Order { get; set; }
 
         public PropertyModel()
         {
@@ -479,7 +480,7 @@ namespace XmlSchemaClassGenerator
                 var propertyAttribute = arrayItemProperty.GetAttribute(false);
                 // HACK: repackage as ArrayItemAttribute
                 var arrayItemAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayItemAttribute)),
-                    propertyAttribute.Arguments.Cast<CodeAttributeArgument>().ToArray());
+                    propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, "Order", StringComparison.Ordinal)).ToArray());
                 member.CustomAttributes.Add(arrayItemAttribute);
             }
         }
@@ -509,6 +510,9 @@ namespace XmlSchemaClassGenerator
                 {
                     attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute)),
                         new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                    if (Order != null)
+                        attribute.Arguments.Add(new CodeAttributeArgument("Order",
+                            new CodePrimitiveExpression(Order.Value)));
                 }
             }
             else
