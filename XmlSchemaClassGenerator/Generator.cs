@@ -23,10 +23,6 @@ namespace XmlSchemaClassGenerator
         public string OutputFolder { get; set; }
         public Action<string> Log { get; set; }
         /// <summary>
-        /// Enable data binding with INotifyPropertyChanged
-        /// </summary>
-        public bool EnableDataBinding { get; set; }
-        /// <summary>
         /// Use XElement instead of XmlElement for Any nodes?
         /// </summary>
         public bool UseXElementForAny { get; set; }
