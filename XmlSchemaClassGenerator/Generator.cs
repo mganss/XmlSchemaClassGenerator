@@ -35,6 +35,15 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public NamingScheme NamingScheme { get; set; }
 
+        /// <summary>
+        /// Determines the kind of annotations to emit
+        /// </summary>
+        public DataAnnotationMode DataAnnotationMode
+        {
+            get { return RestrictionModel.DataAnnotationMode; }
+            set { RestrictionModel.DataAnnotationMode = value; }
+        }
+
         public bool GenerateNullables
         {
             get

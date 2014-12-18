@@ -10,6 +10,25 @@ namespace XmlSchemaClassGenerator
 {
     public abstract class RestrictionModel
     {
+        public static DataAnnotationMode DataAnnotationMode { get; set; }
+
+        static RestrictionModel()
+        {
+            DataAnnotationMode = DataAnnotationMode.All;
+        }
+
+        public bool IsSupported
+        {
+            get
+            {
+                return MinimumDataAnnotationMode >= DataAnnotationMode;
+            }
+        }
+
+        /// <summary>
+        /// The DataAnnotationMode required to be able to emit this restriction
+        /// </summary>
+        public abstract DataAnnotationMode MinimumDataAnnotationMode { get; }
         public abstract string Description { get; }
         public abstract CodeAttributeDeclaration GetAttribute();
     }
@@ -39,6 +58,11 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override CodeAttributeDeclaration GetAttribute()
         {
             return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MaxLengthAttribute)), new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
@@ -55,6 +79,11 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override CodeAttributeDeclaration GetAttribute()
         {
             return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MinLengthAttribute)), new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
@@ -63,6 +92,11 @@ namespace XmlSchemaClassGenerator
 
     public class TotalDigitsRestrictionModel : ValueRestrictionModel<int>
     {
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override string Description
         {
             get
@@ -74,6 +108,11 @@ namespace XmlSchemaClassGenerator
 
     public class FractionDigitsRestrictionModel : ValueRestrictionModel<int>
     {
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override string Description
         {
             get
@@ -93,6 +132,11 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.Partial; }
+        }
+
         public override CodeAttributeDeclaration GetAttribute()
         {
             return new CodeAttributeDeclaration(new CodeTypeReference(typeof(RegularExpressionAttribute)), new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
@@ -101,6 +145,11 @@ namespace XmlSchemaClassGenerator
 
     public class MinInclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override string Description
         {
             get
@@ -112,6 +161,11 @@ namespace XmlSchemaClassGenerator
 
     public class MinExclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override string Description
         {
             get
@@ -123,6 +177,11 @@ namespace XmlSchemaClassGenerator
 
     public class MaxInclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override string Description
         {
             get
@@ -134,6 +193,11 @@ namespace XmlSchemaClassGenerator
 
     public class MaxExclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.All; }
+        }
+
         public override string Description
         {
             get

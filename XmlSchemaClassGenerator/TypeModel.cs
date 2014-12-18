@@ -708,13 +708,13 @@ namespace XmlSchemaClassGenerator
 
         public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()
         {
-            foreach (var attribute in Restrictions.Select(r => r.GetAttribute()).Where(a => a != null))
+            foreach (var attribute in Restrictions.Where(x => x.IsSupported).Select(r => r.GetAttribute()).Where(a => a != null))
             {
                 yield return attribute;
             }
 
-            var minInclusive = Restrictions.OfType<MinInclusiveRestrictionModel>().FirstOrDefault();
-            var maxInclusive = Restrictions.OfType<MaxInclusiveRestrictionModel>().FirstOrDefault();
+            var minInclusive = Restrictions.OfType<MinInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
+            var maxInclusive = Restrictions.OfType<MaxInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
 
             if (minInclusive != null && maxInclusive != null)
                 yield return new CodeAttributeDeclaration(new CodeTypeReference(typeof(RangeAttribute)),
