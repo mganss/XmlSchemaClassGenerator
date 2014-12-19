@@ -524,7 +524,30 @@ namespace XmlSchemaClassGenerator
                     var setValueStatement = new CodeAssignStatement(valueExpression, getValueOrDefaultExpression);
                     var hasValueExpression = new CodePropertyReferenceExpression(new CodePropertySetValueReferenceExpression(), "HasValue");
                     var setSpecifiedStatement = new CodeAssignStatement(specifiedExpression, hasValueExpression);
-                    nullableMember.SetStatements.AddRange(new CodeStatement[] { setValueStatement, setSpecifiedStatement });
+
+                    var statements = new List<CodeStatement>();
+                    if (withDataBinding)
+                    {
+                        var ifNotEquals = new CodeConditionStatement(
+                            new CodeBinaryOperatorExpression(
+                                new CodeMethodInvokeExpression(valueExpression, "Equals", getValueOrDefaultExpression),
+                                CodeBinaryOperatorType.ValueEquality,
+                                new CodePrimitiveExpression(false)
+                                ),
+                            setValueStatement,
+                            setSpecifiedStatement,
+                            new CodeExpressionStatement(new CodeMethodInvokeExpression(null, "OnPropertyChanged",
+                                new CodePrimitiveExpression(Name)))
+                            );
+                        statements.Add(ifNotEquals);
+                    }
+                    else
+                    {
+                        statements.Add(setValueStatement);
+                        statements.Add(setSpecifiedStatement);
+                    }
+
+                    nullableMember.SetStatements.AddRange(statements.ToArray());
 
                     typeDeclaration.Members.Add(nullableMember);
 
@@ -646,7 +669,7 @@ namespace XmlSchemaClassGenerator
                 attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
 
             var simpleModel = Type as SimpleModel;
-            if (simpleModel != null && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute))
+            if (simpleModel != null && simpleModel.UseDataTypeAttribute)
             {
                 var name = Type.XmlSchemaType.GetQualifiedName();
                 if (name.Namespace == XmlSchema.Namespace)
