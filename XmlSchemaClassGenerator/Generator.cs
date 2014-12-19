@@ -92,10 +92,10 @@ namespace XmlSchemaClassGenerator
             set { SimpleModel.IntegerDataType = value; }
         }
 
-        private XmlSchemaSet Set = new XmlSchemaSet();
+        private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
-        private Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
-        private static XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
+        private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
+        private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
 
         public Generator()
         {
@@ -163,7 +163,7 @@ namespace XmlSchemaClassGenerator
             throw new Exception(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
         }
 
-        private static Dictionary<char, string> InvalidChars = CreateInvalidChars();
+        private static readonly Dictionary<char, string> InvalidChars = CreateInvalidChars();
 
         private static Dictionary<char, string> CreateInvalidChars()
         {
@@ -239,7 +239,7 @@ namespace XmlSchemaClassGenerator
             return invalidChars;
         }
 
-        private static Regex InvalidCharsRegex = CreateInvalidCharsRegex();
+        private static readonly Regex InvalidCharsRegex = CreateInvalidCharsRegex();
 
         private static Regex CreateInvalidCharsRegex()
         {
@@ -247,7 +247,7 @@ namespace XmlSchemaClassGenerator
             return new Regex("[" + r + "]", RegexOptions.Compiled);
         }
 
-        private static CodeDomProvider Provider = new Microsoft.CSharp.CSharpCodeProvider();
+        private static readonly CodeDomProvider Provider = new Microsoft.CSharp.CSharpCodeProvider();
         public static string MakeValidIdentifier(string s)
         {
             var id = InvalidCharsRegex.Replace(s, m => InvalidChars[m.Value[0]]);
@@ -366,14 +366,15 @@ namespace XmlSchemaClassGenerator
         }
 
         // see http://msdn.microsoft.com/en-us/library/z2w0sxhf.aspx
-        private static HashSet<string> EnumTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+        private static readonly HashSet<string> EnumTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
             { "string", "normalizedString", "token", "Name", "NCName", "ID", "ENTITY", "NMTOKEN" };
 
+        // ReSharper disable once FunctionComplexityOverflow
         private TypeModel CreateTypeModel(Uri source, XmlSchemaType type, XmlQualifiedName qualifiedName = null)
         {
             if (qualifiedName == null) qualifiedName = type.QualifiedName;
 
-            TypeModel typeModel = null;
+            TypeModel typeModel;
             if (!qualifiedName.IsEmpty && TypeModel.Types.TryGetValue(qualifiedName, out typeModel)) return typeModel;
 
             if (source == null)
@@ -509,7 +510,7 @@ namespace XmlSchemaClassGenerator
                     else if (complexType.ContentModel.Content is XmlSchemaSimpleContentExtension)
                         attributes = ((XmlSchemaSimpleContentExtension)complexType.ContentModel.Content).Attributes;
                     else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
-                        attributes = ((XmlSchemaSimpleContentRestriction)complexType.ContentModel.Content).Attributes;
+                        attributes = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Attributes;
                     else if (complexType.ContentModel.Content is XmlSchemaSimpleContentRestriction)
                         attributes = ((XmlSchemaSimpleContentRestriction)complexType.ContentModel.Content).Attributes;
                 }
@@ -616,7 +617,7 @@ namespace XmlSchemaClassGenerator
                             var valueDocs = GetDocumentation(facet);
                             value.Documentation.AddRange(valueDocs);
 
-                            var deprecated = facet.Annotation == null ? false : facet.Annotation.Items.OfType<XmlSchemaAppInfo>()
+                            var deprecated = facet.Annotation != null && facet.Annotation.Items.OfType<XmlSchemaAppInfo>()
                                 .Any(a => a.Markup.Any(m => m.Name == "annox:annotate" && m.HasChildNodes && m.FirstChild.Name == "jl:Deprecated"));
                             value.IsDeprecated = deprecated;
 
