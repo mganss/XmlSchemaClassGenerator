@@ -645,7 +645,7 @@ namespace XmlSchemaClassGenerator
                 attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
 
             var simpleModel = Type as SimpleModel;
-            if (simpleModel != null && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute)
+            if (simpleModel != null && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute))
             {
                 var name = Type.XmlSchemaType.GetQualifiedName();
                 if (name.Namespace == XmlSchema.Namespace)
