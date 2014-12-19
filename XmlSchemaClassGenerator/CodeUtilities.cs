@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
@@ -52,6 +53,10 @@ namespace XmlSchemaClassGenerator
                         result = false;
                     else
                         result = null;
+                    break;
+                case XmlTypeCode.Base64Binary:
+                case XmlTypeCode.HexBinary:
+                    result = true;
                     break;
                 default:
                     result = null;
@@ -116,6 +121,79 @@ namespace XmlSchemaClassGenerator
         public static Type GetEffectiveType(this XmlSchemaType type)
         {
             return GetEffectiveType(type.TypeCode, type.Datatype.Variety) ?? type.Datatype.ValueType;
+        }
+
+        public static XmlQualifiedName GetQualifiedName(this XmlSchemaType schemaType)
+        {
+            return schemaType.QualifiedName.IsEmpty
+                ? schemaType.BaseXmlSchemaType.QualifiedName
+                : schemaType.QualifiedName;
+        }
+
+        public static XmlQualifiedName GetQualifiedName(this TypeModel typeModel)
+        {
+            XmlQualifiedName qualifiedName;
+            var simpleTypeModel = typeModel as SimpleModel;
+            if (simpleTypeModel == null)
+            {
+                qualifiedName = typeModel.XmlSchemaType.GetQualifiedName();
+            }
+            else
+            {
+                qualifiedName = simpleTypeModel.XmlSchemaType.GetQualifiedName();
+                var xmlSchemaType = simpleTypeModel.XmlSchemaType;
+                while (qualifiedName.Namespace != XmlSchema.Namespace &&
+                       xmlSchemaType.BaseXmlSchemaType != null)
+                {
+                    xmlSchemaType = xmlSchemaType.BaseXmlSchemaType;
+                    qualifiedName = xmlSchemaType.GetQualifiedName();
+                }
+            }
+            return qualifiedName;
+        }
+
+        public static string GetUniqueTypeName(this NamespaceModel model, string name)
+        {
+            var n = name;
+            var i = 2;
+
+            while (model.Types.ContainsKey(n) && !(model.Types[n] is SimpleModel))
+            {
+                n = name + i;
+                i++;
+            }
+
+            return n;
+        }
+
+        public static string GetUniqueFieldName(this TypeModel typeModel, PropertyModel propertyModel)
+        {
+            var propBackingFieldName = propertyModel.Name.ToBackingField();
+            var classModel = typeModel as ClassModel;
+            if (classModel == null)
+                return propBackingFieldName;
+            
+            var i = 0;
+            foreach (var prop in classModel.Properties)
+            {
+                if (!classModel.EnableDataBinding && !(prop.Type is SimpleModel))
+                    continue;
+
+                if (propertyModel == prop)
+                {
+                    i += 1;
+                    break;
+                }
+
+                var backingFieldName = prop.Name.ToBackingField();
+                if (backingFieldName == propBackingFieldName)
+                    i += 1;
+            }
+
+            if (i == 1)
+                return propBackingFieldName;
+
+            return string.Format("{0}{1}", propBackingFieldName, i);
         }
     }
 }
