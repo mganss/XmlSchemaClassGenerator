@@ -96,7 +96,7 @@ namespace XmlSchemaClassGenerator
             GenerateSerializableAttribute = true;
         }
 
-        public TypeModel()
+        protected TypeModel()
         {
             Documentation = new List<DocumentationModel>();
         }
@@ -266,7 +266,7 @@ namespace XmlSchemaClassGenerator
 
             classDeclaration.CustomAttributes.Add(
                 new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute))));
-            if (ClassModel.GenerateDesignerCategoryAttribute)
+            if (GenerateDesignerCategoryAttribute)
             {
                 classDeclaration.CustomAttributes.Add(
                     new CodeAttributeDeclaration(new CodeTypeReference(typeof (DesignerCategoryAttribute)),
@@ -393,9 +393,10 @@ namespace XmlSchemaClassGenerator
             throw new NotSupportedException();
         }
 
+        // ReSharper disable once FunctionComplexityOverflow
         public void AddMembersTo(CodeTypeDeclaration typeDeclaration, bool withDataBinding)
         {
-            CodeTypeMember member = null;
+            CodeTypeMember member;
 
             var typeClassModel = Type as ClassModel;
             var isArray = !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1;
@@ -481,7 +482,7 @@ namespace XmlSchemaClassGenerator
                 var specifiedName = GenerateNullables ? Name + "Value" : Name;
                 var specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
                 specifiedMember.CustomAttributes.Add(ignoreAttribute);
-                specifiedMember.Attributes = (specifiedMember.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
+                specifiedMember.Attributes = MemberAttributes.Public;
                 var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets or sets a value indicating whether the {0} property is specified.", Name) },
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
                 specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
@@ -507,23 +508,23 @@ namespace XmlSchemaClassGenerator
                         Name = Name,
                         HasSet = true,
                         HasGet = true,
+                        Attributes = MemberAttributes.Public,
                     };
-                    nullableMember.Attributes = (nullableMember.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
                     nullableMember.CustomAttributes.Add(ignoreAttribute);
                     nullableMember.Comments.AddRange(member.Comments);
 
                     var specifiedExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), specifiedName + "Specified");
                     var valueExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name + "Value");
                     var conditionStatement = new CodeConditionStatement(specifiedExpression,
-                        new[] { new CodeMethodReturnStatement(valueExpression) },
-                        new[] { new CodeMethodReturnStatement(new CodePrimitiveExpression(null)) });
+                        new CodeStatement[] { new CodeMethodReturnStatement(valueExpression) },
+                        new CodeStatement[] { new CodeMethodReturnStatement(new CodePrimitiveExpression(null)) });
                     nullableMember.GetStatements.Add(conditionStatement);
 
                     var getValueOrDefaultExpression = new CodeMethodInvokeExpression(new CodePropertySetValueReferenceExpression(), "GetValueOrDefault");
                     var setValueStatement = new CodeAssignStatement(valueExpression, getValueOrDefaultExpression);
                     var hasValueExpression = new CodePropertyReferenceExpression(new CodePropertySetValueReferenceExpression(), "HasValue");
                     var setSpecifiedStatement = new CodeAssignStatement(specifiedExpression, hasValueExpression);
-                    nullableMember.SetStatements.AddRange(new[] { setValueStatement, setSpecifiedStatement });
+                    nullableMember.SetStatements.AddRange(new CodeStatement[] { setValueStatement, setSpecifiedStatement });
 
                     typeDeclaration.Members.Add(nullableMember);
 
@@ -543,7 +544,7 @@ namespace XmlSchemaClassGenerator
                     HasGet = true,
                 };
                 specifiedProperty.CustomAttributes.Add(ignoreAttribute);
-                specifiedProperty.Attributes = (specifiedProperty.Attributes & ~MemberAttributes.AccessMask) | MemberAttributes.Public;
+                specifiedProperty.Attributes = MemberAttributes.Public;
 
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
                 var countReference = new CodePropertyReferenceExpression(listReference, "Count");
@@ -575,7 +576,7 @@ namespace XmlSchemaClassGenerator
                 }
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
                 var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, true, true);
-                var initExpression = new CodeObjectCreateExpression(initTypeReference, new CodeExpression[] { });
+                var initExpression = new CodeObjectCreateExpression(initTypeReference);
                 constructor.Statements.Add(new CodeAssignStatement(listReference, initExpression));
             }
 
@@ -704,7 +705,7 @@ namespace XmlSchemaClassGenerator
                     //var deprecatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(ObsoleteAttribute)));
                     //member.CustomAttributes.Add(deprecatedAttribute);
                 
-                    var obsolete = new DocumentationModel { Language = "en", Text = string.Format("[Obsolete]", Name) };
+                    var obsolete = new DocumentationModel { Language = "en", Text = "[Obsolete]" };
                     docs.Add(obsolete);
                 }
 
@@ -811,8 +812,8 @@ namespace XmlSchemaClassGenerator
                 if (defaultString.StartsWith("xs:", StringComparison.OrdinalIgnoreCase))
                 {
                     return new CodeObjectCreateExpression(typeof(XmlQualifiedName),
-                        new CodeExpression[] { new CodePrimitiveExpression(defaultString.Substring(3)), 
-                            new CodePrimitiveExpression(XmlSchema.Namespace) });
+                        new CodePrimitiveExpression(defaultString.Substring(3)),
+                        new CodePrimitiveExpression(XmlSchema.Namespace));
                 }
                 else throw new NotSupportedException(string.Format("Resolving default value {0} for QName not supported.", defaultString));
             }
