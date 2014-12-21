@@ -345,26 +345,30 @@ namespace XmlSchemaClassGenerator
             Documentation = new List<DocumentationModel>();
         }
 
-        internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter)
+        internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter, bool withDataBinding = true)
         {
-            switch (typeCode)
+            if (withDataBinding)
             {
-                case PropertyValueTypeCode.ValueType:
-                    return string.Format(@" 
+                switch (typeCode)
+                {
+                    case PropertyValueTypeCode.ValueType:
+                        return string.Format(@" 
 {{
     get 
     {{
         return {0};
     }}
-    {2}set {{
-        if (!{0}.Equals(value)) {{
+    {2}set 
+    {{
+        if (!{0}.Equals(value)) 
+        {{
             {0} = value;
             OnPropertyChanged(""{1}"");
         }}
     }}
 }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
-                case PropertyValueTypeCode.Other:
-                    return string.Format(@" 
+                    case PropertyValueTypeCode.Other:
+                        return string.Format(@" 
 {{
     get 
     {{
@@ -381,8 +385,8 @@ namespace XmlSchemaClassGenerator
         }}
     }}
 }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
-                case PropertyValueTypeCode.Array:
-                    return string.Format(@" 
+                    case PropertyValueTypeCode.Array:
+                        return string.Format(@" 
 {{
     get 
     {{
@@ -399,6 +403,52 @@ namespace XmlSchemaClassGenerator
         }}
     }}
 }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+                }
+            }
+            switch (typeCode)
+            {
+                case PropertyValueTypeCode.ValueType:
+                    return string.Format(@" 
+{{
+    get 
+    {{
+        return {0};
+    }}
+    {1}set {{
+        if (!{0}.Equals(value))
+            {0} = value;
+    }}
+}}", backingFieldName, (privateSetter ? "private " : string.Empty));
+                case PropertyValueTypeCode.Other:
+                    return string.Format(@" 
+{{
+    get 
+    {{
+        return {0};
+    }}
+    {1}set 
+    {{
+        if ({0} == value)
+            return;
+        if ({0} == null || value == null || !{0}.Equals(value)) 
+            {0} = value;
+    }}
+}}", backingFieldName, (privateSetter ? "private " : string.Empty));
+                case PropertyValueTypeCode.Array:
+                    return string.Format(@" 
+{{
+    get 
+    {{
+        return {0};
+    }}
+    {1}set 
+    {{
+        if ({0} == value)
+            return;
+        if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
+            {0} = value;
+    }}
+}}", backingFieldName, (privateSetter ? "private " : string.Empty));
             }
             throw new NotSupportedException();
         }
@@ -439,7 +489,7 @@ namespace XmlSchemaClassGenerator
                 if (requiresBackingField)
                 {
                     member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(),
-                        isPrivateSetter);
+                        isPrivateSetter, withDataBinding);
                 }
                 else
                 {
@@ -453,7 +503,7 @@ namespace XmlSchemaClassGenerator
                 backingField.InitExpression = defaultValueExpression;
 
                 member = new CodeMemberField(typeReference, Name);
-                member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(), false);
+                member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(), false, withDataBinding);
 
                 if (IsNullable)
                 {
