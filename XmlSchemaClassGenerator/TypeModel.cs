@@ -39,12 +39,14 @@ namespace XmlSchemaClassGenerator
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.Generic"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
-            codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
 
             var typeModels = parts.SelectMany(x => x.Types.Values).ToList();
             if (typeModels.OfType<ClassModel>().Any(x => x.EnableDataBinding))
+            {
+                codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
                 codeNamespace.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
+            }
 
             foreach (var typeModel in typeModels)
             {
