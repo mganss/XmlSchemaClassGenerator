@@ -190,7 +190,7 @@ namespace XmlSchemaClassGenerator
                     i += 1;
             }
 
-            if (i == 1)
+            if (i <= 1)
                 return propBackingFieldName;
 
             return string.Format("{0}{1}", propBackingFieldName, i);
