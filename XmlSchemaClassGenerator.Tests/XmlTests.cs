@@ -4,11 +4,14 @@ using IS24RestApi.Offer.Realestates;
 using IS24RestApi.Search.Searcher;
 using Microsoft.Xml.XMLGen;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -20,12 +23,85 @@ namespace XmlSchemaClassGenerator.Tests
 {
     public class XmlTests
     {
+        public XmlTests()
+        {
+            RestrictionModel.DataAnnotationMode = DataAnnotationMode.None;
+            TypeModel.GenerateSerializableAttribute = true;
+            ClassModel.GenerateDesignerCategoryAttribute = false;
+            ClassModel.GenerateSerializableAttribute = true;
+            PropertyModel.GenerateNullables = true;
+            SimpleModel.CollectionType = typeof(Collection<>);
+            SimpleModel.CollectionImplementationType = typeof(Collection<>);
+            SimpleModel.GenerateSerializableAttribute = true;
+            SimpleModel.IntegerDataType = typeof(int);
+        }
+
+        private Assembly Compile(string name, string pattern)
+        {
+            var cs = new List<string>();
+            var outputFolder = Path.Combine("output", name);
+            Directory.CreateDirectory(outputFolder);
+            var gen = new Generator
+            {
+                OutputFolder = outputFolder,
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key =>
+                    {
+                        var xn = key.XmlSchemaNamespace;
+                        var nm = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
+                            .Select(n => Generator.ToTitleCase(n, NamingScheme.PascalCase)));
+                        return name + (string.IsNullOrEmpty(nm) ? "" : ("." + nm));
+                    }
+                },
+                Log = f => cs.Add(f)
+            };
+
+            var files = Glob.Glob.ExpandNames(pattern);
+
+            gen.Generate(files);
+
+            var provider = CodeDomProvider.CreateProvider("CSharp");
+            var assemblies = new[]
+            {
+                "System.dll",
+                "System.Core.dll",
+                "System.Xml.dll",
+                "System.Xml.Linq.dll",
+                "System.Xml.Serialization.dll",
+                "System.ServiceModel.dll",
+            };
+
+            var binFolder = Path.Combine(outputFolder, "bin");
+            Directory.CreateDirectory(binFolder);
+            var results = provider.CompileAssemblyFromFile(new CompilerParameters(assemblies, Path.Combine(binFolder, name + ".dll")), cs.ToArray());
+
+            Assert.False(results.Errors.HasErrors);
+            Assert.False(results.Errors.HasWarnings);
+            Assert.NotNull(results.CompiledAssembly);
+
+            var assembly = Assembly.Load(results.CompiledAssembly.GetName());
+
+            return assembly;
+        }
+
         [Fact]
         [UseCulture("en-US")]
         public void CanDeserializeSampleXml()
         {
-            var files = Directory.GetFiles(@"..\..\..\XmlSchemaClassGenerator.Console\xsd", "*.xsd", SearchOption.AllDirectories)
-                .Where(f => !f.Contains("includes")).ToList();
+            CompileXsdAndTestSamples("IS24RestApi", @"xsd\is24\*\*.xsd");
+            CompileXsdAndTestSamples("Wadl", @"xsd\wadl\wadl.xsd");
+        }
+
+        private void CompileXsdAndTestSamples(string name, string pattern)
+        {
+            var assembly = Compile(name, pattern);
+            DeserializeSampleXml(pattern, assembly);
+        }
+
+        private void DeserializeSampleXml(string pattern, Assembly assembly)
+        {
+            var files = Glob.Glob.ExpandNames(pattern);
 
             var set = new XmlSchemaSet();
 
@@ -43,7 +119,7 @@ namespace XmlSchemaClassGenerator.Tests
 
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
             {
-                var type = FindType(rootElement.QualifiedName);
+                var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);
                 var generator = new XmlSampleGenerator(set, rootElement.QualifiedName);
                 var sb = new StringBuilder();
@@ -87,10 +163,9 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        private Type FindType(XmlQualifiedName xmlQualifiedName)
+        private Type FindType(Assembly assembly, XmlQualifiedName xmlQualifiedName)
         {
-            return Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.Namespace != typeof(IS24RestApi.Xsd.AbstractRealEstate).Namespace)
+            return assembly.GetTypes()
                 .Single(t => t.CustomAttributes.Any(a => a.AttributeType == typeof(XmlRootAttribute)
                     && a.ConstructorArguments.Any(n => (string)n.Value == xmlQualifiedName.Name)
                     && a.NamedArguments.Any(n => n.MemberName == "Namespace" && (string)n.TypedValue.Value == xmlQualifiedName.Namespace)));
