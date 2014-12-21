@@ -405,52 +405,17 @@ namespace XmlSchemaClassGenerator
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                 }
             }
-            switch (typeCode)
-            {
-                case PropertyValueTypeCode.ValueType:
-                    return string.Format(@" 
+            return string.Format(@" 
         {{
             get 
             {{
-                return {0};
-            }}
-            {1}set {{
-                if (!{0}.Equals(value))
-                    {0} = value;
-            }}
-        }}", backingFieldName, (privateSetter ? "private " : string.Empty));
-                case PropertyValueTypeCode.Other:
-                    return string.Format(@" 
-        {{
-            get 
-            {{
-                return {0};
+                return this.{0};
             }}
             {1}set 
             {{
-                if ({0} == value)
-                    return;
-                if ({0} == null || value == null || !{0}.Equals(value)) 
-                    {0} = value;
+                this.{0} = value;
             }}
         }}", backingFieldName, (privateSetter ? "private " : string.Empty));
-                case PropertyValueTypeCode.Array:
-                    return string.Format(@" 
-        {{
-            get 
-            {{
-                return {0};
-            }}
-            {1}set 
-            {{
-                if ({0} == value)
-                    return;
-                if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
-                    {0} = value;
-            }}
-        }}", backingFieldName, (privateSetter ? "private " : string.Empty));
-            }
-            throw new NotSupportedException();
         }
 
         // ReSharper disable once FunctionComplexityOverflow
