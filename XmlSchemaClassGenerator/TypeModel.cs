@@ -353,102 +353,102 @@ namespace XmlSchemaClassGenerator
                 {
                     case PropertyValueTypeCode.ValueType:
                         return string.Format(@" 
-{{
-    get 
-    {{
-        return {0};
-    }}
-    {2}set 
-    {{
-        if (!{0}.Equals(value)) 
         {{
-            {0} = value;
-            OnPropertyChanged(""{1}"");
-        }}
-    }}
-}}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+            get 
+            {{
+                return {0};
+            }}
+            {2}set 
+            {{
+                if (!{0}.Equals(value)) 
+                {{
+                    {0} = value;
+                    OnPropertyChanged(""{1}"");
+                }}
+            }}
+        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                     case PropertyValueTypeCode.Other:
                         return string.Format(@" 
-{{
-    get 
-    {{
-        return {0};
-    }}
-    {2}set 
-    {{
-        if ({0} == value)
-            return;
-        if ({0} == null || value == null || !{0}.Equals(value)) 
         {{
-            {0} = value;
-            OnPropertyChanged(""{1}"");
-        }}
-    }}
-}}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+            get 
+            {{
+                return {0};
+            }}
+            {2}set 
+            {{
+                if ({0} == value)
+                    return;
+                if ({0} == null || value == null || !{0}.Equals(value)) 
+                {{
+                    {0} = value;
+                    OnPropertyChanged(""{1}"");
+                }}
+            }}
+        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                     case PropertyValueTypeCode.Array:
                         return string.Format(@" 
-{{
-    get 
-    {{
-        return {0};
-    }}
-    {2}set 
-    {{
-        if ({0} == value)
-            return;
-        if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
         {{
-            {0} = value;
-            OnPropertyChanged(""{1}"");
-        }}
-    }}
-}}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+            get 
+            {{
+                return {0};
+            }}
+            {2}set 
+            {{
+                if ({0} == value)
+                    return;
+                if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
+                {{
+                    {0} = value;
+                    OnPropertyChanged(""{1}"");
+                }}
+            }}
+        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                 }
             }
             switch (typeCode)
             {
                 case PropertyValueTypeCode.ValueType:
                     return string.Format(@" 
-{{
-    get 
-    {{
-        return {0};
-    }}
-    {1}set {{
-        if (!{0}.Equals(value))
-            {0} = value;
-    }}
-}}", backingFieldName, (privateSetter ? "private " : string.Empty));
+        {{
+            get 
+            {{
+                return {0};
+            }}
+            {1}set {{
+                if (!{0}.Equals(value))
+                    {0} = value;
+            }}
+        }}", backingFieldName, (privateSetter ? "private " : string.Empty));
                 case PropertyValueTypeCode.Other:
                     return string.Format(@" 
-{{
-    get 
-    {{
-        return {0};
-    }}
-    {1}set 
-    {{
-        if ({0} == value)
-            return;
-        if ({0} == null || value == null || !{0}.Equals(value)) 
-            {0} = value;
-    }}
-}}", backingFieldName, (privateSetter ? "private " : string.Empty));
+        {{
+            get 
+            {{
+                return {0};
+            }}
+            {1}set 
+            {{
+                if ({0} == value)
+                    return;
+                if ({0} == null || value == null || !{0}.Equals(value)) 
+                    {0} = value;
+            }}
+        }}", backingFieldName, (privateSetter ? "private " : string.Empty));
                 case PropertyValueTypeCode.Array:
                     return string.Format(@" 
-{{
-    get 
-    {{
-        return {0};
-    }}
-    {1}set 
-    {{
-        if ({0} == value)
-            return;
-        if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
-            {0} = value;
-    }}
-}}", backingFieldName, (privateSetter ? "private " : string.Empty));
+        {{
+            get 
+            {{
+                return {0};
+            }}
+            {1}set 
+            {{
+                if ({0} == value)
+                    return;
+                if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
+                    {0} = value;
+            }}
+        }}", backingFieldName, (privateSetter ? "private " : string.Empty));
             }
             throw new NotSupportedException();
         }
