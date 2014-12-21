@@ -535,7 +535,7 @@ namespace XmlSchemaClassGenerator
                         Name = Name,
                         HasSet = true,
                         HasGet = true,
-                        Attributes = MemberAttributes.Public,
+                        Attributes = MemberAttributes.Public | MemberAttributes.Final,
                     };
                     nullableMember.CustomAttributes.Add(ignoreAttribute);
                     nullableMember.Comments.AddRange(member.Comments);
@@ -594,7 +594,7 @@ namespace XmlSchemaClassGenerator
                     HasGet = true,
                 };
                 specifiedProperty.CustomAttributes.Add(ignoreAttribute);
-                specifiedProperty.Attributes = MemberAttributes.Public;
+                specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
                 var countReference = new CodePropertyReferenceExpression(listReference, "Count");
