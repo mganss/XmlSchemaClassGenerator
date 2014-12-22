@@ -106,7 +106,7 @@ namespace XmlSchemaClassGenerator
 
         public void Generate(IEnumerable<string> files)
         {
-            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f), (s, e) =>
+            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f, new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore }), (s, e) =>
             {
                 Trace.TraceError(e.Message);
             }));

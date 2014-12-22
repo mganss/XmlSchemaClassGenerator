@@ -1,8 +1,4 @@
-﻿using IS24RestApi.Common;
-using IS24RestApi.Offer.Listelement;
-using IS24RestApi.Offer.Realestates;
-using IS24RestApi.Search.Searcher;
-using Microsoft.Xml.XMLGen;
+﻿using Microsoft.Xml.XMLGen;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -21,6 +17,7 @@ using Xunit;
 
 namespace XmlSchemaClassGenerator.Tests
 {
+    [PrioritizedFixture]
     public class XmlTests
     {
         public XmlTests()
@@ -35,6 +32,8 @@ namespace XmlSchemaClassGenerator.Tests
             SimpleModel.GenerateSerializableAttribute = true;
             SimpleModel.IntegerDataType = typeof(int);
         }
+
+        private static Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
 
         private Assembly Compile(string name, string pattern)
         {
@@ -82,20 +81,29 @@ namespace XmlSchemaClassGenerator.Tests
 
             var assembly = Assembly.Load(results.CompiledAssembly.GetName());
 
+            Assemblies[name] = assembly;
+
             return assembly;
         }
 
-        [Fact]
+        const string IS24Pattern = @"xsd\is24\*\*.xsd";
+        const string WadlPattern = @"xsd\wadl\wadl.xsd";
+
+        [Fact, TestPriority(1)]
         [UseCulture("en-US")]
         public void CanDeserializeSampleXml()
         {
-            CompileXsdAndTestSamples("IS24RestApi", @"xsd\is24\*\*.xsd");
-            CompileXsdAndTestSamples("Wadl", @"xsd\wadl\wadl.xsd");
+            Compile("IS24RestApi", IS24Pattern);
+            TestSamples("IS24RestApi", IS24Pattern);
+            Compile("Wadl", WadlPattern);
+            TestSamples("Wadl", WadlPattern);
         }
 
-        private void CompileXsdAndTestSamples(string name, string pattern)
+        private void TestSamples(string name, string pattern)
         {
-            var assembly = Compile(name, pattern);
+            Assembly assembly;
+            Assemblies.TryGetValue(name, out assembly);
+            Assert.NotNull(assembly);
             DeserializeSampleXml(pattern, assembly);
         }
 
@@ -171,37 +179,51 @@ namespace XmlSchemaClassGenerator.Tests
                     && a.NamedArguments.Any(n => n.MemberName == "Namespace" && (string)n.TypedValue.Value == xmlQualifiedName.Namespace)));
         }
 
-        [Fact]
+        static string[] Classes = new[] { "ApartmentBuy",
+                "ApartmentRent",
+                "AssistedLiving",
+                "CompulsoryAuction",
+                "GarageBuy",
+                "GarageRent",
+                "Gastronomy",
+                "HouseBuy",
+                "HouseRent",
+                "HouseType",
+                "Industry",
+                "Investment",
+                "LivingBuySite",
+                "LivingRentSite",
+                "Office",
+                "SeniorCare",
+                "ShortTermAccommodation",
+                "SpecialPurpose",
+                "Store",
+                "TradeSite" };
+
+        [Fact, TestPriority(2)]
         public void ProducesSameXmlAsXsd()
         {
-            TestCompareToXsd<ApartmentBuy, IS24RestApi.Xsd.ApartmentBuy>("apartmentBuy");
-            TestCompareToXsd<ApartmentRent, IS24RestApi.Xsd.ApartmentRent>("apartmentRent");
-            TestCompareToXsd<AssistedLiving, IS24RestApi.Xsd.AssistedLiving>("assistedLiving");
-            TestCompareToXsd<CompulsoryAuction, IS24RestApi.Xsd.CompulsoryAuction>("compulsoryAuction");
-            TestCompareToXsd<GarageBuy, IS24RestApi.Xsd.GarageBuy>("garageBuy");
-            TestCompareToXsd<GarageRent, IS24RestApi.Xsd.GarageRent>("garageRent");
-            TestCompareToXsd<Gastronomy, IS24RestApi.Xsd.Gastronomy>("gastronomy");
-            TestCompareToXsd<HouseBuy, IS24RestApi.Xsd.HouseBuy>("houseBuy");
-            TestCompareToXsd<HouseRent, IS24RestApi.Xsd.HouseRent>("houseRent");
-            TestCompareToXsd<HouseType, IS24RestApi.Xsd.HouseType>("houseType");
-            TestCompareToXsd<Industry, IS24RestApi.Xsd.Industry>("industry");
-            TestCompareToXsd<Investment, IS24RestApi.Xsd.Investment>("investment");
-            TestCompareToXsd<LivingBuySite, IS24RestApi.Xsd.LivingBuySite>("livingBuySite");
-            TestCompareToXsd<LivingRentSite, IS24RestApi.Xsd.LivingRentSite>("livingRentSite");
-            TestCompareToXsd<Office, IS24RestApi.Xsd.Office>("office");
-            TestCompareToXsd<SeniorCare, IS24RestApi.Xsd.SeniorCare>("seniorCare");
-            TestCompareToXsd<ShortTermAccommodation, IS24RestApi.Xsd.ShortTermAccommodation>("shortTermAccommodation");
-            TestCompareToXsd<SpecialPurpose, IS24RestApi.Xsd.SpecialPurpose>("specialPurpose");
-            TestCompareToXsd<Store, IS24RestApi.Xsd.Store>("store");
-            TestCompareToXsd<TradeSite, IS24RestApi.Xsd.TradeSite>("tradeSite");
+            Compile("IS24RestApi", IS24Pattern);
+
+            var assembly = Assemblies["IS24RestApi"];
+
+            foreach (var c in Classes)
+            {
+                var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
+                Assert.NotNull(t1);
+                var t2 = Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace == "IS24RestApi.Xsd");
+                Assert.NotNull(t2);
+                var f = char.ToLower(c[0]) + c.Substring(1);
+                TestCompareToXsd(t1, t2, f);
+            }
         }
 
-        void TestCompareToXsd<T1, T2>(string file)
+        void TestCompareToXsd(Type t1, Type t2, string file)
         {
             foreach (var suffix in new[] { "max", "min" })
             {
-                var serializer1 = new XmlSerializer(typeof(T1));
-                var serializer2 = new XmlSerializer(typeof(T2));
+                var serializer1 = new XmlSerializer(t1);
+                var serializer2 = new XmlSerializer(t2);
                 var xml = ReadXml(string.Format("{0}_{1}", file, suffix));
                 var o1 = serializer1.Deserialize(new StringReader(xml));
                 var o2 = serializer2.Deserialize(new StringReader(xml));
@@ -215,34 +237,25 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        [Fact]
+        [Fact, TestPriority(3)]
         public void CanSerializeAndDeserializeAllExampleXmlFiles()
         {
-            TestRoundtrip<ApartmentBuy>("apartmentBuy");
-            TestRoundtrip<ApartmentRent>("apartmentRent");
-            TestRoundtrip<AssistedLiving>("assistedLiving");
-            TestRoundtrip<CompulsoryAuction>("compulsoryAuction");
-            TestRoundtrip<GarageBuy>("garageBuy");
-            TestRoundtrip<GarageRent>("garageRent");
-            TestRoundtrip<Gastronomy>("gastronomy");
-            TestRoundtrip<HouseBuy>("houseBuy");
-            TestRoundtrip<HouseRent>("houseRent");
-            TestRoundtrip<HouseType>("houseType");
-            TestRoundtrip<Industry>("industry");
-            TestRoundtrip<Investment>("investment");
-            TestRoundtrip<LivingBuySite>("livingBuySite");
-            TestRoundtrip<LivingRentSite>("livingRentSite");
-            TestRoundtrip<Office>("office");
-            TestRoundtrip<SeniorCare>("seniorCare");
-            TestRoundtrip<ShortTermAccommodation>("shortTermAccommodation");
-            TestRoundtrip<SpecialPurpose>("specialPurpose");
-            TestRoundtrip<Store>("store");
-            TestRoundtrip<TradeSite>("tradeSite");
+            Compile("IS24RestApi", IS24Pattern);
+
+            var assembly = Assemblies["IS24RestApi"];
+
+            foreach (var c in Classes)
+            {
+                var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
+                Assert.NotNull(t1);
+                var f = char.ToLower(c[0]) + c.Substring(1);
+                TestRoundtrip(t1, f);
+            } 
         }
 
-        void TestRoundtrip<T>(string file)
+        void TestRoundtrip(Type t, string file)
         {
-            var serializer = new XmlSerializer(typeof(T));
+            var serializer = new XmlSerializer(t);
 
             foreach (var suffix in new[] { "min", "max" })
             {
