@@ -89,7 +89,6 @@ namespace XmlSchemaClassGenerator
         public string Name { get; set; }
         public XmlQualifiedName XmlSchemaName { get; set; }
         public XmlSchemaType XmlSchemaType { get; set; }
-        public static Dictionary<XmlQualifiedName, TypeModel> Types = new Dictionary<XmlQualifiedName, TypeModel>();
         public List<DocumentationModel> Documentation { get; private set; }
         public bool IsAnonymous { get; set; }
 

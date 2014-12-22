@@ -95,6 +95,7 @@ namespace XmlSchemaClassGenerator
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
+        private Dictionary<XmlQualifiedName, TypeModel> Types = new Dictionary<XmlQualifiedName, TypeModel>();
         private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
 
         public Generator()
@@ -283,7 +284,7 @@ namespace XmlSchemaClassGenerator
                 UseDataTypeAttribute = false
             };
 
-            TypeModel.Types[AnyType] = objectModel;
+            Types[AnyType] = objectModel;
 
             AttributeGroups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>()).ToDictionary(g => g.QualifiedName);
 
@@ -315,7 +316,7 @@ namespace XmlSchemaClassGenerator
                             derivedClassModel.Namespace.Types[derivedClassModel.Name] = derivedClassModel;
                         }
 
-                        TypeModel.Types[rootElement.QualifiedName] = derivedClassModel;
+                        Types[rootElement.QualifiedName] = derivedClassModel;
 
                         derivedClassModel.BaseClass = (ClassModel)type;
                         ((ClassModel)derivedClassModel.BaseClass).DerivedTypes.Add(derivedClassModel);
@@ -324,7 +325,7 @@ namespace XmlSchemaClassGenerator
                     }
                     else
                     {
-                        TypeModel.Types[rootElement.QualifiedName] = type;
+                        Types[rootElement.QualifiedName] = type;
                     }
                 }
                 else
@@ -375,7 +376,7 @@ namespace XmlSchemaClassGenerator
             if (qualifiedName == null) qualifiedName = type.QualifiedName;
 
             TypeModel typeModel;
-            if (!qualifiedName.IsEmpty && TypeModel.Types.TryGetValue(qualifiedName, out typeModel)) return typeModel;
+            if (!qualifiedName.IsEmpty && Types.TryGetValue(qualifiedName, out typeModel)) return typeModel;
 
             if (source == null)
                 throw new ArgumentNullException("source");
@@ -407,7 +408,7 @@ namespace XmlSchemaClassGenerator
                     namespaceModel.Types[classModel.Name] = classModel;
                 }
 
-                if (!qualifiedName.IsEmpty) TypeModel.Types[qualifiedName] = classModel;
+                if (!qualifiedName.IsEmpty) Types[qualifiedName] = classModel;
 
                 if (complexType.BaseXmlSchemaType != null && complexType.BaseXmlSchemaType.QualifiedName != AnyType)
                 {
@@ -629,7 +630,7 @@ namespace XmlSchemaClassGenerator
                             namespaceModel.Types[enumModel.Name] = enumModel;
                         }
 
-                        if (!qualifiedName.IsEmpty) TypeModel.Types[qualifiedName] = enumModel;
+                        if (!qualifiedName.IsEmpty) Types[qualifiedName] = enumModel;
 
                         return enumModel;
                     }
@@ -657,7 +658,7 @@ namespace XmlSchemaClassGenerator
                     namespaceModel.Types[simpleModel.Name] = simpleModel;
                 }
 
-                if (!qualifiedName.IsEmpty) TypeModel.Types[qualifiedName] = simpleModel;
+                if (!qualifiedName.IsEmpty) Types[qualifiedName] = simpleModel;
 
                 return simpleModel;
             }
