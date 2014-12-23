@@ -20,19 +20,6 @@ namespace XmlSchemaClassGenerator.Tests
     [PrioritizedFixture]
     public class XmlTests
     {
-        public XmlTests()
-        {
-            RestrictionModel.DataAnnotationMode = DataAnnotationMode.None;
-            TypeModel.GenerateSerializableAttribute = true;
-            ClassModel.GenerateDesignerCategoryAttribute = false;
-            ClassModel.GenerateSerializableAttribute = true;
-            PropertyModel.GenerateNullables = true;
-            SimpleModel.CollectionType = typeof(Collection<>);
-            SimpleModel.CollectionImplementationType = typeof(Collection<>);
-            SimpleModel.GenerateSerializableAttribute = true;
-            SimpleModel.IntegerDataType = typeof(int);
-        }
-
         private static Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
 
         private Assembly Compile(string name, string pattern)
@@ -53,7 +40,11 @@ namespace XmlSchemaClassGenerator.Tests
                         return name + (string.IsNullOrEmpty(nm) ? "" : ("." + nm));
                     }
                 },
-                Log = f => cs.Add(f)
+                Log = f => cs.Add(f),
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.None,
+                GenerateDesignerCategoryAttribute = false,
             };
 
             var files = Glob.Glob.ExpandNames(pattern);

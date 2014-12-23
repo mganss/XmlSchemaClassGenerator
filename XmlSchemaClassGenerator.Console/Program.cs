@@ -69,8 +69,6 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
             files = files.SelectMany(f => Glob.Glob.ExpandNames(f)).ToList();
 
-            SimpleModel.IntegerDataType = integerType;
-
             var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
                 var xn = key.XmlSchemaNamespace;
@@ -90,6 +88,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 GenerateNullables = nullables,
                 EnableDataBinding = enableDataBinding,
                 EmitOrder = emitOrder,
+                IntegerDataType = integerType,
             };
 
             if (pclCompatible)

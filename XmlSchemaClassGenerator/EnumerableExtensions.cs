@@ -37,8 +37,9 @@ namespace XmlSchemaClassGenerator
             }
             else if (patterns.Count > 1)
             {
+                var config = patterns.Select(x => x.Configuration).First();
                 var pattern = string.Join("|", patterns.Select(x => string.Format("({0})", x.Value)));
-                yield return new PatternRestrictionModel()
+                yield return new PatternRestrictionModel(config)
                 {
                     Value = pattern,
                 };

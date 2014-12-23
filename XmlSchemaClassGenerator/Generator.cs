@@ -19,90 +19,113 @@ namespace XmlSchemaClassGenerator
 {
     public class Generator
     {
-        public NamespaceProvider NamespaceProvider { get; set; }
-        public string OutputFolder { get; set; }
-        public Action<string> Log { get; set; }
+        private readonly GeneratorConfiguration _configuration = new GeneratorConfiguration();
+
+        public NamespaceProvider NamespaceProvider
+        {
+            get { return _configuration.NamespaceProvider; }
+            set { _configuration.NamespaceProvider = value; }
+        }
+
+        public string OutputFolder
+        {
+            get { return _configuration.OutputFolder; }
+            set { _configuration.OutputFolder = value; }
+        }
+
+        public Action<string> Log
+        {
+            get { return _configuration.Log; }
+            set { _configuration.Log = value; }
+        }
+
         /// <summary>
         /// Enable data binding with INotifyPropertyChanged
         /// </summary>
-        public bool EnableDataBinding { get; set; }
+        public bool EnableDataBinding
+        {
+            get { return _configuration.EnableDataBinding; }
+            set { _configuration.EnableDataBinding = value; }
+        }
+
         /// <summary>
         /// Use XElement instead of XmlElement for Any nodes?
         /// </summary>
-        public bool UseXElementForAny { get; set; }
+        public bool UseXElementForAny
+        {
+            get { return _configuration.UseXElementForAny; }
+            set { _configuration.UseXElementForAny = value; }
+        }
+
         /// <summary>
         /// How are the names of the created properties changed?
         /// </summary>
-        public NamingScheme NamingScheme { get; set; }
+        public NamingScheme NamingScheme
+        {
+            get { return _configuration.NamingScheme; }
+            set { _configuration.NamingScheme = value; }
+        }
+
         /// <summary>
         /// Emit the "Order" attribute value for XmlElementAttribute to ensure the correct order
         /// of the serialized XML elements.
         /// </summary>
-        public bool EmitOrder { get; set; }
+        public bool EmitOrder
+        {
+            get { return _configuration.EmitOrder; }
+            set { _configuration.EmitOrder = value; }
+        }
 
         /// <summary>
         /// Determines the kind of annotations to emit
         /// </summary>
         public DataAnnotationMode DataAnnotationMode
         {
-            get { return RestrictionModel.DataAnnotationMode; }
-            set { RestrictionModel.DataAnnotationMode = value; }
+            get { return _configuration.DataAnnotationMode; }
+            set { _configuration.DataAnnotationMode = value; }
         }
 
         public bool GenerateNullables
         {
-            get
-            {
-                return PropertyModel.GenerateNullables;
-            }
-
-            set
-            {
-                PropertyModel.GenerateNullables = value;
-            }
+            get { return _configuration.GenerateNullables; }
+            set { _configuration.GenerateNullables = value; }
         }
 
         public bool GenerateSerializableAttribute
         {
-            get { return TypeModel.GenerateSerializableAttribute; }
-            set { TypeModel.GenerateSerializableAttribute = value; }
+            get { return _configuration.GenerateSerializableAttribute; }
+            set { _configuration.GenerateSerializableAttribute = value; }
         }
 
         public bool GenerateDesignerCategoryAttribute
         {
-            get { return ClassModel.GenerateDesignerCategoryAttribute; }
-            set { ClassModel.GenerateDesignerCategoryAttribute = value; }
+            get { return _configuration.GenerateDesignerCategoryAttribute; }
+            set { _configuration.GenerateDesignerCategoryAttribute = value; }
         }
 
         public Type CollectionType
         {
-            get { return SimpleModel.CollectionType; }
-            set { SimpleModel.CollectionType = value; }
+            get { return _configuration.CollectionType; }
+            set { _configuration.CollectionType = value; }
         }
 
         public Type CollectionImplementationType
         {
-            get { return SimpleModel.CollectionImplementationType; }
-            set { SimpleModel.CollectionImplementationType = value; }
+            get { return _configuration.CollectionImplementationType; }
+            set { _configuration.CollectionImplementationType = value; }
         }
 
         public Type IntegerDataType
         {
-            get { return SimpleModel.IntegerDataType; }
-            set { SimpleModel.IntegerDataType = value; }
+            get { return _configuration.IntegerDataType; }
+            set { _configuration.IntegerDataType = value; }
         }
 
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
-        private Dictionary<XmlQualifiedName, TypeModel> Types = new Dictionary<XmlQualifiedName, TypeModel>();
+        private readonly Dictionary<XmlQualifiedName, TypeModel> Types = new Dictionary<XmlQualifiedName, TypeModel>();
         private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
-
-        public Generator()
-        {
-            NamingScheme = NamingScheme.PascalCase;
-            NamespaceProvider = new NamespaceProvider();
-        }
 
         public void Generate(IEnumerable<string> files)
         {
@@ -274,7 +297,7 @@ namespace XmlSchemaClassGenerator
 
         private void BuildModel()
         {
-            var objectModel = new SimpleModel
+            var objectModel = new SimpleModel(_configuration)
             {
                 Name = "AnyType",
                 Namespace = CreateNamespaceModel(new Uri(XmlSchema.Namespace), AnyType),
@@ -302,7 +325,7 @@ namespace XmlSchemaClassGenerator
                         // There is already another global element with this type.
                         // Need to create an empty derived class.
 
-                        var derivedClassModel = new ClassModel
+                        var derivedClassModel = new ClassModel(_configuration)
                         {
                             Name = ToTitleCase(rootElement.QualifiedName.Name),
                             Namespace = CreateNamespaceModel(source, rootElement.QualifiedName)
@@ -390,7 +413,7 @@ namespace XmlSchemaClassGenerator
                 var name = ToTitleCase(qualifiedName.Name);
                 if (namespaceModel != null) name = namespaceModel.GetUniqueTypeName(name);
 
-                var classModel = new ClassModel
+                var classModel = new ClassModel(_configuration)
                 {
                     Name = name,
                     Namespace = namespaceModel,
@@ -459,7 +482,7 @@ namespace XmlSchemaClassGenerator
                         var propertyName = ToTitleCase(element.QualifiedName.Name);
                         if (propertyName == classModel.Name) propertyName += "Property"; // member names cannot be the same as their enclosing type
 
-                        property = new PropertyModel
+                        property = new PropertyModel(_configuration)
                         {
                             OwningType = classModel,
                             XmlSchemaName = element.QualifiedName,
@@ -478,11 +501,11 @@ namespace XmlSchemaClassGenerator
                         var any = item.XmlParticle as XmlSchemaAny;
                         if (any != null)
                         {
-                            property = new PropertyModel
+                            property = new PropertyModel(_configuration)
                             {
                                 OwningType = classModel,
                                 Name = "Any",
-                                Type = new SimpleModel { ValueType = (UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
+                                Type = new SimpleModel(_configuration) { ValueType = (UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
                                 IsNullable = item.MinOccurs < 1.0m,
                                 IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                                 IsAny = true,
@@ -540,7 +563,7 @@ namespace XmlSchemaClassGenerator
                     var attributeName = ToTitleCase(attribute.QualifiedName.Name);
                     if (attributeName == classModel.Name) attributeName += "Property"; // member names cannot be the same as their enclosing type
 
-                    var property = new PropertyModel
+                    var property = new PropertyModel(_configuration)
                     {
                         OwningType = classModel,
                         Name = attributeName,
@@ -561,11 +584,11 @@ namespace XmlSchemaClassGenerator
 
                 if (complexType.AnyAttribute != null)
                 {
-                    var property = new PropertyModel
+                    var property = new PropertyModel(_configuration)
                     {
                         OwningType = classModel,
                         Name = "AnyAttribute",
-                        Type = new SimpleModel { ValueType = typeof(XmlAttribute), UseDataTypeAttribute = false },
+                        Type = new SimpleModel(_configuration) { ValueType = typeof(XmlAttribute), UseDataTypeAttribute = false },
                         IsAttribute = true,
                         IsCollection = true,
                         IsAny = true
@@ -597,7 +620,7 @@ namespace XmlSchemaClassGenerator
                         var name = ToTitleCase(qualifiedName.Name);
                         if (namespaceModel != null) name = namespaceModel.GetUniqueTypeName(name);
 
-                        var enumModel = new EnumModel
+                        var enumModel = new EnumModel(_configuration)
                         {
                             Name = name,
                             Namespace = namespaceModel,
@@ -641,13 +664,13 @@ namespace XmlSchemaClassGenerator
                 var simpleModelName = ToTitleCase(qualifiedName.Name);
                 if (namespaceModel != null) simpleModelName = namespaceModel.GetUniqueTypeName(simpleModelName);
 
-                var simpleModel = new SimpleModel
+                var simpleModel = new SimpleModel(_configuration)
                 {
                     Name = simpleModelName,
                     Namespace = namespaceModel,
                     XmlSchemaName = qualifiedName,
                     XmlSchemaType = type,
-                    ValueType = simpleType.Datatype.GetEffectiveType(),
+                    ValueType = simpleType.Datatype.GetEffectiveType(_configuration),
                 };
 
                 simpleModel.Documentation.AddRange(docs);
@@ -675,7 +698,7 @@ namespace XmlSchemaClassGenerator
                 if (!Namespaces.TryGetValue(key, out namespaceModel))
                 {
                     var namespaceName = BuildNamespace(source, qualifiedName.Namespace);
-                    namespaceModel = new NamespaceModel(key) { Name = namespaceName };
+                    namespaceModel = new NamespaceModel(key, _configuration) { Name = namespaceName };
                     Namespaces.Add(key, namespaceModel);
                 }
             }
@@ -692,27 +715,27 @@ namespace XmlSchemaClassGenerator
         private RestrictionModel GetRestriction(XmlSchemaSimpleType type, XmlSchemaFacet facet)
         {
             if (facet is XmlSchemaMaxLengthFacet)
-                return new MaxLengthRestrictionModel { Value = int.Parse(facet.Value) };
+                return new MaxLengthRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
             if (facet is XmlSchemaMinLengthFacet)
-                return new MinLengthRestrictionModel { Value = int.Parse(facet.Value) };
+                return new MinLengthRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
             if (facet is XmlSchemaTotalDigitsFacet)
-                return new TotalDigitsRestrictionModel { Value = int.Parse(facet.Value) };
+                return new TotalDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
             if (facet is XmlSchemaFractionDigitsFacet)
-                return new FractionDigitsRestrictionModel { Value = int.Parse(facet.Value) };
+                return new FractionDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
 
             if (facet is XmlSchemaPatternFacet)
-                return new PatternRestrictionModel { Value = facet.Value };
+                return new PatternRestrictionModel(_configuration) { Value = facet.Value };
 
             var valueType = type.Datatype.ValueType;
 
             if (facet is XmlSchemaMinInclusiveFacet)
-                return new MinInclusiveRestrictionModel { Value = facet.Value, Type = valueType };
+                return new MinInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
             if (facet is XmlSchemaMinExclusiveFacet)
-                return new MinExclusiveRestrictionModel { Value = facet.Value, Type = valueType };
+                return new MinExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
             if (facet is XmlSchemaMaxInclusiveFacet)
-                return new MaxInclusiveRestrictionModel { Value = facet.Value, Type = valueType };
+                return new MaxInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
             if (facet is XmlSchemaMaxExclusiveFacet)
-                return new MaxExclusiveRestrictionModel { Value = facet.Value, Type = valueType };
+                return new MaxExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
 
             // unsupported restriction
             return null;

@@ -10,18 +10,18 @@ namespace XmlSchemaClassGenerator
 {
     public abstract class RestrictionModel
     {
-        public static DataAnnotationMode DataAnnotationMode { get; set; }
+        public GeneratorConfiguration Configuration { get; private set; }
 
-        static RestrictionModel()
+        protected RestrictionModel(GeneratorConfiguration configuration)
         {
-            DataAnnotationMode = DataAnnotationMode.All;
+            Configuration = configuration;
         }
 
         public bool IsSupported
         {
             get
             {
-                return MinimumDataAnnotationMode >= DataAnnotationMode;
+                return MinimumDataAnnotationMode >= Configuration.DataAnnotationMode;
             }
         }
 
@@ -35,6 +35,12 @@ namespace XmlSchemaClassGenerator
 
     public abstract class ValueRestrictionModel<T> : RestrictionModel
     {
+        protected ValueRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+            
+        }
+
         public T Value { get; set; }
 
         public override CodeAttributeDeclaration GetAttribute()
@@ -45,11 +51,23 @@ namespace XmlSchemaClassGenerator
 
     public abstract class ValueTypeRestrictionModel: ValueRestrictionModel<string>
     {
+        protected ValueTypeRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+            
+        }
+
         public Type Type { get; set; }
     }
 
     public class MaxLengthRestrictionModel : ValueRestrictionModel<int>
     {
+        public MaxLengthRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+            
+        }
+
         public override string Description
         {
             get
@@ -71,6 +89,12 @@ namespace XmlSchemaClassGenerator
 
     public class MinLengthRestrictionModel : ValueRestrictionModel<int>
     {
+        public MinLengthRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override string Description
         {
             get
@@ -92,6 +116,12 @@ namespace XmlSchemaClassGenerator
 
     public class TotalDigitsRestrictionModel : ValueRestrictionModel<int>
     {
+        public TotalDigitsRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override DataAnnotationMode MinimumDataAnnotationMode
         {
             get { return DataAnnotationMode.All; }
@@ -108,6 +138,12 @@ namespace XmlSchemaClassGenerator
 
     public class FractionDigitsRestrictionModel : ValueRestrictionModel<int>
     {
+        public FractionDigitsRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override DataAnnotationMode MinimumDataAnnotationMode
         {
             get { return DataAnnotationMode.All; }
@@ -124,6 +160,12 @@ namespace XmlSchemaClassGenerator
 
     public class PatternRestrictionModel : ValueRestrictionModel<string>
     {
+        public PatternRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override string Description
         {
             get
@@ -145,6 +187,12 @@ namespace XmlSchemaClassGenerator
 
     public class MinInclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public MinInclusiveRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override DataAnnotationMode MinimumDataAnnotationMode
         {
             get { return DataAnnotationMode.All; }
@@ -161,6 +209,12 @@ namespace XmlSchemaClassGenerator
 
     public class MinExclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public MinExclusiveRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override DataAnnotationMode MinimumDataAnnotationMode
         {
             get { return DataAnnotationMode.All; }
@@ -177,6 +231,12 @@ namespace XmlSchemaClassGenerator
 
     public class MaxInclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public MaxInclusiveRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override DataAnnotationMode MinimumDataAnnotationMode
         {
             get { return DataAnnotationMode.All; }
@@ -193,6 +253,12 @@ namespace XmlSchemaClassGenerator
 
     public class MaxExclusiveRestrictionModel: ValueTypeRestrictionModel
     {
+        public MaxExclusiveRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
         public override DataAnnotationMode MinimumDataAnnotationMode
         {
             get { return DataAnnotationMode.All; }

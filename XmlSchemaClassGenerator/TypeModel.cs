@@ -26,9 +26,11 @@ namespace XmlSchemaClassGenerator
         /// Does the namespace of this type clashes with a class in the same or upper namespace?
         /// </summary>
         public bool IsAmbiguous { get; set; }
+        public GeneratorConfiguration Configuration { get; private set; }
 
-        public NamespaceModel(NamespaceKey key)
+        public NamespaceModel(NamespaceKey key, GeneratorConfiguration configuration)
         {
+            Configuration = configuration;
             Key = key;
             Types = new Dictionary<string, TypeModel>();
         }
@@ -82,8 +84,6 @@ namespace XmlSchemaClassGenerator
 
     public abstract class TypeModel
     {
-        public static bool GenerateSerializableAttribute { get; set; }
-
         public NamespaceModel Namespace { get; set; }
         public XmlQualifiedName RootElementName { get; set; }
         public string Name { get; set; }
@@ -91,14 +91,11 @@ namespace XmlSchemaClassGenerator
         public XmlSchemaType XmlSchemaType { get; set; }
         public List<DocumentationModel> Documentation { get; private set; }
         public bool IsAnonymous { get; set; }
+        public GeneratorConfiguration Configuration { get; private set; }
 
-        static TypeModel()
+        protected TypeModel(GeneratorConfiguration configuration)
         {
-            GenerateSerializableAttribute = true;
-        }
-
-        protected TypeModel()
-        {
+            Configuration = configuration;
             Documentation = new List<DocumentationModel>();
         }
 
@@ -112,7 +109,7 @@ namespace XmlSchemaClassGenerator
                 typeof(AssemblyTitleAttribute))).Title;
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            if (GenerateSerializableAttribute)
+            if (Configuration.GenerateSerializableAttribute)
             {
                 var serializableAttribute =
                     new CodeAttributeDeclaration(new CodeTypeReference(typeof (SerializableAttribute)));
@@ -141,7 +138,7 @@ namespace XmlSchemaClassGenerator
         {
             var name = referencingNamespace == Namespace ? Name : string.Format("{2}{0}.{1}", Namespace.Name, Name, ((referencingNamespace ?? Namespace).IsAmbiguous ? "global::" : string.Empty));
             if (collection)
-                name = forInit ? SimpleModel.GetCollectionImplementationName(name) : SimpleModel.GetCollectionDefinitionName(name);
+                name = forInit ? SimpleModel.GetCollectionImplementationName(name, Configuration) : SimpleModel.GetCollectionDefinitionName(name, Configuration);
             return new CodeTypeReference(name);
         }
 
@@ -153,20 +150,14 @@ namespace XmlSchemaClassGenerator
 
     public class ClassModel : TypeModel
     {
-        public static bool GenerateDesignerCategoryAttribute { get; set; }
-
         public bool IsAbstract { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
         public bool EnableDataBinding { get; set; }
 
-        static ClassModel()
-        {
-            GenerateDesignerCategoryAttribute = true;
-        }
-
-        public ClassModel()
+        public ClassModel(GeneratorConfiguration configuration)
+            : base(configuration)
         {
             Properties = new List<PropertyModel>();
             DerivedTypes = new List<ClassModel>();
@@ -244,7 +235,7 @@ namespace XmlSchemaClassGenerator
 
                     var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute)));
                     var simpleModel = BaseClass as SimpleModel;
-                    if (simpleModel != null && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute))
+                    if (simpleModel != null && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed(Configuration) ?? simpleModel.UseDataTypeAttribute))
                     {
                         var name = BaseClass.GetQualifiedName();
                         if (name.Namespace == XmlSchema.Namespace)
@@ -267,7 +258,7 @@ namespace XmlSchemaClassGenerator
 
             classDeclaration.CustomAttributes.Add(
                 new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute))));
-            if (GenerateDesignerCategoryAttribute)
+            if (Configuration.GenerateDesignerCategoryAttribute)
             {
                 classDeclaration.CustomAttributes.Add(
                     new CodeAttributeDeclaration(new CodeTypeReference(typeof (DesignerCategoryAttribute)),
@@ -323,8 +314,6 @@ namespace XmlSchemaClassGenerator
 
     public class PropertyModel
     {
-        public static bool GenerateNullables { get; set; }
-
         public TypeModel OwningType { get; set; }
         public string Name { get; set; }
         public bool IsAttribute { get; set; }
@@ -340,9 +329,11 @@ namespace XmlSchemaClassGenerator
         public XmlQualifiedName XmlSchemaName { get; set; }
         public bool IsAny { get; set; }
         public int? Order { get; set; }
+        public GeneratorConfiguration Configuration { get; private set; }
 
-        public PropertyModel()
+        public PropertyModel(GeneratorConfiguration configuration)
         {
+            Configuration = configuration;
             Documentation = new List<DocumentationModel>();
         }
 
@@ -449,7 +440,7 @@ namespace XmlSchemaClassGenerator
 
             if (DefaultValue == null)
             {
-                var propertyName = isNullableValueType && GenerateNullables ? Name + "Value" : Name;
+                var propertyName = isNullableValueType && Configuration.GenerateNullables ? Name + "Value" : Name;
                 member = new CodeMemberField(typeReference, propertyName);
                 var isPrivateSetter = IsCollection || isArray;
                 if (requiresBackingField)
@@ -505,7 +496,7 @@ namespace XmlSchemaClassGenerator
 
             if (isNullableValueType)
             {
-                var specifiedName = GenerateNullables ? Name + "Value" : Name;
+                var specifiedName = Configuration.GenerateNullables ? Name + "Value" : Name;
                 var specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
                 specifiedMember.CustomAttributes.Add(ignoreAttribute);
                 specifiedMember.Attributes = MemberAttributes.Public;
@@ -514,7 +505,7 @@ namespace XmlSchemaClassGenerator
                 specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
                 typeDeclaration.Members.Add(specifiedMember);
 
-                if (GenerateNullables)
+                if (Configuration.GenerateNullables)
                 {
                     // public X? Name
                     // {
@@ -726,7 +717,8 @@ namespace XmlSchemaClassGenerator
     {
         public List<EnumValueModel> Values { get; set; }
 
-        public EnumModel()
+        public EnumModel(GeneratorConfiguration configuration)
+            : base(configuration)
         {
             Values = new List<EnumValueModel>();
         }
@@ -776,29 +768,22 @@ namespace XmlSchemaClassGenerator
     public class SimpleModel : TypeModel
     {
         private static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
-        public static Type IntegerDataType { get; set; }
-        public static Type CollectionType { get; set; }
-        public static Type CollectionImplementationType { get; set; }
 
         public Type ValueType { get; set; }
         public List<RestrictionModel> Restrictions { get; private set; }
         public bool UseDataTypeAttribute { get; set; }
 
-        static SimpleModel()
-        {
-            CollectionType = typeof(Collection<>);
-        }
-
-        public SimpleModel()
+        public SimpleModel(GeneratorConfiguration configuration)
+            : base(configuration)
         {
             Restrictions = new List<RestrictionModel>();
             UseDataTypeAttribute = true;
         }
 
-        public static string GetCollectionDefinitionName(string typeName)
+        public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
         {
-            var typeRef = new CodeTypeReference(CollectionType);
-            if (CollectionType.IsGenericTypeDefinition)
+            var typeRef = new CodeTypeReference(configuration.CollectionType);
+            if (configuration.CollectionType.IsGenericTypeDefinition)
                 typeRef.TypeArguments.Add(typeName);
             var typeOfExpr = new CodeTypeOfExpression(typeRef);
             var writer = new System.IO.StringWriter();
@@ -809,10 +794,10 @@ namespace XmlSchemaClassGenerator
             return fullTypeName;
         }
 
-        public static string GetCollectionImplementationName(string typeName)
+        public static string GetCollectionImplementationName(string typeName, GeneratorConfiguration configuration)
         {
-            var typeRef = new CodeTypeReference(CollectionImplementationType ?? CollectionType);
-            if (CollectionType.IsGenericTypeDefinition)
+            var typeRef = new CodeTypeReference(configuration.CollectionImplementationType ?? configuration.CollectionType);
+            if (configuration.CollectionType.IsGenericTypeDefinition)
                 typeRef.TypeArguments.Add(typeName);
             var typeOfExpr = new CodeTypeOfExpression(typeRef);
             var writer = new System.IO.StringWriter();
@@ -839,16 +824,16 @@ namespace XmlSchemaClassGenerator
                 // http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlelementattribute.datatype(v=vs.110).aspx
                 // XmlSerializer is inconsistent: maps xs:decimal to decimal but xs:integer to string,
                 // even though xs:integer is a restriction of xs:decimal
-                type = XmlSchemaType.GetEffectiveType();
-                UseDataTypeAttribute = XmlSchemaType.IsDataTypeAttributeAllowed() ?? UseDataTypeAttribute;
+                type = XmlSchemaType.GetEffectiveType(Configuration);
+                UseDataTypeAttribute = XmlSchemaType.IsDataTypeAttributeAllowed(Configuration) ?? UseDataTypeAttribute;
             }
 
             if (collection)
             {
                 if (forInit)
-                    type = (CollectionImplementationType ?? CollectionType).MakeGenericType(type);
+                    type = (Configuration.CollectionImplementationType ?? Configuration.CollectionType).MakeGenericType(type);
                 else
-                    type = CollectionType.MakeGenericType(type);
+                    type = Configuration.CollectionType.MakeGenericType(type);
             }
 
             return new CodeTypeReference(type);

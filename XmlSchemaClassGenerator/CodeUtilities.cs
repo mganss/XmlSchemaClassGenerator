@@ -35,7 +35,7 @@ namespace XmlSchemaClassGenerator
             return string.Concat("_", propertyName.ToCamelCase());
         }
 
-        private static bool? IsDataTypeAttributeAllowed(XmlTypeCode typeCode)
+        private static bool? IsDataTypeAttributeAllowed(XmlTypeCode typeCode, GeneratorConfiguration configuration)
         {
             bool? result;
             switch (typeCode)
@@ -49,7 +49,7 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.NonNegativeInteger:
                 case XmlTypeCode.NonPositiveInteger:
                 case XmlTypeCode.PositiveInteger:
-                    if (SimpleModel.IntegerDataType != null && SimpleModel.IntegerDataType != typeof(string))
+                    if (configuration.IntegerDataType != null && configuration.IntegerDataType != typeof(string))
                         result = false;
                     else
                         result = null;
@@ -65,17 +65,17 @@ namespace XmlSchemaClassGenerator
             return result;
         }
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type)
+        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
         {
-            return IsDataTypeAttributeAllowed(type.TypeCode);
+            return IsDataTypeAttributeAllowed(type.TypeCode, configuration);
         }
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaType type)
+        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaType type, GeneratorConfiguration configuration)
         {
-            return IsDataTypeAttributeAllowed(type.TypeCode);
+            return IsDataTypeAttributeAllowed(type.TypeCode, configuration);
         }
 
-        private static Type GetEffectiveType(XmlTypeCode typeCode, XmlSchemaDatatypeVariety variety)
+        private static Type GetEffectiveType(XmlTypeCode typeCode, XmlSchemaDatatypeVariety variety, GeneratorConfiguration configuration)
         {
             Type result;
             switch (typeCode)
@@ -99,11 +99,11 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.NonNegativeInteger:
                 case XmlTypeCode.NonPositiveInteger:
                 case XmlTypeCode.PositiveInteger:
-                    if (SimpleModel.IntegerDataType == null || SimpleModel.IntegerDataType == typeof(string))
+                    if (configuration.IntegerDataType == null || configuration.IntegerDataType == typeof(string))
                         result = typeof(string);
                     else
                     {
-                        result = SimpleModel.IntegerDataType;
+                        result = configuration.IntegerDataType;
                     }
                     break;
                 default:
@@ -113,14 +113,14 @@ namespace XmlSchemaClassGenerator
             return result;
         }
 
-        public static Type GetEffectiveType(this XmlSchemaDatatype type)
+        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
         {
-            return GetEffectiveType(type.TypeCode, type.Variety) ?? type.ValueType;
+            return GetEffectiveType(type.TypeCode, type.Variety, configuration) ?? type.ValueType;
         }
 
-        public static Type GetEffectiveType(this XmlSchemaType type)
+        public static Type GetEffectiveType(this XmlSchemaType type, GeneratorConfiguration configuration)
         {
-            return GetEffectiveType(type.TypeCode, type.Datatype.Variety) ?? type.Datatype.ValueType;
+            return GetEffectiveType(type.TypeCode, type.Datatype.Variety, configuration) ?? type.Datatype.ValueType;
         }
 
         public static XmlQualifiedName GetQualifiedName(this XmlSchemaType schemaType)
