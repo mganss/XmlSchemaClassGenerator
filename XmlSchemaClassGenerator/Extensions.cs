@@ -32,5 +32,10 @@ namespace XmlSchemaClassGenerator
                 return PropertyValueTypeCode.ValueType;
             return PropertyValueTypeCode.Other;
         }
+
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> propertySelector)
+        {
+            return source.GroupBy(propertySelector).Select(x => x.First());
+        }
     }
 }
