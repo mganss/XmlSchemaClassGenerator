@@ -465,7 +465,7 @@ namespace XmlSchemaClassGenerator
 
                         if (elementQualifiedName.IsEmpty)
                         {
-                            elementQualifiedName = element.QualifiedName;
+                            elementQualifiedName = element.RefName;
 
                             if (elementQualifiedName.IsEmpty)
                             {
