@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -18,10 +19,16 @@ namespace XmlSchemaClassGenerator
             return name;
         }
 
+        // Match non-letter followed by letter
+        static Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
+
+        // Uppercases first letter and all letters following non-letters.
+        // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
         public static string ToPascalCase(this string s)
         {
             if (string.IsNullOrEmpty(s)) return s;
-            return char.ToUpperInvariant(s[0]) + s.Substring(1);
+            return char.ToUpperInvariant(s[0])
+                + PascalCaseRegex.Replace(s.Substring(1), m => m.Value[0] + char.ToUpperInvariant(m.Value[1]).ToString());
         }
 
         public static string ToCamelCase(this string s)

@@ -14,6 +14,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using MoreLinq;
 
 namespace XmlSchemaClassGenerator
 {
@@ -467,7 +468,7 @@ namespace XmlSchemaClassGenerator
                         {
                             elementQualifiedName = element.QualifiedName;
 
-                            if (elementQualifiedName.IsEmpty || elementQualifiedName.Namespace == "")
+                            if (elementQualifiedName.IsEmpty)
                             {
                                 // inner type, have to generate a type name
                                 var typeName = ToTitleCase(classModel.Name) + ToTitleCase(element.QualifiedName.Name);
@@ -513,7 +514,10 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    if (property != null)
+                    // Discard duplicate property names. This is most likely due to:
+                    // - Choice or
+                    // - Element and attribute with the same name
+                    if (property != null && !classModel.Properties.Any(p => p.Name == property.Name))
                     {
                         var itemDocs = GetDocumentation(item.XmlParticle);
                         property.Documentation.AddRange(itemDocs);
@@ -630,7 +634,7 @@ namespace XmlSchemaClassGenerator
 
                         enumModel.Documentation.AddRange(docs);
 
-                        foreach (var facet in enumFacets)
+                        foreach (var facet in enumFacets.DistinctBy(f => f.Value))
                         {
                             var value = new EnumValueModel
                             {

@@ -18,11 +18,13 @@ from schema restrictions
 * Automatic properties
 * Pascal case for classes and properties
 * Generate nullable adapter properties for optional elements and attributes without default values (see [below](#nullables))
+* Optional support for PCL
+* Optional support for [`INotifyPropertyChanged`](http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged)
 
 Unsupported:
 
 * Some restriction types
-* Recursive choices and choices whose elements have minOccurs > 0
+* Recursive choices and choices whose elements have minOccurs > 0 (see [below](#choice))
 * Possible name clashes and invalid identifiers when names contain non-alphanumeric characters
 
 Usage
@@ -41,12 +43,20 @@ Options:
                                Separate XML namespace and C# namespace by '='.
                                One option must be given for each namespace to
                                be mapped.
+                               A file name may be given by appending a pipe
+                               sign (|) followed by a file name (like schema.
+                               xsd) to the XML namespace.
                                If no mapping is found for an XML namespace, a
                                name is generated automatically (may fail).
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of string
                                TYPE can be i[nt], l[ong], or d[ecimal].
+      --edb, --enable-data-binding
+                             Enable INotifyPropertyChanged data binding
+      --order                Emit order for all class members stored as XML
+                               element
+      --pcl                  PCL compatible output
   -p, --prefix=PREFIX        the PREFIX to prepend to auto-generated namespace
                                names
   -v, --verbose              print generated file names on stdout
@@ -123,6 +133,18 @@ public System.Nullable<int> Id
     }
 }
 ```
+
+Choice Elements<a name="choice"></a>
+------------------------------------
+
+The support for choice elements differs from that [provided by xsd.exe](http://msdn.microsoft.com/en-us/library/sa6z5baz).
+Xsd.exe generates a property called `Item` of type `object` and, if not all choices have a distinct type, 
+another enum property that selects the chosen element.
+Besides being non-typesafe and non-intuitive, this approach breaks apart if the choices have a more complicated structure (e.g. sequences),
+resulting in possibly schema-invalid XML.
+
+XmlSchemaClassGenerator currently simply pretends choices are sequences.
+This means you'll have to take care only to set a schema-valid combination of these properties to non-null values.
 
 Contributing
 ------------
