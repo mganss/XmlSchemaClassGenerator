@@ -127,7 +127,13 @@ namespace XmlSchemaClassGenerator
                     new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)),
                     new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlSchemaName.Namespace)));
                 if (IsAnonymous)
-                    typeAttribute.Arguments.Add(new CodeAttributeArgument("AnonymousType", new CodePrimitiveExpression(true)));
+                {
+                    // don't generate AnonymousType if it's derived class, otherwise XmlSerializer will
+                    // complain with "InvalidOperationException: Cannot include anonymous type '...'"
+                    var classModel = this as ClassModel;
+                    if (classModel == null || classModel.BaseClass == null)
+                        typeAttribute.Arguments.Add(new CodeAttributeArgument("AnonymousType", new CodePrimitiveExpression(true)));
+                }
                 typeDeclaration.CustomAttributes.Add(typeAttribute);
             }
 
