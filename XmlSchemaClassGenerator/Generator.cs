@@ -421,6 +421,7 @@ namespace XmlSchemaClassGenerator
                     XmlSchemaType = type,
                     IsAbstract = complexType.IsAbstract,
                     IsAnonymous = type.QualifiedName.Name == "",
+                    IsMixed = complexType.IsMixed,
                     EnableDataBinding = EnableDataBinding,
                 };
 

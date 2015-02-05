@@ -157,6 +157,7 @@ namespace XmlSchemaClassGenerator
     public class ClassModel : TypeModel
     {
         public bool IsAbstract { get; set; }
+        public bool IsMixed { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
@@ -261,6 +262,16 @@ namespace XmlSchemaClassGenerator
 
             foreach (var property in Properties)
                 property.AddMembersTo(classDeclaration, EnableDataBinding);
+
+            if (IsMixed)
+            {
+                var text = new CodeMemberField(typeof(string), "Text");
+                // hack to generate automatic property
+                text.Name += " { get; set; }";
+                var xmlTextAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute)));
+                text.CustomAttributes.Add(xmlTextAttribute);
+                classDeclaration.Members.Add(text);
+            }
 
             classDeclaration.CustomAttributes.Add(
                 new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute))));
