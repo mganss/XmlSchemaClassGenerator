@@ -268,6 +268,7 @@ namespace XmlSchemaClassGenerator
                 var text = new CodeMemberField(typeof(string), "Text");
                 // hack to generate automatic property
                 text.Name += " { get; set; }";
+                text.Attributes = MemberAttributes.Public;
                 var xmlTextAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute)));
                 text.CustomAttributes.Add(xmlTextAttribute);
                 classDeclaration.Members.Add(text);
