@@ -263,7 +263,7 @@ namespace XmlSchemaClassGenerator
             foreach (var property in Properties)
                 property.AddMembersTo(classDeclaration, EnableDataBinding);
 
-            if (IsMixed)
+            if (IsMixed && (BaseClass == null || BaseClass is ClassModel))
             {
                 var text = new CodeMemberField(typeof(string), "Text");
                 // hack to generate automatic property
