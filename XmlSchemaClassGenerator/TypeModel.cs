@@ -433,6 +433,10 @@ namespace XmlSchemaClassGenerator
         {
             CodeTypeMember member;
 
+            // Check if the member is already inherited:
+            if (OwningType.HasFieldName(this))
+                return;
+
             var typeClassModel = Type as ClassModel;
             var isArray = !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1
                 && !typeClassModel.Properties[0].IsAttribute && !typeClassModel.Properties[0].IsAny
