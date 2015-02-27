@@ -82,7 +82,15 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public abstract class TypeModel
+    public interface IXmlModel
+    {
+        string Name { get; set; }
+        XmlQualifiedName XmlSchemaName { get; set; }
+        List<DocumentationModel> Documentation { get; }
+        GeneratorConfiguration Configuration { get; }
+    }
+
+    public abstract class TypeModel : IXmlModel
     {
         public NamespaceModel Namespace { get; set; }
         public XmlQualifiedName RootElementName { get; set; }
@@ -154,19 +162,71 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class ClassModel : TypeModel
+    public abstract class PropertyContainingModel : TypeModel
+    {
+        public List<PropertyModel> Properties { get; set; }
+        public List<InterfaceModel> InterfacedGroups { get; set; } 
+
+        protected PropertyContainingModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+            Properties = new List<PropertyModel>();
+            InterfacedGroups = new List<InterfaceModel>();
+        }
+
+        protected void AddInterfacedGroups(CodeTypeDeclaration classDeclaration)
+        {
+            foreach (var group in InterfacedGroups)
+            {
+                classDeclaration.BaseTypes.Add(@group.GetReferenceFor(Namespace, false));
+            }
+        }
+
+        public abstract int TotalProperties { get; }
+    }
+
+    public class InterfaceModel : PropertyContainingModel
+    {
+        public InterfaceModel(GeneratorConfiguration configuration) 
+            : base(configuration)
+        {
+        }
+
+        public override CodeTypeDeclaration Generate()
+        {
+            var classDeclaration = new CodeTypeDeclaration { Name = Name };
+
+            classDeclaration.Comments.AddRange(DocumentationModel.GetComments(Documentation).ToArray());
+
+            classDeclaration.IsClass = true;
+            classDeclaration.IsPartial = true;
+            classDeclaration.IsInterface = true;
+
+            AddInterfacedGroups(classDeclaration);
+
+            foreach (var property in Properties)
+                property.AddMembersTo(classDeclaration, false);
+
+            return classDeclaration;
+        }
+
+        public override int TotalProperties
+        {
+            get { return this.Properties.Count; }
+        }
+    }
+
+    public class ClassModel : PropertyContainingModel
     {
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public TypeModel BaseClass { get; set; }
-        public List<PropertyModel> Properties { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
         public bool EnableDataBinding { get; set; }
 
         public ClassModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
-            Properties = new List<PropertyModel>();
             DerivedTypes = new List<ClassModel>();
         }
 
@@ -257,6 +317,8 @@ namespace XmlSchemaClassGenerator
                 }
             }
 
+            AddInterfacedGroups(classDeclaration);
+
             if (EnableDataBinding)
                 classDeclaration.BaseTypes.Add(new CodeTypeReference("INotifyPropertyChanged"));
 
@@ -312,7 +374,7 @@ namespace XmlSchemaClassGenerator
             return allDerivedTypes;
         }
 
-        public int TotalProperties
+        public override int TotalProperties
         {
             get
             {
@@ -330,7 +392,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class PropertyModel
+    public class PropertyModel : IXmlModel
     {
         public TypeModel OwningType { get; set; }
         public string Name { get; set; }
@@ -355,8 +417,13 @@ namespace XmlSchemaClassGenerator
             Documentation = new List<DocumentationModel>();
         }
 
-        internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter, bool withDataBinding = true)
+        internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter, bool withDataBinding = true, bool automaticProperty = false)
         {
+            if (automaticProperty)
+            {
+                return string.Format(@" {{ get; {0}set; }}", (privateSetter ? "private " : string.Empty));
+            }
+
             if (withDataBinding)
             {
                 switch (typeCode)
@@ -433,18 +500,26 @@ namespace XmlSchemaClassGenerator
         {
             CodeTypeMember member;
 
-            // Check if the member is already inherited:
+            // Discard duplicate property names. This is most likely due to:
+            // - Choice or
+            // - Element and attribute with the same name or
+            // - Inherited via extension
             if (OwningType.HasFieldName(this))
                 return;
 
-            var typeClassModel = Type as ClassModel;
-            var isArray = !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1
-                && !typeClassModel.Properties[0].IsAttribute && !typeClassModel.Properties[0].IsAny
-                && typeClassModel.BaseClass == null;
-            var propertyType = !isArray ? Type : typeClassModel.Properties[0].Type;
-            var isNullableValueType = DefaultValue == null 
-                && IsNullable && !(IsCollection || isArray) 
-                && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType));
+            var interfaceModel = typeDeclaration.IsInterface;
+            var propertyContainingModel = Type as PropertyContainingModel;
+            var isArray = !IsAttribute && propertyContainingModel != null && propertyContainingModel.TotalProperties == 1
+                && !propertyContainingModel.Properties[0].IsAttribute && !propertyContainingModel.Properties[0].IsAny
+                && (!(Type is ClassModel) || ((ClassModel)Type).BaseClass == null);
+            var propertyType = !isArray ? Type : propertyContainingModel.Properties[0].Type;
+            var isPrivateSetter = IsCollection || isArray;
+            var isNullableValueType = DefaultValue == null
+                                      && IsNullable && !isPrivateSetter
+                                      &&
+                                      ((propertyType is EnumModel) ||
+                                       (propertyType is SimpleModel &&
+                                        ((SimpleModel)propertyType).ValueType.IsValueType));
 
             var typeReference = propertyType.GetReferenceFor(OwningType.Namespace, IsCollection || isArray);
             var simpleType = propertyType as SimpleModel;
@@ -462,37 +537,45 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(backingField);
             }
 
-            if (DefaultValue == null)
+            var propertyName = isNullableValueType && Configuration.GenerateNullables ? Name + "Value" : Name;
+            if (interfaceModel)
             {
-                var propertyName = isNullableValueType && Configuration.GenerateNullables ? Name + "Value" : Name;
-                member = new CodeMemberField(typeReference, propertyName);
-                var isPrivateSetter = IsCollection || isArray;
-                if (requiresBackingField)
+                member = new CodeMemberProperty
                 {
-                    member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(),
-                        isPrivateSetter, withDataBinding);
-                }
-                else
-                {
-                    // hack to generate automatic property
-                    member.Name += isPrivateSetter ? " { get; private set; }" : " { get; set; }";
-                }
+                    Type = typeReference,
+                    Name = propertyName,
+                    HasSet = !isPrivateSetter,
+                    HasGet = true,
+                    Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                };
             }
             else
             {
-                var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
-                backingField.InitExpression = defaultValueExpression;
-
-                member = new CodeMemberField(typeReference, Name);
-                member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(), false, withDataBinding);
-
-                if (IsNullable)
+                if (DefaultValue == null)
                 {
-                    if (!(defaultValueExpression is CodeObjectCreateExpression))
+                    member = new CodeMemberField(typeReference, propertyName);
+
+                    member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(),
+                        isPrivateSetter, withDataBinding, !requiresBackingField);
+                }
+                else
+                {
+                    var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
+                    backingField.InitExpression = defaultValueExpression;
+
+                    member = new CodeMemberField(typeReference, Name);
+                    member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(),
+                        false, withDataBinding);
+
+                    if (IsNullable)
                     {
-                        var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute)),
-                            new CodeAttributeArgument(defaultValueExpression));
-                        member.CustomAttributes.Add(defaultValueAttribute);
+                        if (!(defaultValueExpression is CodeObjectCreateExpression))
+                        {
+                            var defaultValueAttribute =
+                                new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute)),
+                                    new CodeAttributeArgument(defaultValueExpression));
+                            member.CustomAttributes.Add(defaultValueAttribute);
+                        }
                     }
                 }
             }
@@ -521,9 +604,24 @@ namespace XmlSchemaClassGenerator
             if (isNullableValueType)
             {
                 var specifiedName = Configuration.GenerateNullables ? Name + "Value" : Name;
-                var specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
-                specifiedMember.CustomAttributes.Add(ignoreAttribute);
-                specifiedMember.Attributes = MemberAttributes.Public;
+                CodeTypeMember specifiedMember;
+                if (interfaceModel)
+                {
+                    specifiedMember = new CodeMemberProperty
+                    {
+                        Type = new CodeTypeReference(typeof(bool)),
+                        Name = specifiedName + "Specified",
+                        HasSet = true,
+                        HasGet = true,
+                        Attributes = MemberAttributes.Public | MemberAttributes.Final,
+                    };
+                }
+                else
+                {
+                    specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
+                    specifiedMember.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+                    specifiedMember.CustomAttributes.Add(ignoreAttribute);
+                }
                 var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets or sets a value indicating whether the {0} property is specified.", Name) },
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
                 specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
@@ -554,48 +652,55 @@ namespace XmlSchemaClassGenerator
                     nullableMember.CustomAttributes.Add(ignoreAttribute);
                     nullableMember.Comments.AddRange(member.Comments);
 
-                    var specifiedExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), specifiedName + "Specified");
-                    var valueExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name + "Value");
-                    var conditionStatement = new CodeConditionStatement(specifiedExpression,
-                        new CodeStatement[] { new CodeMethodReturnStatement(valueExpression) },
-                        new CodeStatement[] { new CodeMethodReturnStatement(new CodePrimitiveExpression(null)) });
-                    nullableMember.GetStatements.Add(conditionStatement);
-
-                    var getValueOrDefaultExpression = new CodeMethodInvokeExpression(new CodePropertySetValueReferenceExpression(), "GetValueOrDefault");
-                    var setValueStatement = new CodeAssignStatement(valueExpression, getValueOrDefaultExpression);
-                    var hasValueExpression = new CodePropertyReferenceExpression(new CodePropertySetValueReferenceExpression(), "HasValue");
-                    var setSpecifiedStatement = new CodeAssignStatement(specifiedExpression, hasValueExpression);
-
-                    var statements = new List<CodeStatement>();
-                    if (withDataBinding)
+                    
+                    if (!interfaceModel)
                     {
-                        var ifNotEquals = new CodeConditionStatement(
-                            new CodeBinaryOperatorExpression(
-                                new CodeMethodInvokeExpression(valueExpression, "Equals", getValueOrDefaultExpression),
-                                CodeBinaryOperatorType.ValueEquality,
-                                new CodePrimitiveExpression(false)
-                                ),
-                            setValueStatement,
-                            setSpecifiedStatement,
-                            new CodeExpressionStatement(new CodeMethodInvokeExpression(null, "OnPropertyChanged",
-                                new CodePrimitiveExpression(Name)))
-                            );
-                        statements.Add(ifNotEquals);
-                    }
-                    else
-                    {
-                        statements.Add(setValueStatement);
-                        statements.Add(setSpecifiedStatement);
-                    }
+                        var specifiedExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), specifiedName + "Specified");
+                        var valueExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name + "Value");
+                        var conditionStatement = new CodeConditionStatement(specifiedExpression,
+                            new CodeStatement[] { new CodeMethodReturnStatement(valueExpression) },
+                            new CodeStatement[] { new CodeMethodReturnStatement(new CodePrimitiveExpression(null)) });
+                        nullableMember.GetStatements.Add(conditionStatement);
 
-                    nullableMember.SetStatements.AddRange(statements.ToArray());
+                        var getValueOrDefaultExpression = new CodeMethodInvokeExpression(new CodePropertySetValueReferenceExpression(), "GetValueOrDefault");
+                        var setValueStatement = new CodeAssignStatement(valueExpression, getValueOrDefaultExpression);
+                        var hasValueExpression = new CodePropertyReferenceExpression(new CodePropertySetValueReferenceExpression(), "HasValue");
+                        var setSpecifiedStatement = new CodeAssignStatement(specifiedExpression, hasValueExpression);
+
+                        var statements = new List<CodeStatement>();
+                        if (withDataBinding)
+                        {
+                            var ifNotEquals = new CodeConditionStatement(
+                                new CodeBinaryOperatorExpression(
+                                    new CodeMethodInvokeExpression(valueExpression, "Equals", getValueOrDefaultExpression),
+                                    CodeBinaryOperatorType.ValueEquality,
+                                    new CodePrimitiveExpression(false)
+                                    ),
+                                setValueStatement,
+                                setSpecifiedStatement,
+                                new CodeExpressionStatement(new CodeMethodInvokeExpression(null, "OnPropertyChanged",
+                                    new CodePrimitiveExpression(Name)))
+                                );
+                            statements.Add(ifNotEquals);
+                        }
+                        else
+                        {
+                            statements.Add(setValueStatement);
+                            statements.Add(setSpecifiedStatement);
+                        }
+
+                        nullableMember.SetStatements.AddRange(statements.ToArray());
+                    }
 
                     typeDeclaration.Members.Add(nullableMember);
 
-                    var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute)));
-                    editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(EditorBrowsableState)), "Never")));
-                    specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
-                    member.CustomAttributes.Add(editorBrowsableAttribute);
+                    if (!interfaceModel)
+                    {
+                        var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute)));
+                        editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(EditorBrowsableState)), "Never")));
+                        specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
+                        member.CustomAttributes.Add(editorBrowsableAttribute);
+                    }
                 }
             }
             else if ((IsCollection || isArray) && IsNullable && !IsAttribute)
@@ -605,16 +710,19 @@ namespace XmlSchemaClassGenerator
                     Type = new CodeTypeReference(typeof(bool)),
                     Name = Name + "Specified",
                     HasSet = false,
-                    HasGet = true,
+                    HasGet = true
                 };
                 specifiedProperty.CustomAttributes.Add(ignoreAttribute);
                 specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
-                var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
-                var countReference = new CodePropertyReferenceExpression(listReference, "Count");
-                var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
-                var returnStatement = new CodeMethodReturnStatement(notZeroExpression);
-                specifiedProperty.GetStatements.Add(returnStatement);
+                if (!interfaceModel)
+                {
+                    var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
+                    var countReference = new CodePropertyReferenceExpression(listReference, "Count");
+                    var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
+                    var returnStatement = new CodeMethodReturnStatement(notZeroExpression);
+                    specifiedProperty.GetStatements.Add(returnStatement);
+                }
 
                 var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets a value indicating whether the {0} collection is empty.", Name) },
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Collection leer ist.", Name) } };
@@ -623,11 +731,11 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(specifiedProperty);
             }
 
-            var attribute = GetAttribute(isArray);
-            member.CustomAttributes.Add(attribute);
+            if (!interfaceModel)
+                AddAttributes(member, isArray);
 
             // initialize List<>
-            if (IsCollection || isArray)
+            if ((IsCollection || isArray) && !interfaceModel)
             {
                 var constructor = typeDeclaration.Members.OfType<CodeConstructor>().FirstOrDefault();
                 if (constructor == null)
@@ -646,8 +754,8 @@ namespace XmlSchemaClassGenerator
 
             if (isArray)
             {
-                var arrayItemProperty = typeClassModel.Properties[0];
-                var propertyAttribute = arrayItemProperty.GetAttribute(false);
+                var arrayItemProperty = propertyContainingModel.Properties[0];
+                var propertyAttribute = arrayItemProperty.GetAttributes(arrayItemProperty, false).ToArray()[0];
                 // HACK: repackage as ArrayItemAttribute
                 var arrayItemAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayItemAttribute)),
                     propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, "Order", StringComparison.Ordinal)).ToArray());
@@ -655,72 +763,115 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        private CodeAttributeDeclaration GetAttribute(bool isArray)
+        private CodeAttributeDeclaration[] AddAttributes(CodeTypeMember member, bool isArray)
         {
-            CodeAttributeDeclaration attribute;
+            var attributes = GetAttributes(this, isArray).ToArray();
+            member.CustomAttributes.AddRange(attributes);
+            return attributes;
+        }
+
+        private IEnumerable<CodeAttributeDeclaration> GetAttributes(IXmlModel model, bool isArray)
+        {
+            IEnumerable<CodeAttributeDeclaration> attributes = GetPlainAttributes(model, isArray);
+
+            foreach (var attribute in attributes)
+            {
+                if (Form == XmlSchemaForm.Qualified)
+                {
+                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
+                }
+                else if (XmlNamespace != null)
+                {
+                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
+                }
+                else if (!IsAny)
+                {
+                    attribute.Arguments.Add(new CodeAttributeArgument("Form",
+                        new CodeFieldReferenceExpression( new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm))), 
+                            "Unqualified")));
+                }
+
+                if (IsNillable)
+                    attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
+
+                var simpleModel = Type as SimpleModel;
+                if (simpleModel != null && simpleModel.UseDataTypeAttribute)
+                {
+                    var name = Type.XmlSchemaType.GetQualifiedName();
+                    if (name.Namespace == XmlSchema.Namespace)
+                    {
+                        var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
+                        attribute.Arguments.Add(dataType);
+                    }
+                }
+
+                yield return attribute;
+            }
+        }
+
+        private IEnumerable<CodeAttributeDeclaration> GetPlainAttributes(IXmlModel model, bool isArray)
+        {
             if (IsAttribute)
             {
                 if (IsAny)
                 {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyAttributeAttribute)));
+                    yield return new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyAttributeAttribute)));
                 }
                 else
                 {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAttributeAttribute)),
-                        new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                    yield return new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAttributeAttribute)),
+                        new CodeAttributeArgument(new CodePrimitiveExpression(model.XmlSchemaName.Name)));
                 }
             }
             else if (!isArray)
             {
-                if (IsAny)
-                {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyElementAttribute)));
-                }
-                else
-                {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute)),
-                        new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
-                    if (Order != null)
-                        attribute.Arguments.Add(new CodeAttributeArgument("Order",
-                            new CodePrimitiveExpression(Order.Value)));
-                }
+                foreach (var codeAttributeDeclaration in GetXmlElementAttributes(model))
+                    yield return codeAttributeDeclaration;
             }
             else
             {
-                attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayAttribute)),
-                    new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                yield return new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayAttribute)),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(model.XmlSchemaName.Name)));
             }
+        }
 
-            if (Form == XmlSchemaForm.Qualified)
-            {
-                attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
-            }
-            else if (XmlNamespace != null)
-            {
-                attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
-            }
-            else if (!IsAny)
-            {
-                attribute.Arguments.Add(new CodeAttributeArgument("Form",
-                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm))),
-                        "Unqualified")));
-            }
+        private IEnumerable<CodeAttributeDeclaration> GetXmlElementAttributes(IXmlModel model, bool addEmptyRoot = true)
+        {
+            TypeModel typeModel = null;
+            if (model is PropertyModel)
+                typeModel = ((PropertyModel)model).Type;
+            else if (model is ClassModel)
+                typeModel = (ClassModel)model;
 
-            if (IsNillable)
-                attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
-
-            var simpleModel = Type as SimpleModel;
-            if (simpleModel != null && simpleModel.UseDataTypeAttribute)
+            if (IsCollection && typeModel is ClassModel)
             {
-                var name = Type.XmlSchemaType.GetQualifiedName();
-                if (name.Namespace == XmlSchema.Namespace)
+                var classModel = (ClassModel)typeModel;
+                foreach (var derivedType in classModel.DerivedTypes)
                 {
-                    var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
-                    attribute.Arguments.Add(dataType);
+                    foreach (var attribute in GetXmlElementAttributes(derivedType, false))
+                    {
+                        if (attribute == null) continue;
+                        yield return attribute;
+                    }
                 }
             }
 
-            return attribute;
+            if (!addEmptyRoot && model is ClassModel && ((ClassModel)model).RootElementName == null)
+                yield break;
+
+            if (IsAny)
+            {
+                yield return new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyElementAttribute)));
+            }
+            else
+            {
+                var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute)),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(model.XmlSchemaName.Name)),
+                    new CodeAttributeArgument(new CodeTypeOfExpression(typeModel.GetReferenceFor(null, false))));
+                if (Order != null)
+                    attribute.Arguments.Add(new CodeAttributeArgument("Order", new CodePrimitiveExpression(Order.Value)));
+                yield return attribute;
+            }
         }
     }
 
