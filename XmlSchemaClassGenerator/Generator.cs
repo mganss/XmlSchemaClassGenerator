@@ -475,8 +475,7 @@ namespace XmlSchemaClassGenerator
 
                     if (attributeQualifiedName.IsEmpty)
                     {
-                        // TODO: Maybe this can/should be removed:
-                        //attributeQualifiedName = attribute.QualifiedName;
+                        attributeQualifiedName = attribute.QualifiedName;
 
                         if (attributeQualifiedName.IsEmpty || attributeQualifiedName.Namespace == "")
                         {
