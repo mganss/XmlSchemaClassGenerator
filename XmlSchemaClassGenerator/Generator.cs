@@ -451,84 +451,9 @@ namespace XmlSchemaClassGenerator
                 }
                 else particle = complexType.ContentTypeParticle;
 
-                var items = GetElements(particle);
+                ExploreReferencedGroups(source, qualifiedName, particle, classModel, namespaceModel);
 
-                var order = 0;
-                foreach (var item in items)
-                {
-                    PropertyModel property = null;
-
-                    var element = item.XmlParticle as XmlSchemaElement;
-                    // ElementSchemaType must be non-null. This is not the case when maxOccurs="0".
-                    if (element != null && element.ElementSchemaType != null)
-                    {
-                        var elementQualifiedName = element.ElementSchemaType.QualifiedName;
-
-                        if (elementQualifiedName.IsEmpty)
-                        {
-                            elementQualifiedName = element.RefName;
-
-                            if (elementQualifiedName.IsEmpty)
-                            {
-                                // inner type, have to generate a type name
-                                var typeName = ToTitleCase(classModel.Name) + ToTitleCase(element.QualifiedName.Name);
-                                elementQualifiedName = new XmlQualifiedName(typeName, qualifiedName.Namespace);
-                                // try to avoid name clashes
-                                if (NameExists(elementQualifiedName)) elementQualifiedName = new[] { "Item", "Property", "Element" }
-                                    .Select(s => new XmlQualifiedName(elementQualifiedName.Name + s, elementQualifiedName.Namespace))
-                                    .First(n => !NameExists(n));
-                            }
-                        }
-
-                        var propertyName = ToTitleCase(element.QualifiedName.Name);
-                        if (propertyName == classModel.Name) propertyName += "Property"; // member names cannot be the same as their enclosing type
-
-                        property = new PropertyModel(_configuration)
-                        {
-                            OwningType = classModel,
-                            XmlSchemaName = element.QualifiedName,
-                            Name = propertyName,
-                            Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
-                            IsNillable = element.IsNillable,
-                            IsNullable = item.MinOccurs < 1.0m,
-                            IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                            DefaultValue = element.DefaultValue,
-                            Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
-                            XmlNamespace = element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != qualifiedName.Namespace ? element.QualifiedName.Namespace : null,
-                        };
-                    }
-                    else
-                    {
-                        var any = item.XmlParticle as XmlSchemaAny;
-                        if (any != null)
-                        {
-                            property = new PropertyModel(_configuration)
-                            {
-                                OwningType = classModel,
-                                Name = "Any",
-                                Type = new SimpleModel(_configuration) { ValueType = (UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
-                                IsNullable = item.MinOccurs < 1.0m,
-                                IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                                IsAny = true,
-                            };
-                        }
-                    }
-
-                    // Discard duplicate property names. This is most likely due to:
-                    // - Choice or
-                    // - Element and attribute with the same name
-                    if (property != null && !classModel.Properties.Any(p => p.Name == property.Name))
-                    {
-                        var itemDocs = GetDocumentation(item.XmlParticle);
-                        property.Documentation.AddRange(itemDocs);
-
-                        if (EmitOrder)
-                            property.Order = order++;
-                        property.IsDeprecated = itemDocs.Any(d => d.Text.StartsWith("DEPRECATED"));
-
-                        classModel.Properties.Add(property);
-                    }
-                }
+                GetPropertyElements(source, qualifiedName, particle, true, classModel);
 
                 XmlSchemaObjectCollection attributes = null;
                 if (classModel.BaseClass != null)
@@ -561,8 +486,8 @@ namespace XmlSchemaClassGenerator
                             if (NameExists(attributeQualifiedName)) attributeQualifiedName = new[] { "Item", "Property", "Element" }
                                 .Select(s => new XmlQualifiedName(attributeQualifiedName.Name + s, attributeQualifiedName.Namespace))
                                 .First(n => !NameExists(n));
-                        }
-                    } 
+                        } 
+                    }
                     
                     var attributeName = ToTitleCase(attribute.QualifiedName.Name);
                     if (attributeName == classModel.Name) attributeName += "Property"; // member names cannot be the same as their enclosing type
@@ -693,6 +618,148 @@ namespace XmlSchemaClassGenerator
             throw new Exception(string.Format("Cannot build declaration for {0}", qualifiedName));
         }
 
+        private void ExploreReferencedGroups(Uri source, XmlQualifiedName qualifiedName, XmlSchemaParticle particle, PropertyContainingModel parentModel, NamespaceModel namespaceModel)
+        {
+            foreach (var item in GetElements(particle, false, false, false, true))
+            {
+                XmlSchemaGroupRef group = item.XmlParticle as XmlSchemaGroupRef;
+                if (group == null)
+                    continue;
+
+                if (group.RefName.IsEmpty)
+                    continue;
+
+                TypeModel model;
+                InterfaceModel interfaceModel = null;
+                var interfaceName = "I" + ToTitleCase(group.RefName.Name);
+                if (interfaceName == parentModel.Name)
+                    interfaceName += "Interface"; // member names cannot be the same as their enclosing type
+
+                if (!Types.TryGetValue(group.RefName, out model))
+                {
+                    model = new InterfaceModel(_configuration)
+                    {
+                        XmlSchemaName = group.RefName,
+                        Name = interfaceName,
+                        Namespace = namespaceModel
+                    };
+                    interfaceModel = (InterfaceModel)model;
+
+                    Types[group.RefName] = model;
+
+                    if (namespaceModel != null)
+                    {
+                        namespaceModel.Types[model.Name] = model;
+                    }
+
+                    var schemaGroup = Set.Schemas().Cast<XmlSchema>().Where(s => s.Groups.Contains(group.RefName)).Select(s => s.Groups[group.RefName]).GetEnumerator();
+                    if (schemaGroup.MoveNext())
+                    {
+                        var groupParticle = ((XmlSchemaGroup)schemaGroup.Current).Particle;
+                        GetPropertyElements(source, qualifiedName, groupParticle, false, interfaceModel);
+                        ExploreReferencedGroups(source, qualifiedName, groupParticle, interfaceModel, namespaceModel);
+                    }
+                }
+                else
+                {
+                    interfaceModel = (InterfaceModel)model;
+                }
+
+                parentModel.InterfacedGroups.Add(interfaceModel);
+            }
+        }
+
+        private void GetPropertyElements(Uri source, XmlQualifiedName qualifiedName, XmlSchemaParticle particle, bool followReferences, PropertyContainingModel propertyContainingModel)
+        {
+            var items = GetElements(particle, followReferences);
+
+            var order = 0;
+            foreach (var item in items)
+            {
+                PropertyModel property = null;
+
+                var element = item.XmlParticle as XmlSchemaElement;
+                // ElementSchemaType must be non-null. This is not the case when maxOccurs="0".
+                if (element != null && element.ElementSchemaType != null)
+                {
+                    var elementQualifiedName = element.ElementSchemaType.QualifiedName;
+
+                    if (elementQualifiedName.IsEmpty)
+                    {
+                        elementQualifiedName = element.RefName;
+
+                        if (elementQualifiedName.IsEmpty)
+                        {
+                            // inner type, have to generate a type name
+                            var typeName = ToTitleCase(propertyContainingModel.Name) + ToTitleCase(element.QualifiedName.Name);
+                            elementQualifiedName = new XmlQualifiedName(typeName, qualifiedName.Namespace);
+                            // try to avoid name clashes
+                            if (NameExists(elementQualifiedName))
+                                elementQualifiedName = new[] {"Item", "Property", "Element"}
+                                    .Select(
+                                        s => new XmlQualifiedName(elementQualifiedName.Name + s, elementQualifiedName.Namespace))
+                                    .First(n => !NameExists(n));
+                        }
+                    }
+
+                    var propertyName = ToTitleCase(element.QualifiedName.Name);
+                    if (propertyName == propertyContainingModel.Name)
+                        propertyName += "Property"; // member names cannot be the same as their enclosing type
+
+                    property = new PropertyModel(_configuration)
+                    {
+                        OwningType = propertyContainingModel,
+                        XmlSchemaName = element.QualifiedName,
+                        Name = propertyName,
+                        Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
+                        IsNillable = element.IsNillable,
+                        IsNullable = item.MinOccurs < 1.0m,
+                        IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
+                        DefaultValue = element.DefaultValue,
+                        Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
+                        XmlNamespace =
+                            element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != qualifiedName.Namespace
+                                ? element.QualifiedName.Namespace
+                                : null,
+                    };
+                }
+                else
+                {
+                    var any = item.XmlParticle as XmlSchemaAny;
+                    if (any != null)
+                    {
+                        property = new PropertyModel(_configuration)
+                        {
+                            OwningType = propertyContainingModel,
+                            Name = "Any",
+                            Type =
+                                new SimpleModel(_configuration)
+                                {
+                                    ValueType = (UseXElementForAny ? typeof (XElement) : typeof (XmlElement)),
+                                    UseDataTypeAttribute = false
+                                },
+                            IsNullable = item.MinOccurs < 1.0m,
+                            IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m,
+                            // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
+                            IsAny = true,
+                        };
+                    }
+                }
+
+                if (property != null)
+                {
+                    var itemDocs = GetDocumentation(item.XmlParticle);
+                    property.Documentation.AddRange(itemDocs);
+
+                    if (EmitOrder)
+                        property.Order = order++;
+                    property.IsDeprecated = itemDocs.Any(d => d.Text.StartsWith("DEPRECATED"));
+
+                    propertyContainingModel.Properties.Add(property);
+                }
+            }
+        }
+
         private NamespaceModel CreateNamespaceModel(Uri source, XmlQualifiedName qualifiedName)
         {
             NamespaceModel namespaceModel = null;
@@ -745,11 +812,11 @@ namespace XmlSchemaClassGenerator
             return null;
         }
 
-        public IEnumerable<Particle> GetElements(XmlSchemaGroupBase groupBase)
+        public IEnumerable<Particle> GetElements(XmlSchemaGroupBase groupBase, bool followReferences = true, bool getSchemaElements = true, bool getSchemaAny = true, bool getGroupRef = false)
         {
             foreach (var item in groupBase.Items)
             {
-                foreach (var element in GetElements(item))
+                foreach (var element in GetElements(item, followReferences, getSchemaElements, getSchemaAny, getGroupRef))
                 {
                     element.MaxOccurs = Math.Max(element.MaxOccurs, groupBase.MaxOccurs);
                     element.MinOccurs = Math.Min(element.MinOccurs, groupBase.MinOccurs);
@@ -758,24 +825,41 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        public IEnumerable<Particle> GetElements(XmlSchemaObject item)
+        public IEnumerable<Particle> GetElements(XmlSchemaObject item, bool followReferences = true, bool getSchemaElements = true, bool getSchemaAny = true, bool getGroupRef = false)
         {
             if (item == null) yield break;
 
-            var element = item as XmlSchemaElement;
-            if (element != null) yield return new Particle(element);
+            if (getSchemaElements)
+            {
+                var element = item as XmlSchemaElement;
+                if (element != null) yield return new Particle(element);
+            }
 
-            var any = item as XmlSchemaAny;
-            if (any != null) yield return new Particle(any);
+            if (getSchemaAny)
+            {
+                var any = item as XmlSchemaAny;
+                if (any != null) yield return new Particle(any);
+            }
 
-            var groupRef = item as XmlSchemaGroupRef;
-            if (groupRef != null)
-                foreach (var groupRefElement in GetElements(groupRef.Particle))
-                    yield return groupRefElement;
+            if (followReferences || getGroupRef)
+            {
+                var groupRef = item as XmlSchemaGroupRef;
+                if (groupRef != null)
+                {
+                    if (getGroupRef)
+                        yield return new Particle(groupRef);
+
+                    if (followReferences)
+                    {
+                        foreach (var groupRefElement in GetElements(groupRef.Particle, followReferences, getSchemaElements, getSchemaAny, getGroupRef))
+                            yield return groupRefElement;
+                    }
+                }
+            }
 
             var itemGroupBase = item as XmlSchemaGroupBase;
             if (itemGroupBase != null)
-                foreach (var groupBaseElement in GetElements(itemGroupBase))
+                foreach (var groupBaseElement in GetElements(itemGroupBase, followReferences, getSchemaElements, getSchemaAny, getGroupRef))
                     yield return groupBaseElement;
         }
 

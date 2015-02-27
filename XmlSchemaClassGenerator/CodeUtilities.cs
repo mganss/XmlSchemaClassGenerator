@@ -202,5 +202,30 @@ namespace XmlSchemaClassGenerator
 
             return string.Format("{0}{1}", propBackingFieldName, i);
         }
+
+        public static bool HasFieldName(this TypeModel typeModel, PropertyModel propertyModel)
+        {
+            var propName = propertyModel.Name;
+            var classModel = typeModel as ClassModel;
+            if (classModel == null)
+                return false;
+
+            foreach (var prop in classModel.Properties)
+            {
+                if (propertyModel == prop)
+                    continue;
+
+                if (prop.Name == propName)
+                    return true;
+            }
+
+            if (classModel.BaseClass != null)
+            {
+                if (classModel.BaseClass.HasFieldName(propertyModel))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }
