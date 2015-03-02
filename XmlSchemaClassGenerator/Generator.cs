@@ -662,7 +662,7 @@ namespace XmlSchemaClassGenerator
                         return enumModel;
                     }
 
-                    restrictions = typeRestriction.Facets.Cast<XmlSchemaFacet>().Select(f => GetRestriction(simpleType, f)).Where(r => r != null).Sanitize().ToList();
+                    restrictions = GetRestrictions(typeRestriction.Facets.Cast<XmlSchemaFacet>(), simpleType).Where(r => r != null).Sanitize().ToList();
                 }
 
                 var simpleModelName = ToTitleCase(qualifiedName.Name);
@@ -716,33 +716,40 @@ namespace XmlSchemaClassGenerator
             return elements.Concat(types).Any(n => n.Namespace == name.Namespace && name.Name.Equals(n.Name, StringComparison.OrdinalIgnoreCase));
         }
 
-        private RestrictionModel GetRestriction(XmlSchemaSimpleType type, XmlSchemaFacet facet)
+        private IEnumerable<RestrictionModel> GetRestrictions(IEnumerable<XmlSchemaFacet> facets, XmlSchemaSimpleType type)
         {
-            if (facet is XmlSchemaMaxLengthFacet)
-                return new MaxLengthRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
-            if (facet is XmlSchemaMinLengthFacet)
-                return new MinLengthRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
-            if (facet is XmlSchemaTotalDigitsFacet)
-                return new TotalDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
-            if (facet is XmlSchemaFractionDigitsFacet)
-                return new FractionDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
+            var min = facets.OfType<XmlSchemaMinLengthFacet>().Select(f => int.Parse(f.Value)).DefaultIfEmpty().Max();
+            var max = facets.OfType<XmlSchemaMaxLengthFacet>().Select(f => int.Parse(f.Value)).DefaultIfEmpty().Min();
 
-            if (facet is XmlSchemaPatternFacet)
-                return new PatternRestrictionModel(_configuration) { Value = facet.Value };
+            if (DataAnnotationMode == XmlSchemaClassGenerator.DataAnnotationMode.All)
+            {
+                if (min > 0) yield return new MinLengthRestrictionModel(_configuration) { Value = min };
+                if (max > 0) yield return new MaxLengthRestrictionModel(_configuration) { Value = max };
+            }
+            else if (min > 0 || max > 0)
+                yield return new MinMaxLengthRestrictionModel(_configuration) { Min = min, Max = max };
 
-            var valueType = type.Datatype.ValueType;
+            foreach (var facet in facets)
+            {
+                if (facet is XmlSchemaTotalDigitsFacet)
+                    yield return new TotalDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
+                if (facet is XmlSchemaFractionDigitsFacet)
+                    yield return new FractionDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
 
-            if (facet is XmlSchemaMinInclusiveFacet)
-                return new MinInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
-            if (facet is XmlSchemaMinExclusiveFacet)
-                return new MinExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
-            if (facet is XmlSchemaMaxInclusiveFacet)
-                return new MaxInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
-            if (facet is XmlSchemaMaxExclusiveFacet)
-                return new MaxExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
+                if (facet is XmlSchemaPatternFacet)
+                    yield return new PatternRestrictionModel(_configuration) { Value = facet.Value };
 
-            // unsupported restriction
-            return null;
+                var valueType = type.Datatype.ValueType;
+
+                if (facet is XmlSchemaMinInclusiveFacet)
+                    yield return new MinInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
+                if (facet is XmlSchemaMinExclusiveFacet)
+                    yield return new MinExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
+                if (facet is XmlSchemaMaxInclusiveFacet)
+                    yield return new MaxInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
+                if (facet is XmlSchemaMaxExclusiveFacet)
+                    yield return new MaxExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType };
+            }
         }
 
         public IEnumerable<Particle> GetElements(XmlSchemaGroupBase groupBase)

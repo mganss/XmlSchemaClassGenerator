@@ -43,7 +43,7 @@ namespace XmlSchemaClassGenerator.Tests
                 Log = f => cs.Add(f),
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.None,
+                DataAnnotationMode = DataAnnotationMode.Partial,
                 GenerateDesignerCategoryAttribute = false,
             };
 
@@ -60,6 +60,7 @@ namespace XmlSchemaClassGenerator.Tests
                 "System.Xml.Linq.dll",
                 "System.Xml.Serialization.dll",
                 "System.ServiceModel.dll",
+                "System.ComponentModel.DataAnnotations.dll",
             };
 
             var binFolder = Path.Combine(outputFolder, "bin");

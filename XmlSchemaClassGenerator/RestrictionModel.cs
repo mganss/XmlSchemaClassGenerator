@@ -38,7 +38,7 @@ namespace XmlSchemaClassGenerator
         protected ValueRestrictionModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
-            
+
         }
 
         public T Value { get; set; }
@@ -54,10 +54,47 @@ namespace XmlSchemaClassGenerator
         protected ValueTypeRestrictionModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
-            
+
         }
 
         public Type Type { get; set; }
+    }
+
+    public class MinMaxLengthRestrictionModel : RestrictionModel
+    {
+        public MinMaxLengthRestrictionModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+
+        }
+
+        public int Min { get; set; }
+        public int Max { get; set; }
+
+        public override string Description
+        {
+            get
+            {
+                var s = "";
+                if (Min > 0) s += string.Format("Minimum length: {0}. ", Min);
+                if (Max > 0) s += string.Format("Maximum length: {0}.", Max);
+                return s.Trim();
+            }
+        }
+
+        public override DataAnnotationMode MinimumDataAnnotationMode
+        {
+            get { return DataAnnotationMode.Partial; }
+        }
+
+        public override CodeAttributeDeclaration GetAttribute()
+        {
+            var a = new CodeAttributeDeclaration(new CodeTypeReference(typeof(StringLengthAttribute)),
+                new CodeAttributeArgument(Max > 0 ? (CodeExpression)new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
+            if (Min > 0) a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min)));
+
+            return a;
+        }
     }
 
     public class MaxLengthRestrictionModel : ValueRestrictionModel<int>
@@ -65,7 +102,7 @@ namespace XmlSchemaClassGenerator
         public MaxLengthRestrictionModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
-            
+
         }
 
         public override string Description

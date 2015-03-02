@@ -72,8 +72,8 @@ namespace XmlSchemaClassGenerator
 
             foreach (var doc in docs.OrderBy(d => d.Language))
             {
-                var comment = string.Format(@"<para{0}>{1}</para>", 
-                    string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language), 
+                var comment = string.Format(@"<para{0}>{1}</para>",
+                    string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language),
                     Regex.Replace(doc.Text, @"(^|[^\r])\n", "$1\r\n")); // normalize newlines
                 yield return new CodeCommentStatement(comment, true);
             }
@@ -362,15 +362,15 @@ namespace XmlSchemaClassGenerator
                 switch (typeCode)
                 {
                     case PropertyValueTypeCode.ValueType:
-                        return string.Format(@" 
+                        return string.Format(@"
         {{
-            get 
+            get
             {{
                 return {0};
             }}
-            {2}set 
+            {2}set
             {{
-                if (!{0}.Equals(value)) 
+                if (!{0}.Equals(value))
                 {{
                     {0} = value;
                     OnPropertyChanged(""{1}"");
@@ -378,17 +378,17 @@ namespace XmlSchemaClassGenerator
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                     case PropertyValueTypeCode.Other:
-                        return string.Format(@" 
+                        return string.Format(@"
         {{
-            get 
+            get
             {{
                 return {0};
             }}
-            {2}set 
+            {2}set
             {{
                 if ({0} == value)
                     return;
-                if ({0} == null || value == null || !{0}.Equals(value)) 
+                if ({0} == null || value == null || !{0}.Equals(value))
                 {{
                     {0} = value;
                     OnPropertyChanged(""{1}"");
@@ -396,17 +396,17 @@ namespace XmlSchemaClassGenerator
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                     case PropertyValueTypeCode.Array:
-                        return string.Format(@" 
+                        return string.Format(@"
         {{
-            get 
+            get
             {{
                 return {0};
             }}
-            {2}set 
+            {2}set
             {{
                 if ({0} == value)
                     return;
-                if ({0} == null || value == null || !{0}.SequenceEqual(value)) 
+                if ({0} == null || value == null || !{0}.SequenceEqual(value))
                 {{
                     {0} = value;
                     OnPropertyChanged(""{1}"");
@@ -415,13 +415,13 @@ namespace XmlSchemaClassGenerator
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                 }
             }
-            return string.Format(@" 
+            return string.Format(@"
         {{
-            get 
+            get
             {{
                 return this.{0};
             }}
-            {1}set 
+            {1}set
             {{
                 this.{0} = value;
             }}
@@ -438,8 +438,8 @@ namespace XmlSchemaClassGenerator
                 && !typeClassModel.Properties[0].IsAttribute && !typeClassModel.Properties[0].IsAny
                 && typeClassModel.BaseClass == null;
             var propertyType = !isArray ? Type : typeClassModel.Properties[0].Type;
-            var isNullableValueType = DefaultValue == null 
-                && IsNullable && !(IsCollection || isArray) 
+            var isNullableValueType = DefaultValue == null
+                && IsNullable && !(IsCollection || isArray)
                 && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType));
 
             var typeReference = propertyType.GetReferenceFor(OwningType.Namespace, IsCollection || isArray);
@@ -530,8 +530,8 @@ namespace XmlSchemaClassGenerator
                     // public X? Name
                     // {
                     //      get { return NameSpecified ? NameValue : null; }
-                    //      set 
-                    //      { 
+                    //      set
+                    //      {
                     //          NameValue = value.GetValueOrDefault();
                     //          NameSpecified = value.HasValue;
                     //      }
@@ -765,7 +765,7 @@ namespace XmlSchemaClassGenerator
                     // From .NET 3.5 XmlSerializer doesn't serialize objects with [Obsolete] >(
                     //var deprecatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(ObsoleteAttribute)));
                     //member.CustomAttributes.Add(deprecatedAttribute);
-                
+
                     var obsolete = new DocumentationModel { Language = "en", Text = "[Obsolete]" };
                     docs.Add(obsolete);
                 }
