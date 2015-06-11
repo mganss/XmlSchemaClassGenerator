@@ -45,7 +45,6 @@ namespace XmlSchemaClassGenerator.Tests
                 IntegerDataType = typeof(int),
                 DataAnnotationMode = DataAnnotationMode.Partial,
                 GenerateDesignerCategoryAttribute = false,
-                EnableDataBinding = true
             };
 
             var files = Glob.Glob.ExpandNames(pattern);

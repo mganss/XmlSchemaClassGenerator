@@ -415,7 +415,20 @@ namespace XmlSchemaClassGenerator
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
                 }
             }
-            return string.Format(@"
+
+            if (privateSetter)
+            {
+                return string.Format(@"
+        {{
+            get
+            {{
+                return this.{0};
+            }}
+        }}", backingFieldName);
+            }
+            else
+            {
+                return string.Format(@"
         {{
             get
             {{
@@ -426,6 +439,7 @@ namespace XmlSchemaClassGenerator
                 this.{0} = value;
             }}
         }}", backingFieldName, (privateSetter ? "private " : string.Empty));
+            }
         }
 
         // ReSharper disable once FunctionComplexityOverflow
@@ -445,7 +459,7 @@ namespace XmlSchemaClassGenerator
             var typeReference = propertyType.GetReferenceFor(OwningType.Namespace, IsCollection || isArray);
             var simpleType = propertyType as SimpleModel;
 
-            var requiresBackingField = withDataBinding || DefaultValue != null;
+            var requiresBackingField = withDataBinding || DefaultValue != null || IsCollection || isArray;
             var backingField = new CodeMemberField(typeReference, OwningType.GetUniqueFieldName(this))
             {
                 Attributes = MemberAttributes.Private
@@ -635,7 +649,8 @@ namespace XmlSchemaClassGenerator
                     constructor.Comments.AddRange(DocumentationModel.GetComments(constructorDocs).ToArray());
                     typeDeclaration.Members.Add(constructor);
                 }
-                var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
+                var listReference = requiresBackingField ? (CodeExpression)new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), backingField.Name) :
+                    new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
                 var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, true, true);
                 var initExpression = new CodeObjectCreateExpression(initTypeReference);
                 constructor.Statements.Add(new CodeAssignStatement(listReference, initExpression));
