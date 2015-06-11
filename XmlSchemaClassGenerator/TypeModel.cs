@@ -465,7 +465,8 @@ namespace XmlSchemaClassGenerator
                 var isPrivateSetter = IsCollection || isArray;
                 if (requiresBackingField)
                 {
-                    member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(),
+                    member.Name += GetAccessors(member.Name, backingField.Name,
+                        IsCollection || isArray ? PropertyValueTypeCode.Array : propertyType.GetPropertyValueTypeCode(),
                         isPrivateSetter, withDataBinding);
                 }
                 else

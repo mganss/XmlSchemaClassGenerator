@@ -183,7 +183,7 @@ namespace XmlSchemaClassGenerator
             var result = NamespaceProvider.FindNamespace(key);
             if (!string.IsNullOrEmpty(result))
                 return result;
-            
+
             throw new Exception(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
         }
 
@@ -390,7 +390,7 @@ namespace XmlSchemaClassGenerator
         }
 
         // see http://msdn.microsoft.com/en-us/library/z2w0sxhf.aspx
-        private static readonly HashSet<string> EnumTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+        private static readonly HashSet<string> EnumTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             { "string", "normalizedString", "token", "Name", "NCName", "ID", "ENTITY", "NMTOKEN" };
 
         // ReSharper disable once FunctionComplexityOverflow
@@ -562,8 +562,8 @@ namespace XmlSchemaClassGenerator
                                 .Select(s => new XmlQualifiedName(attributeQualifiedName.Name + s, attributeQualifiedName.Namespace))
                                 .First(n => !NameExists(n));
                         }
-                    } 
-                    
+                    }
+
                     var attributeName = ToTitleCase(attribute.QualifiedName.Name);
                     if (attributeName == classModel.Name) attributeName += "Property"; // member names cannot be the same as their enclosing type
 
