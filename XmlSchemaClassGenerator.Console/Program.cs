@@ -124,6 +124,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
         {
             System.Console.WriteLine("Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...");
             System.Console.WriteLine("Generate C# classes from XML Schema files.");
+            System.Console.WriteLine("Version " + typeof(Generator).Assembly.GetName().Version);
             System.Console.WriteLine(@"xsdFiles may contain globs, e.g. ""content\{schema,xsd}\**\*.xsd"".");
             System.Console.WriteLine();
             System.Console.WriteLine("Options:");
