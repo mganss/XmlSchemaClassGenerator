@@ -24,6 +24,7 @@ namespace XmlSchemaClassGenerator.Console
             var pclCompatible = false;
             var enableDataBinding = false;
             var emitOrder = false;
+            var entityFramework = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -35,7 +36,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
                 { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of string
 {TYPE} can be i[nt], l[ong], or d[ecimal].", v => {
-                                         switch (v) 
+                                         switch (v)
                                          {
                                              case "i":
                                              case "int":
@@ -51,12 +52,13 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                                  break;
                                          }
                                      } },
-                { "edb|enable-data-binding", "Enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
-                { "order", "Emit order for all class members stored as XML element", v => emitOrder = v != null },
-                { "pcl", "PCL compatible output", v => pclCompatible = v != null },
+                { "e|edb|enable-data-binding", "Enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
+                { "r|order", "Emit order for all class members stored as XML element", v => emitOrder = v != null },
+                { "c|pcl", "PCL compatible output", v => pclCompatible = v != null },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
                 { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
                 { "0|nullable", "generate nullable adapter properties for optional elements/attributes w/o default values", v => nullables = v != null },
+                { "f|ef", "generate Entity Framework Code First compatible classes", v => entityFramework = v != null },
             };
 
             var files = options.Parse(args);
@@ -89,6 +91,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EnableDataBinding = enableDataBinding,
                 EmitOrder = emitOrder,
                 IntegerDataType = integerType,
+                EntityFramework = entityFramework
             };
 
             if (pclCompatible)

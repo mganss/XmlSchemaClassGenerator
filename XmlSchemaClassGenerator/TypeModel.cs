@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -260,6 +261,28 @@ namespace XmlSchemaClassGenerator
             if (EnableDataBinding)
                 classDeclaration.BaseTypes.Add(new CodeTypeReference("INotifyPropertyChanged"));
 
+            if (Configuration.EntityFramework && (BaseClass == null || !(BaseClass is ClassModel)))
+            {
+                // generate key
+                var keyProperty = Properties.FirstOrDefault(p => p.Name.ToLowerInvariant() == "id")
+                    ?? Properties.FirstOrDefault(p => p.Name.ToLowerInvariant() == (Name.ToLowerInvariant() + "id"));
+
+                if (keyProperty == null)
+                {
+                    keyProperty = new PropertyModel(Configuration)
+                    {
+                        Name = "Id",
+                        Type = new SimpleModel(Configuration) { ValueType = typeof(long) },
+                        OwningType = this,
+                        Documentation = { new DocumentationModel {  Language = "en", Text = "Gets or sets a value uniquely identifying this entity." },
+                            new DocumentationModel { Language = "de", Text = "Ruft einen Wert ab, der diese Entität eindeutig identifiziert, oder legt diesen fest." } }
+                    };
+                    Properties.Insert(0, keyProperty);
+                }
+
+                keyProperty.IsKey = true;
+            }
+
             foreach (var property in Properties)
                 property.AddMembersTo(classDeclaration, EnableDataBinding);
 
@@ -347,6 +370,7 @@ namespace XmlSchemaClassGenerator
         public XmlQualifiedName XmlSchemaName { get; set; }
         public bool IsAny { get; set; }
         public int? Order { get; set; }
+        public bool IsKey { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
 
         public PropertyModel(GeneratorConfiguration configuration)
@@ -465,6 +489,7 @@ namespace XmlSchemaClassGenerator
                 Attributes = MemberAttributes.Private
             };
             var ignoreAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute)));
+            var notMappedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(NotMappedAttribute)));
             backingField.CustomAttributes.Add(ignoreAttribute);
 
             if (requiresBackingField)
@@ -534,6 +559,7 @@ namespace XmlSchemaClassGenerator
                 var specifiedName = Configuration.GenerateNullables ? Name + "Value" : Name;
                 var specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
                 specifiedMember.CustomAttributes.Add(ignoreAttribute);
+                if (Configuration.EntityFramework && Configuration.GenerateNullables) specifiedMember.CustomAttributes.Add(notMappedAttribute);
                 specifiedMember.Attributes = MemberAttributes.Public;
                 var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets or sets a value indicating whether the {0} property is specified.", Name) },
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
@@ -607,6 +633,7 @@ namespace XmlSchemaClassGenerator
                     editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(EditorBrowsableState)), "Never")));
                     specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
                     member.CustomAttributes.Add(editorBrowsableAttribute);
+                    if (Configuration.EntityFramework) member.CustomAttributes.Add(notMappedAttribute);
                 }
             }
             else if ((IsCollection || isArray) && IsNullable && !IsAttribute)
@@ -619,6 +646,7 @@ namespace XmlSchemaClassGenerator
                     HasGet = true,
                 };
                 specifiedProperty.CustomAttributes.Add(ignoreAttribute);
+                if (Configuration.EntityFramework) specifiedProperty.CustomAttributes.Add(notMappedAttribute);
                 specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
@@ -665,11 +693,29 @@ namespace XmlSchemaClassGenerator
                     propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, "Order", StringComparison.Ordinal)).ToArray());
                 member.CustomAttributes.Add(arrayItemAttribute);
             }
+
+            if (IsKey)
+            {
+                var keyAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(KeyAttribute)));
+                member.CustomAttributes.Add(keyAttribute);
+            }
+
+            if (IsAny && Configuration.EntityFramework)
+            {
+                member.CustomAttributes.Add(notMappedAttribute);
+            }
         }
 
         private CodeAttributeDeclaration GetAttribute(bool isArray)
         {
             CodeAttributeDeclaration attribute;
+
+            if (IsKey && XmlSchemaName == null)
+            {
+                attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute)));
+                return attribute;
+            }
+
             if (IsAttribute)
             {
                 if (IsAny)

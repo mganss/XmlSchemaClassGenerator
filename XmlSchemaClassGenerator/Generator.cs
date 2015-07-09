@@ -121,6 +121,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.IntegerDataType = value; }
         }
 
+        public bool EntityFramework
+        {
+            get { return _configuration.EntityFramework; }
+            set { _configuration.EntityFramework = value; }
+        }
+
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();

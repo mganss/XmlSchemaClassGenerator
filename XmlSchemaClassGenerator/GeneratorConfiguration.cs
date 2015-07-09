@@ -97,6 +97,10 @@ namespace XmlSchemaClassGenerator
         /// Default data type for numeric fields
         /// </summary>
         public Type IntegerDataType { get; set; }
+        /// <summary>
+        /// Generate Entity Framework Code First compatible classes
+        /// </summary>
+        public bool EntityFramework { get; set; }
 
         /// <summary>
         /// Provides a fast and safe way to write to the Log
