@@ -20,6 +20,7 @@ from schema restrictions
 * Generate nullable adapter properties for optional elements and attributes without default values (see [below](#nullables))
 * Optional support for PCL
 * Optional support for [`INotifyPropertyChanged`](http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged)
+* Optional support for Entity Framework Code First (automatically generate key properties)
 
 Unsupported:
 
@@ -35,6 +36,7 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
+Version 0.7.5668.19736
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd".
 
 Options:
@@ -52,16 +54,18 @@ Options:
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of string
                                TYPE can be i[nt], l[ong], or d[ecimal].
-      --edb, --enable-data-binding
+  -e, --edb, --enable-data-binding
                              Enable INotifyPropertyChanged data binding
-      --order                Emit order for all class members stored as XML
+  -r, --order                Emit order for all class members stored as XML
                                element
-      --pcl                  PCL compatible output
+  -c, --pcl                  PCL compatible output
   -p, --prefix=PREFIX        the PREFIX to prepend to auto-generated namespace
                                names
   -v, --verbose              print generated file names on stdout
   -0, --nullable             generate nullable adapter properties for optional
                                elements/attributes w/o default values
+  -f, --ef                   generate Entity Framework Code First compatible
+                               classes
 ```
 
 From code:
