@@ -472,8 +472,9 @@ namespace XmlSchemaClassGenerator
             CodeTypeMember member;
 
             var typeClassModel = Type as ClassModel;
-            var isArray = !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1
+            var isArray = !IsCollection && !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1
                 && !typeClassModel.Properties[0].IsAttribute && !typeClassModel.Properties[0].IsAny
+                && typeClassModel.Properties[0].IsCollection
                 && typeClassModel.BaseClass == null;
             var propertyType = !isArray ? Type : typeClassModel.Properties[0].Type;
             var isNullableValueType = DefaultValue == null
