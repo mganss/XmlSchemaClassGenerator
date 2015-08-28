@@ -25,6 +25,7 @@ namespace XmlSchemaClassGenerator.Console
             var enableDataBinding = false;
             var emitOrder = false;
             var entityFramework = false;
+            var interfaces = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -52,13 +53,14 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                                  break;
                                          }
                                      } },
-                { "e|edb|enable-data-binding", "Enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
-                { "r|order", "Emit order for all class members stored as XML element", v => emitOrder = v != null },
+                { "e|edb|enable-data-binding", "enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
+                { "r|order", "emit order for all class members stored as XML element", v => emitOrder = v != null },
                 { "c|pcl", "PCL compatible output", v => pclCompatible = v != null },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
                 { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
                 { "0|nullable", "generate nullable adapter properties for optional elements/attributes w/o default values", v => nullables = v != null },
                 { "f|ef", "generate Entity Framework Code First compatible classes", v => entityFramework = v != null },
+                { "t|interface", "generate interfaces for groups and attribute groups (default is enabled)", v => interfaces = v != null },
             };
 
             var files = options.Parse(args);
@@ -91,7 +93,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EnableDataBinding = enableDataBinding,
                 EmitOrder = emitOrder,
                 IntegerDataType = integerType,
-                EntityFramework = entityFramework
+                EntityFramework = entityFramework,
+                GenerateInterfaces = interfaces
             };
 
             if (pclCompatible)
@@ -126,6 +129,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             System.Console.WriteLine("Generate C# classes from XML Schema files.");
             System.Console.WriteLine("Version " + typeof(Generator).Assembly.GetName().Version);
             System.Console.WriteLine(@"xsdFiles may contain globs, e.g. ""content\{schema,xsd}\**\*.xsd"".");
+            System.Console.WriteLine(@"Append - to option to disable it, e.g. --interface-.");
             System.Console.WriteLine();
             System.Console.WriteLine("Options:");
             p.WriteOptionDescriptions(System.Console.Out);

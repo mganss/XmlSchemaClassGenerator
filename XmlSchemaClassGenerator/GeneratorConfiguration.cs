@@ -101,6 +101,10 @@ namespace XmlSchemaClassGenerator
         /// Generate Entity Framework Code First compatible classes
         /// </summary>
         public bool EntityFramework { get; set; }
+        /// <summary>
+        /// Generate interfaces for groups and attribute groups
+        /// </summary>
+        public bool GenerateInterfaces { get; set; }
 
         /// <summary>
         /// Provides a fast and safe way to write to the Log

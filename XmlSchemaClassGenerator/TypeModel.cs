@@ -110,18 +110,16 @@ namespace XmlSchemaClassGenerator
                 typeof(AssemblyTitleAttribute))).Title;
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            if (Configuration.GenerateSerializableAttribute)
-            {
-                var serializableAttribute =
-                    new CodeAttributeDeclaration(new CodeTypeReference(typeof (SerializableAttribute)));
-                typeDeclaration.CustomAttributes.Add(serializableAttribute);
-            }
-
             var generatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(GeneratedCodeAttribute)),
                 new CodeAttributeArgument(new CodePrimitiveExpression(title)),
                 new CodeAttributeArgument(new CodePrimitiveExpression(version)));
             typeDeclaration.CustomAttributes.Add(generatedAttribute);
 
+            return typeDeclaration;
+        }
+
+        protected void GenerateTypeAttribute(CodeTypeDeclaration typeDeclaration)
+        {
             if (XmlSchemaName != null)
             {
                 var typeAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTypeAttribute)),
@@ -137,8 +135,16 @@ namespace XmlSchemaClassGenerator
                 }
                 typeDeclaration.CustomAttributes.Add(typeAttribute);
             }
+        }
 
-            return typeDeclaration;
+        protected void GenerateSerializableAttribute(CodeTypeDeclaration typeDeclaration)
+        {
+            if (Configuration.GenerateSerializableAttribute)
+            {
+                var serializableAttribute =
+                    new CodeAttributeDeclaration(new CodeTypeReference(typeof(SerializableAttribute)));
+                typeDeclaration.CustomAttributes.Add(serializableAttribute);
+            }
         }
 
         public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection, bool forInit = false)
@@ -155,12 +161,41 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    public class InterfaceModel: TypeModel
+    {
+        public InterfaceModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+            Properties = new List<PropertyModel>();
+            Interfaces = new List<InterfaceModel>();
+        }
+
+        public List<PropertyModel> Properties { get; set; }
+        public List<InterfaceModel> Interfaces { get; set; }
+
+        public override CodeTypeDeclaration Generate()
+        {
+            var interfaceDeclaration = base.Generate();
+
+            interfaceDeclaration.IsInterface = true;
+            interfaceDeclaration.IsPartial = true;
+
+            foreach (var property in Properties)
+                property.AddInterfaceMembersTo(interfaceDeclaration);
+
+            interfaceDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace, false)).ToArray());
+
+            return interfaceDeclaration;
+        }
+    }
+
     public class ClassModel : TypeModel
     {
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
+        public List<InterfaceModel> Interfaces { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
         public bool EnableDataBinding { get; set; }
 
@@ -168,12 +203,17 @@ namespace XmlSchemaClassGenerator
             : base(configuration)
         {
             Properties = new List<PropertyModel>();
+            Interfaces = new List<InterfaceModel>();
             DerivedTypes = new List<ClassModel>();
         }
 
         public override CodeTypeDeclaration Generate()
         {
             var classDeclaration = base.Generate();
+
+            GenerateSerializableAttribute(classDeclaration);
+            GenerateTypeAttribute(classDeclaration);
+
             classDeclaration.IsClass = true;
             classDeclaration.IsPartial = true;
 
@@ -322,6 +362,8 @@ namespace XmlSchemaClassGenerator
                 classDeclaration.CustomAttributes.Add(includeAttribute);
             }
 
+            classDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace, false)).ToArray());
+
             return classDeclaration;
         }
 
@@ -466,22 +508,109 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        private ClassModel TypeClassModel
+        {
+            get { return Type as ClassModel; }
+        }
+
+        private bool IsArray
+        {
+            get
+            {
+                return !IsCollection && !IsAttribute && TypeClassModel != null && TypeClassModel.TotalProperties == 1
+                && !TypeClassModel.Properties[0].IsAttribute && !TypeClassModel.Properties[0].IsAny
+                && TypeClassModel.Properties[0].IsCollection
+                && TypeClassModel.BaseClass == null;
+            }
+        }
+
+        private TypeModel PropertyType
+        {
+            get { return !IsArray ? Type : TypeClassModel.Properties[0].Type; }
+        }
+
+        private bool IsNullableValueType
+        {
+            get
+            {
+                return DefaultValue == null
+                    && IsNullable && !(IsCollection || IsArray)
+                    && ((PropertyType is EnumModel) || (PropertyType is SimpleModel && ((SimpleModel)PropertyType).ValueType.IsValueType));
+            }
+        }
+
+        private CodeTypeReference TypeReference
+        {
+            get { return PropertyType.GetReferenceFor(OwningType.Namespace, IsCollection || IsArray); }
+        }
+
+        private void AddDocs(CodeTypeMember member)
+        {
+            var simpleType = PropertyType as SimpleModel;
+            var docs = new List<DocumentationModel>(Documentation);
+
+            if (simpleType != null)
+            {
+                docs.AddRange(simpleType.Documentation);
+                docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = "en", Text = r.Description }));
+            }
+
+            member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
+        }
+
+        public void AddInterfaceMembersTo(CodeTypeDeclaration typeDeclaration)
+        {
+            CodeTypeMember member;
+
+            var typeClassModel = TypeClassModel;
+            var isArray = IsArray;
+            var propertyType = PropertyType;
+            var isNullableValueType = IsNullableValueType;
+            var typeReference = TypeReference;
+            var simpleType = propertyType as SimpleModel;
+
+            if (isNullableValueType && Configuration.GenerateNullables)
+            {
+                var nullableType = new CodeTypeReference(typeof(Nullable<>));
+                nullableType.TypeArguments.Add(typeReference);
+                typeReference = nullableType;
+            }
+
+            member = new CodeMemberProperty
+            {
+                Name = Name,
+                Type = typeReference,
+                HasGet = true,
+                HasSet = !IsCollection && !isArray
+            };
+
+            if (DefaultValue != null && IsNullable)
+            {
+                var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
+
+                if (!(defaultValueExpression is CodeObjectCreateExpression))
+                {
+                    var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute)),
+                        new CodeAttributeArgument(defaultValueExpression));
+                    member.CustomAttributes.Add(defaultValueAttribute);
+                }
+            }
+
+            typeDeclaration.Members.Add(member);
+
+            AddDocs(member);
+        }
+
         // ReSharper disable once FunctionComplexityOverflow
         public void AddMembersTo(CodeTypeDeclaration typeDeclaration, bool withDataBinding)
         {
             CodeTypeMember member;
 
-            var typeClassModel = Type as ClassModel;
-            var isArray = !IsCollection && !IsAttribute && typeClassModel != null && typeClassModel.TotalProperties == 1
-                && !typeClassModel.Properties[0].IsAttribute && !typeClassModel.Properties[0].IsAny
-                && typeClassModel.Properties[0].IsCollection
-                && typeClassModel.BaseClass == null;
-            var propertyType = !isArray ? Type : typeClassModel.Properties[0].Type;
-            var isNullableValueType = DefaultValue == null
-                && IsNullable && !(IsCollection || isArray)
-                && ((propertyType is EnumModel) || (propertyType is SimpleModel && ((SimpleModel)propertyType).ValueType.IsValueType));
-
-            var typeReference = propertyType.GetReferenceFor(OwningType.Namespace, IsCollection || isArray);
+            var typeClassModel = TypeClassModel;
+            var isArray = IsArray;
+            var propertyType = PropertyType;
+            var isNullableValueType = IsNullableValueType;
+            var typeReference = TypeReference;
             var simpleType = propertyType as SimpleModel;
 
             var requiresBackingField = withDataBinding || DefaultValue != null || IsCollection || isArray;
@@ -537,14 +666,7 @@ namespace XmlSchemaClassGenerator
             member.Attributes = MemberAttributes.Public;
             typeDeclaration.Members.Add(member);
 
-            var docs = new List<DocumentationModel>(Documentation);
-
-            if (simpleType != null)
-            {
-                docs.AddRange(simpleType.Documentation);
-                docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = "en", Text = r.Description }));
-                member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
-            }
+            AddDocs(member);
 
             if (IsDeprecated)
             {
@@ -552,8 +674,6 @@ namespace XmlSchemaClassGenerator
                 //var deprecatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(ObsoleteAttribute)));
                 //member.CustomAttributes.Add(deprecatedAttribute);
             }
-
-            member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
             if (isNullableValueType)
             {
@@ -809,6 +929,10 @@ namespace XmlSchemaClassGenerator
         public override CodeTypeDeclaration Generate()
         {
             var enumDeclaration = base.Generate();
+
+            GenerateSerializableAttribute(enumDeclaration);
+            GenerateTypeAttribute(enumDeclaration);
+
             enumDeclaration.IsEnum = true;
 
             foreach (var val in Values)

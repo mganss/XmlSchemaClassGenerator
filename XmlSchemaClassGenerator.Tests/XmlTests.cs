@@ -22,11 +22,23 @@ namespace XmlSchemaClassGenerator.Tests
     {
         private static Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
 
-        private Assembly Compile(string name, string pattern)
+        private Assembly Compile(string name, string pattern, Generator generatorPrototype = null)
         {
             var cs = new List<string>();
+
             var outputFolder = Path.Combine("output", name);
             Directory.CreateDirectory(outputFolder);
+
+            generatorPrototype = generatorPrototype ?? new Generator
+            {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.Partial,
+                GenerateDesignerCategoryAttribute = false,
+                EntityFramework = false,
+                GenerateInterfaces = true
+            };
+
             var gen = new Generator
             {
                 OutputFolder = outputFolder,
@@ -41,11 +53,12 @@ namespace XmlSchemaClassGenerator.Tests
                     }
                 },
                 Log = f => cs.Add(f),
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.Partial,
-                GenerateDesignerCategoryAttribute = false,
-                EntityFramework = true
+                GenerateNullables = generatorPrototype.GenerateNullables,
+                IntegerDataType = generatorPrototype.IntegerDataType,
+                DataAnnotationMode = generatorPrototype.DataAnnotationMode,
+                GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
+                EntityFramework = generatorPrototype.EntityFramework,
+                GenerateInterfaces = generatorPrototype.GenerateInterfaces
             };
 
             var files = Glob.Glob.ExpandNames(pattern);
@@ -88,7 +101,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compile("IS24RestApi", IS24Pattern);
             TestSamples("IS24RestApi", IS24Pattern);
-            Compile("Wadl", WadlPattern);
+            Compile("Wadl", WadlPattern, new Generator { EntityFramework = true });
             TestSamples("Wadl", WadlPattern);
         }
 
@@ -243,7 +256,7 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.NotNull(t1);
                 var f = char.ToLower(c[0]) + c.Substring(1);
                 TestRoundtrip(t1, f);
-            } 
+            }
         }
 
         void TestRoundtrip(Type t, string file)
