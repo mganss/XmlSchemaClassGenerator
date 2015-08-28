@@ -21,6 +21,7 @@ from schema restrictions
 * Optional support for PCL
 * Optional support for [`INotifyPropertyChanged`](http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged)
 * Optional support for Entity Framework Code First (automatically generate key properties)
+* Optionally generate interfaces for groups and attribute groups
 
 Unsupported:
 
@@ -36,8 +37,9 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 0.7.5668.19736
+Version 0.8.5718.30340
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd".
+Append - to option to disable it, e.g. --interface-.
 
 Options:
   -h, --help                 show this message and exit
@@ -55,8 +57,8 @@ Options:
                                of string
                                TYPE can be i[nt], l[ong], or d[ecimal].
   -e, --edb, --enable-data-binding
-                             Enable INotifyPropertyChanged data binding
-  -r, --order                Emit order for all class members stored as XML
+                             enable INotifyPropertyChanged data binding
+  -r, --order                emit order for all class members stored as XML
                                element
   -c, --pcl                  PCL compatible output
   -p, --prefix=PREFIX        the PREFIX to prepend to auto-generated namespace
@@ -66,6 +68,8 @@ Options:
                                elements/attributes w/o default values
   -f, --ef                   generate Entity Framework Code First compatible
                                classes
+  -t, --interface            generate interfaces for groups and attribute
+                               groups (default is enabled)
 ```
 
 From code:
@@ -149,6 +153,44 @@ resulting in possibly schema-invalid XML.
 
 XmlSchemaClassGenerator currently simply pretends choices are sequences.
 This means you'll have to take care only to set a schema-valid combination of these properties to non-null values.
+
+Interfaces<a name="interfaces"></a>
+-----------------------------------
+
+Groups and attribute groups in XML Schema are reusable components that can be included in multiple type definitions. XmlSchemaClassGenerator can optionally generate interfaces from these groups to make it easier to access common properties on otherwise unrelated classes. So
+
+```XML
+<xs:attributeGroup name="Common">
+  <xs:attribute name="name" type="xs:string"></xs:attribute>
+</xs:attributeGroup>
+
+<xs:complexType name="A">
+  <xs:attributeGroup ref="Common"/>
+</xs:complexType>
+
+<xs:complexType name="B">
+  <xs:attributeGroup ref="Common"/>
+</xs:complexType>
+```
+
+becomes
+
+```C#
+public partial interface ICommon
+{
+  string Name { get; set; }
+}
+
+public partial class A: ICommon
+{
+  public string Name { get; set; }
+}
+
+public partial class B: ICommon
+{
+  public string Name { get; set; }
+}
+```
 
 Contributing
 ------------
