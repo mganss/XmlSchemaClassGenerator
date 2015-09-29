@@ -37,7 +37,7 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 0.8.5718.30340
+Version 0.8.5750.32346
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd".
 Append - to option to disable it, e.g. --interface-.
 
@@ -70,6 +70,8 @@ Options:
                                classes
   -t, --interface            generate interfaces for groups and attribute
                                groups (default is enabled)
+  -a, --pascal               use Pascal case for class and property names (
+                               default is enabled)
 ```
 
 From code:

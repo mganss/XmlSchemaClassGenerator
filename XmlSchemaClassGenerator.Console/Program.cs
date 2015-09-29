@@ -26,6 +26,7 @@ namespace XmlSchemaClassGenerator.Console
             var emitOrder = false;
             var entityFramework = false;
             var interfaces = true;
+            var pascal = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -61,6 +62,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "0|nullable", "generate nullable adapter properties for optional elements/attributes w/o default values", v => nullables = v != null },
                 { "f|ef", "generate Entity Framework Code First compatible classes", v => entityFramework = v != null },
                 { "t|interface", "generate interfaces for groups and attribute groups (default is enabled)", v => interfaces = v != null },
+                { "a|pascal", "use Pascal case for class and property names (default is enabled)", v => pascal = v != null },
             };
 
             var files = options.Parse(args);
@@ -94,7 +96,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EmitOrder = emitOrder,
                 IntegerDataType = integerType,
                 EntityFramework = entityFramework,
-                GenerateInterfaces = interfaces
+                GenerateInterfaces = interfaces,
+                NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct
             };
 
             if (pclCompatible)
