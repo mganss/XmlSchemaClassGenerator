@@ -497,8 +497,11 @@ namespace XmlSchemaClassGenerator
                 {
                     if (complexType.ContentModel.Content is XmlSchemaComplexContentExtension)
                         particle = ((XmlSchemaComplexContentExtension)complexType.ContentModel.Content).Particle;
-                    else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
-                        particle = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Particle;
+
+                    // If it's a restriction, do not duplicate elements on the derived class, they're already in the base class.
+                    // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
+                    //else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
+                    //    particle = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Particle;
                 }
                 else particle = complexType.ContentTypeParticle;
 
@@ -520,15 +523,21 @@ namespace XmlSchemaClassGenerator
                         attributes = ((XmlSchemaComplexContentExtension)complexType.ContentModel.Content).Attributes;
                     else if (complexType.ContentModel.Content is XmlSchemaSimpleContentExtension)
                         attributes = ((XmlSchemaSimpleContentExtension)complexType.ContentModel.Content).Attributes;
-                    else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
-                        attributes = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Attributes;
-                    else if (complexType.ContentModel.Content is XmlSchemaSimpleContentRestriction)
-                        attributes = ((XmlSchemaSimpleContentRestriction)complexType.ContentModel.Content).Attributes;
+
+                    // If it's a restriction, do not duplicate attributes on the derived class, they're already in the base class.
+                    // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
+                    //else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
+                    //    attributes = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Attributes;
+                    //else if (complexType.ContentModel.Content is XmlSchemaSimpleContentRestriction)
+                    //    attributes = ((XmlSchemaSimpleContentRestriction)complexType.ContentModel.Content).Attributes;
                 }
                 else attributes = complexType.Attributes;
 
-                var attributeProperties = CreatePropertiesForAttributes(source, classModel, attributes.Cast<XmlSchemaObject>());
-                classModel.Properties.AddRange(attributeProperties);
+                if (attributes != null)
+                {
+                    var attributeProperties = CreatePropertiesForAttributes(source, classModel, attributes.Cast<XmlSchemaObject>());
+                    classModel.Properties.AddRange(attributeProperties);
+                }
 
                 if (GenerateInterfaces)
                 {

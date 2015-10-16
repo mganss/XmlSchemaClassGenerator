@@ -207,6 +207,19 @@ namespace XmlSchemaClassGenerator
             DerivedTypes = new List<ClassModel>();
         }
 
+        public IEnumerable<ClassModel> AllBaseClasses
+        {
+            get
+            {
+                var baseClass = BaseClass as ClassModel;
+                while (baseClass != null)
+                {
+                    yield return baseClass;
+                    baseClass = baseClass.BaseClass as ClassModel;
+                }
+            }
+        }
+
         public override CodeTypeDeclaration Generate()
         {
             var classDeclaration = base.Generate();
@@ -326,7 +339,7 @@ namespace XmlSchemaClassGenerator
             foreach (var property in Properties)
                 property.AddMembersTo(classDeclaration, EnableDataBinding);
 
-            if (IsMixed && (BaseClass == null || BaseClass is ClassModel))
+            if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
             {
                 var text = new CodeMemberField(typeof(string), "Text");
                 // hack to generate automatic property
@@ -517,10 +530,11 @@ namespace XmlSchemaClassGenerator
         {
             get
             {
-                return !IsCollection && !IsAttribute && TypeClassModel != null && TypeClassModel.TotalProperties == 1
+                return !IsCollection && !IsAttribute && TypeClassModel != null
+                && TypeClassModel.BaseClass == null
+                && TypeClassModel.Properties.Count == 1
                 && !TypeClassModel.Properties[0].IsAttribute && !TypeClassModel.Properties[0].IsAny
-                && TypeClassModel.Properties[0].IsCollection
-                && TypeClassModel.BaseClass == null;
+                && TypeClassModel.Properties[0].IsCollection;
             }
         }
 
