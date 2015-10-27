@@ -74,6 +74,12 @@ namespace Microsoft.Xml.XMLGen {
             InstanceElement newElem = (InstanceElement)MemberwiseClone();
             newElem.Occurs = occurs;
             newElem.Child = null;
+             int noOfChildren = this.NoOfChildren;
+            for (int i = 0; i < noOfChildren; i++)
+            {
+                var existingChild = (InstanceElement)this.GetChild(i);
+                newElem.AddChild(existingChild.Clone(existingChild.Occurs));
+            }
             newElem.Parent = null;
             newElem.Sibling = null;
             return newElem;
