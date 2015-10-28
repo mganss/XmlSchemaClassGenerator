@@ -98,6 +98,22 @@ namespace Microsoft.Xml.XMLGen {
             }
             return null;
         }
+
+        internal InstanceGroup Clone(decimal occurs)
+        {
+            InstanceGroup newElem = MemberwiseClone() as InstanceGroup;
+            newElem.Occurs = occurs;
+            newElem.Child = null;
+            int noOfChildren = this.NoOfChildren;
+            for (int i = 0; i < noOfChildren; i++)
+            {
+                var existingChild = this.GetChild(i);
+                newElem.AddChild(existingChild.Clone(existingChild.Occurs));
+            }
+            newElem.Parent = null;
+            newElem.Sibling = null;
+            return newElem;
+        }
     }
 }
 
