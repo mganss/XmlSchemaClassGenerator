@@ -69,15 +69,6 @@ namespace Microsoft.Xml.XMLGen {
                 prev.NextAttribute = attr;
             }
         }
-        
-        internal InstanceElement Clone(decimal occurs) {
-            InstanceElement newElem = (InstanceElement)MemberwiseClone();
-            newElem.Occurs = occurs;
-            newElem.Child = null;
-            newElem.Parent = null;
-            newElem.Sibling = null;
-            return newElem;
-        }
 
         internal StringBuilder Comment {
             get {
