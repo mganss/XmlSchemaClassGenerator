@@ -537,13 +537,13 @@ namespace XmlSchemaClassGenerator
                 {
                     var attributeProperties = CreatePropertiesForAttributes(source, classModel, attributes.Cast<XmlSchemaObject>());
                     classModel.Properties.AddRange(attributeProperties);
-                }
 
-                if (GenerateInterfaces)
-                {
-                    var attributeInterfaces = attributes.OfType<XmlSchemaAttributeGroupRef>()
-                        .Select(i => (InterfaceModel)CreateTypeModel(new Uri(i.SourceUri), AttributeGroups[i.RefName], i.RefName));
-                    classModel.Interfaces.AddRange(attributeInterfaces);
+                    if (GenerateInterfaces)
+                    {
+                        var attributeInterfaces = attributes.OfType<XmlSchemaAttributeGroupRef>()
+                            .Select(i => (InterfaceModel)CreateTypeModel(new Uri(i.SourceUri), AttributeGroups[i.RefName], i.RefName));
+                        classModel.Interfaces.AddRange(attributeInterfaces);
+                    }
                 }
 
                 if (complexType.AnyAttribute != null)

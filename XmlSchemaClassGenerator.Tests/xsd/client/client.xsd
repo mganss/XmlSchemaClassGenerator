@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<xs:schema xmlns="http://tempuri.org/mySchema.xsd" elementFormDefault="qualified" targetNamespace="http://tempuri.org/mySchema.xsd" id="mySchema" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Client">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="MainClientDetail" type="MainClientFieldSets" />
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="RelatedClientDetail" type="RelatedClientFieldSets" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="MainClientFieldSets">
+    <xs:all minOccurs="0">
+  
+      <xs:element minOccurs="1" name="MainClientDetails" type="MainClientDetailsType" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="RelatedClientFieldSets">
+    <xs:all minOccurs="0">
+    
+      <xs:element minOccurs="1" name="RelatedClientDetails" type="RelatedClientDetailsType" />
+    </xs:all>
+  </xs:complexType>
+  
+  <xs:complexType name="ClientDetailsType">
+    <xs:sequence>
+  
+      <xs:element minOccurs="1" maxOccurs="1" name="ClientName" type="MandatoryStringType" />
+      <xs:element minOccurs="1" maxOccurs="1" name="IDNumber" type="MandatoryStringType" />
+      <xs:element minOccurs="1" maxOccurs="1" name="LegalEntity">
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="EntityType">
+              <xs:attribute fixed="True" name="MandatoryField" type="xs:string" use="optional" />
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" maxOccurs="1" name="ClientDocuments" type="ClientDocumentListType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MainClientDetailsType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="ClientDetailsType">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="1" name="ReviewDate" type="MandatoryDateType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RelatedClientDetailsType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="ClientDetailsType">
+        <xs:sequence>
+          <xs:element minOccurs="1" maxOccurs="unbounded" name="RelationshipDetails" type="RelationshipDetailsType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  	<xs:complexType name="NameCodePairComplexType">
+		<xs:all>
+			<xs:element minOccurs="0" name="Name" type="xs:string" />
+			<xs:element name="Code" type="xs:string" />
+		</xs:all>
+	</xs:complexType>
+  <xs:complexType name="MandatoryStringType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute fixed="True" name="MandatoryField" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="MandatoryDateType">
+    <xs:simpleContent>
+      <xs:extension base="xs:date">
+        <xs:attribute fixed="True" name="MandatoryField" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="RelationshipDetailsType">
+    <xs:all>
+      <xs:element minOccurs="1" maxOccurs="1" name="Role">
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="RoleType">
+              <xs:attribute fixed="True" name="MandatoryField" type="xs:string" use="optional" />
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="1" maxOccurs="1" name="ClientParentUniqueID" type="MandatoryStringType" />
+     
+    </xs:all>
+  </xs:complexType>
+  <xs:simpleType name="GUIDType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})|(\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\})" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="ClientDocumentListType">
+    <xs:choice>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ClientDocument" type="ClientDocumentType" />
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="ClientDocumentType">
+    <xs:all>
+      <xs:element name="DocRef" type="xs:string" />
+      <xs:element minOccurs="0" name="Name" type="xs:string" />
+      <xs:element name="DocType" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="EntityType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="NameCodePairComplexType">
+        <xs:all>
+          <xs:element minOccurs="0" name="Name">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="A" />
+                <xs:enumeration value="B" />
+               
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element name="Code">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="1" />
+                <xs:enumeration value="2" />              
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:all>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoleType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="NameCodePairComplexType">
+        <xs:all>
+          <xs:element minOccurs="0" name="Name">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="c" />
+                <xs:enumeration value="d" />
+              
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+          <xs:element name="Code">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="3" />
+                <xs:enumeration value="4" />
+               
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:element>
+        </xs:all>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

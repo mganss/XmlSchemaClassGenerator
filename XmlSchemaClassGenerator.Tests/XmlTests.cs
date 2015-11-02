@@ -94,11 +94,14 @@ namespace XmlSchemaClassGenerator.Tests
 
         const string IS24Pattern = @"xsd\is24\*\*.xsd";
         const string WadlPattern = @"xsd\wadl\wadl.xsd";
+        const string ClientPattern = @"xsd\client\client.xsd";
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
         public void CanDeserializeSampleXml()
         {
+            Compile("Client", ClientPattern);
+            TestSamples("Client", ClientPattern);
             Compile("IS24RestApi", IS24Pattern);
             TestSamples("IS24RestApi", IS24Pattern);
             Compile("Wadl", WadlPattern, new Generator { EntityFramework = true });
