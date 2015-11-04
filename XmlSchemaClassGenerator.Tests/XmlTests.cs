@@ -24,6 +24,8 @@ namespace XmlSchemaClassGenerator.Tests
 
         private Assembly Compile(string name, string pattern, Generator generatorPrototype = null)
         {
+            if (Assemblies.ContainsKey(name)) return Assemblies[name];
+
             var cs = new List<string>();
 
             var outputFolder = Path.Combine("output", name);
@@ -81,8 +83,8 @@ namespace XmlSchemaClassGenerator.Tests
             Directory.CreateDirectory(binFolder);
             var results = provider.CompileAssemblyFromFile(new CompilerParameters(assemblies, Path.Combine(binFolder, name + ".dll")), cs.ToArray());
 
-            Assert.False(results.Errors.HasErrors);
-            Assert.False(results.Errors.HasWarnings);
+            Assert.False(results.Errors.HasErrors, string.Join("\n", results.Output.Cast<string>()));
+            Assert.False(results.Errors.HasWarnings, string.Join("\n", results.Output.Cast<string>()));
             Assert.NotNull(results.CompiledAssembly);
 
             var assembly = Assembly.Load(results.CompiledAssembly.GetName());
@@ -212,9 +214,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact, TestPriority(2)]
         public void ProducesSameXmlAsXsd()
         {
-            Compile("IS24RestApi", IS24Pattern);
-
-            var assembly = Assemblies["IS24RestApi"];
+            var assembly = Compile("IS24RestApi", IS24Pattern);
 
             foreach (var c in Classes)
             {
@@ -249,9 +249,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact, TestPriority(3)]
         public void CanSerializeAndDeserializeAllExampleXmlFiles()
         {
-            Compile("IS24RestApi", IS24Pattern);
-
-            var assembly = Assemblies["IS24RestApi"];
+            var assembly = Compile("IS24RestApi", IS24Pattern);
 
             foreach (var c in Classes)
             {
