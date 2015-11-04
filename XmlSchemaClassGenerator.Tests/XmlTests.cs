@@ -106,7 +106,7 @@ namespace XmlSchemaClassGenerator.Tests
             TestSamples("Client", ClientPattern);
             Compile("IS24RestApi", IS24Pattern);
             TestSamples("IS24RestApi", IS24Pattern);
-            Compile("Wadl", WadlPattern, new Generator { EntityFramework = true });
+            Compile("Wadl", WadlPattern, new Generator { EntityFramework = true, DataAnnotationMode = DataAnnotationMode.All });
             TestSamples("Wadl", WadlPattern);
         }
 

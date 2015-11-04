@@ -389,23 +389,6 @@ namespace XmlSchemaClassGenerator
 
             return allDerivedTypes;
         }
-
-        public int TotalProperties
-        {
-            get
-            {
-                var elems = 0;
-                var clss = this;
-
-                while (clss != null)
-                {
-                    elems += clss.Properties.Count();
-                    clss = clss.BaseClass as ClassModel;
-                }
-
-                return elems;
-            }
-        }
     }
 
     public class PropertyModel
@@ -567,6 +550,7 @@ namespace XmlSchemaClassGenerator
             {
                 docs.AddRange(simpleType.Documentation);
                 docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = "en", Text = r.Description }));
+                member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
             }
 
             member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
