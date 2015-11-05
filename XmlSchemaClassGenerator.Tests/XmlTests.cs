@@ -35,25 +35,17 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.Partial,
+                DataAnnotationMode = DataAnnotationMode.All,
                 GenerateDesignerCategoryAttribute = false,
                 EntityFramework = false,
-                GenerateInterfaces = true
+                GenerateInterfaces = true,
+                NamespacePrefix = name,
             };
 
             var gen = new Generator
             {
                 OutputFolder = outputFolder,
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key =>
-                    {
-                        var xn = key.XmlSchemaNamespace;
-                        var nm = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
-                            .Select(n => Generator.ToTitleCase(n, NamingScheme.PascalCase)));
-                        return name + (string.IsNullOrEmpty(nm) ? "" : ("." + nm));
-                    }
-                },
+                NamespaceProvider = generatorPrototype.NamespaceProvider,
                 Log = f => cs.Add(f),
                 GenerateNullables = generatorPrototype.GenerateNullables,
                 IntegerDataType = generatorPrototype.IntegerDataType,
@@ -106,7 +98,12 @@ namespace XmlSchemaClassGenerator.Tests
             TestSamples("Client", ClientPattern);
             Compile("IS24RestApi", IS24Pattern);
             TestSamples("IS24RestApi", IS24Pattern);
-            Compile("Wadl", WadlPattern, new Generator { EntityFramework = true, DataAnnotationMode = DataAnnotationMode.All });
+            Compile("Wadl", WadlPattern, new Generator
+            {
+                EntityFramework = true,
+                DataAnnotationMode = DataAnnotationMode.All,
+                NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace)
+            });
             TestSamples("Wadl", WadlPattern);
         }
 

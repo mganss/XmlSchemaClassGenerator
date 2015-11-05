@@ -27,6 +27,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.NamespaceProvider = value; }
         }
 
+        public string NamespacePrefix
+        {
+            get { return _configuration.NamespacePrefix; }
+            set { _configuration.NamespacePrefix = value; }
+        }
+
         public string OutputFolder
         {
             get { return _configuration.OutputFolder; }
