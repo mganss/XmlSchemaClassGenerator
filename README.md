@@ -1,6 +1,10 @@
 XmlSchemaClassGenerator
 =======================
 
+[![NuGet version](https://badge.fury.io/nu/XmlSchemaClassGenerator.svg)](http://badge.fury.io/nu/XmlSchemaClassGenerator)
+[![Build status](https://ci.appveyor.com/api/projects/status/yhxiw0stmv5y7f6n/branch/master?svg=true)](https://ci.appveyor.com/project/mganss/xmlschemaclassgenerator/branch/master)
+[![codecov.io](https://codecov.io/github/mganss/XmlSchemaClassGenerator/coverage.svg?branch=master)](https://codecov.io/github/mganss/XmlSchemaClassGenerator?branch=master)
+
 A console program and library to generate 
 [XmlSerializer](http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlserializer.aspx) compatible C# classes
 from <a href="http://en.wikipedia.org/wiki/XML_Schema_(W3C)">XML Schema</a> files.
