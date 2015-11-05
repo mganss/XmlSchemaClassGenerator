@@ -1,7 +1,7 @@
 XmlSchemaClassGenerator
 =======================
 
-[![NuGet version](https://badge.fury.io/nu/XmlSchemaClassGenerator.svg)](http://badge.fury.io/nu/XmlSchemaClassGenerator)
+[![NuGet version](https://badge.fury.io/nu/XmlSchemaClassGenerator-beta.svg)](http://badge.fury.io/nu/XmlSchemaClassGenerator-beta)
 [![Build status](https://ci.appveyor.com/api/projects/status/yhxiw0stmv5y7f6n/branch/master?svg=true)](https://ci.appveyor.com/project/mganss/xmlschemaclassgenerator/branch/master)
 [![codecov.io](https://codecov.io/github/mganss/XmlSchemaClassGenerator/coverage.svg?branch=master)](https://codecov.io/github/mganss/XmlSchemaClassGenerator?branch=master)
 
