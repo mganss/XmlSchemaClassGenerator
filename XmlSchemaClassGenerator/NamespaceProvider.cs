@@ -165,9 +165,13 @@ namespace XmlSchemaClassGenerator
             foreach (var keyValue in keyValues)
             {
                 string result;
-                if (TryGetValue(keyValue, out result))
+                if (InternalDictionary.TryGetValue(keyValue, out result))
                     return result;
             }
+
+            string ns;
+            if (TryGenerateNamespace(key, out ns))
+                return ns;
 
             return defaultNamespace;
         }
