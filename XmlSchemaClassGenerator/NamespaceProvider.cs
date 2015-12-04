@@ -170,7 +170,7 @@ namespace XmlSchemaClassGenerator
             }
 
             string ns;
-            if (TryGenerateNamespace(key, out ns))
+            if (TryGetValue(key, out ns))
                 return ns;
 
             return defaultNamespace;
