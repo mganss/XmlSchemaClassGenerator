@@ -87,6 +87,7 @@ namespace XmlSchemaClassGenerator.Tests
         }
 
         const string IS24Pattern = @"xsd\is24\*\*.xsd";
+        const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
         const string WadlPattern = @"xsd\wadl\wadl.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
 
@@ -105,6 +106,8 @@ namespace XmlSchemaClassGenerator.Tests
                 NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace)
             });
             TestSamples("Wadl", WadlPattern);
+            Compile("IS24ImmoTransfer", IS24ImmoTransferPattern);
+            TestSamples("IS24ImmoTransfer", IS24ImmoTransferPattern);
         }
 
         private void TestSamples(string name, string pattern)
