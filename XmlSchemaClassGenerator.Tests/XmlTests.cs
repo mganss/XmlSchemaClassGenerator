@@ -136,7 +136,7 @@ namespace XmlSchemaClassGenerator.Tests
 
             set.Compile();
 
-            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
+            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);

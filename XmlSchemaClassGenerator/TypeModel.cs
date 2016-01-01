@@ -193,6 +193,7 @@ namespace XmlSchemaClassGenerator
     {
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
+        public bool IsSubstitution { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<InterfaceModel> Interfaces { get; set; }
@@ -781,8 +782,8 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(specifiedProperty);
             }
 
-            var attribute = GetAttribute(isArray);
-            member.CustomAttributes.Add(attribute);
+            var attributes = GetAttributes(isArray).ToArray();
+            member.CustomAttributes.AddRange(attributes);
 
             // initialize List<>
             if (IsCollection || isArray)
@@ -806,11 +807,14 @@ namespace XmlSchemaClassGenerator
             if (isArray)
             {
                 var arrayItemProperty = typeClassModel.Properties[0];
-                var propertyAttribute = arrayItemProperty.GetAttribute(false);
+                var propertyAttributes = arrayItemProperty.GetAttributes(false).ToList();
                 // HACK: repackage as ArrayItemAttribute
-                var arrayItemAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayItemAttribute)),
-                    propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, "Order", StringComparison.Ordinal)).ToArray());
-                member.CustomAttributes.Add(arrayItemAttribute);
+                foreach (var propertyAttribute in propertyAttributes)
+                {
+                    var arrayItemAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayItemAttribute)),
+                        propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, "Order", StringComparison.Ordinal)).ToArray());
+                    member.CustomAttributes.Add(arrayItemAttribute);
+                }
             }
 
             if (IsKey)
@@ -825,79 +829,99 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        private CodeAttributeDeclaration GetAttribute(bool isArray)
+        private IEnumerable<CodeAttributeDeclaration> GetAttributes(bool isArray)
         {
-            CodeAttributeDeclaration attribute;
+            var attributes = new List<CodeAttributeDeclaration>();
 
             if (IsKey && XmlSchemaName == null)
             {
-                attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute)));
-                return attribute;
+                attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute))));
+                return attributes;
             }
 
             if (IsAttribute)
             {
                 if (IsAny)
                 {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyAttributeAttribute)));
+                    attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyAttributeAttribute))));
                 }
                 else
                 {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAttributeAttribute)),
-                        new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                    attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAttributeAttribute)),
+                        new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name))));
                 }
             }
             else if (!isArray)
             {
                 if (IsAny)
                 {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyElementAttribute)));
+                    attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyElementAttribute))));
                 }
                 else
                 {
-                    attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute)),
-                        new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                    var classType = PropertyType as ClassModel;
+                    if (classType != null && classType.IsAbstract && classType.DerivedTypes.Any())
+                    {
+                        var derivedTypes = classType.GetAllDerivedTypes().Where(t => t.IsSubstitution);
+                        foreach (var derivedType in derivedTypes)
+                        {
+                            var derivedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute)),
+                                new CodeAttributeArgument(new CodePrimitiveExpression(derivedType.XmlSchemaName.Name)),
+                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace, false))));
+                            if (Order != null)
+                                derivedAttribute.Arguments.Add(new CodeAttributeArgument("Order",
+                                    new CodePrimitiveExpression(Order.Value)));
+                            attributes.Add(derivedAttribute);
+                        }
+                    }
+
+                    var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute)),
+                            new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
                     if (Order != null)
                         attribute.Arguments.Add(new CodeAttributeArgument("Order",
                             new CodePrimitiveExpression(Order.Value)));
+                    attributes.Add(attribute);
                 }
             }
             else
             {
-                attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayAttribute)),
-                    new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayAttribute)),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name))));
             }
 
-            if (Form == XmlSchemaForm.Qualified)
+            foreach (var attribute in attributes)
             {
-                attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
-            }
-            else if (XmlNamespace != null)
-            {
-                attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
-            }
-            else if (!IsAny)
-            {
-                attribute.Arguments.Add(new CodeAttributeArgument("Form",
-                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm))),
-                        "Unqualified")));
-            }
-
-            if (IsNillable)
-                attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
-
-            var simpleModel = Type as SimpleModel;
-            if (simpleModel != null && simpleModel.UseDataTypeAttribute)
-            {
-                var name = Type.XmlSchemaType.GetQualifiedName();
-                if (name.Namespace == XmlSchema.Namespace)
+                if (Form == XmlSchemaForm.Qualified)
                 {
-                    var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
-                    attribute.Arguments.Add(dataType);
+                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
+                }
+                else if (XmlNamespace != null)
+                {
+                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
+                }
+                else if (!IsAny)
+                {
+                    attribute.Arguments.Add(new CodeAttributeArgument("Form",
+                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm))),
+                            "Unqualified")));
+                }
+
+                if (IsNillable)
+                    attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
+
+                var simpleModel = Type as SimpleModel;
+                if (simpleModel != null && simpleModel.UseDataTypeAttribute)
+                {
+                    var name = Type.XmlSchemaType.GetQualifiedName();
+                    if (name.Namespace == XmlSchema.Namespace)
+                    {
+                        var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
+                        attribute.Arguments.Add(dataType);
+                    }
                 }
             }
 
-            return attribute;
+            return attributes;
         }
     }
 

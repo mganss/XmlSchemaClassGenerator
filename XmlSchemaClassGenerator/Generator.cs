@@ -479,6 +479,7 @@ namespace XmlSchemaClassGenerator
                     IsAbstract = complexType.IsAbstract,
                     IsAnonymous = complexType.QualifiedName.Name == "",
                     IsMixed = complexType.IsMixed,
+                    IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty,
                     EnableDataBinding = EnableDataBinding,
                 };
 

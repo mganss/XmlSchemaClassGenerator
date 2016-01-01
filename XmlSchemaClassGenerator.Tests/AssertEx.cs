@@ -71,7 +71,7 @@ namespace XmlSchemaClassGenerator.Tests
             }
             else
             {
-                foreach (var prop in type1.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead))
+                foreach (var prop in type1.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && !p.GetIndexParameters().Any()))
                 {
                     var val1 = prop.GetValue(o1);
                     var val2 = prop.GetValue(o2);
