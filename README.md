@@ -30,7 +30,7 @@ from schema restrictions
 Unsupported:
 
 * Some restriction types
-* Recursive choices and choices whose elements have minOccurs > 0 (see [below](#choice))
+* Recursive choices and choices whose elements have minOccurs > 0 or nillable="true" (see [below](#choice))
 * Possible name clashes and invalid identifiers when names contain non-alphanumeric characters
 * Groups with maxOccurs > 0
 
