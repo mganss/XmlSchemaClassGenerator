@@ -139,6 +139,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.GenerateInterfaces = value; }
         }
 
+        public CodeTypeReferenceOptions CodeTypeReferenceOptions
+        {
+            get { return _configuration.CodeTypeReferenceOptions; }
+            set { _configuration.CodeTypeReferenceOptions = value; }
+        }
+
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
