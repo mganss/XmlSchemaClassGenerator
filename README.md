@@ -83,6 +83,10 @@ Options:
       --cit, --collectionImplementationType=VALUE
                              the default collection type implementation to use (
                                default is null)
+	  --ctro, --codeTypeReferenceOptions=VALUE
+							 the default CodeTypeReferenceOptions Flags to use (
+							   default is unset; 
+							   can be: {GlobalReference, GenericTypeParameter})
 ```
 
 From code:
