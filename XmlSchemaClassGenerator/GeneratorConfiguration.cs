@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -105,6 +106,11 @@ namespace XmlSchemaClassGenerator
         /// Generate interfaces for groups and attribute groups
         /// </summary>
         public bool GenerateInterfaces { get; set; }
+
+        /// <summary>
+        /// Generator Code reference options
+        /// </summary>
+        public CodeTypeReferenceOptions CodeTypeReferenceOptions { get; set; }
 
         /// <summary>
         /// Provides a fast and safe way to write to the Log
