@@ -337,6 +337,13 @@ namespace XmlSchemaClassGenerator
             AttributeGroups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>()).ToDictionary(g => g.QualifiedName);
             Groups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.Groups.Values.Cast<XmlSchemaGroup>()).ToDictionary(g => g.QualifiedName);
 
+            foreach (var globalType in Set.GlobalTypes.Values.Cast<XmlSchemaType>())
+            {
+                var schema = globalType.GetSchema();
+                var source = (schema == null ? null : new Uri(schema.SourceUri));
+                var type = CreateTypeModel(source, globalType, globalType.QualifiedName);
+            }
+
             foreach (var rootElement in Set.GlobalElements.Values.Cast<XmlSchemaElement>())
             {
                 var source = new Uri(rootElement.GetSchema().SourceUri);
@@ -387,13 +394,6 @@ namespace XmlSchemaClassGenerator
 
                     type.RootElementName = rootElement.QualifiedName;
                 }
-            }
-
-            foreach (var globalType in Set.GlobalTypes.Values.Cast<XmlSchemaType>())
-            {
-                var schema = globalType.GetSchema();
-                var source = (schema == null ? null : new Uri(schema.SourceUri));
-                var type = CreateTypeModel(source, globalType, globalType.QualifiedName);
             }
         }
 
@@ -707,7 +707,7 @@ namespace XmlSchemaClassGenerator
                             Type = CreateTypeModel(source, attribute.AttributeSchemaType, attributeQualifiedName),
                             IsAttribute = true,
                             IsNullable = attribute.Use != XmlSchemaUse.Required,
-                            DefaultValue = attribute.DefaultValue,
+                            DefaultValue = attribute.DefaultValue ?? (attribute.Use != XmlSchemaUse.Optional ? attribute.FixedValue : null),
                             Form = attribute.Form == XmlSchemaForm.None ? attribute.GetSchema().AttributeFormDefault : attribute.Form,
                             XmlNamespace = attribute.QualifiedName.Namespace != "" && attribute.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? attribute.QualifiedName.Namespace : null,
                         };
@@ -779,7 +779,7 @@ namespace XmlSchemaClassGenerator
                         IsNillable = element.IsNillable,
                         IsNullable = item.MinOccurs < 1.0m,
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                        DefaultValue = element.DefaultValue,
+                        DefaultValue = element.DefaultValue ?? (item.MinOccurs >= 1.0m ? element.FixedValue : null),
                         Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
                         XmlNamespace = element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
                     };
