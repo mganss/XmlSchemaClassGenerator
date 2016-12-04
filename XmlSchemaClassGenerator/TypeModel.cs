@@ -912,11 +912,19 @@ namespace XmlSchemaClassGenerator
                 var simpleModel = Type as SimpleModel;
                 if (simpleModel != null && simpleModel.UseDataTypeAttribute)
                 {
-                    var name = Type.XmlSchemaType.GetQualifiedName();
-                    if (name.Namespace == XmlSchema.Namespace)
+                    // walk up the inheritance chain to find DataType if the simple type is derived (see #18)
+                    var xmlSchemaType = Type.XmlSchemaType;
+                    while (xmlSchemaType != null)
                     {
-                        var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
-                        attribute.Arguments.Add(dataType);
+                        var name = xmlSchemaType.GetQualifiedName();
+                        if (name.Namespace == XmlSchema.Namespace && name.Name != "anySimpleType")
+                        {
+                            var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
+                            attribute.Arguments.Add(dataType);
+                            break;
+                        }
+                        else
+                            xmlSchemaType = xmlSchemaType.BaseXmlSchemaType;
                     }
                 }
             }
