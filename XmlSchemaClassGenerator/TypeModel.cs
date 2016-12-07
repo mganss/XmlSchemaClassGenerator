@@ -497,11 +497,11 @@ namespace XmlSchemaClassGenerator
             {{
                 return this.{0};
             }}
-            {1}set
+            set
             {{
                 this.{0} = value;
             }}
-        }}", backingFieldName, (privateSetter ? "private " : string.Empty));
+        }}", backingFieldName);
             }
         }
 
