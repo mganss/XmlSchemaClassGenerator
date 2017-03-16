@@ -76,8 +76,8 @@ namespace XmlSchemaClassGenerator
             get
             {
                 var s = "";
-                if (Min > 0) s += string.Format("Minimum length: {0}. ", Min);
-                if (Max > 0) s += string.Format("Maximum length: {0}.", Max);
+                if (Min > 0) { s += string.Format("Minimum length: {0}. ", Min); }
+                if (Max > 0) { s += string.Format("Maximum length: {0}.", Max); }
                 return s.Trim();
             }
         }
@@ -91,7 +91,7 @@ namespace XmlSchemaClassGenerator
         {
             var a = new CodeAttributeDeclaration(new CodeTypeReference(typeof(StringLengthAttribute)),
                 new CodeAttributeArgument(Max > 0 ? (CodeExpression)new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
-            if (Min > 0) a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min)));
+            if (Min > 0) { a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min))); }
 
             return a;
         }

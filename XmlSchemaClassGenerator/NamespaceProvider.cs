@@ -16,7 +16,9 @@ namespace XmlSchemaClassGenerator
         protected virtual string OnGenerateNamespace(NamespaceKey key)
         {
             if (GenerateNamespace != null)
+            {
                 return GenerateNamespace(key);
+            }
             return null;
         }
 
@@ -34,10 +36,14 @@ namespace XmlSchemaClassGenerator
         public bool ContainsKey(NamespaceKey key)
         {
             if (InternalDictionary.ContainsKey(key))
+            {
                 return true;
+            }
             string ns;
             if (!TryGenerateNamespace(key, out ns))
+            {
                 return false;
+            }
             InternalDictionary.Add(key, ns);
             return true;
         }
@@ -55,9 +61,13 @@ namespace XmlSchemaClassGenerator
         public bool TryGetValue(NamespaceKey key, out string value)
         {
             if (InternalDictionary.TryGetValue(key, out value))
+            {
                 return true;
+            }
             if (!TryGenerateNamespace(key, out value))
+            {
                 return false;
+            }
             InternalDictionary.Add(key, value);
             return true;
         }
@@ -73,7 +83,9 @@ namespace XmlSchemaClassGenerator
             {
                 string result;
                 if (TryGetValue(key, out result))
+                {
                     return result;
+                }
                 throw new KeyNotFoundException();
             }
             set { InternalDictionary[key] = value; }
@@ -134,8 +146,10 @@ namespace XmlSchemaClassGenerator
             if (key.Source == null)
             {
                 if (key.XmlSchemaNamespace != null)
+                {
                     // Search for empty key
                     keyValues.Add(new NamespaceKey());
+                }
             }
             else if (key.XmlSchemaNamespace != null)
             {
@@ -166,12 +180,16 @@ namespace XmlSchemaClassGenerator
             {
                 string result;
                 if (InternalDictionary.TryGetValue(keyValue, out result))
+                {
                     return result;
+                }
             }
 
             string ns;
             if (TryGetValue(key, out ns))
+            {
                 return ns;
+            }
 
             return defaultNamespace;
         }
