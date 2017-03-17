@@ -29,7 +29,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         public static void Equal(object o1, object o2)
         {
-            if (o1 == null && o2 == null) return;
+            if (o1 == null && o2 == null) { return; }
             Assert.NotNull(o1);
             Assert.NotNull(o2);
 
@@ -83,7 +83,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         public static void CollectionEqual<T>(IList<T> l1, IList<T> l2)
         {
-            if (l1 == null && l2 == null) return;
+            if (l1 == null && l2 == null) { return; }
             Assert.NotNull(l1);
             Assert.NotNull(l2);
 
