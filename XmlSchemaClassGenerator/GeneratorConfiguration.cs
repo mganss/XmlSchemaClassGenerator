@@ -22,7 +22,9 @@ namespace XmlSchemaClassGenerator
                         xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
                             .Select(n => Generator.ToTitleCase(n, NamingScheme.PascalCase)));
                     if (!string.IsNullOrEmpty(NamespacePrefix))
+                    {
                         name = NamespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name));
+                    }
                     return name;
                 },
             };
@@ -122,7 +124,9 @@ namespace XmlSchemaClassGenerator
         public void WriteLog(Func<string> messageCreator)
         {
             if (Log != null)
+            {
                 Log(messageCreator());
+            }
         }
         /// <summary>
         /// Write the message to the log.
@@ -131,7 +135,9 @@ namespace XmlSchemaClassGenerator
         public void WriteLog(string message)
         {
             if (Log != null)
+            {
                 Log(message);
+            }
         }
     }
 }

@@ -23,13 +23,19 @@ namespace XmlSchemaClassGenerator
             {
                 var enumModel = model as EnumModel;
                 if (enumModel == null)
+                {
                     return PropertyValueTypeCode.Other;
+                }
                 return PropertyValueTypeCode.ValueType;
             }
             if (simpleType.ValueType.IsArray)
+            {
                 return PropertyValueTypeCode.Array;
+            }
             if (simpleType.ValueType.IsValueType)
+            {
                 return PropertyValueTypeCode.ValueType;
+            }
             return PropertyValueTypeCode.Other;
         }
 

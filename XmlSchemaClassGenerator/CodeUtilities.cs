@@ -13,9 +13,13 @@ namespace XmlSchemaClassGenerator
         {
             name = name.Trim().Replace(' ', '_').Replace('\t', '_');
             if (string.IsNullOrEmpty(name))
+            {
                 return "Item";
+            }
             if (!char.IsLetter(name[0]))
+            {
                 return string.Format("Item{0}", name);
+            }
             return name;
         }
 
@@ -26,14 +30,14 @@ namespace XmlSchemaClassGenerator
         // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
         public static string ToPascalCase(this string s)
         {
-            if (string.IsNullOrEmpty(s)) return s;
+            if (string.IsNullOrEmpty(s)) { return s; }
             return char.ToUpperInvariant(s[0])
                 + PascalCaseRegex.Replace(s.Substring(1), m => m.Value[0] + char.ToUpperInvariant(m.Value[1]).ToString());
         }
 
         public static string ToCamelCase(this string s)
         {
-            if (string.IsNullOrEmpty(s)) return s;
+            if (string.IsNullOrEmpty(s)) { return s; }
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
@@ -57,9 +61,13 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.NonPositiveInteger:
                 case XmlTypeCode.PositiveInteger:
                     if (configuration.IntegerDataType != null && configuration.IntegerDataType != typeof(string))
+                    {
                         result = false;
+                    }
                     else
+                    {
                         result = null;
+                    }
                     break;
                 case XmlTypeCode.Base64Binary:
                 case XmlTypeCode.HexBinary:
@@ -107,7 +115,9 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.NonPositiveInteger:
                 case XmlTypeCode.PositiveInteger:
                     if (configuration.IntegerDataType == null || configuration.IntegerDataType == typeof(string))
+                    {
                         result = typeof(string);
+                    }
                     else
                     {
                         result = configuration.IntegerDataType;
@@ -178,13 +188,17 @@ namespace XmlSchemaClassGenerator
             var propBackingFieldName = propertyModel.Name.ToBackingField();
             var classModel = typeModel as ClassModel;
             if (classModel == null)
+            {
                 return propBackingFieldName;
+            }
             
             var i = 0;
             foreach (var prop in classModel.Properties)
             {
                 if (!classModel.EnableDataBinding && !(prop.Type is SimpleModel))
+                {
                     continue;
+                }
 
                 if (propertyModel == prop)
                 {
@@ -194,11 +208,15 @@ namespace XmlSchemaClassGenerator
 
                 var backingFieldName = prop.Name.ToBackingField();
                 if (backingFieldName == propBackingFieldName)
+                {
                     i += 1;
+                }
             }
 
             if (i <= 1)
+            {
                 return propBackingFieldName;
+            }
 
             return string.Format("{0}{1}", propBackingFieldName, i);
         }

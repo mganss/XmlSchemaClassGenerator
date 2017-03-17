@@ -24,7 +24,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         private Assembly Compile(string name, string pattern, Generator generatorPrototype = null)
         {
-            if (Assemblies.ContainsKey(name)) return Assemblies[name];
+            if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
 
             var cs = new List<string>();
 
@@ -167,7 +167,9 @@ namespace XmlSchemaClassGenerator.Tests
                     {
                         // generator doesn't generate valid values where pattern restrictions exist, e.g. email
                         if (!e.Message.Contains("The Pattern constraint failed"))
+                        {
                             Assert.True(false, e.Message);
+                        }
                     };
 
                     XmlReader reader = XmlReader.Create(new StringReader(xml2), settings);

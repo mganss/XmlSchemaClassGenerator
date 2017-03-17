@@ -27,9 +27,13 @@ namespace XmlSchemaClassGenerator
             {
                 var pattern = item as PatternRestrictionModel;
                 if (pattern != null)
+                {
                     patterns.Add(pattern);
+                }
                 else
+                {
                     yield return item;
+                }
             }
             if (patterns.Count == 1)
             {
@@ -51,7 +55,9 @@ namespace XmlSchemaClassGenerator
             foreach (var hierarchyItem in hierarchyItems)
             {
                 if (hierarchyItem.Models.Any())
+                {
                     yield return hierarchyItem;
+                }
                 foreach (var subNamespaceItem in hierarchyItem.SubNamespaces.Flatten())
                     yield return subNamespaceItem;
             }

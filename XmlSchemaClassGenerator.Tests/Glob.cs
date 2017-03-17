@@ -75,7 +75,7 @@ namespace Glob
 
         private void Log(string s, params object[] args)
         {
-            if (ErrorLog != null) ErrorLog(string.Format(s, args));
+            if (ErrorLog != null) { ErrorLog(string.Format(s, args)); }
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Glob
 
         private RegexOrString CreateRegexOrString(string pattern)
         {
-            if (!CacheRegexes) return new RegexOrString(GlobToRegex(pattern), pattern, IgnoreCase, compileRegex: false);
+            if (!CacheRegexes) { return new RegexOrString(GlobToRegex(pattern), pattern, IgnoreCase, compileRegex: false); }
 
             RegexOrString regexOrString;
 
@@ -187,7 +187,7 @@ namespace Glob
 
         private IEnumerable<FileSystemInfo> Expand(string path, bool dirOnly)
         {
-            if (Cancelled) yield break;
+            if (Cancelled) { yield break; }
 
             if (string.IsNullOrEmpty(path))
             {
@@ -209,10 +209,10 @@ namespace Glob
                 catch (Exception ex)
                 {
                     Log("Error getting FileSystemInfo for '{0}': {1}", path, ex);
-                    if (ThrowOnError) throw;
+                    if (ThrowOnError) { throw; }
                 }
 
-                if (exists) yield return fsi;
+                if (exists) { yield return fsi; }
                 yield break;
             }
 
@@ -225,7 +225,7 @@ namespace Glob
             catch (Exception ex)
             {
                 Log("Error getting directory name for '{0}': {1}", path, ex);
-                if (ThrowOnError) throw;
+                if (ThrowOnError) { throw; }
                 yield break;
             }
 
@@ -240,10 +240,10 @@ namespace Glob
                 catch (Exception ex)
                 {
                     Log("Error getting DirectoryInfo for '{0}': {1}", path, ex);
-                    if (ThrowOnError) throw;
+                    if (ThrowOnError) { throw; }
                 }
 
-                if (dir != null) yield return dir;
+                if (dir != null) { yield return dir; }
                 yield break;
             }
 
@@ -256,7 +256,7 @@ namespace Glob
                 catch (Exception ex)
                 {
                     Log("Error getting current working directory: {1}", ex);
-                    if (ThrowOnError) throw;
+                    if (ThrowOnError) { throw; }
                 }
             }
 
@@ -290,7 +290,7 @@ namespace Glob
                     catch (Exception ex)
                     {
                         Log("Error finding recursive directory in {0}: {1}.", dir, ex);
-                        if (ThrowOnError) throw;
+                        if (ThrowOnError) { throw; }
                         continue;
                     }
 
@@ -318,7 +318,7 @@ namespace Glob
                 catch (Exception ex)
                 {
                     Log("Error finding file system entries in {0}: {1}.", parentDir, ex);
-                    if (ThrowOnError) throw;
+                    if (ThrowOnError) { throw; }
                     continue;
                 }
 
@@ -330,8 +330,8 @@ namespace Glob
                     }
                 }
 
-                if (childRegexes.Any(r => r.Pattern == @"^\.\.$")) yield return parentDir.Parent ?? parentDir;
-                if (childRegexes.Any(r => r.Pattern == @"^\.$")) yield return parentDir;
+                if (childRegexes.Any(r => r.Pattern == @"^\.\.$")) { yield return parentDir.Parent ?? parentDir; }
+                if (childRegexes.Any(r => r.Pattern == @"^\.$")) { yield return parentDir; }
             }
         }
 
@@ -348,7 +348,7 @@ namespace Glob
             {
                 if (characterClass)
                 {
-                    if (c == ']') characterClass = false;
+                    if (c == ']') { characterClass = false; }
                     regex.Append(c);
                     continue;
                 }
@@ -366,7 +366,7 @@ namespace Glob
                         regex.Append(c);
                         break;
                     default:
-                        if (RegexSpecialChars.Contains(c)) regex.Append('\\');
+                        if (RegexSpecialChars.Contains(c)) { regex.Append('\\'); }
                         regex.Append(c);
                         break;
                 }
@@ -511,7 +511,7 @@ namespace Glob
         public override bool Equals(object obj)
         {
             //Check for null and compare run-time types.
-            if (obj == null || GetType() != obj.GetType()) return false;
+            if (obj == null || GetType() != obj.GetType()) { return false; }
 
             Glob g = (Glob)obj;
             return Pattern == g.Pattern;
