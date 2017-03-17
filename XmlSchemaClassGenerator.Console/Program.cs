@@ -88,12 +88,14 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 var xn = key.XmlSchemaNamespace;
                 var name = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
                     .Select(n => Generator.ToTitleCase(n, NamingScheme.PascalCase)));
-                if (!string.IsNullOrEmpty(namespacePrefix)) name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name));
+                if (!string.IsNullOrEmpty(namespacePrefix)) { name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name)); }
                 return name;
             });
 
             if (!string.IsNullOrEmpty(outputFolder))
+            {
                 outputFolder = Path.GetFullPath(outputFolder);
+            }
 
             var generator = new Generator
             {
@@ -119,7 +121,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 generator.DataAnnotationMode = DataAnnotationMode.None;
             }
 
-            if (verbose) generator.Log = s => System.Console.Out.WriteLine(s);
+            if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
             generator.Generate(files);
         }
@@ -133,7 +135,9 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             var source = parts2.Length == 2 ? new Uri(parts2[1], UriKind.RelativeOrAbsolute) : null;
             xmlNs = parts2[0];
             if (!string.IsNullOrEmpty(namespacePrefix))
+            {
                 netNs = namespacePrefix + "." + netNs;
+            }
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
