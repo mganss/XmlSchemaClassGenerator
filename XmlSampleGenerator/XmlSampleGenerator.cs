@@ -100,7 +100,9 @@ namespace Microsoft.Xml.XMLGen {
 
         public XmlSampleGenerator(XmlSchemaSet schemaSet, XmlQualifiedName rootElem) {
             if (schemaSet == null || schemaSet.Count == 0)
+            {
                 throw new Exception("Provided Schema set is empty. Xml cannot be generated.");
+            }
             this.schemaSet = schemaSet;
             schemaSet.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
             if (xmlResolver == null) {

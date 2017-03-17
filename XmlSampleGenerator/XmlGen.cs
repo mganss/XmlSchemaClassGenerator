@@ -63,8 +63,8 @@ namespace XmlTools {
             XmlTextWriter textWriter = new XmlTextWriter("Sample.xml", null);
             textWriter.Formatting = Formatting.Indented;
             XmlSampleGenerator genr = new XmlSampleGenerator(schemas, qname);
-            if (max > 0) genr.MaxThreshold = max;
-            if (listLength > 0) genr.ListLength = listLength;
+            if (max > 0) { genr.MaxThreshold = max; }
+            if (listLength > 0) { genr.ListLength = listLength; }
             genr.WriteXml(textWriter);
         }
 
