@@ -139,5 +139,10 @@ namespace XmlSchemaClassGenerator
                 Log(message);
             }
         }
+
+        /// <summary>
+        /// Optional delegate that is called for each generated type member
+        /// </summary>
+        public Action<CodeTypeMember, PropertyModel> MemberVisitor { get; set; }
     }
 }

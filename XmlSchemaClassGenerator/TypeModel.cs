@@ -837,6 +837,8 @@ namespace XmlSchemaClassGenerator
             {
                 member.CustomAttributes.Add(notMappedAttribute);
             }
+
+            Configuration.MemberVisitor(member, this);
         }
 
         private IEnumerable<CodeAttributeDeclaration> GetAttributes(bool isArray)
