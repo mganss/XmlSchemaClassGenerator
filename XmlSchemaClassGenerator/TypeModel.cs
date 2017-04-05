@@ -696,6 +696,13 @@ namespace XmlSchemaClassGenerator
                 specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
                 typeDeclaration.Members.Add(specifiedMember);
 
+                var specifiedMemberPropertyModel = new PropertyModel(Configuration)
+                {
+                    Name = specifiedName + "Specified"
+                };
+
+                Configuration.MemberVisitor(specifiedMember, specifiedMemberPropertyModel);
+
                 if (Configuration.GenerateNullables)
                 {
                     // public X? Name
@@ -789,6 +796,8 @@ namespace XmlSchemaClassGenerator
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Collection leer ist.", Name) } };
                 specifiedProperty.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
 
+                Configuration.MemberVisitor(specifiedProperty, this);
+
                 typeDeclaration.Members.Add(specifiedProperty);
             }
 
@@ -837,6 +846,8 @@ namespace XmlSchemaClassGenerator
             {
                 member.CustomAttributes.Add(notMappedAttribute);
             }
+
+            Configuration.MemberVisitor(member, this);
         }
 
         private IEnumerable<CodeAttributeDeclaration> GetAttributes(bool isArray)

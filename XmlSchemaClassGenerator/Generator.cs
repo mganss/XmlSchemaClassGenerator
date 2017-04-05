@@ -145,6 +145,15 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CodeTypeReferenceOptions = value; }
         }
 
+        /// <summary>
+        /// Optional delegate that is called for each generated type member
+        /// </summary>
+        public Action<CodeTypeMember, PropertyModel> MemberVisitor
+        {
+            get { return _configuration.MemberVisitor; }
+            set { _configuration.MemberVisitor = value;}
+        }
+
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
