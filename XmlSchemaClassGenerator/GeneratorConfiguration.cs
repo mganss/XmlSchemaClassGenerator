@@ -33,6 +33,7 @@ namespace XmlSchemaClassGenerator
             DataAnnotationMode = DataAnnotationMode.All;
             GenerateSerializableAttribute = GenerateDesignerCategoryAttribute = true;
             CollectionType = typeof(Collection<>);
+            MemberVisitor = (member, model) => { };
         }
 
         /// <summary>
