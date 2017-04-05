@@ -39,7 +39,7 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateDesignerCategoryAttribute = false,
                 EntityFramework = false,
                 GenerateInterfaces = true,
-                NamespacePrefix = name,
+                NamespacePrefix = name
             };
 
             var gen = new Generator
@@ -52,7 +52,8 @@ namespace XmlSchemaClassGenerator.Tests
                 DataAnnotationMode = generatorPrototype.DataAnnotationMode,
                 GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
                 EntityFramework = generatorPrototype.EntityFramework,
-                GenerateInterfaces = generatorPrototype.GenerateInterfaces
+                GenerateInterfaces = generatorPrototype.GenerateInterfaces,
+                MemberVisitor = generatorPrototype.MemberVisitor
             };
 
             var files = Glob.Glob.ExpandNames(pattern);
@@ -103,7 +104,8 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 EntityFramework = true,
                 DataAnnotationMode = DataAnnotationMode.All,
-                NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace)
+                NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace),
+                MemberVisitor = (member, model) => { }
             });
             TestSamples("Wadl", WadlPattern);
             Compile("IS24ImmoTransfer", IS24ImmoTransferPattern);
