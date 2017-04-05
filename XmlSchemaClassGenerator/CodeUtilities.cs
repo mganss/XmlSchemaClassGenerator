@@ -220,5 +220,12 @@ namespace XmlSchemaClassGenerator
 
             return string.Format("{0}{1}", propBackingFieldName, i);
         }
+
+        static readonly Regex NormalizeNewlinesRegex = new Regex(@"(^|[^\r])\n",RegexOptions.Compiled);
+
+        internal static string NormalizeNewlines(string text)
+        {
+            return NormalizeNewlinesRegex.Replace(text, "$1\r\n");
+        }
     }
 }

@@ -75,9 +75,9 @@ namespace XmlSchemaClassGenerator
 
             foreach (var doc in docs.OrderBy(d => d.Language))
             {
+                var text = doc.Text;
                 var comment = string.Format(@"<para{0}>{1}</para>",
-                    string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language),
-                    Regex.Replace(doc.Text, @"(^|[^\r])\n", "$1\r\n")); // normalize newlines
+                    string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language), CodeUtilities.NormalizeNewlines(text));
                 yield return new CodeCommentStatement(comment, true);
             }
 
@@ -435,7 +435,7 @@ namespace XmlSchemaClassGenerator
                 switch (typeCode)
                 {
                     case PropertyValueTypeCode.ValueType:
-                        return string.Format(@"
+                        return CodeUtilities.NormalizeNewlines(string.Format(@"
         {{
             get
             {{
@@ -449,9 +449,9 @@ namespace XmlSchemaClassGenerator
                     OnPropertyChanged(""{1}"");
                 }}
             }}
-        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
                     case PropertyValueTypeCode.Other:
-                        return string.Format(@"
+                        return CodeUtilities.NormalizeNewlines(string.Format(@"
         {{
             get
             {{
@@ -467,9 +467,9 @@ namespace XmlSchemaClassGenerator
                     OnPropertyChanged(""{1}"");
                 }}
             }}
-        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
                     case PropertyValueTypeCode.Array:
-                        return string.Format(@"
+                        return CodeUtilities.NormalizeNewlines(string.Format(@"
         {{
             get
             {{
@@ -485,23 +485,23 @@ namespace XmlSchemaClassGenerator
                     OnPropertyChanged(""{1}"");
                 }}
             }}
-        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty));
+        }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
                 }
             }
 
             if (privateSetter)
             {
-                return string.Format(@"
+                return CodeUtilities.NormalizeNewlines(string.Format(@"
         {{
             get
             {{
                 return this.{0};
             }}
-        }}", backingFieldName);
+        }}", backingFieldName));
             }
             else
             {
-                return string.Format(@"
+                return CodeUtilities.NormalizeNewlines(string.Format(@"
         {{
             get
             {{
@@ -511,7 +511,7 @@ namespace XmlSchemaClassGenerator
             {{
                 this.{0} = value;
             }}
-        }}", backingFieldName);
+        }}", backingFieldName));
             }
         }
 
