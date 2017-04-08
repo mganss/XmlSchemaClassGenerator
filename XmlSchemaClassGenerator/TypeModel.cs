@@ -275,11 +275,11 @@ namespace XmlSchemaClassGenerator
                 {
                     classDeclaration.BaseTypes.Add(BaseClass.GetReferenceFor(Namespace, false));
                 }
-                else
+                else if (!string.IsNullOrEmpty(Configuration.TextValuePropertyName))
                 {
                     var typeReference = BaseClass.GetReferenceFor(Namespace, false);
 
-                    var member = new CodeMemberField(typeReference, "Value")
+                    var member = new CodeMemberField(typeReference, Configuration.TextValuePropertyName)
                     {
                         Attributes = MemberAttributes.Public,
                     };

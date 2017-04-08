@@ -32,6 +32,7 @@ namespace XmlSchemaClassGenerator.Console
             var collectionType = typeof(Collection<>);
             Type collectionImplementationType = null;
             var codeTypeReferenceOptions = default(CodeTypeReferenceOptions);
+            string textValuePropertyName = "Value";
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -70,7 +71,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "a|pascal", "use Pascal case for class and property names (default is enabled)", v => pascal = v != null },
                 { "ct|collectionType=", "collection type to use (default is " + typeof(Collection<>).FullName + ")", v => collectionType = v == null ? typeof(Collection<>) : Type.GetType(v, true) },
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
-                { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default(CodeTypeReferenceOptions) : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) }
+                { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default(CodeTypeReferenceOptions) : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) },
+                { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v }
             };
 
             var files = options.Parse(args);
@@ -110,7 +112,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
-                CodeTypeReferenceOptions = codeTypeReferenceOptions
+                CodeTypeReferenceOptions = codeTypeReferenceOptions,
+                TextValuePropertyName = textValuePropertyName
             };
 
             if (pclCompatible)

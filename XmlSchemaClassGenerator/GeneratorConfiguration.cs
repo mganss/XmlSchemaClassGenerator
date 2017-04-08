@@ -116,6 +116,11 @@ namespace XmlSchemaClassGenerator
         public CodeTypeReferenceOptions CodeTypeReferenceOptions { get; set; }
 
         /// <summary>
+        /// The name of the property that will contain the text value of an XML element
+        /// </summary>
+        public string TextValuePropertyName { get; set; } = "Value";
+
+        /// <summary>
         /// Provides a fast and safe way to write to the Log
         /// </summary>
         /// <param name="messageCreator"></param>

@@ -145,6 +145,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CodeTypeReferenceOptions = value; }
         }
 
+        public string TextValuePropertyName
+        {
+            get { return _configuration.TextValuePropertyName; }
+            set { _configuration.TextValuePropertyName = value; }
+        }
+
         /// <summary>
         /// Optional delegate that is called for each generated type member
         /// </summary>
