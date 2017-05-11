@@ -103,6 +103,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.GenerateSerializableAttribute = value; }
         }
 
+        public bool GenerateDebuggerStepThroughAttribute
+        {
+            get { return _configuration.GenerateDebuggerStepThroughAttribute; }
+            set { _configuration.GenerateDebuggerStepThroughAttribute = value; }
+        }
+
         public bool GenerateDesignerCategoryAttribute
         {
             get { return _configuration.GenerateDesignerCategoryAttribute; }
@@ -772,6 +778,7 @@ namespace XmlSchemaClassGenerator
         {
             var properties = new List<PropertyModel>();
             var order = 0;
+            var count = 0;
             foreach (var item in items)
             {
                 PropertyModel property = null;
@@ -802,6 +809,7 @@ namespace XmlSchemaClassGenerator
                     }
 
                     var propertyName = ToTitleCase(element.QualifiedName.Name);
+                    propertyName = CreatePrefix(count, propertyName);
                     if (propertyName == typeModel.Name)
                     {
                         propertyName += "Property"; // member names cannot be the same as their enclosing type
@@ -811,7 +819,8 @@ namespace XmlSchemaClassGenerator
                     {
                         OwningType = typeModel,
                         XmlSchemaName = element.QualifiedName,
-                        Name = propertyName,
+                        Name = propertyName, // TODO: Name = originalName,
+                        // TODO: OrderName = propertyName,
                         Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
                         IsNillable = element.IsNillable,
                         IsNullable = item.MinOccurs < 1.0m,
@@ -869,9 +878,20 @@ namespace XmlSchemaClassGenerator
 
                     properties.Add(property);
                 }
+
+                count++;
             }
 
             return properties;
+        }
+
+        private static string CreatePrefix(int count, string propertyName)
+        {
+            if ((char)('a' + count) <= 'z')
+                propertyName = (char)('a' + count) + "_" + propertyName;
+            else
+                propertyName = "z" + (char)('a' + (count - 26)) + "_" + propertyName;
+            return propertyName;
         }
 
         private NamespaceModel CreateNamespaceModel(Uri source, XmlQualifiedName qualifiedName)

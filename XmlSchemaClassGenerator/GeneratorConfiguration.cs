@@ -83,6 +83,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public bool GenerateSerializableAttribute { get; set; }
         /// <summary>
+        /// Generate the DebuggerStepThroughAttribute?
+        /// </summary>
+        public bool GenerateDebuggerStepThroughAttribute { get; set; }
+        /// <summary>
         /// Generate the DesignerCategoryAttribute?
         /// </summary>
         public bool GenerateDesignerCategoryAttribute { get; set; }

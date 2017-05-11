@@ -33,6 +33,7 @@ namespace XmlSchemaClassGenerator.Console
             Type collectionImplementationType = null;
             var codeTypeReferenceOptions = default(CodeTypeReferenceOptions);
             string textValuePropertyName = "Value";
+            var generateDebuggerStepThroughAttribute = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -72,7 +73,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "ct|collectionType=", "collection type to use (default is " + typeof(Collection<>).FullName + ")", v => collectionType = v == null ? typeof(Collection<>) : Type.GetType(v, true) },
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
                 { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default(CodeTypeReferenceOptions) : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) },
-                { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v }
+                { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v },
+                { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null }
             };
 
             var files = options.Parse(args);
@@ -113,7 +115,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
                 CodeTypeReferenceOptions = codeTypeReferenceOptions,
-                TextValuePropertyName = textValuePropertyName
+                TextValuePropertyName = textValuePropertyName,
+                GenerateDebuggerStepThroughAttribute = generateDebuggerStepThroughAttribute
             };
 
             if (pclCompatible)
@@ -121,6 +124,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 generator.UseXElementForAny = true;
                 generator.GenerateDesignerCategoryAttribute = false;
                 generator.GenerateSerializableAttribute = false;
+                generator.GenerateDebuggerStepThroughAttribute = false;
                 generator.DataAnnotationMode = DataAnnotationMode.None;
             }
 
