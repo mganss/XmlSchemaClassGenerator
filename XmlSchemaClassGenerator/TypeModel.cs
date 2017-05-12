@@ -361,8 +361,10 @@ namespace XmlSchemaClassGenerator
                 classDeclaration.Members.Add(text);
             }
 
-            classDeclaration.CustomAttributes.Add(
-                new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute), Configuration.CodeTypeReferenceOptions)));
+            if (Configuration.GenerateDebuggerStepThroughAttribute)
+                classDeclaration.CustomAttributes.Add(
+                    new CodeAttributeDeclaration(new CodeTypeReference(typeof(DebuggerStepThroughAttribute), Configuration.CodeTypeReferenceOptions)));
+
             if (Configuration.GenerateDesignerCategoryAttribute)
             {
                 classDeclaration.CustomAttributes.Add(
@@ -864,7 +866,10 @@ namespace XmlSchemaClassGenerator
             {
                 if (IsAny)
                 {
-                    attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyAttributeAttribute), Configuration.CodeTypeReferenceOptions)));
+                    var anyAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyAttributeAttribute), Configuration.CodeTypeReferenceOptions));
+                    if (Order != null)
+                        anyAttribute.Arguments.Add(new CodeAttributeArgument("Order", new CodePrimitiveExpression(Order.Value)));
+                    attributes.Add(anyAttribute);
                 }
                 else
                 {
@@ -876,7 +881,10 @@ namespace XmlSchemaClassGenerator
             {
                 if (IsAny)
                 {
-                    attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyElementAttribute), Configuration.CodeTypeReferenceOptions)));
+                    var anyAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlAnyElementAttribute), Configuration.CodeTypeReferenceOptions));
+                    if (Order != null)
+                        anyAttribute.Arguments.Add(new CodeAttributeArgument("Order", new CodePrimitiveExpression(Order.Value)));
+                    attributes.Add(anyAttribute);
                 }
                 else
                 {

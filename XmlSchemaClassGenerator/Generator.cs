@@ -103,6 +103,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.GenerateSerializableAttribute = value; }
         }
 
+        public bool GenerateDebuggerStepThroughAttribute
+        {
+            get { return _configuration.GenerateDebuggerStepThroughAttribute; }
+            set { _configuration.GenerateDebuggerStepThroughAttribute = value; }
+        }
+
         public bool GenerateDesignerCategoryAttribute
         {
             get { return _configuration.GenerateDesignerCategoryAttribute; }
