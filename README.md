@@ -42,7 +42,7 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 1.0.0.0
+Version 1.0.50.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd".
 Append - to option to disable it, e.g. --interface-.
 
@@ -83,10 +83,16 @@ Options:
       --cit, --collectionImplementationType=VALUE
                              the default collection type implementation to use (
                                default is null)
-	  --ctro, --codeTypeReferenceOptions=VALUE
-							 the default CodeTypeReferenceOptions Flags to use (
-							   default is unset; 
-							   can be: {GlobalReference, GenericTypeParameter})
+      --ctro, --codeTypeReferenceOptions=GlobalReference, GenericTypeParameter
+                             the default CodeTypeReferenceOptions Flags to use (
+                               default is unset; can be: GlobalReference,
+                               GenericTypeParameter)
+      --tvpn, --textValuePropertyName=VALUE
+                             the name of the property that holds the text value
+                               of an element (default is Value)
+      --dst, --debuggerStepThrough
+                             generate DebuggerStepThroughAttribute (default is
+                               enabled)
 ```
 
 From code:
