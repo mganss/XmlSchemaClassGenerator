@@ -85,7 +85,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 return;
             }
 
-            files = files.SelectMany(f => Glob.Glob.ExpandNames(f)).ToList();
+            files = files.SelectMany(f => Glob.Glob.ExpandNames(f)).Concat(files.Where(f => Uri.IsWellFormedUriString(f, UriKind.Absolute))).ToList();
 
             var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
