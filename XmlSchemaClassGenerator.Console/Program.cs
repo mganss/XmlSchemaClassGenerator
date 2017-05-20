@@ -16,7 +16,7 @@ namespace XmlSchemaClassGenerator.Console
     {
         static void Main(string[] args)
         {
-            var showHelp = false;
+            var showHelp = args.Length == 0;
             var namespaces = new List<string>();
             var outputFolder = "";
             var integerType = typeof(string);
@@ -135,10 +135,10 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
         static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
         {
-            var parts = nsArg.Split(new[] {'='}, 2);
+            var parts = nsArg.Split(new[] { '=' }, 2);
             var xmlNs = parts[0];
             var netNs = parts[1];
-            var parts2 = xmlNs.Split(new[] {'|'}, 2);
+            var parts2 = xmlNs.Split(new[] { '|' }, 2);
             var source = parts2.Length == 2 ? new Uri(parts2[1], UriKind.RelativeOrAbsolute) : null;
             xmlNs = parts2[0];
             if (!string.IsNullOrEmpty(namespacePrefix))
