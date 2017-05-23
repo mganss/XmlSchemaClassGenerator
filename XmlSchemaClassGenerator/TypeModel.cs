@@ -924,13 +924,13 @@ namespace XmlSchemaClassGenerator
 
             foreach (var attribute in attributes)
             {
-                if (Form == XmlSchemaForm.Qualified)
-                {
-                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
-                }
-                else if (XmlNamespace != null)
+                if (XmlNamespace != null)
                 {
                     attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
+                }
+                else if (Form == XmlSchemaForm.Qualified)
+                {
+                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
                 }
                 else if (!IsAny)
                 {
