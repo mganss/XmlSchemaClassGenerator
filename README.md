@@ -42,8 +42,8 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 1.0.50.0
-xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd".
+Version 1.0.58.0
+xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
 Options:
