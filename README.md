@@ -100,14 +100,29 @@ From code:
 ```C#
 var generator = new Generator
 {
-    GenerateNamespaceName = xn => ..., // namespace generator func
-    NamespaceMapping = new Dictionary<string, string>(...),
     OutputFolder = outputFolder,
     Log = s => Console.Out.WriteLine(s),
     GenerateNullables = true,
+    NamespaceProvider = new Dictionary<NamespaceKey, string> 
+    { 
+        { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } 
+    }
+    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace)
 };
 
 generator.Generate(files);
+```
+
+Specifying the `NamespaceProvider` is optional. If you don't provide one, C# namespaces will be generated automatically. The example above shows how to create a custom `NamespaceProvider` that has a dictionary for a number of specific namespaces as well as a generator function for XML namespaces that are not in the dictionary. In the example the generator function is the default function but with a custom namespace prefix. You can also use a custom generator function, e.g.
+
+```C#
+var generator = new Generator
+{
+    NamespaceProvider = new NamespaceProvider
+    { 
+        GenerateNamespace = key => ...
+    }
+};
 ```
 
 Nullables<a name="nullables"></a>
