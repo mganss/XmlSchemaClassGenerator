@@ -17,7 +17,7 @@ using Xunit;
 
 namespace XmlSchemaClassGenerator.Tests
 {
-    [PrioritizedFixture]
+    [TestCaseOrderer("XmlSchemaClassGenerator.Tests.PriorityOrderer", "XmlSchemaClassGenerator.Tests")]
     public class XmlTests
     {
         private static Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
@@ -114,8 +114,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         private void TestSamples(string name, string pattern)
         {
-            Assembly assembly;
-            Assemblies.TryGetValue(name, out assembly);
+            Assemblies.TryGetValue(name, out Assembly assembly);
             Assert.NotNull(assembly);
             DeserializeSampleXml(pattern, assembly);
         }
@@ -162,9 +161,12 @@ namespace XmlSchemaClassGenerator.Tests
                     File.WriteAllText("xml2.xml", xml2);
 
                     // validate serialized xml
-                    XmlReaderSettings settings = new XmlReaderSettings();
-                    settings.ValidationType = ValidationType.Schema;
-                    settings.Schemas = set;
+                    XmlReaderSettings settings = new XmlReaderSettings
+                    {
+                        ValidationType = ValidationType.Schema,
+                        Schemas = set
+                    };
+
                     settings.ValidationEventHandler += (s, e) =>
                     {
                         // generator doesn't generate valid values where pattern restrictions exist, e.g. email

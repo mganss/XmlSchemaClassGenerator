@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit.Sdk;
 
 namespace XmlSchemaClassGenerator.Tests
 {
@@ -15,7 +16,7 @@ namespace XmlSchemaClassGenerator.Tests
     /// <see cref="CultureInfo.CurrentUICulture" /> with another culture.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    class UseCultureAttribute : Xunit.BeforeAfterTestAttribute
+    public class UseCultureAttribute : BeforeAfterTestAttribute
     {
         readonly Lazy<CultureInfo> culture;
         readonly Lazy<CultureInfo> uiCulture;
@@ -45,8 +46,8 @@ namespace XmlSchemaClassGenerator.Tests
         /// <param name="uiCulture">The name of the UI culture.</param>
         public UseCultureAttribute(string culture, string uiCulture)
         {
-            this.culture = new Lazy<CultureInfo>(() => new CultureInfo(culture));
-            this.uiCulture = new Lazy<CultureInfo>(() => new CultureInfo(uiCulture));
+            this.culture = new Lazy<CultureInfo>(() => new CultureInfo(culture, false));
+            this.uiCulture = new Lazy<CultureInfo>(() => new CultureInfo(uiCulture, false));
         }
 
         /// <summary>

@@ -5,108 +5,53 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Sdk;
+using Xunit.Abstractions;
 
 namespace XmlSchemaClassGenerator.Tests
 {
-    /// <summary>
-    /// http://www.andreas-reiff.de/2012/06/xunit-with-alphabetically-sorted-classes-and-proper-display-list-matching-execution-order/
-    /// </summary>
-    class PrioritizedFixtureClassCommand : ITestClassCommand
+    public class PriorityOrderer : ITestCaseOrderer
     {
-        // Delegate most of the work to the existing TestClassCommand class so that we
-        // can preserve any existing behavior (like supporting IUseFixture<T>).
-        readonly TestClassCommand cmd = new TestClassCommand();
-
-        public object ObjectUnderTest
+        public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases) where TTestCase : ITestCase
         {
-            get { return cmd.ObjectUnderTest; }
-        }
+            var sortedMethods = new SortedDictionary<int, List<TTestCase>>();
 
-        public ITypeInfo TypeUnderTest
-        {
-            get { return cmd.TypeUnderTest; }
-            set { cmd.TypeUnderTest = value; }
-        }
-
-        public int ChooseNextTest(ICollection<IMethodInfo> testsLeftToRun)
-        {
-            // Always run the next test in the list, since the list is already ordered
-            return 0;
-        }
-
-        public Exception ClassFinish()
-        {
-            return cmd.ClassFinish();
-        }
-
-        public Exception ClassStart()
-        {
-            return cmd.ClassStart();
-        }
-
-        public IEnumerable<ITestCommand> EnumerateTestCommands(IMethodInfo testMethod)
-        {
-            return cmd.EnumerateTestCommands(testMethod);
-        }
-
-        public IEnumerable<IMethodInfo> EnumerateTestMethods()
-        {
-            var sortedMethods = new SortedDictionary<int, List<IMethodInfo>>();
-
-            foreach (IMethodInfo method in cmd.EnumerateTestMethods())
+            foreach (TTestCase testCase in testCases)
             {
                 int priority = 0;
 
-                foreach (IAttributeInfo attr in method.GetCustomAttributes(typeof(TestPriorityAttribute)))
-                    priority = attr.GetPropertyValue<int>("Priority");
+                foreach (IAttributeInfo attr in testCase.TestMethod.Method.GetCustomAttributes((typeof(TestPriorityAttribute).AssemblyQualifiedName)))
+                    priority = attr.GetNamedArgument<int>("Priority");
 
-                GetOrCreate(sortedMethods, priority).Add(method);
+                GetOrCreate(sortedMethods, priority).Add(testCase);
             }
 
-            foreach (int priority in sortedMethods.Keys)
-                foreach (IMethodInfo method in sortedMethods[priority])
-                    yield return method;
+            foreach (var list in sortedMethods.Keys.Select(priority => sortedMethods[priority]))
+            {
+                list.Sort((x, y) => StringComparer.OrdinalIgnoreCase.Compare(x.TestMethod.Method.Name, y.TestMethod.Method.Name));
+                foreach (TTestCase testCase in list)
+                    yield return testCase;
+            }
         }
-
-        public bool IsTestMethod(IMethodInfo testMethod)
-        {
-            return cmd.IsTestMethod(testMethod);
-        }
-
-        // Dictionary helper method
 
         static TValue GetOrCreate<TKey, TValue>(IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()
         {
-            TValue result;
+            if (dictionary.TryGetValue(key, out TValue result)) return result;
 
-            if (!dictionary.TryGetValue(key, out result))
-            {
-                result = new TValue();
-                dictionary[key] = result;
-            }
+            result = new TValue();
+            dictionary[key] = result;
 
             return result;
         }
     }
 
-    public class PrioritizedFixtureAttribute : RunWithAttribute
-    {
-        public PrioritizedFixtureAttribute() : base(typeof(PrioritizedFixtureClassCommand)) { }
-    }
-    
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    class TestPriorityAttribute : Attribute
+    public class TestPriorityAttribute : Attribute
     {
-        readonly int _priority;
-
         public TestPriorityAttribute(int priority)
         {
-            _priority = priority;
+            Priority = priority;
         }
 
-        public int Priority
-        {
-            get { return _priority; }
-        }
+        public int Priority { get; private set; }
     }
 }
