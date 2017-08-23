@@ -1,27 +1,17 @@
-version: 1.0.{build}
+version: 2.0.{build}-beta
 skip_tags: true
 image: Visual Studio 2017
-init:
-  - git config --global core.autocrlf true
-install:
-  - nuget restore
-configuration: Release
-platform: Any CPU
-build:
-  project: XmlSchemaClassGenerator.sln
-  verbosity: minimal
-  publish_nuget: true
-  publish_nuget_symbols: true
-assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: "{version}"
-  assembly_file_version: "{version}"
-  assembly_informational_version: "{version}"
+build_script:
+  - ps: (Get-Content XmlSchemaClassGenerator\XmlSchemaClassGenerator.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content XmlSchemaClassGenerator\XmlSchemaClassGenerator.csproj
+  - ps: (Get-Content XmlSchemaClassGenerator.Console\XmlSchemaClassGenerator.Console.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content XmlSchemaClassGenerator.Console\XmlSchemaClassGenerator.Console.csproj
+  - dotnet restore
+  - dotnet pack -c Release XmlSchemaClassGenerator
 test_script:
+  - dotnet test XmlSchemaClassGenerator.Tests\XmlSchemaClassGenerator.Tests.csproj
   - nuget.exe install OpenCover -ExcludeVersion
-  - nuget.exe install xunit.runner.console -ExcludeVersion
-  - OpenCover\tools\OpenCover.Console.exe -register:user -filter:"+[*]* -[xunit*]* -[*Tests*]* -[*Sample*]*" -target:"xunit.runner.console\tools\xunit.console.exe" -targetargs:"XmlSchemaClassGenerator.Tests\bin\release\XmlSchemaClassGenerator.Tests.dll -noshadow" -returntargetcode -hideskipped:All -output:coverage.xml
+  - OpenCover\tools\OpenCover.Console.exe -register:user -filter:"+[XmlSchemaClassGenerator]*" -target:"C:\Program Files\dotnet\dotnet.exe" "-targetargs:test XmlSchemaClassGenerator.Tests\XmlSchemaClassGenerator.Tests.csproj" -returntargetcode -hideskipped:All -output:coverage.xml
   - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
   - pip install codecov
   - codecov -f "coverage.xml"
+artifacts:
+  - path: 'src\**\*.nupkg'
