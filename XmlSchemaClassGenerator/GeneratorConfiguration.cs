@@ -133,10 +133,7 @@ namespace XmlSchemaClassGenerator
         /// </remarks>
         public void WriteLog(Func<string> messageCreator)
         {
-            if (Log != null)
-            {
-                Log(messageCreator());
-            }
+            Log?.Invoke(messageCreator());
         }
         /// <summary>
         /// Write the message to the log.
@@ -144,10 +141,7 @@ namespace XmlSchemaClassGenerator
         /// <param name="message"></param>
         public void WriteLog(string message)
         {
-            if (Log != null)
-            {
-                Log(message);
-            }
+            Log?.Invoke(message);
         }
 
         /// <summary>

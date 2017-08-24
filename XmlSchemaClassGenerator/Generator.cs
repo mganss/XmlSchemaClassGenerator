@@ -209,8 +209,7 @@ namespace XmlSchemaClassGenerator
                     provider.GenerateCodeFromCompileUnit(compileUnit, sw, new CodeGeneratorOptions { VerbatimOrder = true, BracingStyle = "C" });
                     var s = sw.ToString().Replace("};", "}"); // remove ';' at end of automatic properties
                     var path = Path.Combine(OutputFolder, ns.Name + ".cs");
-                    if (Log != null) { Log(path); }
-                    File.WriteAllText(path, s);
+                    Log?.Invoke(path); File.WriteAllText(path, s);
                 }
             }
         }
@@ -239,74 +238,75 @@ namespace XmlSchemaClassGenerator
 
         private static Dictionary<char, string> CreateInvalidChars()
         {
-            var invalidChars = new Dictionary<char, string>();
-
-            invalidChars['\x00'] = "Null";
-            invalidChars['\x01'] = "StartOfHeading";
-            invalidChars['\x02'] = "StartOfText";
-            invalidChars['\x03'] = "EndOfText";
-            invalidChars['\x04'] = "EndOfTransmission";
-            invalidChars['\x05'] = "Enquiry";
-            invalidChars['\x06'] = "Acknowledge";
-            invalidChars['\x07'] = "Bell";
-            invalidChars['\x08'] = "Backspace";
-            invalidChars['\x09'] = "HorizontalTab";
-            invalidChars['\x0A'] = "LineFeed";
-            invalidChars['\x0B'] = "VerticalTab";
-            invalidChars['\x0C'] = "FormFeed";
-            invalidChars['\x0D'] = "CarriageReturn";
-            invalidChars['\x0E'] = "ShiftOut";
-            invalidChars['\x0F'] = "ShiftIn";
-            invalidChars['\x10'] = "DataLinkEscape";
-            invalidChars['\x11'] = "DeviceControl1";
-            invalidChars['\x12'] = "DeviceControl2";
-            invalidChars['\x13'] = "DeviceControl3";
-            invalidChars['\x14'] = "DeviceControl4";
-            invalidChars['\x15'] = "NegativeAcknowledge";
-            invalidChars['\x16'] = "SynchronousIdle";
-            invalidChars['\x17'] = "EndOfTransmissionBlock";
-            invalidChars['\x18'] = "Cancel";
-            invalidChars['\x19'] = "EndOfMedium";
-            invalidChars['\x1A'] = "Substitute";
-            invalidChars['\x1B'] = "Escape";
-            invalidChars['\x1C'] = "FileSeparator";
-            invalidChars['\x1D'] = "GroupSeparator";
-            invalidChars['\x1E'] = "RecordSeparator";
-            invalidChars['\x1F'] = "UnitSeparator";
-            //invalidChars['\x20'] = "Space";
-            invalidChars['\x21'] = "ExclamationMark";
-            invalidChars['\x22'] = "Quote";
-            invalidChars['\x23'] = "Hash";
-            invalidChars['\x24'] = "Dollar";
-            invalidChars['\x25'] = "Percent";
-            invalidChars['\x26'] = "Ampersand";
-            invalidChars['\x27'] = "SingleQuote";
-            invalidChars['\x28'] = "LeftParenthesis";
-            invalidChars['\x29'] = "RightParenthesis";
-            invalidChars['\x2A'] = "Asterisk";
-            invalidChars['\x2B'] = "Plus";
-            invalidChars['\x2C'] = "Comma";
-            //invalidChars['\x2D'] = "Minus";
-            invalidChars['\x2E'] = "Period";
-            invalidChars['\x2F'] = "Slash";
-            invalidChars['\x3A'] = "Colon";
-            invalidChars['\x3B'] = "Semicolon";
-            invalidChars['\x3C'] = "LessThan";
-            invalidChars['\x3D'] = "Equal";
-            invalidChars['\x3E'] = "GreaterThan";
-            invalidChars['\x3F'] = "QuestionMark";
-            invalidChars['\x40'] = "At";
-            invalidChars['\x5B'] = "LeftSquareBracket";
-            invalidChars['\x5C'] = "Backslash";
-            invalidChars['\x5D'] = "RightSquareBracket";
-            invalidChars['\x5E'] = "Caret";
-            //invalidChars['\x5F'] = "Underscore";
-            invalidChars['\x60'] = "Backquote";
-            invalidChars['\x7B'] = "LeftCurlyBrace";
-            invalidChars['\x7C'] = "Pipe";
-            invalidChars['\x7D'] = "RightCurlyBrace";
-            invalidChars['\x7E'] = "Tilde";
-            invalidChars['\x7F'] = "Delete";
+            var invalidChars = new Dictionary<char, string>
+            {
+                ['\x00'] = "Null",
+                ['\x01'] = "StartOfHeading",
+                ['\x02'] = "StartOfText",
+                ['\x03'] = "EndOfText",
+                ['\x04'] = "EndOfTransmission",
+                ['\x05'] = "Enquiry",
+                ['\x06'] = "Acknowledge",
+                ['\x07'] = "Bell",
+                ['\x08'] = "Backspace",
+                ['\x09'] = "HorizontalTab",
+                ['\x0A'] = "LineFeed",
+                ['\x0B'] = "VerticalTab",
+                ['\x0C'] = "FormFeed",
+                ['\x0D'] = "CarriageReturn",
+                ['\x0E'] = "ShiftOut",
+                ['\x0F'] = "ShiftIn",
+                ['\x10'] = "DataLinkEscape",
+                ['\x11'] = "DeviceControl1",
+                ['\x12'] = "DeviceControl2",
+                ['\x13'] = "DeviceControl3",
+                ['\x14'] = "DeviceControl4",
+                ['\x15'] = "NegativeAcknowledge",
+                ['\x16'] = "SynchronousIdle",
+                ['\x17'] = "EndOfTransmissionBlock",
+                ['\x18'] = "Cancel",
+                ['\x19'] = "EndOfMedium",
+                ['\x1A'] = "Substitute",
+                ['\x1B'] = "Escape",
+                ['\x1C'] = "FileSeparator",
+                ['\x1D'] = "GroupSeparator",
+                ['\x1E'] = "RecordSeparator",
+                ['\x1F'] = "UnitSeparator",
+                //invalidChars['\x20'] = "Space";
+                ['\x21'] = "ExclamationMark",
+                ['\x22'] = "Quote",
+                ['\x23'] = "Hash",
+                ['\x24'] = "Dollar",
+                ['\x25'] = "Percent",
+                ['\x26'] = "Ampersand",
+                ['\x27'] = "SingleQuote",
+                ['\x28'] = "LeftParenthesis",
+                ['\x29'] = "RightParenthesis",
+                ['\x2A'] = "Asterisk",
+                ['\x2B'] = "Plus",
+                ['\x2C'] = "Comma",
+                //invalidChars['\x2D'] = "Minus";
+                ['\x2E'] = "Period",
+                ['\x2F'] = "Slash",
+                ['\x3A'] = "Colon",
+                ['\x3B'] = "Semicolon",
+                ['\x3C'] = "LessThan",
+                ['\x3D'] = "Equal",
+                ['\x3E'] = "GreaterThan",
+                ['\x3F'] = "QuestionMark",
+                ['\x40'] = "At",
+                ['\x5B'] = "LeftSquareBracket",
+                ['\x5C'] = "Backslash",
+                ['\x5D'] = "RightSquareBracket",
+                ['\x5E'] = "Caret",
+                //invalidChars['\x5F'] = "Underscore";
+                ['\x60'] = "Backquote",
+                ['\x7B'] = "LeftCurlyBrace",
+                ['\x7C'] = "Pipe",
+                ['\x7D'] = "RightCurlyBrace",
+                ['\x7E'] = "Tilde",
+                ['\x7F'] = "Delete"
+            };
 
             return invalidChars;
         }
@@ -409,8 +409,7 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
-                    var classModel = type as ClassModel;
-                    if (classModel != null)
+                    if (type is ClassModel classModel)
                     {
                         classModel.Documentation.AddRange(GetDocumentation(rootElement));
                     }
@@ -427,8 +426,7 @@ namespace XmlSchemaClassGenerator
         // ReSharper disable once FunctionComplexityOverflow
         private TypeModel CreateTypeModel(Uri source, XmlSchemaAnnotated type, XmlQualifiedName qualifiedName)
         {
-            TypeModel typeModel;
-            if (!qualifiedName.IsEmpty && Types.TryGetValue(qualifiedName, out typeModel)) { return typeModel; }
+            if (!qualifiedName.IsEmpty && Types.TryGetValue(qualifiedName, out TypeModel typeModel)) { return typeModel; }
 
             if (source == null)
             {
@@ -438,8 +436,7 @@ namespace XmlSchemaClassGenerator
 
             var docs = GetDocumentation(type);
 
-            var group = type as XmlSchemaGroup;
-            if (group != null)
+            if (type is XmlSchemaGroup group)
             {
                 var name = "I" + ToTitleCase(qualifiedName.Name);
                 if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
@@ -467,8 +464,7 @@ namespace XmlSchemaClassGenerator
                 return interfaceModel;
             }
 
-            var attributeGroup = type as XmlSchemaAttributeGroup;
-            if (attributeGroup != null)
+            if (type is XmlSchemaAttributeGroup attributeGroup)
             {
                 var name = "I" + ToTitleCase(qualifiedName.Name);
                 if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
@@ -495,8 +491,7 @@ namespace XmlSchemaClassGenerator
                 return interfaceModel;
             }
 
-            var complexType = type as XmlSchemaComplexType;
-            if (complexType != null)
+            if (type is XmlSchemaComplexType complexType)
             {
                 var name = ToTitleCase(qualifiedName.Name);
                 if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
@@ -611,13 +606,11 @@ namespace XmlSchemaClassGenerator
                 return classModel;
             }
 
-            var simpleType = type as XmlSchemaSimpleType;
-            if (simpleType != null)
+            if (type is XmlSchemaSimpleType simpleType)
             {
                 var restrictions = new List<RestrictionModel>();
 
-                var typeRestriction = simpleType.Content as XmlSchemaSimpleTypeRestriction;
-                if (typeRestriction != null)
+                if (simpleType.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
                 {
                     var enumFacets = typeRestriction.Facets.OfType<XmlSchemaEnumerationFacet>().ToList();
                     var isEnum = (enumFacets.Count == typeRestriction.Facets.Count && enumFacets.Count != 0)
@@ -703,8 +696,7 @@ namespace XmlSchemaClassGenerator
 
             foreach (var item in items)
             {
-                var attribute = item as XmlSchemaAttribute;
-                if (attribute != null)
+                if (item is XmlSchemaAttribute attribute)
                 {
                     if (attribute.Use != XmlSchemaUse.Prohibited)
                     {
@@ -733,7 +725,7 @@ namespace XmlSchemaClassGenerator
                         if (attributeName == typeModel.Name)
                         {
                             attributeName += "Property"; // member names cannot be the same as their enclosing type
-                        } 
+                        }
 
                         var property = new PropertyModel(_configuration)
                         {
@@ -756,8 +748,7 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
-                    var attributeGroupRef = item as XmlSchemaAttributeGroupRef;
-                    if (attributeGroupRef != null)
+                    if (item is XmlSchemaAttributeGroupRef attributeGroupRef)
                     {
                         if (GenerateInterfaces)
                         {
@@ -782,9 +773,8 @@ namespace XmlSchemaClassGenerator
             {
                 PropertyModel property = null;
 
-                var element = item.XmlParticle as XmlSchemaElement;
                 // ElementSchemaType must be non-null. This is not the case when maxOccurs="0".
-                if (element != null && element.ElementSchemaType != null)
+                if (item.XmlParticle is XmlSchemaElement element && element.ElementSchemaType != null)
                 {
                     var elementQualifiedName = element.ElementSchemaType.QualifiedName;
 
@@ -811,7 +801,7 @@ namespace XmlSchemaClassGenerator
                     if (propertyName == typeModel.Name)
                     {
                         propertyName += "Property"; // member names cannot be the same as their enclosing type
-                    } 
+                    }
 
                     property = new PropertyModel(_configuration)
                     {
@@ -829,8 +819,7 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
-                    var any = item.XmlParticle as XmlSchemaAny;
-                    if (any != null)
+                    if (item.XmlParticle is XmlSchemaAny any)
                     {
                         property = new PropertyModel(_configuration)
                         {
@@ -844,8 +833,7 @@ namespace XmlSchemaClassGenerator
                     }
                     else
                     {
-                        var groupRef = item.XmlParticle as XmlSchemaGroupRef;
-                        if (groupRef != null)
+                        if (item.XmlParticle is XmlSchemaGroupRef groupRef)
                         {
                             if (GenerateInterfaces)
                             {
@@ -972,17 +960,13 @@ namespace XmlSchemaClassGenerator
         {
             if (item == null) { yield break; }
 
-            var element = item as XmlSchemaElement;
-            if (element != null) { yield return new Particle(element); }
+            if (item is XmlSchemaElement element) { yield return new Particle(element); }
 
-            var any = item as XmlSchemaAny;
-            if (any != null) { yield return new Particle(any); }
+            if (item is XmlSchemaAny any) { yield return new Particle(any); }
 
-            var groupRef = item as XmlSchemaGroupRef;
-            if (groupRef != null) { yield return new Particle(groupRef); }
+            if (item is XmlSchemaGroupRef groupRef) { yield return new Particle(groupRef); }
 
-            var itemGroupBase = item as XmlSchemaGroupBase;
-            if (itemGroupBase != null)
+            if (item is XmlSchemaGroupBase itemGroupBase)
             {
                 foreach (var groupBaseElement in GetElements(itemGroupBase))
                     yield return groupBaseElement;

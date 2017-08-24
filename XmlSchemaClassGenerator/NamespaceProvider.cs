@@ -39,8 +39,7 @@ namespace XmlSchemaClassGenerator
             {
                 return true;
             }
-            string ns;
-            if (!TryGenerateNamespace(key, out ns))
+            if (!TryGenerateNamespace(key, out string ns))
             {
                 return false;
             }
@@ -81,8 +80,7 @@ namespace XmlSchemaClassGenerator
         {
             get
             {
-                string result;
-                if (TryGetValue(key, out result))
+                if (TryGetValue(key, out string result))
                 {
                     return result;
                 }
@@ -178,15 +176,13 @@ namespace XmlSchemaClassGenerator
 
             foreach (var keyValue in keyValues)
             {
-                string result;
-                if (InternalDictionary.TryGetValue(keyValue, out result))
+                if (InternalDictionary.TryGetValue(keyValue, out string result))
                 {
                     return result;
                 }
             }
 
-            string ns;
-            if (TryGetValue(key, out ns))
+            if (TryGetValue(key, out string ns))
             {
                 return ns;
             }

@@ -25,8 +25,7 @@ namespace XmlSchemaClassGenerator
             var patterns = new List<PatternRestrictionModel>();
             foreach (var item in input)
             {
-                var pattern = item as PatternRestrictionModel;
-                if (pattern != null)
+                if (item is PatternRestrictionModel pattern)
                 {
                     patterns.Add(pattern);
                 }

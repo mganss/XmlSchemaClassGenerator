@@ -304,8 +304,7 @@ namespace XmlSchemaClassGenerator
                     member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
                     var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute), Configuration.CodeTypeReferenceOptions));
-                    var simpleModel = BaseClass as SimpleModel;
-                    if (simpleModel != null && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed(Configuration) ?? simpleModel.UseDataTypeAttribute))
+                    if (BaseClass is SimpleModel simpleModel && (simpleModel.XmlSchemaType.IsDataTypeAttributeAllowed(Configuration) ?? simpleModel.UseDataTypeAttribute))
                     {
                         var name = BaseClass.GetQualifiedName();
                         if (name.Namespace == XmlSchema.Namespace)
@@ -888,8 +887,7 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
-                    var classType = PropertyType as ClassModel;
-                    if (classType != null && classType.IsAbstract && classType.DerivedTypes.Any())
+                    if (PropertyType is ClassModel classType && classType.IsAbstract && classType.DerivedTypes.Any())
                     {
                         var derivedTypes = classType.GetAllDerivedTypes().Where(t => t.IsSubstitution);
                         foreach (var derivedType in derivedTypes)
@@ -944,8 +942,7 @@ namespace XmlSchemaClassGenerator
                     attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
                 }
 
-                var simpleModel = Type as SimpleModel;
-                if (simpleModel != null && simpleModel.UseDataTypeAttribute)
+                if (Type is SimpleModel simpleModel && simpleModel.UseDataTypeAttribute)
                 {
                     // walk up the inheritance chain to find DataType if the simple type is derived (see #18)
                     var xmlSchemaType = Type.XmlSchemaType;
