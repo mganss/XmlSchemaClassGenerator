@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 #if !NETSTANDARD
 
@@ -13,5 +11,3 @@ using System.Runtime.InteropServices;
 [assembly: Guid("bd5c99cb-a57e-43d9-a14f-7f2a7ef9eb48")]
 
 #endif
-
-[assembly: AssemblyVersion("2.0.0.0")]
