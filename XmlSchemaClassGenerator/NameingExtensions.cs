@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace XmlSchemaClassGenerator
 {
-    public static class NameingExtensions
+    public static class NamingExtensions
     {
         private static readonly CodeDomProvider Provider = new Microsoft.CSharp.CSharpCodeProvider();
 

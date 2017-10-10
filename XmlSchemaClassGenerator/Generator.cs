@@ -22,7 +22,7 @@ namespace XmlSchemaClassGenerator
             set { _configuration.NamespaceProvider = value; }
         }
 
-        public NamingProvider NameingProvider
+        public NamingProvider NamingProvider
         {
             get { return _configuration.NamingProvider; }
             set { _configuration.NamingProvider = value; }
