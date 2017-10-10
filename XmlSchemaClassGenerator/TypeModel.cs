@@ -548,6 +548,17 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        private bool IsNillableValueType
+        {
+            get
+            {
+                return IsNillable
+                    && !IsNullableValueType
+                    && !(IsCollection || IsArray)
+                    && ((PropertyType is EnumModel) || (PropertyType is SimpleModel && ((SimpleModel)PropertyType).ValueType.IsValueType));
+            }
+        }
+
         private CodeTypeReference TypeReference
         {
             get { return PropertyType.GetReferenceFor(OwningType.Namespace, IsCollection || IsArray); }
@@ -640,7 +651,16 @@ namespace XmlSchemaClassGenerator
             if (DefaultValue == null)
             {
                 var propertyName = isNullableValueType && Configuration.GenerateNullables ? Name + "Value" : Name;
-                member = new CodeMemberField(typeReference, propertyName);
+
+                if (IsNillableValueType)
+                {
+                    var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions);
+                    nullableType.TypeArguments.Add(typeReference);
+                    member = new CodeMemberField(nullableType, propertyName);
+                }
+                else
+                    member = new CodeMemberField(typeReference, propertyName);
+
                 var isPrivateSetter = IsCollection || isArray;
                 if (requiresBackingField)
                 {
@@ -659,7 +679,15 @@ namespace XmlSchemaClassGenerator
                 var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
                 backingField.InitExpression = defaultValueExpression;
 
-                member = new CodeMemberField(typeReference, Name);
+                if (IsNillableValueType)
+                {
+                    var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions);
+                    nullableType.TypeArguments.Add(typeReference);
+                    member = new CodeMemberField(nullableType, Name);
+                }
+                else
+                    member = new CodeMemberField(typeReference, Name);
+
                 member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(), false, withDataBinding);
 
                 if (IsNullable)
