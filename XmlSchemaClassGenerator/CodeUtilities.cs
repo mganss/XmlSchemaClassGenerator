@@ -9,20 +9,6 @@ namespace XmlSchemaClassGenerator
 {
     public static class CodeUtilities
     {
-        public static string ToNormalizedEnumName(this string name)
-        {
-            name = name.Trim().Replace(' ', '_').Replace('\t', '_');
-            if (string.IsNullOrEmpty(name))
-            {
-                return "Item";
-            }
-            if (!char.IsLetter(name[0]))
-            {
-                return string.Format("Item{0}", name);
-            }
-            return name;
-        }
-
         // Match non-letter followed by letter
         static Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
 

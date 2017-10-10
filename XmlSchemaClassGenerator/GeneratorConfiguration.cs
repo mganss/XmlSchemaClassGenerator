@@ -20,7 +20,7 @@ namespace XmlSchemaClassGenerator
                     var xn = key.XmlSchemaNamespace;
                     var name = string.Join(".",
                         xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
-                            .Select(n => Generator.ToTitleCase(n, NamingScheme.PascalCase)));
+                            .Select(n => n.ToTitleCase(NamingScheme.PascalCase)));
                     if (!string.IsNullOrEmpty(NamespacePrefix))
                     {
                         name = NamespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name));
@@ -34,6 +34,7 @@ namespace XmlSchemaClassGenerator
             GenerateSerializableAttribute = GenerateDesignerCategoryAttribute = true;
             CollectionType = typeof(Collection<>);
             MemberVisitor = (member, model) => { };
+            NamingProvider = new NamingProvider(NamingScheme);
         }
 
         /// <summary>
@@ -148,5 +149,10 @@ namespace XmlSchemaClassGenerator
         /// Optional delegate that is called for each generated type member
         /// </summary>
         public Action<CodeTypeMember, PropertyModel> MemberVisitor { get; set; }
+
+        /// <summary>
+        /// Provides options to customize Elementnamens with own logik
+        /// </summary>
+        public NamingProvider NamingProvider { get; set; }
     }
 }

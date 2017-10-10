@@ -3,17 +3,12 @@ using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace XmlSchemaClassGenerator
 {
@@ -25,6 +20,12 @@ namespace XmlSchemaClassGenerator
         {
             get { return _configuration.NamespaceProvider; }
             set { _configuration.NamespaceProvider = value; }
+        }
+
+        public NamingProvider NameingProvider
+        {
+            get { return _configuration.NamingProvider; }
+            set { _configuration.NamingProvider = value; }
         }
 
         public string NamespacePrefix
@@ -234,113 +235,9 @@ namespace XmlSchemaClassGenerator
             throw new Exception(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
         }
 
-        private static readonly Dictionary<char, string> InvalidChars = CreateInvalidChars();
-
-        private static Dictionary<char, string> CreateInvalidChars()
+        private string ToTitleCase(string s)
         {
-            var invalidChars = new Dictionary<char, string>
-            {
-                ['\x00'] = "Null",
-                ['\x01'] = "StartOfHeading",
-                ['\x02'] = "StartOfText",
-                ['\x03'] = "EndOfText",
-                ['\x04'] = "EndOfTransmission",
-                ['\x05'] = "Enquiry",
-                ['\x06'] = "Acknowledge",
-                ['\x07'] = "Bell",
-                ['\x08'] = "Backspace",
-                ['\x09'] = "HorizontalTab",
-                ['\x0A'] = "LineFeed",
-                ['\x0B'] = "VerticalTab",
-                ['\x0C'] = "FormFeed",
-                ['\x0D'] = "CarriageReturn",
-                ['\x0E'] = "ShiftOut",
-                ['\x0F'] = "ShiftIn",
-                ['\x10'] = "DataLinkEscape",
-                ['\x11'] = "DeviceControl1",
-                ['\x12'] = "DeviceControl2",
-                ['\x13'] = "DeviceControl3",
-                ['\x14'] = "DeviceControl4",
-                ['\x15'] = "NegativeAcknowledge",
-                ['\x16'] = "SynchronousIdle",
-                ['\x17'] = "EndOfTransmissionBlock",
-                ['\x18'] = "Cancel",
-                ['\x19'] = "EndOfMedium",
-                ['\x1A'] = "Substitute",
-                ['\x1B'] = "Escape",
-                ['\x1C'] = "FileSeparator",
-                ['\x1D'] = "GroupSeparator",
-                ['\x1E'] = "RecordSeparator",
-                ['\x1F'] = "UnitSeparator",
-                //invalidChars['\x20'] = "Space";
-                ['\x21'] = "ExclamationMark",
-                ['\x22'] = "Quote",
-                ['\x23'] = "Hash",
-                ['\x24'] = "Dollar",
-                ['\x25'] = "Percent",
-                ['\x26'] = "Ampersand",
-                ['\x27'] = "SingleQuote",
-                ['\x28'] = "LeftParenthesis",
-                ['\x29'] = "RightParenthesis",
-                ['\x2A'] = "Asterisk",
-                ['\x2B'] = "Plus",
-                ['\x2C'] = "Comma",
-                //invalidChars['\x2D'] = "Minus";
-                ['\x2E'] = "Period",
-                ['\x2F'] = "Slash",
-                ['\x3A'] = "Colon",
-                ['\x3B'] = "Semicolon",
-                ['\x3C'] = "LessThan",
-                ['\x3D'] = "Equal",
-                ['\x3E'] = "GreaterThan",
-                ['\x3F'] = "QuestionMark",
-                ['\x40'] = "At",
-                ['\x5B'] = "LeftSquareBracket",
-                ['\x5C'] = "Backslash",
-                ['\x5D'] = "RightSquareBracket",
-                ['\x5E'] = "Caret",
-                //invalidChars['\x5F'] = "Underscore";
-                ['\x60'] = "Backquote",
-                ['\x7B'] = "LeftCurlyBrace",
-                ['\x7C'] = "Pipe",
-                ['\x7D'] = "RightCurlyBrace",
-                ['\x7E'] = "Tilde",
-                ['\x7F'] = "Delete"
-            };
-
-            return invalidChars;
-        }
-
-        private static readonly Regex InvalidCharsRegex = CreateInvalidCharsRegex();
-
-        private static Regex CreateInvalidCharsRegex()
-        {
-            var r = string.Join("", InvalidChars.Keys.Select(c => string.Format(@"\x{0:x2}", (int)c)).ToArray());
-            return new Regex("[" + r + "]", RegexOptions.Compiled);
-        }
-
-        private static readonly CodeDomProvider Provider = new Microsoft.CSharp.CSharpCodeProvider();
-        public static string MakeValidIdentifier(string s)
-        {
-            var id = InvalidCharsRegex.Replace(s, m => InvalidChars[m.Value[0]]);
-            return Provider.CreateValidIdentifier(Regex.Replace(id, @"\W+", "_"));
-        }
-
-        public string ToTitleCase(string s)
-        {
-            return ToTitleCase(s, NamingScheme);
-        }
-
-        public static string ToTitleCase(string s, NamingScheme namingScheme)
-        {
-            if (string.IsNullOrEmpty(s)) { return s; }
-            switch (namingScheme)
-            {
-                case NamingScheme.PascalCase:
-                    s = s.ToPascalCase();
-                    break;
-            }
-            return MakeValidIdentifier(s);
+            return s.ToTitleCase(NamingScheme);
         }
 
         private void BuildModel()
@@ -635,7 +532,7 @@ namespace XmlSchemaClassGenerator
                         {
                             var value = new EnumValueModel
                             {
-                                Name = ToTitleCase(facet.Value).ToNormalizedEnumName(),
+                                Name = _configuration.NamingProvider.EnumMemberNameFromValue(enumModel.Name, facet.Value),
                                 Value = facet.Value
                             };
 
@@ -709,7 +606,7 @@ namespace XmlSchemaClassGenerator
                             if (attributeQualifiedName.IsEmpty || attributeQualifiedName.Namespace == "")
                             {
                                 // inner type, have to generate a type name
-                                var typeName = ToTitleCase(typeModel.Name) + ToTitleCase(attribute.QualifiedName.Name);
+                                var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(typeModel.Name, attribute.QualifiedName.Name);
                                 attributeQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                                 // try to avoid name clashes
                                 if (NameExists(attributeQualifiedName))
@@ -785,7 +682,7 @@ namespace XmlSchemaClassGenerator
                         if (elementQualifiedName.IsEmpty)
                         {
                             // inner type, have to generate a type name
-                            var typeName = ToTitleCase(typeModel.Name) + ToTitleCase(element.QualifiedName.Name);
+                            var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModel.Name, element.QualifiedName.Name);
                             elementQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                             // try to avoid name clashes
                             if (NameExists(elementQualifiedName))
