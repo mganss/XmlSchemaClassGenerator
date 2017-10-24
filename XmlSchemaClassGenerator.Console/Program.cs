@@ -34,6 +34,7 @@ namespace XmlSchemaClassGenerator.Console
             var codeTypeReferenceOptions = default(CodeTypeReferenceOptions);
             string textValuePropertyName = "Value";
             var generateDebuggerStepThroughAttribute = true;
+            var disableComments = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -74,7 +75,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
                 { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default(CodeTypeReferenceOptions) : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) },
                 { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v },
-                { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null }
+                { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null },
+                { "dc|disableComments", "do not include comments from xsd", v => disableComments = v != null },
             };
 
             var files = options.Parse(args);
@@ -116,7 +118,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 CollectionImplementationType = collectionImplementationType,
                 CodeTypeReferenceOptions = codeTypeReferenceOptions,
                 TextValuePropertyName = textValuePropertyName,
-                GenerateDebuggerStepThroughAttribute = generateDebuggerStepThroughAttribute
+                GenerateDebuggerStepThroughAttribute = generateDebuggerStepThroughAttribute,
+                DisableComments = disableComments
             };
 
             if (pclCompatible)
@@ -129,7 +132,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             }
 
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
-
+            
             generator.Generate(files);
         }
 

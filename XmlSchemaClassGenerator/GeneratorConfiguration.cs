@@ -154,5 +154,7 @@ namespace XmlSchemaClassGenerator
         /// Provides options to customize Elementnamens with own logik
         /// </summary>
         public NamingProvider NamingProvider { get; set; }
+
+        public bool DisableComments { get; set; }
     }
 }

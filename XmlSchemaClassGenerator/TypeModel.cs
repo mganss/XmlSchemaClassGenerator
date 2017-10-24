@@ -68,9 +68,13 @@ namespace XmlSchemaClassGenerator
     {
         public string Language { get; set; }
         public string Text { get; set; }
+        public static bool DisableComments { get; set; }
 
         public static IEnumerable<CodeCommentStatement> GetComments(IEnumerable<DocumentationModel> docs)
         {
+            if (DisableComments)
+                yield break;
+
             yield return new CodeCommentStatement("<summary>", true);
 
             foreach (var doc in docs.OrderBy(d => d.Language))
