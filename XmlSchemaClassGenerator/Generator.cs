@@ -167,6 +167,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.MemberVisitor = value;}
         }
 
+        public bool DisableComments
+        {
+            get { return _configuration.DisableComments; }
+            set { _configuration.DisableComments = value; }
+        }
+
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
@@ -242,6 +248,7 @@ namespace XmlSchemaClassGenerator
 
         private void BuildModel()
         {
+            DocumentationModel.DisableComments = _configuration.DisableComments;
             var objectModel = new SimpleModel(_configuration)
             {
                 Name = "AnyType",
