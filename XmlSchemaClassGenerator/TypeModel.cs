@@ -87,6 +87,8 @@ namespace XmlSchemaClassGenerator
 
     public abstract class TypeModel
     {
+        protected static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
+
         public NamespaceModel Namespace { get; set; }
         public XmlQualifiedName RootElementName { get; set; }
         public string Name { get; set; }
@@ -401,6 +403,31 @@ namespace XmlSchemaClassGenerator
 
             return allDerivedTypes;
         }
+
+        public override CodeExpression GetDefaultValueFor(string defaultString)
+        {
+            if (BaseClass is SimpleModel)
+            {
+                string reference, val;
+
+                using (var writer = new System.IO.StringWriter())
+                {
+                    CSharpProvider.GenerateCodeFromExpression(BaseClass.GetDefaultValueFor(defaultString), writer, new CodeGeneratorOptions());
+                    val = writer.ToString();
+                }
+
+                using (var writer = new System.IO.StringWriter())
+                {
+                    CSharpProvider.GenerateCodeFromExpression(new CodeTypeReferenceExpression(GetReferenceFor(null, false)), writer, new CodeGeneratorOptions());
+                    reference = writer.ToString();
+                }
+
+                var dv = new CodeSnippetExpression($"new { reference } {{ { Configuration.TextValuePropertyName } = { val } }};");
+                return dv;
+            }
+
+            return base.GetDefaultValueFor(defaultString);
+        }
     }
 
     public class PropertyModel
@@ -609,7 +636,7 @@ namespace XmlSchemaClassGenerator
             {
                 var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
 
-                if (!(defaultValueExpression is CodeObjectCreateExpression))
+                if ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression))
                 {
                     var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions),
                         new CodeAttributeArgument(defaultValueExpression));
@@ -692,7 +719,7 @@ namespace XmlSchemaClassGenerator
 
                 if (IsNullable)
                 {
-                    if (!(defaultValueExpression is CodeObjectCreateExpression))
+                    if ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression))
                     {
                         var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions),
                             new CodeAttributeArgument(defaultValueExpression));
@@ -1064,8 +1091,6 @@ namespace XmlSchemaClassGenerator
 
     public class SimpleModel : TypeModel
     {
-        private static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
-
         public Type ValueType { get; set; }
         public List<RestrictionModel> Restrictions { get; private set; }
         public bool UseDataTypeAttribute { get; set; }
