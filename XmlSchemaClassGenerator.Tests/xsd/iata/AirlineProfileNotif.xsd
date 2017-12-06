@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.000" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+   A I R L I N E   F R O F I L E   R E Q U E S T   B U S I N E S S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+	<xsd:element name="AirlineProfileNotif">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">Airline Profile Sender pushes Airline Profile or link to Airline Profile Receivers that have been activated/authorized, including Profile version number.                              
+The message also returns multi-media content at the message level with media content references at the individual service level.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:element ref="Party"/>
+				<xsd:element name="Query">
+					<xsd:annotation>
+						<xsd:documentation source="Description" xml:lang="en">Core Query for requesting Airline Profiles.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="ReceiverID" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Identification of the Airline Profile Receiver : may be either an Aggregator Identity ID, a Travel Agency ID, or an Airline identity Code as defined in the Order Management Data Dictionary</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ProfileOwner" type="AirlineID_Type">
+								<xsd:annotation>
+									<xsd:documentation>Profile owner (Airline)</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="SourceFiles" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Airline Profile Data elements or Link</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="SourceFile" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>Airline Profile Data elements or Link</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:choice>
+													<xsd:element name="MediaLink" type="xsd:anyURI">
+														<xsd:annotation>
+															<xsd:documentation>Link to Airline Profile Source File. Alows large AP file to be distributed over FTP, FTPS, ... as agreed bilaterally with Profile Owner</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+													<xsd:element name="DataItems">
+														<xsd:annotation>
+															<xsd:documentation>Actual Data Elements of the Profile</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="POSGeoSpecification" type="GeographicSpecificationType" minOccurs="0" maxOccurs="unbounded">
+																	<xsd:annotation>
+																		<xsd:documentation>Point of sale Geographic Specification information.</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+																<xsd:element name="POSNonGeoSpecification" type="NonGeographicSpecificationType" minOccurs="0" maxOccurs="unbounded">
+																	<xsd:annotation>
+																		<xsd:documentation>Point of sale Non Geographic Specification information.</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+																<xsd:element name="OfferGeoSpecification" minOccurs="0" maxOccurs="unbounded">
+																	<xsd:annotation>
+																		<xsd:documentation>Offer Geographic Specification</xsd:documentation>
+																	</xsd:annotation>
+																	<xsd:complexType>
+																		<xsd:complexContent>
+																			<xsd:extension base="OfferGeographicSpecificationType"/>
+																		</xsd:complexContent>
+																	</xsd:complexType>
+																</xsd:element>
+																<xsd:element name="OfferedService" minOccurs="0" maxOccurs="4">
+																	<xsd:annotation>
+																		<xsd:documentation>Offered Service.      Example:                         1. Transportation               2. Baggage                      3. Seats                           4. Other     </xsd:documentation>
+																	</xsd:annotation>
+																	<xsd:complexType>
+																		<xsd:simpleContent>
+																			<xsd:extension base="OfferedServiceType">
+																				<xsd:attribute name="Permitted">
+																					<xsd:annotation>
+																						<xsd:documentation>Specify whether the service is offered. Example: True</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																			</xsd:extension>
+																		</xsd:simpleContent>
+																	</xsd:complexType>
+																</xsd:element>
+															</xsd:sequence>
+															<xsd:attribute name="ActionType" use="required">
+																<xsd:annotation>
+																	<xsd:documentation>Add, Delete, Or Change</xsd:documentation>
+																</xsd:annotation>
+															</xsd:attribute>
+															<xsd:attribute name="SequenceNumber" type="xsd:long" use="required">
+																<xsd:annotation>
+																	<xsd:documentation>Global sequence number of this record in the Airline profile.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:attribute>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:choice>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="ActionType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Type of action. Examples:  Create, Update, Delete.
+              </xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:simpleContent>
+										<xsd:extension base="OrderItemActionListType">
+											<xsd:attribute name="Context" type="ContextSimpleType" use="optional">
+												<xsd:annotation>
+													<xsd:documentation>Action Type Context.</xsd:documentation>
+												</xsd:annotation>
+											</xsd:attribute>
+										</xsd:extension>
+									</xsd:simpleContent>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="4.001" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+   C U S T O M E R  I N P U T    R E Q U E S T   B U S I N E S S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="CustomerInputRQ">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">The CustomerInput transaction set supports other EDIST transactions by providing discrete-but related-functional capabilities for customer authentication and 3D Secure Payment Authentication. Supported functionality includes:
+
+PIN Phrasing Scheme Membership: Predefined structures and keyword-value pairs are provided for 1.5FA (Factor Authentication) Traveler authentication.
+
+3-D Secure Payment Protocol: 3DS is designed to reduce fraud and chargebacks during e-commerce Internet transactions. Cardholders are asked to identify themselves at the point of sale before the purchase can be completed. This usually means entering a PIN or other password after entering their card details.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:element ref="Party"/>
+				<xsd:element ref="CustomerInputParameters" minOccurs="0"/>
+				<xsd:element name="Query">
+					<xsd:annotation>
+						<xsd:documentation source="Description" xml:lang="en">Customer Input query parameters.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element ref="PointOfSale" minOccurs="0"/>
+							<xsd:element name="PassengerAuthentication" type="PIN_AuthTravelerType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Passenger Pin Phrase Authentication.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="SecurePayments" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>3D Secure Payment Program Enrollment, Verification and Authentication information.</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="SecurePayment" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>3D Secure Payment detail.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:complexContent>
+													<xsd:extension base="SecurePaymentAlertType">
+														<xsd:sequence>
+															<xsd:element name="Amount" type="SimpleCurrencyPriceType" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation source="description" xml:lang="en">Payment Amount. Example: 300 USD</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+															<xsd:element name="PaymentCard" type="PaymentCardType" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Payment Card information.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+															<xsd:element name="Approval" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Payment Approval/ Authorization information.
+
+Note: This includes pre-authorized transaction and authorization status.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element name="ApprovalType" type="IATA_CodeType" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Approval Code Method. Example: M (Manual)
+
+Note: This is used to specify how the approval code for a credit card sale was obtained.
+
+Encoding Scheme: IATA PADIS Code List for data element 9890.</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="Code" type="ContextSimpleType" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">The approval code returned as part of an authorization process.</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="TrxTimestamp" type="TimestampRepType" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Transaction Timestamp. Example: 2015-01-13T13:59:38Z</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="TrxReference" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">The approval code returned as part of an authorization process.</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:simpleType>
+																				<xsd:restriction base="xsd:string">
+																					<xsd:minLength value="1"/>
+																					<xsd:maxLength value="25"/>
+																				</xsd:restriction>
+																			</xsd:simpleType>
+																		</xsd:element>
+																	</xsd:sequence>
+																	<xsd:attribute name="PreAuthorizedInd" type="xsd:boolean" use="optional">
+																		<xsd:annotation>
+																			<xsd:documentation>When true, this transaction has been pre-authorized.</xsd:documentation>
+																		</xsd:annotation>
+																	</xsd:attribute>
+																</xsd:complexType>
+															</xsd:element>
+															<xsd:element name="Qualifier" type="IATA_CodeType" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation source="description" xml:lang="en">Used to specify if this is the old, new, or orginal form of payment.
+
+Encoding Scheme: IATA  PADIS code list 9988</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+															<xsd:element ref="Associations" minOccurs="0"/>
+														</xsd:sequence>
+													</xsd:extension>
+												</xsd:complexContent>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CusInputReqParamsType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Customer Input Request Message Parameters.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Notices" minOccurs="0"/>
+			<xsd:element ref="Policies" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Message Policy information.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CustomerInputParameters" type="CusInputReqParamsType">
+		<xsd:annotation>
+			<xsd:documentation>Parameters that influence overall message results.
+
+Note: These capabilities may not be supported by all EDIST-enabled systems or may be supported by bilateral agreement only. The technical implementation of this capability is not dictated by this specification. </xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

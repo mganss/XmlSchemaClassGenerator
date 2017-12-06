@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.003" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<xsd:include schemaLocation="aidm_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+     B AG G A G E   A L L O W A N C E    R E S P O N S E   B U S I N E S S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="BaggageAllowanceRS">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">The BaggageAllowance transaction set provides checked and carry-on baggage allowance details. Request qualifiers may include Traveler, origin/ destination, point of sale, flight-specific and ticketed fare information. 
+
+The response returns the baggage allowance, whether or not IATA Reso 302 or DOT rules are applicable, baggage weight, dimensions and size information by origin/ destination pair. Implementers may also obtain an additional catalog of applicable embargoes and charges within the same origin and destination pair.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:element ref="Document"/>
+					<xsd:element name="Success" type="SuccessType">
+						<xsd:annotation>
+							<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Processing" type="ProcessingResultType" minOccurs="0"/>
+					<xsd:element name="Parameters" type="BagAllowResParamsType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Search Result Parameters that influence overall message results.
+
+Note: These capabilities may not be supported by all NDC-enabled systems or may be supported by bilateral agreement only. The technical implementation of this capability is not dictated by this specification. </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ShoppingResponseID" minOccurs="0"/>
+					<xsd:element name="OriginDestination" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Baggage Allowance by Origin/ Destination.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element ref="DepartureCode"/>
+								<xsd:element ref="ArrivalCode"/>
+								<xsd:element ref="CheckedBags" minOccurs="0"/>
+								<xsd:element ref="CarryOnBags" minOccurs="0"/>
+								<xsd:element name="Services" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Service(s).</xsd:documentation>
+									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:sequence>
+											<xsd:element name="Service" type="ServiceDetailType" maxOccurs="unbounded">
+												<xsd:annotation>
+													<xsd:documentation>Service detail.</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+										</xsd:sequence>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="USDOT" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">US Department of Transportation (DOT) Reservation or Disclosure Baggage Rule.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:extension base="BagDisclosureType">
+									<xsd:sequence>
+										<xsd:element ref="BagDisclosureKey" minOccurs="0"/>
+									</xsd:sequence>
+								</xsd:extension>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="DataLists" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Data Lists(s).</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:extension base="DataListType">
+									<xsd:sequence>
+										<xsd:element name="PassengerList" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Passenger data list definition.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Passenger" type="PassengerType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>Any person except members of the crew carried or to be carried with the consent of the carrier, on board of any transport vehicle such as aircraft, train, bus, ship.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="ContactList" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Contact data list definition.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="ContactInformation" type="ContactInformationType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>The electronic or geographic address which a party has provided as the contact channel. For example, contact email, contact postal address, contact phone number.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:extension>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="Metadata" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Metadata List(s).</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:extension base="BagAllowResMetadataType"/>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="Policies" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Message Policy information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:sequence>
+			</xsd:choice>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BagAllowResParamsType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Baggage Allowance Response Parameters definition.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="MessageParamsBaseType">
+				<xsd:sequence>
+					<xsd:element name="Pricing" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Pricing Parameters, including Simple Pricing, Award Travel, Auto Exchange, Override Currency and Fee Exemption.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="OverrideCurrency" type="CurrencySimpleType" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation source="description" xml:lang="en">Requested override currency code for pricing.
+Example: EUR</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element name="FeeExemption" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation source="description" xml:lang="en">Fee exemption application for Offer pricing.</xsd:documentation>
+									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:complexContent>
+											<xsd:extension base="AssociatedObjectBaseType">
+												<xsd:sequence>
+													<xsd:element name="Fee" minOccurs="0" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation source="description" xml:lang="en">Exemption(s) based on tax codes plus (optional) tax types within a tax code.</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="Code">
+																	<xsd:annotation>
+																		<xsd:documentation source="description" xml:lang="en">Exempt tax code.
+Example: YQ/YR</xsd:documentation>
+																	</xsd:annotation>
+																	<xsd:complexType>
+																		<xsd:simpleContent>
+																			<xsd:extension base="xsd:string">
+																				<xsd:attribute name="CollectionPoint" use="optional">
+																					<xsd:annotation>
+																						<xsd:documentation source="description" xml:lang="en">Airport code location for exempt ZP or XF taxes.
+Example: MIA</xsd:documentation>
+																						<xsd:documentation source="ENCODING" xml:lang="en">For maximum interoperability, it is recommended that IATA (three character) Airport/ City Code values be used. Use an IATA code or a proprietary string value.
+
+http://www.iata.org/publications/Pages/code-search.aspx</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																			</xsd:extension>
+																		</xsd:simpleContent>
+																	</xsd:complexType>
+																</xsd:element>
+																<xsd:element name="TaxType" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+																	<xsd:annotation>
+																		<xsd:documentation source="description" xml:lang="en">Tax type(s) within the tax code.
+Examples: I, C</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+															</xsd:sequence>
+															<xsd:attributeGroup ref="ObjAssociationAttrGroup"/>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element ref="CountryCode" minOccurs="0" maxOccurs="unbounded"/>
+													<xsd:element name="ProvinceCode" type="ProperNameSimpleType" minOccurs="0" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation source="description" xml:lang="en">Exempt province(s).</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+													<xsd:element name="GovernmentBody" type="ProperNameSimpleType" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation source="description" xml:lang="en">Entity name.</xsd:documentation>
+															<xsd:documentation source="Guidelines" xml:lang="en">=notes=:
+1. This must be provided for certain exemptions in the Canadian market.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:extension>
+										</xsd:complexContent>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+							<xsd:attribute name="AutoExchangeInd" type="xsd:boolean" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>When true, fare information for one or more Offer Items has been returned from an auto-exchanging application.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attribute name="AwardIncludedInd" type="xsd:boolean" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>When true, award eligible in addition to priced offers and fares is requested.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attribute name="AwardOnlyInd" type="xsd:boolean" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>When true, only award eligible offers/ fares have been returned.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attribute name="SimpleInd" type="xsd:boolean" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>When true, Simple Pricing  for flight offers has been applied.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BagAllowResMetadataType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Baggage Allowance Response Metadata definition.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Shopping" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Shopping Query-Related Metadata.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="ShopMetadataGroup"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Passenger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Passenger Metadata List(s).</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="PassengerMetadata"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Other" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Other Metadata Lists(s).</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="OtherMetadata" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation source="description" xml:lang="en">Other Metadata List.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:element ref="AircraftMetadatas"/>
+									<xsd:element ref="AirportMetadatas"/>
+									<xsd:element ref="CityMetadatas"/>
+									<xsd:element ref="CodesetMetadatas"/>
+									<xsd:element ref="ContactMetadatas"/>
+									<xsd:element ref="CountryMetadatas"/>
+									<xsd:element ref="CurrencyMetadatas"/>
+									<xsd:element ref="DescriptionMetadatas"/>
+									<xsd:element ref="EquivalentID_Metadatas"/>
+									<xsd:element ref="LanguageMetadatas"/>
+									<xsd:element ref="PaymentCardMetadatas"/>
+									<xsd:element ref="PaymentFormMetadatas"/>
+									<xsd:element ref="PriceMetadatas"/>
+									<xsd:element ref="RuleMetadatas"/>
+									<xsd:element ref="StateProvMetadatas"/>
+									<xsd:element ref="ZoneMetadatas"/>
+									<xsd:element ref="AddressMetadatas"/>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

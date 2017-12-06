@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.001" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<xsd:include schemaLocation="aidm_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+
+    O R D E R   C H A N G E   N O T I F   R E Q U E S T   B U S I N E S S   O B J E C T
+
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="AirDocNotifRQ">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">The AirDocNotifRQ transaction sends an unsolicited document change notification message. The Acknowledgement message may be returned to acknowledge receipt of the notification request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:element ref="Party"/>
+				<xsd:element name="Query">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="DocumentNotif" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Ticket document Notification details.</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="PassengerReference" type="xsd:IDREF">
+											<xsd:annotation>
+												<xsd:documentation>Association to a passenger.</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="Type" type="IATA_CodeType">
+											<xsd:annotation>
+												<xsd:documentation>Coupon Type. Example: Y (EMD-S Standalone)
+
+Encoding Scheme: IATA Padis Codeset - List for data element 1001 (Document/ Message Name, coded)</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element ref="OrderID"/>
+										<xsd:element name="TicketDocNbr">
+											<xsd:annotation>
+												<xsd:documentation>Coupon Document Number.
+
+Note: This is the document number comprised of the airline code, form code, and serial number.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:simpleType>
+												<xsd:restriction base="xsd:string">
+													<xsd:minLength value="1"/>
+													<xsd:maxLength value="14"/>
+												</xsd:restriction>
+											</xsd:simpleType>
+										</xsd:element>
+										<xsd:element name="DateOfIssue" type="xsd:date">
+											<xsd:annotation>
+												<xsd:documentation>Date of Issue. Example: 2017-01-13</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="CouponNotif" maxOccurs="unbounded">
+											<xsd:annotation>
+												<xsd:documentation>Coupon Notification details.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="CouponNumber" type="xsd:integer" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation>Applicable coupon number. Example: 1234</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+													<xsd:element ref="OrderItemID" minOccurs="0"/>
+													<xsd:element ref="ServiceID" minOccurs="0"/>
+													<xsd:element ref="AirlineID"/>
+													<xsd:element name="ServiceType" type="xsd:string" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation>Type of Service.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+													<xsd:element name="ServiceDate" type="xsd:date" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation>Service date. Example : 15-08-2015</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+													<xsd:element name="ServiceDetails" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation>Service Details.</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element name="ServiceActionCode" type="xsd:string">
+																	<xsd:annotation>
+																		<xsd:documentation>Service Action Code       E.g. HK, HL (use PADIS Codeset)</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+																<xsd:element name="ServiceQuantity" type="xsd:int">
+																	<xsd:annotation>
+																		<xsd:documentation>Quantity of Services. Example : 3</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+																<xsd:element name="LocationCode" minOccurs="0">
+																	<xsd:annotation>
+																		<xsd:documentation>Location Code.          Example : LON </xsd:documentation>
+																	</xsd:annotation>
+																	<xsd:complexType>
+																		<xsd:simpleContent>
+																			<xsd:extension base="xsd:string">
+																				<xsd:attribute name="LocationType" type="xsd:string">
+																					<xsd:annotation>
+																						<xsd:documentation>Location Indicator Type. Example :  Primary or Secondary</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																			</xsd:extension>
+																		</xsd:simpleContent>
+																	</xsd:complexType>
+																</xsd:element>
+																<xsd:element name="Name">
+																	<xsd:annotation>
+																		<xsd:documentation source="description" xml:lang="en">Service name. Example: Lounge Pass</xsd:documentation>
+																	</xsd:annotation>
+																	<xsd:complexType>
+																		<xsd:simpleContent>
+																			<xsd:extension base="ProperNameSimpleType"/>
+																		</xsd:simpleContent>
+																	</xsd:complexType>
+																</xsd:element>
+																<xsd:element ref="RFIC" minOccurs="0"/>
+																<xsd:element name="RFISC" type="xsd:string" minOccurs="0">
+																	<xsd:annotation>
+																		<xsd:documentation>Reason For Issuance Sub Codes</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+													<xsd:element name="FlightDetails" minOccurs="0">
+														<xsd:annotation>
+															<xsd:documentation>Flight Details.</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:sequence>
+																<xsd:element ref="FlightNumber"/>
+																<xsd:element ref="Departure"/>
+																<xsd:element ref="Arrival" minOccurs="0"/>
+																<xsd:element name="ServiceActionCode" type="xsd:string" minOccurs="0">
+																	<xsd:annotation>
+																		<xsd:documentation>Service Action Code       E.g. HK, HL (use PADIS Codeset)</xsd:documentation>
+																	</xsd:annotation>
+																</xsd:element>
+																<xsd:element ref="CabinType" minOccurs="0"/>
+																<xsd:element ref="ClassOfService" minOccurs="0"/>
+															</xsd:sequence>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="DataLists" minOccurs="0">
+								<xsd:complexType>
+									<xsd:annotation>
+										<xsd:documentation source="description" xml:lang="en">Common NDC Data List choices.</xsd:documentation>
+									</xsd:annotation>
+									<xsd:sequence>
+										<xsd:element name="PassengerList" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Passenger data list definition.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Passenger" type="PassengerType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>Any person except members of the crew carried or to be carried with the consent of the carrier, on board of any transport vehicle such as aircraft, train, bus, ship.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="ContactList" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Contact data list definition.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="ContactInformation" type="ContactInformationType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>The electronic or geographic address which a party has provided as the contact channel. For example, contact email, contact postal address, contact phone number.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

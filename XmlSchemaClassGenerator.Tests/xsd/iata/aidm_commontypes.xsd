@@ -1,0 +1,814 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" version="1.000" id="IATA2017.2">
+	<xsd:complexType name="AirlineTypeAIDM">
+		<xsd:annotation>
+			<xsd:documentation>AIRLINE means: an enterprise operating aircraft for commercial purposes which (i) performs scheduled or  non-scheduled air transport services, or both, which are available to the public for carriage of passengers, mail and/or cargo and (ii) is certified for such purposes by the civil aviation authority of the state in which it is established.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AirlineName" type="ProperNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Issuing Airline Name. Example: British Airways</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AirlineDesignator" type="AirlineDesignatorCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Airline code assigned to a carrier. Either ICAO-defined 3-character code or IATA-defined 2-character code.  Refer to IATA Airline Coding Directory, Section 3.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="AirlineDesignatorCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive
+value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:maxLength value="3"/>
+			<xsd:minLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="AllianceType">
+		<xsd:sequence>
+			<xsd:element name="Name" type="ProperNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Two or more airlines participating in a commercial relationship or joint venture, where a joint and commonly identifiable product is marketed under a single commercial name or brand.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Code" type="AllianceCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Used to specify the alliance based on PADIS Code List (code list defined in BDT).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="URL" type="URI_Type" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Alliance information URL.
+Example: http://www.oneworld.com/home</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Airline" type="AirlineTypeAIDM" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>An enterprise operating aircraft for commercial purposes</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="AllianceCodeContentType">
+		<xsd:annotation>
+			<xsd:documentation>Specifies the content value(s) for the alliance code BDT based on PADIS Code List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AllianceCodeType">
+		<xsd:annotation>
+			<xsd:documentation>Additional BDT to specify alliance codes.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="AllianceCodeContentType">
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CodesetValueTextType">
+		<xsd:annotation>
+			<xsd:documentation>Text is a character string such as a finite set of characters generally in the form of words of a language.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="15"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ContactInformationType">
+		<xsd:annotation>
+			<xsd:documentation>The electronic or geographic address which a party has provided as the contact channel. For example, contact email, contact postal address, contact phone number.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ContactType" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Classification for a particular set of contact information (e.g. Primary, Payment, etc.)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PostalAddress" type="PostalAddressType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>The address used for postal service. Examples are post office boxes address, postal physical address, postal code</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="ContactProvided" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element name="EmailAddress" type="EmailAddressType" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>The email address which should be used for contact purposes.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Phone" type="PhoneTypeAIDM" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>A telephone number is a sequence of digits assigned to a fixed-line telephone subscriber station connected to a telephone line or to a wireless electronic telephony device, such as a radio telephone or a mobile telephone, or to other devices for data transmission via the public switched telephone network (PSTN) or other private networks.
+</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="ContactNotProvided" type="xsd:string" fixed="">
+					<xsd:annotation>
+						<xsd:documentation>The presence of the empty ContactNotProvided element indicates that the passenger refused to provide contact information.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="OtherAddress" type="OtherAddressType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Other Contact Method information.   (i.e. social media handle, website, etc.)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="IndividualRef" type="xsd:IDREF" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Reference to Individual instance(s)</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Individual" type="IndividualType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>A single human being as distinct from a group, class, or family.
+</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="ContactID" type="xsd:ID">
+			<xsd:annotation>
+				<xsd:documentation>Uniquely Identifies a set of Contact Information, within the context of one message.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:simpleType name="CountryDialiingCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive
+value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="CreditCardVendorCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive
+value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token">
+			<xsd:pattern value="[0-9a-zA-Z]{1,2}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DateType">
+		<xsd:annotation>
+			<xsd:documentation>A date is a Gregorian calendar representation in various common resolutions: year, month, week, day.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:date"/>
+	</xsd:simpleType>
+	<xsd:complexType name="EmailAddressType">
+		<xsd:annotation>
+			<xsd:documentation>The email address which should be used for contact purposes.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Label" type="SimpleTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Used to differentiate multiple email addresses of one contact. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EmailAddressValue" type="SimpleTextType" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>The email address which should be used for contact purposes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FOID">
+		<xsd:annotation>
+			<xsd:documentation>Form of identification.  Typically used to identify that the passenger is who he says he is.
+
+This is the type of FOID as defined in AIRIMP (FF Number, Credit Card Number, etc.).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CreditCardVendorCode" type="CreditCardVendorCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>The CC vendor code in case FOID is a Credit Card.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FOID_Number" type="SimpleCodeType" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>FOID ID value. Example: NY122345</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FOID_Type" type="SimpleCodeType" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Form of identification type code used for booking/ticketing.  Examples: PP (passport), CC (credit card), FF (frequent flyer), DL (drivers license)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="GenderCodeContentType">
+		<xsd:annotation>
+			<xsd:documentation>Specifies the content value(s) for the gender code BDT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Female"/>
+			<xsd:enumeration value="Male"/>
+			<xsd:enumeration value="Unspecified"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="GenderCodeType">
+		<xsd:annotation>
+			<xsd:documentation>Additional BDT to specify Gender code list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="GenderCodeContentType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PassengerTypeCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of letters. It represents the type a passenger like ADT(Adult).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="IdentityDocumentType">
+		<xsd:annotation>
+			<xsd:documentation>Any document which may be used to identify a person or verify aspects of a person's personal identity. If issued in a small, standard credit card size form, it is usually called an identity card. Some countries issue formal identity documents, while others may require identity verification using informal documents. When the identity document incorporates a person's photograph, it may be called photo ID.
+
+In the absence of a formal identity document, a driver's license may be accepted in many countries for identity verification. Most countries accept passports as a form of identification.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="IdentityDocumentNumber" type="SimpleCodeType">
+				<xsd:annotation>
+					<xsd:documentation>Uniquely identifies the document from all other identity documents issued by the state or organization. e.g. passport number, drive license number.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IdentityDocumentType" type="IdentityDocumentTypeCodeType">
+				<xsd:annotation>
+					<xsd:documentation>The type of passenger document. 
+Examples: PT (Passport)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IssuingCountryCode" type="ISO_3166CountryCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Issuing country code of the identity document.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CitizenshipCountryCode" type="ISO_3166CountryCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Citizenship Country Code. Examples: US, FR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ResidenceCountryCode" type="ISO_3166CountryCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Residence Country Code. Examples: US, FR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IssueDate" type="DateType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The date the identity document was issued.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ExpiryDate" type="DateType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The date the identity document expires.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Birthdate" type="DateType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Holder’s date of birth as written on the document.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Birthplace" type="SimpleTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Holder's birth location (e.g. city and/or country) as written on the  document. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Gender" type="GenderCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Holder’s gender as specified on the document (M, F, or X for unspecified).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NameTitle" type="ProperNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Holder's name title as written on the document. Examples: MR, MRS, DRn.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GivenName" type="ProperNameType" minOccurs="0" maxOccurs="5">
+				<xsd:annotation>
+					<xsd:documentation>Holder's first or given name, as written on the document.  Example: JOHN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MiddleName" type="ProperNameType" minOccurs="0" maxOccurs="3">
+				<xsd:annotation>
+					<xsd:documentation>Holder's middle name or initial, as written on the document.  Examples: G, GEORGE</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Surname" type="ProperNameType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Holder's family name, last name as written on the document. Example: SMITH.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SurnameSuffix" type="ShortNameType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Holder's surname suffixes and letters as written on the document. Examples: Jr., Sr., III, Ret., Esq.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Visa" type="VisaType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>An official entry in a Passport or other Travel Document made by an official of a government to indicate that the bearer has been granted authority to enter or re-enter the country or region concerned.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="IdentityDocumentTypeCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive
+value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="IndicatorType">
+		<xsd:annotation>
+			<xsd:documentation>An indicator is a list of two mutually exclusive Boolean values that express the only possible states of a property.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:boolean"/>
+	</xsd:simpleType>
+	<xsd:complexType name="IndividualType">
+		<xsd:annotation>
+			<xsd:documentation>A single human being as distinct from a group, class, or family.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Birthdate" type="DateType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Individual's birth location (e.g. city and/or country).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Birthplace" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Country Code where the Passenger was born (ISO 3166).  For example: DE</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Gender" type="GenderCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Gender of the individual (M, F, or X for unspecified).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NameTitle" type="ShortNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Individual's name title. Examples: MR, MRS, DRn.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GivenName" type="ProperNameType" minOccurs="0" maxOccurs="5">
+				<xsd:annotation>
+					<xsd:documentation>Individual's first or given name. Example: JOHN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MiddleName" type="ProperNameType" minOccurs="0" maxOccurs="3">
+				<xsd:annotation>
+					<xsd:documentation>Individual's middle name or initial.  Examples: G, GEORGE</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Surname" type="ProperNameType" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Individual's family name, last name. Example: SMITH.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SurnameSuffix" type="ShortNameType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Individual's surname suffixes and letters. Examples: Jr., Sr., III, Ret., Esq.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="IndividualID" type="xsd:ID">
+			<xsd:annotation>
+				<xsd:documentation>Uniquely Identifies an Individual within the context of one message.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:simpleType name="ISO_3166CountryCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of latters , number, special characters (except escape sequences) , and symbols. It represents a definitive value, a method or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ISO_3166CountryCodeContentType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ISO_3166CountryCodeContentType">
+		<xsd:annotation>
+			<xsd:documentation>2 character country code as defined in ISO3166</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="LanguageUsageType">
+		<xsd:annotation>
+			<xsd:documentation>Language Code representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="LanguageCode" type="CodesetValueTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Language Code representation.
+
+Notes:
+1. Language code.  Example: en, en-US
+2. Encoding Schemes: ISO 639-1 Code OR Microsoft National Language Support (NLS) Code
+3. Supports ISO 639-1 (two alpha character) neutral language encoding indicated by a name such as "en" for English.
+4.  Supports MNLS geographically specific language encoding indicated by a name that includes both locale and country/region information. For example, the locale English (United States) has the language name "en-US"</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LanguageUsage" type="SimpleTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Written or Spoken language.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LoyaltyProgramAccountType">
+		<xsd:annotation>
+			<xsd:documentation>An account set up for a customer within a rewards program which holds funds on behalf of that customer.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Alliance" type="AllianceType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Two or more airlines participating in a commercial relationship or joint venture.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:element name="Airline" type="AirlineTypeAIDM" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>An enterprise operating aircraft for commercial purposes</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="ProviderName" type="SimpleNameType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Non-airline loyalty program provider name.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="ProgramName" type="SimpleNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program Name. Example: Miles and More</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ProgramCode" type="SimpleCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program ID: Example: MAM</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccountNumber" type="SimpleCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program account number. Example: ABC123456</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="URL" type="URI_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program information URL. Example: https://www.britishairways.com/en-gb/executive-club/about-the-club</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SignInID" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program sign-in ID (or username).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TierCode" type="SimpleCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program tier code.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TierName" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program tier name.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TierPriority" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Loyalty Program account priority within the tier (e.g. Platinum, executive, etc.)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MeasureType">
+		<xsd:annotation>
+			<xsd:documentation>A measure is a numeric value determined by measuring an object along with the specified unit of measure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:decimal">
+				<xsd:attribute name="UnitCode" type="xsd:token" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>The type of unit of measure.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="NumberType">
+		<xsd:annotation>
+			<xsd:documentation>A mathematical number that is assigned or is determined by calculation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal"/>
+	</xsd:simpleType>
+	<xsd:complexType name="OtherAddressType">
+		<xsd:annotation>
+			<xsd:documentation>Other Contact Method information.   (i.e. social media handle, website, etc.)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Label" type="SimpleNameType" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Used to differentiate multiple Other Addresses of one contact.  (i.e. social media handle, website, etc.)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OtherAddressValue" type="SimpleTextType" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Other Contact Method Value. Example: www.marketingsite.com</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PassengerType">
+		<xsd:annotation>
+			<xsd:documentation>Any person except members of the crew carried or to be carried with the consent of the carrier, on board of any transport vehicle such as aircraft, train, bus, ship.  Holds the attributes specific to a one booking, from shopping to fulfilment.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PTC" type="PassengerTypeCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type code applying to the Passenger which typically drives pricing (e.g. ADT, CHD, etc).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:element name="Age" type="MeasureType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The Age of the Passenger.  To be used in NDC Anonymous Shopping requests or when the birthdate (in Individual) is not known.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Birthdate" type="DateType" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The Date of Birth of the Passenger.  Anonymous Shopping requests or when the birthdate (in Individual) is not known.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="ResidenceCountryCode" type="ISO_3166CountryCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Residence Country Code. Examples: US, FR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CitizenshipCountryCode" type="ISO_3166CountryCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Citizenship Country Code. Examples: US, FR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Individual" type="IndividualType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>A single human being as distinct from a group, class, or family.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ProfileID" type="SimpleTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Passenger Profile ID</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LoyaltyProgramAccount" type="LoyaltyProgramAccountType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>An account set up for a customer within a rewards program which holds funds on behalf of that customer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FOID" type="FOID" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Form of identification.  Typically used to identify that the passenger is who he says he is.
+
+This is the type of FOID as defined in AIRIMP (FF Number, Credit Card Number, etc.).
+</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IdentityDocument" type="IdentityDocumentType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Any document which may be used to identify a person or verify aspects of a person's personal identity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ContactInfoRef" type="xsd:IDREF" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Reference to Contact Information, within the context of one message.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="InfantRef" type="xsd:IDREF" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Reference to Passenger instance within the context of one message, associating an infant on lap to this adult passenger. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Language" type="LanguageUsageType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Language Code representation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Remark" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Additional, supplementary information about the document or service.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="RemarkTypeAIDM"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="PassengerID" type="xsd:ID" use="required">
+			<xsd:annotation>
+				<xsd:documentation>Uniquely identifies a Passenger within the context of one message.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ProfileConsentIndicator" type="IndicatorType">
+			<xsd:annotation>
+				<xsd:documentation>When true, passenger authorizes the airline to share his/her profile information or send promotional emails.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="PhoneTypeAIDM">
+		<xsd:annotation>
+			<xsd:documentation>A telephone number is a sequence of digits assigned to a fixed-line telephone subscriber station connected to a telephone line or to a wireless electronic telephony device, such as a radio telephone or a mobile telephone, or to other devices for data transmission via the public switched telephone network (PSTN) or other private networks.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Label" type="SimpleTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Used to differentiate multiple Phone numbers of one contact. 
+Examples: Work, Home, Mobile</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CountryDialingCode" type="CountryDialiingCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Numeric telephone dialing prefixes for the member countries of the International Telecommunication Union (ITU).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AreaCode" type="NumberType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Phone number area code.  Example: 813</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PhoneNumber" type="NumberType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Phone number text.
+Eg: +1 999-999-9999 ext 1234, 
+617-9976
+Note: This may be a simple, un-structured phone number, such as +01 999-999-9999 ext 1234 or combined with the additional attributes to create a structured phone number.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Extension" type="NumberType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Phone extension number.  Example: 1234</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PostalAddressType">
+		<xsd:annotation>
+			<xsd:documentation>The address used for postal service. Examples are post office boxes address, postal physical address, postal code</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Label" type="SimpleTextType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Used to differentiate multiple Postal Addresses of one contact.  Examples: AddressAtOrigin or AddressAtDestination</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Street" type="SimpleTextType" minOccurs="0" maxOccurs="2">
+				<xsd:annotation>
+					<xsd:documentation>Street name and number corresponding to the postal address. Examples: Main Street, 100 Main Street</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BuildingRoom" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Additional address information including building name, room, apartment, or suite number.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="POBox" type="SimpleCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Post office box.  Example: P.O. Box 21</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PostalCode" type="SimpleCodeType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Postal code. Examples: 11001, 11001-2345</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CityName" type="SimpleNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The name, expressed as text, of the city, town or village.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CountrySubdivisionName" type="ProperNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The name, expressed as text, of the subdivision of a country.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CountryName" type="ProperNameType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The name, expressed as text, of the country.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CountryCode" type="ISO_3166CountryCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ISO Country Code. Examples: US, FR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="ProperNameType">
+		<xsd:annotation>
+			<xsd:documentation>A name is a word or a phrase that constitutes a distinctive designation of a person, place, thing or concept.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="RemarkTypeAIDM">
+		<xsd:annotation>
+			<xsd:documentation>Additional, supplementary information about the document or service.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Remark" type="SimpleTextType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Additional, supplementary information about the document or service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="DisplayInd" type="IndType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>When TRUE, this remark should be displayed.  Notes: 1. This capability may not be supported by all NDC-enabled systems or may be supported by bilateral agreement only.  The technical implementation of this capability is not dictated by this specificat</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Timestamp" type="DateTimeType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Remark creation timestamp.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="VisaType">
+		<xsd:annotation>
+			<xsd:documentation>An official entry in a Passport or other Travel Document made by an official of a government to indicate that the bearer has been granted authority to enter or re-enter the country or region concerned.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="VisaNumber" type="SimpleCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Visa ID value. Example: NY122345.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VisaType" type="SimpleCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The type of visa.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VisaHostCountryCode" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ISO Country Code where the visa is valid.  For example: DE</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EnterBeforeDate" type="DateType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Date at which the VISA expires and is no longer a valid entry document.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DurationOfStay" type="OrdinalType" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Duration permitted of the Passenger's stay in the visa host country (in days).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NumberOfEntries" type="OrdinalType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of entries permitted by the visa into the host country.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="OrdinalType">
+		<xsd:annotation>
+			<xsd:documentation>An ordinal number is an assigned mathematical number that represents order or sequence.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ShortNameType">
+		<xsd:annotation>
+			<xsd:documentation>A short name is a word or a phrase that constitutes a distinctive designation of a person, place, thing or concept.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="15"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SimpleCodeType">
+		<xsd:annotation>
+			<xsd:documentation>A code is a character string of letters, numbers, special characters (except escape sequences), and symbols. It represents a definitive
+value, a method, or a property description in an abbreviated or language-independent form that is part of a finite list of allowed values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SimpleNameType">
+		<xsd:annotation>
+			<xsd:documentation>A name is a word or phrase that constitutes the distinctive designation of a person, place, thing or concept</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:token"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SimpleTextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="URI_Type">
+		<xsd:annotation>
+			<xsd:documentation>A string of characters used to identify a resource. Such identification enables interaction with representations of the resource over a network, typically the World Wide Web, using specific protocols.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:anyURI"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="DateTimeType">
+		<xsd:restriction base="xsd:dateTime"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="IndType">
+		<xsd:restriction base="xsd:boolean"/>
+	</xsd:simpleType>
+</xsd:schema>

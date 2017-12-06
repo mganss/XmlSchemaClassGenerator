@@ -1,0 +1,2257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="5.000" id="IATA2017.2">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">EDIST XML Specification Base Structures. Includes base types for EDIST XML data objects, utility xml objects and core simple type definitions.</xsd:documentation>
+	</xsd:annotation>
+	<!--xsd:include schemaLocation="edist_commontypes.xsd"/-->
+	<!--
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    S T R U C T U R E D   P A Y L O A D   S T A N D A R D   T Y P E  D E F I N I T I O N S
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+	<!--
+======================================================
+=== A C T O R   O B J E C T   BA S E T Y P E
+======================================================-->
+	<xsd:attributeGroup name="ActorObjAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Actor object instance id and association(s).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="metadata" type="MultiAssocSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Association between this object and metadata instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="refs" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this actor object and any object instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:complexType name="ActorObjectType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for NDC Actor Object Base Type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attributeGroup ref="ActorObjAttrGroup"/>
+	</xsd:complexType>
+	<xsd:simpleType name="InstanceClassSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Globally Unique XML Instance or Other Class ID size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:ID"/>
+	</xsd:simpleType>
+	<!--
+	======================================================
+          BASE TYPES
+======================================================-->
+	<xsd:complexType name="CoreBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A base type definition for Core Entity Object.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AugPointAssocs" type="AugPointAssocType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Object Augmentation Point(s).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="Key" type="InstanceClassSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Globally Unique Object instance/ class Key.
+
+Example: 2B75C565-5BB0- 4DCE-8DE6-67CB7B4F25A7</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Source Entity Code or ID. Examples: BA, WIDGETCO</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="ListBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A base type definition for Data List Object.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="ListToken" type="DescriptionSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Unique List Token.
+
+Example: jZhJu7SORZeO MNpifElIkA
+
+Note: This token pertains to all specified List instances, e.g. the list collection.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Source Entity Code or ID. Examples: BA, WIDGETCO</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="MetaBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A base type definition for Metadata Object.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:complexType>
+	<xsd:simpleType name="OwnerSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Airline Carrier or Entity Owner.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="AirlineDesigSimpleType OwnerTextSimpleType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="OwnerTextSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Owner Entity size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--
+======================================================
+=== A S S O C I A T E D  O B J E C T S
+======================================================-->
+	<xsd:complexType name="AssociatedObjectBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A base type for an Object with Instance Associations.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attributeGroup ref="ObjAssociationAttrGroup"/>
+		<xsd:attribute name="ApproxInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, this fee is approximate.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="RefundAllInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, all fee amounts are refundable.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ExemptAllInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>When true, price is exempt from all taxes.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="AllGuaranteeInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>When true, ALL associated inventory has been guaranteed for this and the guarantee information specified in the InventoryGuarantee node.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="DisclosureInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>When true, one or more associated Offer Item(s) are subject to regulatory disclosure.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="BrowserInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, the attachment can be displayed in a browser.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:attributeGroup name="ObjAssociationAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Policy and other object association.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="refs" type="MultiAssocSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this object and any other object or metadata instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:simpleType name="TokenID_SimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Reference Association Token type and size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:whiteSpace value="preserve"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--
+===================================================================================
+    AUGMENTATION STRUCTURES
+===================================================================================-->
+	<xsd:element name="AugmentationPoint" type="AugPointInfoType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Augmentation Point.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AugPointType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Augmentation Point.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:any namespace="##other" processContents="lax">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Implementer-Augmented Structure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:any>
+		</xsd:sequence>
+		<xsd:attribute name="Key" type="InstanceClassSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Globally Unique Object instance/ class Key.
+
+Example: 2B75C565-5BB0- 4DCE-8DE6-67CB7B4F25A7</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Source Entity Code or ID. Examples: BA, WIDGETCO</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="AugPointAssocType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Augmentation Point Association.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AugPointAssoc" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Augmentation Point Association detail.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="KeyRef" type="InstanceClassRefSimpleType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Reference to globally unique AUGMENTATION POINT instance/ class Key.
+
+Example: 2B75C565-5BB0- 4DCE-8DE6-67CB7B4F25A7</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Owner Airline (or other entity) Code. Examples: BA, WIDGETCO</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Owner Airline (or other entity) Code. Examples: BA, WIDGETCO</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="AugPointListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Augmentation Point  List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ListBaseType">
+				<xsd:sequence>
+					<xsd:element name="List" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Augmentation Point List detail.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="AugPointAssoc" maxOccurs="unbounded">
+									<xsd:annotation>
+										<xsd:documentation>Associated Augmentation Point(s).</xsd:documentation>
+									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:attribute name="KeyRef" type="InstanceClassRefSimpleType" use="required">
+											<xsd:annotation>
+												<xsd:documentation>Reference to globally unique AUGMENTATION POINT instance/ class Key.
+
+Example: 2B75C565-5BB0- 4DCE-8DE6-67CB7B4F25A7</xsd:documentation>
+											</xsd:annotation>
+										</xsd:attribute>
+										<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+											<xsd:annotation>
+												<xsd:documentation>Source Entity Code or ID. Examples: BA, WIDGETCO</xsd:documentation>
+											</xsd:annotation>
+										</xsd:attribute>
+										<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+											<xsd:annotation>
+												<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+											</xsd:annotation>
+										</xsd:attribute>
+									</xsd:complexType>
+								</xsd:element>
+								<xsd:element name="NamedAssocs" type="NamedAssocType" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Augmentation Point List Named Association(s).
+
+Note: This capability supports implementer-specified, or "Named", reference associations to other (target) instantiated objects with @Key, @GroupKey, @GroupTokenKey, @ListKey and @ListTokenKey attributes.</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+							<xsd:attribute name="ListKey" type="InstanceClassSimpleType" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>Globally Unique Group instance/ class Key.
+
+Example: {CA2016A0-0AE1-4E65-8EA6-0A16AE906596}</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attribute name="ListName" type="ContextSimpleType" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>List Name. Example: MyList</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attribute name="Owner" type="OwnerSimpleType" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>Source Entity Code or ID. Examples: BA, WIDGETCO</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AugPointInfoType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Augmentation Point Definition and List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AugPoint" type="AugPointType" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Augmentation Point Definition.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Lists" type="AugPointListType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Augmentation Point Reference/ Association Lists.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="NamedAssocType">
+		<xsd:annotation>
+			<xsd:documentation>A data type definition for Named Association Type.
+
+Named Association(s).
+
+Note: This capability supports implementer-specified, or "Named" reference associations to other (target) instantiated objects with @Key, @GroupKey and/ or @ListKey attributes.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="NamedAssoc" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Association detail, including:
+
+- Target object name
+- Group instance/ class key reference
+- Object instance/ class key reference
+- From object name
+- Sequence id</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Group" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Associated Target Group Key and/ or Token.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:attribute name="GroupKeyRef" type="InstanceClassRefSimpleType" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Reference to globally unique TARGET GROUP instance/ class Key.
+
+Example: A3E9CF38-B140-4E03-A550-493A817A2BC9</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="TokenRef" type="TokenID_SimpleType" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Reference to globally unique TARGET GROUP COLLECTION instance/ class Key.
+
+Example: {AEF93466-0464-46C6-89B5-487DF5007D3E}</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="List" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Associated Target List Key and/ or Token.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:attribute name="ListKeyRef" type="InstanceClassRefSimpleType" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Reference to globally unique TARGET LIST instance/ class Key.
+
+Example: {E7A28E6D-045C-4BE1-B85E-304262911773}</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="TokenRef" type="TokenID_SimpleType" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Reference to globally unique TARGET LIST COLLECTION instance/ class Key.
+
+Example: E20C732E-17AE-40E8-B3DB-FCC04585DD4C</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="UniqueKeyID" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Object Unique Key ID.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:attribute name="UniqueID_Ref" type="UniqueID_SimpleType" use="required">
+									<xsd:annotation>
+										<xsd:documentation>A reference to a Unique (string-based) Object ID. Example: OBJ001</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+								<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="Target" type="ContextSimpleType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Target Object Source Name.
+
+Example: PolicyList</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="KeyRef" type="InstanceClassRefSimpleType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>A reference to the @Target OBJECT instance/ class Key.
+
+Example: 23D20750-1FFE-4EA7-A5CD-A4B9733A491B</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="From" type="ContextSimpleType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>From Object Name. 
+
+Example: FlightSegmentList</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="Seq" type="xsd:integer" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Sequence ID. Example: 1</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+======================================================
+=== D A T A  L I S T  O B J E C T S
+======================================================-->
+	<xsd:attributeGroup name="DataListObjAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Policy and object association(s).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="refs" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this object and any object instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ListKey" type="xsd:ID" use="required">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Globally unique id for this Data List instance.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<!--
+======================================================
+===  M E T A D A T A
+======================================================-->
+	<xsd:attributeGroup name="MetadataObjAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Metadata object instance id and association(s).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="metarefs" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Association(s) between this metadata object and any metadata instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="refs" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this metadata object and any object instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="MetadataKey" type="xsd:ID" use="required">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">A globally unique identifier for this Metadata instance.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:complexType name="MetadataObjectBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Base type for NDC Metadata Representation.
+
+Notes: Within NDC, metadata is defined as data about data. This may include information such as the security of a piece of data or the source of the data. These pieces of metadata may be composed into a metadata type. The types of data to which metadata may be applied may be constrained.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="AugmentationPoint" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Augmentation Point for this Metadata Structure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="refs" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this object and any object instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="MetadataKey" type="xsd:ID" use="required">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">A globally unique identifier for this Metadata instance.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!--
+======================================================
+=== K E Y  O B J E C T   W I T H   M E T A D A T A
+======================================================-->
+	<xsd:complexType name="KeyObjectBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A base type for a Keyed Object.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attributeGroup ref="ObjectKeyAttrGroup"/>
+		<xsd:attribute name="PricedInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, Corporate Fare Information was used for Pricing.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:attributeGroup name="ObjectKeyAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Policy, unique instance id and other object associations.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="refs" type="MultiAssocSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this object and any other object or metadata instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ObjectKey" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object globally unique Instance ID. Example: obj1</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:attributeGroup name="ObjectKeyMetaAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Policy, unique instance id, object metadata and other object associations.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="refs" type="MultiAssocSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this object and any other object or metadata instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ObjectKey" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object globally unique Instance ID. Example: obj1</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:attributeGroup name="ObjectPolicyMetaAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Policy, object metadata and other object associations.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="refs" type="MultiAssocSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object association(s) between this object and any other object or metadata instance(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ObjectMetaReferences" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Object Metadata Association(s). Example: meta1 meta3</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<!--
+===================================================
+          DATE AND PERIOD REPRESENTATION
+===================================================-->
+	<!--            <<< DATE >>>-->
+	<xsd:attributeGroup name="AttrCoreDateGrpType">
+		<xsd:annotation>
+			<xsd:documentation>A data type definition for Commonly Used Date Representation Formats: Short Date, Date and Time, Timestamp</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="DateTime" type="xsd:dateTime" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Date and time. Example: 2017-01-03T13:20:00</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ShortDate" type="xsd:date" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Short date. Example: 2017-01-13
+
+Encoding Scheme: ISO 8601 Date Format (YYYY-MM-DD)</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Timestamp" type="xsd:dateTime" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Timestamp. Example: 2017-01-13T13:59:38Z</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Time" type="TimeSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Time. Example: 14:00
+
+[Encoding Scheme] ISO 8601 Military/ 24 Hour (HH:MM)</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:complexType name="CoreDateGrpType">
+		<xsd:annotation>
+			<xsd:documentation>A data type definition for Commonly Used Date Representation Formats: Short Date, Date and Time, Timestamp</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="DateTime" type="xsd:dateTime" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Date and time. Example: 2017-01-03T13:20:00</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="ShortDate" type="xsd:date" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Short date. Example: 2017-01-13
+
+Encoding Scheme: ISO 8601 Date Format (YYYY-MM-DD)</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Timestamp" type="xsd:dateTime" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Timestamp. Example: 2017-01-13T13:59:38Z</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Time" type="TimeSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Time. Example: 14:00
+
+[Encoding Scheme] ISO 8601 Military/ 24 Hour (HH:MM)</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!--
+
+======================================================
+=== T R A N S A C T I O N   P R O C E S S I N G
+======================================================
+-->
+	<xsd:attributeGroup name="TrxProcessObjAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Policy and object association(s).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="refs" type="InstanceClassRefSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">
+          Object association(s) between this object and any object instance(s).
+        </xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="trxItemKey" type="xsd:ID" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">
+          Globally unique id for this Transaction Processing object instance.
+        </xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:complexType name="TrxProcessObjectBaseType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A base type for a Transaction Processing Object.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attributeGroup ref="TrxProcessObjAttrGroup">
+			<xsd:annotation>
+				<xsd:documentation>Unique instance ID and object association(s).</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attributeGroup>
+		<xsd:attribute name="AuthResponseInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, Payer Authentication Response information is specified in the PayerAuth node.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="MaximumTryInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, the maximum payment authentication attemps have been exceeded.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="NotProcessedInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>When true, the Payment information has not been processed.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="RetryInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, the payment transaction should be resent.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="AuthRequestInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, Payer Authentication Request information is specified in the PayerAuth node.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!--
+======================================================
+===  P R E F E R E N C E
+======================================================-->
+	<xsd:attributeGroup name="PreferenceAttrGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Preference level and context.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="PreferencesLevel" type="PreferencesLevelSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Preference Level.  Example: Preferred, Required, Exclude, Other</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="PreferencesContext" type="ContextSimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Preference Level Context.  Example: MyContext</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    U N I Q U E  I D  / U R I
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+	<xsd:simpleType name="DomainListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Named NDC Domain list constraint.
+
+Examples: Shopping, OrderManagement, PaymentTicketing, AirlineProfile, Utility
+
+Note: Supports pre-defined enumerated list and/ or bilaterally-agreed upon values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="DomainSimpleType ListApplicationSimpleType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="EncSchemeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Encoding Scheme Source Provider Type list constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Airline"/>
+			<xsd:enumeration value="Filed"/>
+			<xsd:enumeration value="ThirdParty"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EncSchemeListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Encoding Scheme Source Provider Type.
+
+Examples: Airline, Filed, ThirdParty
+
+Note: Supports pre-defined enumerated list and/ or bilaterally-agreed upon values.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ListApplicationSimpleType EncSchemeSimpleType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="InstanceClassRefSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Globally Unique XML Instance or Other Class Reference Association size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:IDREFS"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="KeyIdentifier">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for an xsd:ID unique instance identifier.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:ID"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ListApplicationSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for List Application size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="35"/>
+			<xsd:whiteSpace value="collapse"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MultiAssocSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for an InstanceClassRefSimpleType Association.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="InstanceClassRefSimpleType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="UniqueID_SimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Service, Offer, Order and Order Item ID size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="45"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="UniqueIDContextType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Unique ID with Context.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="UniqueStringID_SimpleType">
+				<xsd:attributeGroup ref="ObjAssociationAttrGroup"/>
+				<xsd:attribute name="Owner" type="ContextSimpleType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="Description" xml:lang="en">Airline designator or CRS code of the owner/ assigner of the Offer ID, typically used for offer ordering purposes.  Example: UA, BA
+
+Encoding Scheme: IATA/ A4A (two or three character) Airline or CRS Designator Code</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    P E R I O D  R E P R E S E N T A T I O N  D E F I N I T I O N S
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+===========================================================================
+Note: 
+= The Period element is the period representation subgrp head element.
+= The Date element is the date representation subgrp head element.
+===========================================================================-->
+	<!--<< Date Representation >>-->
+	<xsd:complexType name="CorePeriodGrpType">
+		<xsd:annotation>
+			<xsd:documentation>A data type definition for Commonly Used Effective (start) and Expiration (end) Period.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Date" type="DatePeriodType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Dates.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DateTime" type="DateTimePeriodType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Date and Time.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TimeStamp" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Timestamp.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="Effective" type="xsd:dateTime" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Effective (start) Timestamp. Example: 2017-01-13T13:59:38Z</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="Expiration" type="xsd:dateTime" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Expiration (end) Timestamp. Example: 2017-11-13T13:00:00Z</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DateTimePeriodType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Effective/ Expiration Date And Time Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="Effective" type="xsd:dateTime" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Effective (start) Date/ Time. Example: 2017-01-13T06:00:00</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Expiration" type="xsd:dateTime" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Expiration (end) Date/ Time. Example: 2017-03-13T23:00:00</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:complexType name="DatePeriodType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type definition for Effective/ Expiration Short Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="Effective" type="xsd:date" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Effective (start) Date.  Example: 2017-01-13
+
+Encoding Scheme: ISO 8601 Date Format (YYYY-MM-DD)</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="Expiration" type="xsd:date" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Expiration (end) Date.  Example: 2017-01-14
+
+Encoding Scheme: ISO 8601 Date Format (YYYY-MM-DD)</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:element name="Month" type="MonthRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A month number. Example: 01 (January)</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!--<< Period Representation >>-->
+	<xsd:element name="DatePeriod" type="DatePeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Dates.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DateTimePeriod" type="DateTimePeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Date and Time.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DayPeriod" type="DayPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Day of Week.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DayRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Day of Week Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="DayOfWeekSimpleType">
+				<xsd:attribute name="Name" type="ContextSimpleType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">Day Name.  Example: Monday</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="DatePeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Short Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) date.  Example: 2017-01-13
+
+Encoding Scheme: ISO 8601 Date Format (YYYY-MM-DD)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) date.  Example: 2017-01-14
+
+Encoding Scheme: ISO 8601 Date Format (YYYY-MM-DD)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DateTimePeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Date And Time Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) date/ time.  Example: 2017-01-13T06:00:00</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) date/ time.  Example: 2017-03-13T23:00:00</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DayPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Day of Week Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="DayRepType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) day of the week number.  Example: 01</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="DayRepType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) day of the week number.  Example: 04</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="MonthPeriod" type="MonthPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Months.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="MonthRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Month Number Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="MonthNumberSimpleType">
+				<xsd:attribute name="Name" type="ContextSimpleType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">Month Name.  Example: January</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="MonthPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Month Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="MonthRepType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) month number.  Example: 01</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="MonthRepType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) month number.  Example: 04</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="QuarterPeriod" type="QuarterPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Calendar Quarter.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="QuarterPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Calendar Quarter Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) quarter.
+Example: 1Q (JAN-MAR)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="1Q"/>
+						<xsd:enumeration value="2Q"/>
+						<xsd:enumeration value="3Q"/>
+						<xsd:enumeration value="4Q"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Expiration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) quarter.
+Example: 3Q (JUL-SEP)</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="1Q"/>
+						<xsd:enumeration value="2Q"/>
+						<xsd:enumeration value="3Q"/>
+						<xsd:enumeration value="4Q"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="TimePeriod" type="TimePeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Times.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TimePeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Time Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="TimeSimpleType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) time.  Example: 09:00
+
+Encoding Scheme: ISO 8601 Military/ 24 Hour Format (HH:MM)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="TimeSimpleType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration time.  Example: 18:00
+
+Encoding Scheme: ISO 8601 Military/ 24 Hour Format (HH:MM)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TimestampRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Timestamp Representation. Example: 2015-01-13T13:59:38Z</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:dateTime"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:element name="YearPeriod" type="YearPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Full Year.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="YearMonthPeriod" type="YearMonthPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Effective (start) and expiration (end) Full Year and Month.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="YearPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Year Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="xsd:gYear" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) year.
+Example: 2014</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="xsd:gYear" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) year.
+Example: 2016</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="YearMonthPeriodRepType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Effective/ Expiration Year And Month Date Period Representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Effective" type="xsd:gYearMonth" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Effective (start) year and month.  Example: 2017-01</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Expiration" type="xsd:gYearMonth" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Expiration (end) year and month.  Example: 2017-12</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    S I M P L E  T Y P E  D E F I N I T I O N S
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+	<!-- << 3DS PROGRAM >> -->
+	<xsd:simpleType name="CustomerAuthStatusListType">
+		<xsd:annotation>
+			<xsd:documentation>
+        A data type for 3DS Program ACS Customer Authentication contextual list. Examples: Y- Customer authenticated N- Customer not authenticated A- An authentication attempt occurred but could not be completed U- Unable to perform authentication
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="A">
+				<xsd:annotation>
+					<xsd:documentation>
+            A- An authentication attempt occurred but could not be completed
+          </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="N">
+				<xsd:annotation>
+					<xsd:documentation>N- Customer not authenticated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="U">
+				<xsd:annotation>
+					<xsd:documentation>U- Unable to perform authentication</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Y">
+				<xsd:annotation>
+					<xsd:documentation>Y- Customer authenticated</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CustomerAuthStatusSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for 3DS Program ACS Customer Authentication status. Examples: Y- Customer authenticated N- Customer not authenticated A- An authentication attempt occurred but could not be completed U- Unable to perform authentication
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType CustomerAuthStatusListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="EnrollStatusListType">
+		<xsd:annotation>
+			<xsd:documentation>
+        A data type for 3DS Program Enrollment Status contextual list. Examples: CardNotEnrolled, CardEnrolled, CardMayBeEnrolled, Unknown
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Disable"/>
+			<xsd:enumeration value="Enable"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EnrollStatusSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for 3DS Program Enrollment Status. Examples: CardNotEnrolled, CardEnrolled, CardMayBeEnrolled, Unknown
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType EnrollStatusListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SecureTransactionListType">
+		<xsd:annotation>
+			<xsd:documentation>
+        A data type for 3DS Transaction Type contextual list. Examples: Authorize: Authorize amount (no funds transferred) Complete: Complete a previous authorization (funds are transferred) Purchase: Purchase (funds are transferred immediately) Refund: Refund (funds transferred immediately) Validate: Validation Transaction (a small authorized transaction amount to validate card details including expiry date and address)
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Authorize">
+				<xsd:annotation>
+					<xsd:documentation>Amount is authorized. No funds are transferred.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="CheckEnrollment"/>
+			<xsd:enumeration value="Complete">
+				<xsd:annotation>
+					<xsd:documentation>
+            Complete a previous authorization. Funds are transferred.
+          </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Purchase">
+				<xsd:annotation>
+					<xsd:documentation>Purchase. Funds are transferred immediately.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Refund">
+				<xsd:annotation>
+					<xsd:documentation>Refund. Funds transferred immediately.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Validate">
+				<xsd:annotation>
+					<xsd:documentation>
+            Validation Transaction. Effects a $1.00 Authorization to validate card details including expiry date, address.
+          </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SecureTransactionSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for 3DS Transaction Type. Examples: Purchase, Refund, Authorization, Complete, Validate
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType SecureTransactionListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SecureTrxClientListType">
+		<xsd:annotation>
+			<xsd:documentation>
+        A data type for 3DS Secure Authorization Client Type contextual list. Examples: InteractiveVoiceResponse (IVR) Internet MailOrTelephoneOrder (MOTO) Recurring Unattended
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="InteractiveVoiceResponse">
+				<xsd:annotation>
+					<xsd:documentation>IVR</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Internet"/>
+			<xsd:enumeration value="MailOrTelephoneOrder">
+				<xsd:annotation>
+					<xsd:documentation>MOTO</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Recurring"/>
+			<xsd:enumeration value="Unattended"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SecureTrxClientSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for 3DS Secure Authorization Client Type. Examples: InteractiveVoiceResponse (IVR) Internet MailOrTelephoneOrder (MOTO) Recurring Unattended
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType SecureTrxClientListType"/>
+	</xsd:simpleType>
+	<!--<< ADVANCE PURCHASE >>-->
+	<xsd:simpleType name="AdvPurchListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Advanced Purchase list constraint.
+
+Examples: EARLIEST, LATEST, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="EARLIEST"/>
+			<xsd:enumeration value="LATEST"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AdvPurchaseSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Fare Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType AdvPurchListType"/>
+	</xsd:simpleType>
+	<!--<< APPLICATION >>-->
+	<xsd:simpleType name="ApplicationSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Application size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< AIRCRAFT >>-->
+	<xsd:simpleType name="AirRowNbrSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Aircraft row number.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AircraftEquipSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Aircraft Equipment Code encoding constraint: IATA/ A4A Aircraft Equipment Code</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< AIRLINE DESIGNATOR >>-->
+	<xsd:simpleType name="AirlineDesigSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Airline Designator Code encoding constraint: IATA/ A4A (two or three character) Airline Designator Code</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="2"/>
+			<xsd:maxLength value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< AIRPORT >>-->
+	<xsd:simpleType name="AirportCitySimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for an Airport or City Code constraint.</xsd:documentation>
+			<xsd:documentation source="Rules" xml:lang="en">Encoding: For maximum interoperability, use IATA/ A4A (three character) airport or city codes.</xsd:documentation>
+			<xsd:documentation source="Example" xml:lang="en">Examples: JFK, NYC</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< BAGGAGE >>-->
+	<xsd:simpleType name="BagAppListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Applicable To contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Party"/>
+			<xsd:enumeration value="Traveler"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BagAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType BagAppListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="BagDimensionListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Dimension contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Length"/>
+			<xsd:enumeration value="Height"/>
+			<xsd:enumeration value="Width"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BagDimensionSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Dimension Unit.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType BagDimensionListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="BagDiscloseRuleListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Disclosure Rule Code contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="D">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Disclosure with NO US DOT Reservation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="N">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">No Disclosure or US DOT Reservation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Y">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Disclosure AND US DOT Reservation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BagDiscloseRuleSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Disclosure Rule.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType BagDiscloseRuleListType"/>
+	</xsd:simpleType>
+	<!--<< CODESET >>-->
+	<xsd:simpleType name="CodesetValueSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Code Set Value size constraint.</xsd:documentation>
+			<xsd:documentation source="Rules" xml:lang="en">Encoding: Alphanumeric
+Min Length: 1
+Max Length: 6</xsd:documentation>
+			<xsd:documentation source="Example" xml:lang="en">Examples: A, ABC, 1</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="15"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OtherCodeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for an Implementer-Specified Code Value constraint.</xsd:documentation>
+			<xsd:documentation source="Rules" xml:lang="en">Encoding: Alphanumeric
+Min Length: 1
+Max Length: 6</xsd:documentation>
+			<xsd:documentation source="Example" xml:lang="en">Examples: A, ABC, 1</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< CONNECTION >>-->
+	<xsd:simpleType name="ConnectMethodListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application constrained list.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DirectWithAirline"/>
+			<xsd:enumeration value="DirectWithOther"/>
+			<xsd:enumeration value="Gateway"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ConnectMethodSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType ConnectMethodListType"/>
+	</xsd:simpleType>
+	<!--<< CONTACT >>-->
+	<xsd:simpleType name="ContactListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application constrained list.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Billing"/>
+			<xsd:enumeration value="Business"/>
+			<xsd:enumeration value="Home"/>
+			<xsd:enumeration value="ServiceLocation"/>
+			<xsd:enumeration value="StayLocation"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ContactAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType ContactListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="EmailListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Email Application list constraints.
+Example: Account, Business, Personal, SMS, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Account"/>
+			<xsd:enumeration value="Business"/>
+			<xsd:enumeration value="Personal"/>
+			<xsd:enumeration value="SMS"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EmailAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Email Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType EmailListType"/>
+	</xsd:simpleType>
+	<!--<< CONTEXT >>-->
+	<xsd:simpleType name="ContextSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Context Value size constraint.</xsd:documentation>
+			<xsd:documentation source="Rules" xml:lang="en">Encoding: Alphanumeric
+Min Length: 1
+Max Length: 35</xsd:documentation>
+			<xsd:documentation source="Example" xml:lang="en">Examples: Provider, tablename.field</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="35"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< COUNTRY >>-->
+	<xsd:simpleType name="CountrySimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Country Code encoding constraint: ISO 3166-1 (two character) Country Code</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[A-Z]{2}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< COUPON >>-->
+	<xsd:simpleType name="CouponMediaListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Coupon Media Type contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Electronic"/>
+			<xsd:enumeration value="Paper"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CouponMediaSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType CouponMediaListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="CouponPurposeListType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">A data type for a Coupon Purpose.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Additional"/>
+			<xsd:enumeration value="Base"/>
+			<xsd:enumeration value="Net">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en"/>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Refund"/>
+			<xsd:enumeration value="Sell">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en"/>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FareWaiverRuleListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Fare Rule Modification or Override Type contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ExchangedReissued"/>
+			<xsd:enumeration value="FareComponent"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FareWaiverRuleSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Baggage Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType FareWaiverRuleListType"/>
+	</xsd:simpleType>
+	<!--<< CURRENCY >>-->
+	<xsd:attributeGroup name="AmountCurrencyGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Currency encoding for the Amount value.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="Code" type="CurrencySimpleType" use="required">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Currency code. Example: USD
+Encoding Scheme: ISO 4217 (three alpha character) Currency Code</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:attributeGroup name="AmountCurrencyOptGroup">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Optional currency encoding for the Amount value.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:attribute name="Code" type="CurrencySimpleType" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">Currency code. Example: USD
+Encoding Scheme: ISO 4217 (three alpha character) Currency Code</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+	<xsd:simpleType name="CurrencyListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application list constraint.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Actual"/>
+			<xsd:enumeration value="Conversion"/>
+			<xsd:enumeration value="Display"/>
+			<xsd:enumeration value="Requested"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CurrencyAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType CurrencyListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="CurrencySimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code encoding constraint: ISO 4217 (three alpha character) Currency Code</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[A-Z]{3}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< DATE/ TIME FORMATS >>-->
+	<xsd:simpleType name="DayOfWeekMaskType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Day of Week encoding constraint:String, 1 - 7 length</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="7"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DayOfWeekSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Day of Week encoding constraint:Positive Integer 1 - 7</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0]{1}[1-7]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MonthNumberSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Month Number encoding constraint: 01 through 12</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-1]{1}[0-9]{1}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TimeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Time encoding constraint: SO 8601 Military/ 24 Hour (HH:MM)
+Example: 14:00</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="5"/>
+			<xsd:pattern value="([0-1][0-9]|2[0-3]):[0-5][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< DESCRIPTIONS >>-->
+	<xsd:simpleType name="DescriptionSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Description encoding constraint: Minimum Length of 1</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ShortDescSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Short Description size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="255"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< DOMAIN >>-->
+	<xsd:simpleType name="DomainSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for NDC Domain List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AirlineProfile"/>
+			<xsd:enumeration value="OrderManagement"/>
+			<xsd:enumeration value="PaymentTicketing"/>
+			<xsd:enumeration value="Shopping"/>
+			<xsd:enumeration value="Utility"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< DISTANCE >>-->
+	<xsd:simpleType name="DistanceUnitListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Distance Unit of Measure contextual list.
+Examples: Miles, Kilometers</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Feet"/>
+			<xsd:enumeration value="Kilometers">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">K = KILOMETERS</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Meters"/>
+			<xsd:enumeration value="Miles">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">M = MILES</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DistanceUnitSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Currency Code Application.
+
+Examples: Actual, Display, Requested, Conversion, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType DistanceUnitListType"/>
+	</xsd:simpleType>
+	<!--<< IMAGE >>-->
+	<xsd:simpleType name="ImageUnitListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for an Image UOM constrained list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Inch"/>
+			<xsd:enumeration value="Millimeter"/>
+			<xsd:enumeration value="Pixel"/>
+			<xsd:enumeration value="Point"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ImageUnitSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for an Image UOM Description.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ContextSimpleType ImageUnitListType"/>
+	</xsd:simpleType>
+	<!--<< LANGUAGE >>-->
+	<xsd:simpleType name="LanguageAppListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application list constraint.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Actual"/>
+			<xsd:enumeration value="Requested"/>
+			<xsd:enumeration value="Spoken"/>
+			<xsd:enumeration value="Written"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LanguageAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType LanguageAppListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="RenderingTypeListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Rendering Type constrained list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Narrative"/>
+			<xsd:enumeration value="XSLT"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RenderingTypeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType RenderingTypeListType"/>
+	</xsd:simpleType>
+	<!--<< PASSENGER TYPE >>-->
+	<xsd:simpleType name="PaxSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Passenger Type Code (PTC) encoding constraint: IATA (three character) Passenger Type Codes</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="3"/>
+			<xsd:pattern value="[0-9A-Z]{3}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< PAYMENT >>-->
+	<xsd:simpleType name="PayCardTypeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">A data type for a Credit Card Type constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:pattern value="[0-9a-zA-Z]{1,6}"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:union>
+	</xsd:simpleType>
+	<xsd:simpleType name="PayCardCodeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">A data type for a Credit Card Code constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:pattern value="[A-Z]{2}"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:union>
+	</xsd:simpleType>
+	<xsd:simpleType name="PayCardNmbrSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Credit Card Number constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9]{1,19}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PayCardCVV_SimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Payment Card Series Code constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9]{1,8}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PayCardDateSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Payment Card Date constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="(0[1-9]|1[0-2])[0-9][0-9]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PaymentStatusListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for Payment Status contextual list. Examples: Canceled, Complete, Failed, MoreInformation, Partial
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Canceled"/>
+			<xsd:enumeration value="Complete"/>
+			<xsd:enumeration value="Failed"/>
+			<xsd:enumeration value="MoreInformation"/>
+			<xsd:enumeration value="Partial"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MaskedCardNmbrSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Masked Payment Card Number constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9a-zA-Z]{1,19}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< PENALTY >>-->
+	<xsd:simpleType name="PenaltyAppListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Offer Penalty Amount Application list constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MaximumPenaltyAmount"/>
+			<xsd:enumeration value="MinimumPenaltyAmount"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PenaltyAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Offer Penalty Amount Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType PenaltyAppListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PenaltyListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Offer Penalty Type list constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Cancellation"/>
+			<xsd:enumeration value="Change"/>
+			<xsd:enumeration value="NoShow"/>
+			<xsd:enumeration value="Upgrade"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PenaltySimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Offer Penalty Type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType PenaltyListType"/>
+	</xsd:simpleType>
+	<!--<< PERCENTAGE >>-->
+	<xsd:simpleType name="WholePercentageSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for  Whole Percentage encoding constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minInclusive value="0.01"/>
+			<xsd:maxInclusive value="100"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< PREFERENCE >>-->
+	<xsd:simpleType name="PreferencesLevelListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Preference Type list constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Preferred"/>
+			<xsd:enumeration value="Required"/>
+			<xsd:enumeration value="Exclude"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PreferencesLevelSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType PreferencesLevelListType"/>
+	</xsd:simpleType>
+	<!--<< PROPER NAME >>-->
+	<xsd:simpleType name="ProperNameSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Proper Name size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CarrierNameType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Carrier Name size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="99"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PropertyNameSimpleType_">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Property Name size constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="50"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< PROXIMITY >>-->
+	<xsd:simpleType name="ProximityAppListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Proximity Data Application list constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ActualProximity"/>
+			<xsd:enumeration value="SearchRadius"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ProximityAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Proximity Data Application.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType ProximityAppListType"/>
+	</xsd:simpleType>
+	<!--<< PSEUDO CITY >>-->
+	<xsd:simpleType name="PseudoCitySimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for  Pseudo City Code encoding constraint. Example: AAA2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="16"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< REDEMPTION PRICING >>-->
+	<xsd:simpleType name="RedempUnitListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Redemption Unit List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Miles"/>
+			<xsd:enumeration value="Points"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RedemptionUnitSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType RedempUnitListType"/>
+	</xsd:simpleType>
+	<!--<< RULES >>-->
+	<xsd:simpleType name="RuleStatusListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Rule Status contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ActionRequired"/>
+			<xsd:enumeration value="RuleExecuted"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RuleStatusSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType RuleStatusListType"/>
+	</xsd:simpleType>
+	<!--<< SPECIAL SERVICE >>-->
+	<xsd:simpleType name="SpecialSrvcSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Special Service or Request Code constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="SSR_SimpleType CodesetValueSimpleType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SSR_SimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Special Service Request Code encoding constraint: IATA
+Examples:
+EXST (EXTRA SEAT REQUIRED)
+INFT (INFANT ACCOMPANYING ADULT PASSENGER)
+PETC (PASSENGER TRAVELING WITH PET IN CABIN)
+UMNR (UNACCOMPANIED MINOR)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[A-Z]{4}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< STANDARDS >>-->
+	<xsd:simpleType name="IATA_NbrSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for IATA Company Number encoding constraint. Example: 98417900</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[A-Z0-9]{7,8}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ICAO_LocSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for ICAO Location Code encoding constraint. Example: K (CONTIGUOUS UNITED STATES)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< TICKET >>-->
+	<xsd:simpleType name="TicketDesigAppListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Ticket Designator Application list constraint.
+
+Examples: Requested, Ticketed, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Requested"/>
+			<xsd:enumeration value="Ticketed"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TicketDesigAppSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Language Code Application.
+
+Examples: Display, Requested, Spoken, Written, Other</xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType TicketDesigAppListType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="TicketNumberSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for Ticket Number Constraint. Examples: String, Length 1 to 16.
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="16"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< TRIP >>-->
+	<xsd:simpleType name="TripPurposeListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Trip Purpose contextual list.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Business"/>
+			<xsd:enumeration value="Leisure"/>
+			<xsd:enumeration value="BusinessAndLeisure"/>
+			<xsd:enumeration value="Other"/>
+			<xsd:enumeration value="Unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< UNIQUE IDENTIFIER >>-->
+	<xsd:simpleType name="UniqueStringID_SimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for a Unique String Identifier constraint.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--<< UNITS OF MEASURE >>-->
+	<xsd:simpleType name="SizeUnitSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">A data type for Size Values list constraint. Examples: Centimeter, Inch</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Centimeter"/>
+			<xsd:enumeration value="Inch"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- << POLICY >> -->
+	<xsd:simpleType name="PolicyTypeSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for Policy Type list constraint. Examples: Privacy_PII, Payment_PCI, Credentialing
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Privacy_PII">
+				<xsd:annotation>
+					<xsd:documentation>
+            Personnally Identifting Information Privacy Policy.
+          </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="Payment_PCI"/>
+			<xsd:enumeration value="Credentialing"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PolicyTypeListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for Policy Type. Examples: Privacy_PII, Payment_PCI, Credentialing
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType PolicyTypeSimpleType"/>
+	</xsd:simpleType>
+	<!-- << RESHOPPING >> -->
+	<xsd:simpleType name="AlphaNumericStringLength1to3">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Used for Alpha-Numeric Strings, length 1 to 3</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9a-zA-Z]{1,3}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaLength3">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Used for Alphabetic Strings, length exactly 3</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[a-zA-Z]{3}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AirlineType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Type definition for IATA airline designator (2-alphanumeric) or ICAO airline code (3-alpha).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="([0-9A-Z]{2})|([A-Z]{3})"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumericStringLength1to71">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Used for Alpha-Numeric Strings, length 1 to 71</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9a-zA-Z]{1,71}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="AlphaNumericStringLength1to4">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Used forAlpha-Numeric Strings, length 1 to 4.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9a-zA-Z]{1,4}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="Numeric0to99">
+		<xsd:annotation>
+			<xsd:documentation>Use for numeric values, from 0 to 99 inclusive.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="99"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NumericStringLength1to19">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Used for Numeric Strings, length 1 to 19.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[0-9]{1,19}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OrderItemActionSimpleType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for an Order Action list constraint. Examples: Cancel, Create, Divide, Delete, Reissue, Reprice, Update
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Cancel"/>
+			<xsd:enumeration value="Create"/>
+			<xsd:enumeration value="Delete"/>
+			<xsd:enumeration value="Divide"/>
+			<xsd:enumeration value="Reissue"/>
+			<xsd:enumeration value="Reprice"/>
+			<xsd:enumeration value="Update"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MeasurementTypeListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+       Examples: Imperial, Metric
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Imperial"/>
+			<xsd:enumeration value="Metric"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OrderItemActionListType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">
+        A data type for an Order Action. Examples: Create, Update, Delete, Reissue, Reprice
+      </xsd:documentation>
+		</xsd:annotation>
+		<xsd:union memberTypes="ApplicationSimpleType OrderItemActionSimpleType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="BaggageCategoryListType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="CarryOn"/>
+			<xsd:enumeration value="Checked"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BeforeOrAfterListType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Before"/>
+			<xsd:enumeration value="After"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

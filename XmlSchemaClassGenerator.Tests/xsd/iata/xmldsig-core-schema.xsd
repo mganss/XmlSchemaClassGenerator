@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE schema PUBLIC "-//W3C//DTD XMLSchema 200102//EN" "http://www.w3.org/2001/XMLSchema.dtd" [
+	<!ATTLIST schema
+		xmlns:ds CDATA #FIXED "http://www.w3.org/2000/09/xmldsig#"
+	>
+	<!ENTITY dsig 'http://www.w3.org/2000/09/xmldsig#'>
+	<!ENTITY % p ''>
+	<!ENTITY % s ''>
+]>
+<!-- Schema for XML Signatures
+    http://www.w3.org/2000/09/xmldsig#
+    $Revision: 1.1 $ on $Date: 2002/02/08 20:32:26 $ by $Author: reagle $
+
+    Copyright 2001 The Internet Society and W3C (Massachusetts Institute
+    of Technology, Institut National de Recherche en Informatique et en
+    Automatique, Keio University). All Rights Reserved.
+    http://www.w3.org/Consortium/Legal/
+
+    This document is governed by the W3C Software License [1] as described
+    in the FAQ [2].
+
+    [1] http://www.w3.org/Consortium/Legal/copyright-software-19980720
+    [2] http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620.html#DTD
+-->
+<ns1:schema xmlns:ns1="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="0.1">
+	<!-- Basic Types Defined for Signatures -->
+	<ns1:simpleType name="CryptoBinary">
+		<ns1:restriction base="ns1:base64Binary"/>
+	</ns1:simpleType>
+	<!-- Start Signature -->
+	<ns1:element name="Signature" type="SignatureType"/>
+	<ns1:complexType name="SignatureType">
+		<ns1:sequence>
+			<ns1:element ref="SignedInfo"/>
+			<ns1:element ref="SignatureValue"/>
+			<ns1:element ref="KeyInfo" minOccurs="0"/>
+			<ns1:element ref="Object" minOccurs="0" maxOccurs="unbounded"/>
+		</ns1:sequence>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+	</ns1:complexType>
+	<ns1:element name="SignatureValue" type="SignatureValueType"/>
+	<ns1:complexType name="SignatureValueType">
+		<ns1:simpleContent>
+			<ns1:extension base="ns1:base64Binary">
+				<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+			</ns1:extension>
+		</ns1:simpleContent>
+	</ns1:complexType>
+	<!-- Start SignedInfo -->
+	<ns1:element name="SignedInfo" type="SignedInfoType"/>
+	<ns1:complexType name="SignedInfoType">
+		<ns1:sequence>
+			<ns1:element ref="CanonicalizationMethod"/>
+			<ns1:element ref="SignatureMethod"/>
+			<ns1:element ref="Reference" maxOccurs="unbounded"/>
+		</ns1:sequence>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+	</ns1:complexType>
+	<ns1:element name="CanonicalizationMethod" type="CanonicalizationMethodType"/>
+	<ns1:complexType name="CanonicalizationMethodType" mixed="true">
+		<ns1:sequence>
+			<ns1:any namespace="##any" minOccurs="0" maxOccurs="unbounded"/>
+			<!-- (0,unbounded) elements from (1,1) namespace -->
+		</ns1:sequence>
+		<ns1:attribute name="Algorithm" type="ns1:anyURI" use="required"/>
+	</ns1:complexType>
+	<ns1:element name="SignatureMethod" type="SignatureMethodType"/>
+	<ns1:complexType name="SignatureMethodType" mixed="true">
+		<ns1:sequence>
+			<ns1:element name="HMACOutputLength" type="HMACOutputLengthType" minOccurs="0"/>
+			<ns1:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
+			<!-- (0,unbounded) elements from (1,1) external namespace -->
+		</ns1:sequence>
+		<ns1:attribute name="Algorithm" type="ns1:anyURI" use="required"/>
+	</ns1:complexType>
+	<!-- Start Reference -->
+	<ns1:element name="Reference" type="ReferenceType"/>
+	<ns1:complexType name="ReferenceType">
+		<ns1:sequence>
+			<ns1:element ref="Transforms" minOccurs="0"/>
+			<ns1:element ref="DigestMethod"/>
+			<ns1:element ref="DigestValue"/>
+		</ns1:sequence>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+		<ns1:attribute name="URI" type="ns1:anyURI" use="optional"/>
+		<ns1:attribute name="Type" type="ns1:anyURI" use="optional"/>
+	</ns1:complexType>
+	<ns1:element name="Transforms" type="TransformsType"/>
+	<ns1:complexType name="TransformsType">
+		<ns1:sequence>
+			<ns1:element ref="Transform" maxOccurs="unbounded"/>
+		</ns1:sequence>
+	</ns1:complexType>
+	<ns1:element name="Transform" type="TransformType"/>
+	<ns1:complexType name="TransformType" mixed="true">
+		<ns1:choice minOccurs="0" maxOccurs="unbounded">
+			<ns1:any namespace="##other" processContents="lax"/>
+			<!-- (1,1) elements from (0,unbounded) namespaces -->
+			<ns1:element name="XPath" type="ns1:string"/>
+		</ns1:choice>
+		<ns1:attribute name="Algorithm" type="ns1:anyURI" use="required"/>
+	</ns1:complexType>
+	<!-- End Reference -->
+	<ns1:element name="DigestMethod" type="DigestMethodType"/>
+	<ns1:complexType name="DigestMethodType" mixed="true">
+		<ns1:sequence>
+			<ns1:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</ns1:sequence>
+		<ns1:attribute name="Algorithm" type="ns1:anyURI" use="required"/>
+	</ns1:complexType>
+	<ns1:element name="DigestValue" type="DigestValueType"/>
+	<ns1:simpleType name="DigestValueType">
+		<ns1:restriction base="ns1:base64Binary"/>
+	</ns1:simpleType>
+	<!-- End SignedInfo -->
+	<!-- Start KeyInfo -->
+	<ns1:element name="KeyInfo" type="KeyInfoType"/>
+	<ns1:complexType name="KeyInfoType" mixed="true">
+		<ns1:choice maxOccurs="unbounded">
+			<ns1:element ref="KeyName"/>
+			<ns1:element ref="KeyValue"/>
+			<ns1:element ref="RetrievalMethod"/>
+			<ns1:element ref="X509Data"/>
+			<ns1:element ref="PGPData"/>
+			<ns1:element ref="SPKIData"/>
+			<ns1:element ref="MgmtData"/>
+			<ns1:any namespace="##other" processContents="lax"/>
+			<!-- (1,1) elements from (0,unbounded) namespaces -->
+		</ns1:choice>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+	</ns1:complexType>
+	<ns1:element name="KeyName" type="ns1:string"/>
+	<ns1:element name="MgmtData" type="ns1:string"/>
+	<ns1:element name="KeyValue" type="KeyValueType"/>
+	<ns1:complexType name="KeyValueType" mixed="true">
+		<ns1:choice>
+			<ns1:element ref="DSAKeyValue"/>
+			<ns1:element ref="RSAKeyValue"/>
+			<ns1:any namespace="##other" processContents="lax"/>
+		</ns1:choice>
+	</ns1:complexType>
+	<ns1:element name="RetrievalMethod" type="RetrievalMethodType"/>
+	<ns1:complexType name="RetrievalMethodType">
+		<ns1:sequence>
+			<ns1:element ref="Transforms" minOccurs="0"/>
+		</ns1:sequence>
+		<ns1:attribute name="URI" type="ns1:anyURI"/>
+		<ns1:attribute name="Type" type="ns1:anyURI" use="optional"/>
+	</ns1:complexType>
+	<!-- Start X509Data -->
+	<ns1:element name="X509Data" type="X509DataType"/>
+	<ns1:complexType name="X509DataType">
+		<ns1:sequence maxOccurs="unbounded">
+			<ns1:choice>
+				<ns1:element name="X509IssuerSerial" type="X509IssuerSerialType"/>
+				<ns1:element name="X509SKI" type="ns1:base64Binary"/>
+				<ns1:element name="X509SubjectName" type="ns1:string"/>
+				<ns1:element name="X509Certificate" type="ns1:base64Binary"/>
+				<ns1:element name="X509CRL" type="ns1:base64Binary"/>
+				<ns1:any namespace="##other" processContents="lax"/>
+			</ns1:choice>
+		</ns1:sequence>
+	</ns1:complexType>
+	<ns1:complexType name="X509IssuerSerialType">
+		<ns1:sequence>
+			<ns1:element name="X509IssuerName" type="ns1:string"/>
+			<ns1:element name="X509SerialNumber" type="ns1:integer"/>
+		</ns1:sequence>
+	</ns1:complexType>
+	<!-- End X509Data -->
+	<!-- Begin PGPData -->
+	<ns1:element name="PGPData" type="PGPDataType"/>
+	<ns1:complexType name="PGPDataType">
+		<ns1:choice>
+			<ns1:sequence>
+				<ns1:element name="PGPKeyID" type="ns1:base64Binary"/>
+				<ns1:element name="PGPKeyPacket" type="ns1:base64Binary" minOccurs="0"/>
+				<ns1:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</ns1:sequence>
+			<ns1:sequence>
+				<ns1:element name="PGPKeyPacket" type="ns1:base64Binary"/>
+				<ns1:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</ns1:sequence>
+		</ns1:choice>
+	</ns1:complexType>
+	<!-- End PGPData -->
+	<!-- Begin SPKIData -->
+	<ns1:element name="SPKIData" type="SPKIDataType"/>
+	<ns1:complexType name="SPKIDataType">
+		<ns1:sequence maxOccurs="unbounded">
+			<ns1:element name="SPKISexp" type="ns1:base64Binary"/>
+			<ns1:any namespace="##other" processContents="lax" minOccurs="0"/>
+		</ns1:sequence>
+	</ns1:complexType>
+	<!-- End SPKIData -->
+	<!-- End KeyInfo -->
+	<!-- Start Object (Manifest, SignatureProperty) -->
+	<ns1:element name="Object" type="ObjectType"/>
+	<ns1:complexType name="ObjectType" mixed="true">
+		<ns1:sequence minOccurs="0" maxOccurs="unbounded">
+			<ns1:any namespace="##any" processContents="lax"/>
+		</ns1:sequence>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+		<ns1:attribute name="MimeType" type="ns1:string" use="optional"/>
+		<ns1:attribute name="Encoding" type="ns1:anyURI" use="optional"/>
+		<!-- add a grep facet -->
+	</ns1:complexType>
+	<ns1:element name="Manifest" type="ManifestType"/>
+	<ns1:complexType name="ManifestType">
+		<ns1:sequence>
+			<ns1:element ref="Reference" maxOccurs="unbounded"/>
+		</ns1:sequence>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+	</ns1:complexType>
+	<ns1:element name="SignatureProperties" type="SignaturePropertiesType"/>
+	<ns1:complexType name="SignaturePropertiesType">
+		<ns1:sequence>
+			<ns1:element ref="SignatureProperty" maxOccurs="unbounded"/>
+		</ns1:sequence>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+	</ns1:complexType>
+	<ns1:element name="SignatureProperty" type="SignaturePropertyType"/>
+	<ns1:complexType name="SignaturePropertyType" mixed="true">
+		<ns1:choice maxOccurs="unbounded">
+			<ns1:any namespace="##other" processContents="lax"/>
+			<!-- (1,1) elements from (1,unbounded) namespaces -->
+		</ns1:choice>
+		<ns1:attribute name="Target" type="ns1:anyURI" use="required"/>
+		<ns1:attribute name="Id" type="ns1:ID" use="optional"/>
+	</ns1:complexType>
+	<!-- End Object (Manifest, SignatureProperty) -->
+	<!-- Start Algorithm Parameters -->
+	<ns1:simpleType name="HMACOutputLengthType">
+		<ns1:restriction base="ns1:integer"/>
+	</ns1:simpleType>
+	<!-- Start KeyValue Element-types -->
+	<ns1:element name="DSAKeyValue" type="DSAKeyValueType"/>
+	<ns1:complexType name="DSAKeyValueType">
+		<ns1:sequence>
+			<ns1:sequence minOccurs="0">
+				<ns1:element name="P" type="CryptoBinary"/>
+				<ns1:element name="Q" type="CryptoBinary"/>
+			</ns1:sequence>
+			<ns1:element name="G" type="CryptoBinary" minOccurs="0"/>
+			<ns1:element name="Y" type="CryptoBinary"/>
+			<ns1:element name="J" type="CryptoBinary" minOccurs="0"/>
+			<ns1:sequence minOccurs="0">
+				<ns1:element name="Seed" type="CryptoBinary"/>
+				<ns1:element name="PgenCounter" type="CryptoBinary"/>
+			</ns1:sequence>
+		</ns1:sequence>
+	</ns1:complexType>
+	<ns1:element name="RSAKeyValue" type="RSAKeyValueType"/>
+	<ns1:complexType name="RSAKeyValueType">
+		<ns1:sequence>
+			<ns1:element name="Modulus" type="CryptoBinary"/>
+			<ns1:element name="Exponent" type="CryptoBinary"/>
+		</ns1:sequence>
+	</ns1:complexType>
+	<!-- End KeyValue Element-types -->
+	<!-- End Signature -->
+</ns1:schema>

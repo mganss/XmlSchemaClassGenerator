@@ -261,8 +261,12 @@ namespace XmlSchemaClassGenerator
 
             Types[AnyType] = objectModel;
 
-            AttributeGroups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>()).ToDictionary(g => g.QualifiedName);
-            Groups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.Groups.Values.Cast<XmlSchemaGroup>()).ToDictionary(g => g.QualifiedName);
+            AttributeGroups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>())
+                .DistinctBy(g => g.QualifiedName.ToString())
+                .ToDictionary(g => g.QualifiedName);
+            Groups = Set.Schemas().Cast<XmlSchema>().SelectMany(s => s.Groups.Values.Cast<XmlSchemaGroup>())
+                .DistinctBy(g => g.QualifiedName.ToString())
+                .ToDictionary(g => g.QualifiedName);
 
             foreach (var globalType in Set.GlobalTypes.Values.Cast<XmlSchemaType>())
             {
@@ -605,30 +609,40 @@ namespace XmlSchemaClassGenerator
                     if (attribute.Use != XmlSchemaUse.Prohibited)
                     {
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
+                        var attributeName = ToTitleCase(attribute.QualifiedName.Name);
 
-                        if (attributeQualifiedName.IsEmpty)
+                        if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup && attributeGroup.QualifiedName != typeModel.XmlSchemaName)
                         {
-                            attributeQualifiedName = attribute.QualifiedName;
-
-                            if (attributeQualifiedName.IsEmpty || attributeQualifiedName.Namespace == "")
+                            var interfaceTypeModel = (InterfaceModel)Types[attributeGroup.QualifiedName];
+                            var interfaceProperty = interfaceTypeModel.Properties.Single(p => p.XmlSchemaName == attribute.QualifiedName);
+                            attributeQualifiedName = interfaceProperty.Type.XmlSchemaName;
+                            attributeName = interfaceProperty.Name;
+                        }
+                        else
+                        {
+                            if (attributeQualifiedName.IsEmpty)
                             {
-                                // inner type, have to generate a type name
-                                var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(typeModel.Name, attribute.QualifiedName.Name);
-                                attributeQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
-                                // try to avoid name clashes
-                                if (NameExists(attributeQualifiedName))
+                                attributeQualifiedName = attribute.QualifiedName;
+
+                                if (attributeQualifiedName.IsEmpty || attributeQualifiedName.Namespace == "")
                                 {
-                                    attributeQualifiedName = new[] { "Item", "Property", "Element" }
-                                        .Select(s => new XmlQualifiedName(attributeQualifiedName.Name + s, attributeQualifiedName.Namespace))
-                                        .First(n => !NameExists(n));
+                                    // inner type, have to generate a type name
+                                    var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(typeModel.Name, attribute.QualifiedName.Name);
+                                    attributeQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
+                                    // try to avoid name clashes
+                                    if (NameExists(attributeQualifiedName))
+                                    {
+                                        attributeQualifiedName = new[] { "Item", "Property", "Element" }
+                                            .Select(s => new XmlQualifiedName(attributeQualifiedName.Name + s, attributeQualifiedName.Namespace))
+                                            .First(n => !NameExists(n));
+                                    }
                                 }
                             }
-                        }
 
-                        var attributeName = ToTitleCase(attribute.QualifiedName.Name);
-                        if (attributeName == typeModel.Name)
-                        {
-                            attributeName += "Property"; // member names cannot be the same as their enclosing type
+                            if (attributeName == typeModel.Name)
+                            {
+                                attributeName += "Property"; // member names cannot be the same as their enclosing type
+                            }
                         }
 
                         var property = new PropertyModel(_configuration)

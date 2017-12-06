@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.000" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<xsd:include schemaLocation="aidm_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+
+    O R D E R   R U L E S   R E S P O N S E   B U S I N E S S   O B J E C T
+
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="OrderRulesRS">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">The OrderRules transaction set requests the rules, change and penalty fees applicable to a specified order.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="Success" type="SuccessType">
+							<xsd:annotation>
+								<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Response">
+							<xsd:annotation>
+								<xsd:documentation>Query Results.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element ref="OrderRulesProcessing" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Transaction Processing Results, including processing status, alerts, notices, business warnings, supplemental marketing messages and policy.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="OrderRules">
+										<xsd:annotation>
+											<xsd:documentation>Order Rules.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:complexContent>
+												<xsd:extension base="OrderPenaltyType"/>
+											</xsd:complexContent>
+										</xsd:complexType>
+									</xsd:element>
+									<xsd:element name="OrderID"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="OrderRulesProcessing" type="OrdRulesProcessType">
+		<xsd:annotation>
+			<xsd:documentation>Transaction Processing Results, including processing status, alerts, business warnings, supplemental marketing messages and policy.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OrdRulesProcessType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Response Message Processing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="OrderProcessResultType">
+				<xsd:sequence>
+					<xsd:element ref="Notices" minOccurs="0"/>
+					<xsd:element ref="Remarks" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

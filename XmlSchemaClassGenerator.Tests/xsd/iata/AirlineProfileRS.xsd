@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.000" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+   A I R L I N E   F R O F I L E   R E S P O N S E   B U S I N E S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////-->
+	<xsd:element name="AirlineProfileRS">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">Response from an Airline Profile Sender to an Airline Profile Receiver to get one or more Airlines’ Profiles            
+The message also returns multi-media content at the message level with media content references at the individual service level.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Success" type="SuccessType">
+							<xsd:annotation>
+								<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Profiles">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="Profile" maxOccurs="unbounded">
+										<xsd:annotation>
+											<xsd:documentation source="Description" xml:lang="en">Query result.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="RecordCount" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>The number of decompressed records contained in this file.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:simpleType>
+														<xsd:restriction base="xsd:positiveInteger">
+															<xsd:totalDigits value="9"/>
+															<xsd:minInclusive value="1"/>
+															<xsd:maxInclusive value="999999999"/>
+														</xsd:restriction>
+													</xsd:simpleType>
+												</xsd:element>
+												<xsd:element name="ProfileOwner" type="ProfileOwnerType">
+													<xsd:annotation>
+														<xsd:documentation>Profile owner (Airline).          The standard industry alphanumeric code for the airline.  </xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+												<xsd:element name="SourceFiles">
+													<xsd:annotation>
+														<xsd:documentation>Airline Profile Data elements or Link</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="SourceFile" maxOccurs="unbounded">
+																<xsd:annotation>
+																	<xsd:documentation>Airline Profile Data elements or Link</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:choice>
+																		<xsd:element name="MediaLink" type="xsd:anyURI">
+																			<xsd:annotation>
+																				<xsd:documentation>Link to Airline Profile Source File. Alows large AP file to be distributed over FTP, FTPS, ... as agreed bilaterally with Profile Owner</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="DataItems">
+																			<xsd:annotation>
+																				<xsd:documentation>Actual Data Elements of the Profile</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:sequence>
+																					<xsd:element name="POSGeoSpecification" type="GeographicSpecificationType" minOccurs="0" maxOccurs="unbounded">
+																						<xsd:annotation>
+																							<xsd:documentation>Point of sale Geographic Specification information.</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																					<xsd:element name="POSNonGeoSpecification" type="NonGeographicSpecificationType" minOccurs="0" maxOccurs="unbounded">
+																						<xsd:annotation>
+																							<xsd:documentation>Point of sale Non Geographic Specification information.</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																					<xsd:element name="OfferGeoSpecification" minOccurs="0" maxOccurs="unbounded">
+																						<xsd:annotation>
+																							<xsd:documentation>Offer Geographic Specification</xsd:documentation>
+																						</xsd:annotation>
+																						<xsd:complexType>
+																							<xsd:complexContent>
+																								<xsd:extension base="OfferGeographicSpecificationType"/>
+																							</xsd:complexContent>
+																						</xsd:complexType>
+																					</xsd:element>
+																					<xsd:element name="OfferedService" minOccurs="0" maxOccurs="4">
+																						<xsd:annotation>
+																							<xsd:documentation>Offered Service.      Example:                         1. Transportation               2. Baggage                      3. Seats                           4. Other     </xsd:documentation>
+																						</xsd:annotation>
+																						<xsd:complexType>
+																							<xsd:simpleContent>
+																								<xsd:extension base="OfferedServiceType">
+																									<xsd:attribute name="Permitted">
+																										<xsd:annotation>
+																											<xsd:documentation>Specify whether the service is offered. Example: True</xsd:documentation>
+																										</xsd:annotation>
+																									</xsd:attribute>
+																								</xsd:extension>
+																							</xsd:simpleContent>
+																						</xsd:complexType>
+																					</xsd:element>
+																				</xsd:sequence>
+																				<xsd:attribute name="ActionType" use="required">
+																					<xsd:annotation>
+																						<xsd:documentation>Add, Delete, Or Change</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																				<xsd:attribute name="SequenceNumber" type="xsd:long" use="required">
+																					<xsd:annotation>
+																						<xsd:documentation>Global sequence number of this record in the Airline profile.</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																			</xsd:complexType>
+																		</xsd:element>
+																	</xsd:choice>
+																</xsd:complexType>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="SupportedMessageInfo" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation source="DESCRIPTION" xml:lang="en">List of supported messages and respective versions.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="Name" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation source="DESCRIPTION" xml:lang="en">Name of NDC Message.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="Version" maxOccurs="unbounded">
+										<xsd:annotation>
+											<xsd:documentation source="DESCRIPTION" xml:lang="en">Version of NDC Message.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="SupportedElementPath" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+													<xsd:annotation>
+														<xsd:documentation source="DESCRIPTION" xml:lang="en">X-Path to supported elements and/or attributes with a specific message of a specific version.</xsd:documentation>
+													</xsd:annotation>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

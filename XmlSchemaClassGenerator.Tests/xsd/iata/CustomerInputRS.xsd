@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="4.001" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+     C U S T O M E R  I N P U T   R E S P O N S E   B U S I N E S S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="CustomerInputRS">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">The CustomerInput transaction set supports other EDIST transactions by providing discrete-but related-functional capabilities for customer authentication and 3D Secure Payment Authentication. Supported functionality includes:
+
+PIN Phrasing Scheme Membership: Predefined structures and keyword-value pairs are provided for 1.5FA (Factor Authentication) Traveler authentication.
+
+3-D Secure Payment Protocol: 3DS is designed to reduce fraud and chargebacks during e-commerce Internet transactions. Cardholders are asked to identify themselves at the point of sale before the purchase can be completed. This usually means entering a PIN or other password after entering their card details.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="Success" type="SuccessType">
+							<xsd:annotation>
+								<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Response">
+							<xsd:annotation>
+								<xsd:documentation>Query Results.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element ref="CustomerInputProcessing" minOccurs="0"/>
+									<xsd:element name="PassengerAuthentication" type="PIN_AuthTravelerType" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Passenger Pin Phrase Authentication.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="SecurePayments" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>3D Secure Payment Program Enrollment, Verification and Authentication information.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="SecurePayment" maxOccurs="unbounded">
+													<xsd:annotation>
+														<xsd:documentation>3D Secure Payment detail.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:complexContent>
+															<xsd:extension base="SecurePaymentAlertType">
+																<xsd:sequence>
+																	<xsd:element name="Status" minOccurs="0">
+																		<xsd:annotation>
+																			<xsd:documentation>Traveler Authentication process status.
+Examples:
+Y- Customer authenticated
+N- Customer not authenticated
+A- An authentication attempt occurred but could not be completed
+U- Unable to perform authentication</xsd:documentation>
+																		</xsd:annotation>
+																		<xsd:complexType>
+																			<xsd:simpleContent>
+																				<xsd:extension base="CustomerAuthStatusSimpleType">
+																					<xsd:attribute name="Context" type="ContextSimpleType" use="optional">
+																						<xsd:annotation>
+																							<xsd:documentation>Authentication Status Context.</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:attribute>
+																				</xsd:extension>
+																			</xsd:simpleContent>
+																		</xsd:complexType>
+																	</xsd:element>
+																</xsd:sequence>
+															</xsd:extension>
+														</xsd:complexContent>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CustInputResProcessType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Customer Input Response Message Processing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AssociatedObjectBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Notices" minOccurs="0"/>
+					<xsd:element ref="MarketingMessages" minOccurs="0"/>
+					<xsd:element ref="Policies" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Message Policy information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="AlertInd" type="xsd:boolean" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">When true, processing alerts have been generated and the Alerts node should be parsed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="MarketingInd" type="xsd:boolean" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">When true, supplemental marketing information has been generated and the Notifications/ MarketingMessage node should be parsed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="WarningInd" type="xsd:boolean" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">When true, business warnings have been generated and the Notification/Warning node should be parsed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="NoticeInd" type="xsd:boolean" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">When true, notices have been generated and the Notifications/Notice node should be parsed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CustomerInputProcessing" type="CustInputResProcessType">
+		<xsd:annotation>
+			<xsd:documentation>Transaction Processing Results, including processing status, payload content notifices, , business warnings and supplemental marketing messages.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

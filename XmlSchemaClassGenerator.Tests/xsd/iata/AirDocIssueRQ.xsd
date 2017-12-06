@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="5.000" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<xsd:include schemaLocation="aidm_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+   A I R   D O C U M E N T   I S S U E   R E Q U E S T   B U S I N E S S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="AirDocIssueRQ">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">The AirDocIssue transaction set requests an Airline to issue flight (ET) and/or ancillary (EMD) document(s).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="PointOfSale" minOccurs="0"/>
+				<xsd:element ref="Document"/>
+				<xsd:element ref="Party"/>
+				<xsd:element name="Query">
+					<xsd:annotation>
+						<xsd:documentation>Air Document Issue Request Query.</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element ref="TicketDocQuantity"/>
+							<xsd:element name="TicketDocInfo" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Coupon Creation Information, including Traveler; Order/ Booking Reference ID(s); Promotions and Commission.</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="PassengerReference" type="xsd:IDREF">
+											<xsd:annotation>
+												<xsd:documentation>Association to a passenger.</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element ref="BookingReference" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Booking Reference information.
+</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="OrderReference" type="CouponOrderKeyType" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>The order id for which a ticket/document should be issued.</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="Promotions" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Promotion information.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Promotion" type="PromotionType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>Promotion Code.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="Payments" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation source="description" xml:lang="en">Payment information.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Payment" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation source="description" xml:lang="en">Payment detail, including association(s).</xsd:documentation>
+														</xsd:annotation>
+														<xsd:complexType>
+															<xsd:complexContent>
+																<xsd:extension base="OrderPaymentFormType">
+																	<xsd:sequence>
+																		<xsd:element name="Order" maxOccurs="unbounded">
+																			<xsd:complexType>
+																				<xsd:sequence>
+																					<xsd:element name="OrderItemID" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+																						<xsd:annotation>
+																							<xsd:documentation>
+                            Association to one or multiple Order Items instance(s). Example:OI1 OI2
+                          </xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																				</xsd:sequence>
+																				<xsd:attribute name="OrderID" type="UniqueID_SimpleType" use="required">
+																					<xsd:annotation>
+																						<xsd:documentation>The airline-assigned unique Order ID. Example: ORDER-c98c-4759-a20b</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																				<xsd:attribute name="Owner" type="AirlineDesigSimpleType" use="required">
+																					<xsd:annotation>
+																						<xsd:documentation source="Description" xml:lang="en">Airline Designator of airline that owns/ assigned this ID. Example: BA
+
+Encoding Scheme: IATA/ A4A (two or three character) Airline Designator Codes</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																				<xsd:attribute name="OwnerType">
+																					<xsd:annotation>
+																						<xsd:documentation>The POA OrderID should only go to the ORA, not back to the seller.
+1. ORA
+2. POA</xsd:documentation>
+																					</xsd:annotation>
+																					<xsd:simpleType>
+																						<xsd:restriction base="xsd:string">
+																							<xsd:enumeration value="ORA"/>
+																							<xsd:enumeration value="POA"/>
+																						</xsd:restriction>
+																					</xsd:simpleType>
+																				</xsd:attribute>
+																			</xsd:complexType>
+																		</xsd:element>
+																	</xsd:sequence>
+																</xsd:extension>
+															</xsd:complexContent>
+														</xsd:complexType>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="Commission" type="CommissionType" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Commission information</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="DataLists" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Data Lists(s).</xsd:documentation>
+								</xsd:annotation>
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="PassengerList" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Passenger data list definition.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="Passenger" type="PassengerType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>Any person except members of the crew carried or to be carried with the consent of the carrier, on board of any transport vehicle such as aircraft, train, bus, ship.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+										<xsd:element name="ContactList" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Contact data list definition.</xsd:documentation>
+											</xsd:annotation>
+											<xsd:complexType>
+												<xsd:sequence>
+													<xsd:element name="ContactInformation" type="ContactInformationType" maxOccurs="unbounded">
+														<xsd:annotation>
+															<xsd:documentation>The electronic or geographic address which a party has provided as the contact channel. For example, contact email, contact postal address, contact phone number.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:element>
+												</xsd:sequence>
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -91,6 +91,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
         const string WadlPattern = @"xsd\wadl\wadl.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
+        const string IataPattern = @"xsd\iata\????[^_][^_]?[^-]*.xsd";
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
@@ -110,6 +111,16 @@ namespace XmlSchemaClassGenerator.Tests
             TestSamples("Wadl", WadlPattern);
             Compile("IS24ImmoTransfer", IS24ImmoTransferPattern);
             TestSamples("IS24ImmoTransfer", IS24ImmoTransferPattern);
+            Compile("Iata", IataPattern, new Generator
+            {
+                EntityFramework = true,
+                DataAnnotationMode = DataAnnotationMode.All,
+                NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
+                    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace),
+                MemberVisitor = (member, model) => { },
+                GenerateInterfaces = true
+            });
+            TestSamples("Iata", IataPattern);
         }
 
         private void TestSamples(string name, string pattern)

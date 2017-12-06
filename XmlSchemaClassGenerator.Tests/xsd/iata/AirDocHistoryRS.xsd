@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.001" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+    A I R   D O C U M E N T   H I S TO R Y   R E S P O N S E   B U S I N E S S   O B J E C T
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="AirDocHistoryRS">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">The AirDocHistory transaction returns the ticket/document history.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="Success" type="SuccessType">
+							<xsd:annotation>
+								<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Response">
+							<xsd:annotation>
+								<xsd:documentation>Query Results.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element ref="AirDocHistoryProcessing" minOccurs="0"/>
+									<xsd:element name="TicketDocInfo">
+										<xsd:annotation>
+											<xsd:documentation>Ticket/document information.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:complexContent>
+												<xsd:extension base="TicketDocHistoryType">
+													<xsd:attribute name="ExchTicketNbrInd" type="xsd:boolean" use="optional">
+														<xsd:annotation>
+															<xsd:documentation>When true, this is the ticket/document number for a ticket/document that is being exchanged.</xsd:documentation>
+														</xsd:annotation>
+													</xsd:attribute>
+													<xsd:attribute name="PrimaryDocInd" type="xsd:boolean" use="optional">
+														<xsd:annotation>
+															<xsd:documentation>When true, this is the primary ticket/document number. </xsd:documentation>
+														</xsd:annotation>
+													</xsd:attribute>
+												</xsd:extension>
+											</xsd:complexContent>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AirDocHistoryResProcessType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Response Message Processing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Alerts" minOccurs="0"/>
+			<xsd:element ref="Notices" minOccurs="0"/>
+			<xsd:element ref="MarketingMessages" minOccurs="0"/>
+			<xsd:element ref="Policies" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Message Policy information.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="ObjAssociationAttrGroup"/>
+		<xsd:attribute name="AlertInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, processing alerts have been generated and the Alerts node should be parsed.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="MarketingInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, supplemental marketing information has been generated and the Notifications/ MarketingMessage node should be parsed.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="WarningInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, business warnings have been generated and the Notification/Warning node should be parsed.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="NoticeInd" type="xsd:boolean" use="optional">
+			<xsd:annotation>
+				<xsd:documentation source="description" xml:lang="en">When true, notices have been generated and the Notifications/Notice node should be parsed.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:element name="AirDocHistoryProcessing" type="AirDocHistoryResProcessType">
+		<xsd:annotation>
+			<xsd:documentation>Transaction Processing Results, including processing status, payload content notifices, , business warnings and supplemental marketing messages.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>

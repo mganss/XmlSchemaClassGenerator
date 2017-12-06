@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="5.000" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<xsd:include schemaLocation="aidm_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+
+    O R D E R   V I E W   R E S P O N S E   B U S I N E S S   O B J E C T
+
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="OrderViewRS">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">The OrderCreate/ OrderView transaction is a multi-function message that may:
+
+1) Request specified inventory to be held (and returns a reference to the held inventory)
+
+2) Request that an order to be created (returning the complete view of the Order)
+
+3) Request additions to order data elements (e.g. add frequent flyer data)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:element ref="Party" minOccurs="0"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="Success" type="SuccessType">
+							<xsd:annotation>
+								<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Response">
+							<xsd:annotation>
+								<xsd:documentation>Query Results.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element ref="OrderViewProcessing" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Transaction Processing Results, including processing status, alerts, notices, business warnings, supplemental marketing messages and policy.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="Group" type="GroupType" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation source="description" xml:lang="en">Group Information.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="Order" maxOccurs="unbounded">
+										<xsd:annotation>
+											<xsd:documentation source="description" xml:lang="en">Order information.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:complexContent>
+												<xsd:extension base="OrderType">
+													<xsd:sequence>
+														<xsd:element name="OrderItems" type="OrderItemType">
+															<xsd:annotation>
+																<xsd:documentation source="description" xml:lang="en">Order Item Detail.</xsd:documentation>
+															</xsd:annotation>
+														</xsd:element>
+													</xsd:sequence>
+												</xsd:extension>
+											</xsd:complexContent>
+										</xsd:complexType>
+									</xsd:element>
+									<xsd:element name="TicketDocInfos" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Ticket/ Document Information.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="TicketDocInfo" maxOccurs="unbounded">
+													<xsd:annotation>
+														<xsd:documentation>Ticket/document information.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="AgentIDs" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Booking and Servicing Agent information.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element ref="AgentID" maxOccurs="2"/>
+																	</xsd:sequence>
+																</xsd:complexType>
+															</xsd:element>
+															<xsd:element ref="IssuingAirlineInfo" minOccurs="0"/>
+															<xsd:element ref="TicketDocument" maxOccurs="unbounded"/>
+															<xsd:element name="Price" type="ServicePriceType" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Fare Tax information.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+															<xsd:element ref="CarrierFeeInfo" minOccurs="0"/>
+															<xsd:element ref="OriginalIssueInfo" minOccurs="0"/>
+															<xsd:element ref="PassengerReference"/>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+									<xsd:element name="Commission" type="CommissionType" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Commission information.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="Amendments" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation source="description" xml:lang="en">Order Amendment information.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="Amendment" maxOccurs="unbounded">
+													<xsd:annotation>
+														<xsd:documentation>Amendment Detail.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="ActionType">
+																<xsd:annotation>
+																	<xsd:documentation>Amendement Action Type. Examples: Add, Change, Delete, Reissue, Reprice</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:simpleContent>
+																		<xsd:extension base="OrderItemActionListType">
+																			<xsd:attribute name="Context" type="ContextSimpleType" use="optional">
+																				<xsd:annotation>
+																					<xsd:documentation>Action Type Context.</xsd:documentation>
+																				</xsd:annotation>
+																			</xsd:attribute>
+																		</xsd:extension>
+																	</xsd:simpleContent>
+																</xsd:complexType>
+															</xsd:element>
+															<xsd:element name="OfferItem" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Offer Item ID with optional Service ID(s).</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:complexContent>
+																		<xsd:extension base="AssociatedObjectBaseType">
+																			<xsd:sequence>
+																				<xsd:element ref="OfferItemID"/>
+																				<xsd:element name="Passengers" minOccurs="0">
+																					<xsd:annotation>
+																						<xsd:documentation>Passenger(s)/ Group associated with the Offer Item.
+
+Note: This contains references to Passenger and Group instance(s) defined in the  Passengers node.</xsd:documentation>
+																					</xsd:annotation>
+																					<xsd:complexType>
+																						<xsd:choice>
+																							<xsd:element ref="PassengerReferences">
+																								<xsd:annotation>
+																									<xsd:documentation>Association to multiple Passenger instance(s). Example: pax1 pax2</xsd:documentation>
+																								</xsd:annotation>
+																							</xsd:element>
+																							<xsd:element ref="GroupReference"/>
+																						</xsd:choice>
+																					</xsd:complexType>
+																				</xsd:element>
+																				<xsd:element name="Services" minOccurs="0">
+																					<xsd:annotation>
+																						<xsd:documentation>Associated Optional Service(s).</xsd:documentation>
+																					</xsd:annotation>
+																					<xsd:complexType>
+																						<xsd:sequence>
+																							<xsd:element ref="ServiceID" maxOccurs="unbounded"/>
+																							<xsd:element name="Passengers" minOccurs="0">
+																								<xsd:annotation>
+																									<xsd:documentation>Passenger(s)/ Group associated with the Offer Item.
+
+Note: This contains references to Passenger and Group instance(s) defined in the  Passengers node.</xsd:documentation>
+																								</xsd:annotation>
+																								<xsd:complexType>
+																									<xsd:choice>
+																										<xsd:element ref="PassengerReferences">
+																											<xsd:annotation>
+																												<xsd:documentation>Association to multiple Passenger instance(s). Example: pax1 pax2</xsd:documentation>
+																											</xsd:annotation>
+																										</xsd:element>
+																										<xsd:element ref="GroupReference"/>
+																									</xsd:choice>
+																								</xsd:complexType>
+																							</xsd:element>
+																						</xsd:sequence>
+																					</xsd:complexType>
+																				</xsd:element>
+																				<xsd:element name="OtherAssociation" minOccurs="0" maxOccurs="unbounded">
+																					<xsd:annotation>
+																						<xsd:documentation source="description" xml:lang="en">Other Named Association(s).
+
+Note: Includes an association type choice (e.g. MediaGroup) and an instance association value (e.g. mediagrp1).</xsd:documentation>
+																					</xsd:annotation>
+																					<xsd:complexType>
+																						<xsd:attribute name="Type" type="OtherOrderAssocListType" use="required">
+																							<xsd:annotation>
+																								<xsd:documentation>Named Instance Association Type. Examples: CarryOnAllowance, MediaGroup</xsd:documentation>
+																							</xsd:annotation>
+																						</xsd:attribute>
+																						<xsd:attribute name="ReferenceValue" type="xsd:IDREF" use="required">
+																							<xsd:annotation>
+																								<xsd:documentation>Associated object instance value.
+Example: mediagrp1</xsd:documentation>
+																							</xsd:annotation>
+																						</xsd:attribute>
+																					</xsd:complexType>
+																				</xsd:element>
+																			</xsd:sequence>
+																		</xsd:extension>
+																	</xsd:complexContent>
+																</xsd:complexType>
+															</xsd:element>
+															<xsd:element name="TicketDocInfo" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Ticket/document information.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element name="AgentIDs" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Booking and Servicing Agent information.</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:sequence>
+																					<xsd:element ref="AgentID" maxOccurs="2"/>
+																				</xsd:sequence>
+																			</xsd:complexType>
+																		</xsd:element>
+																		<xsd:element ref="IssuingAirlineInfo" minOccurs="0"/>
+																		<xsd:element ref="TicketDocument" maxOccurs="4"/>
+																		<xsd:element ref="CarrierFeeInfo" minOccurs="0"/>
+																		<xsd:element ref="OriginalIssueInfo" minOccurs="0"/>
+																		<xsd:element name="Passengers" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Passenger(s)/ Group associated with the Offer Item.
+
+Note: This contains references to Passenger and Group instance(s) defined in the  Passengers node.</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:choice>
+																					<xsd:element ref="PassengerReferences">
+																						<xsd:annotation>
+																							<xsd:documentation>Association to multiple Passenger instance(s). Example: pax1 pax2</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																					<xsd:element ref="GroupReference"/>
+																				</xsd:choice>
+																			</xsd:complexType>
+																		</xsd:element>
+																	</xsd:sequence>
+																</xsd:complexType>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+									<xsd:element name="DataLists" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Data Lists(s).</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="PassengerList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>Passenger data list definition.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="Passenger" type="PassengerType" maxOccurs="unbounded">
+																<xsd:annotation>
+																	<xsd:documentation>Any person except members of the crew carried or to be carried with the consent of the carrier, on board of any transport vehicle such as aircraft, train, bus, ship.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="ContactList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>Contact data list definition.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="ContactInformation" type="ContactInformationType" maxOccurs="unbounded">
+																<xsd:annotation>
+																	<xsd:documentation>The electronic or geographic address which a party has provided as the contact channel. For example, contact email, contact postal address, contact phone number.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element ref="BagDisclosureList" minOccurs="0"/>
+												<xsd:element name="BaggageAllowanceList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>Checked or Carry-On Baggage Allowance detail. Use BaggageCategory to specify which of the two.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="BaggageAllowance" maxOccurs="unbounded">
+																<xsd:annotation>
+																	<xsd:documentation source="description" xml:lang="en">Checked or Carry-On Baggage Allowance detail. Use BaggageCategory to specify which of the two.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element name="BaggageCategory" type="xsd:string">
+																			<xsd:annotation>
+																				<xsd:documentation>Enumeration:
+
+CarryOn
+Checked</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element ref="AllowanceDescription" minOccurs="0"/>
+																		<xsd:element ref="DimensionAllowance" minOccurs="0"/>
+																		<xsd:element ref="PieceAllowance" minOccurs="0" maxOccurs="unbounded"/>
+																		<xsd:element ref="WeightAllowance" minOccurs="0"/>
+																		<xsd:element name="BaggageDeterminingCarrier" type="BaggageDeterminingCarrierType" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Baggage Determining Carrier as defined in resolution 722 (f), and who’s baggage rules apply.</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																	</xsd:sequence>
+																	<xsd:attribute name="BaggageAllowanceID" type="xsd:ID" use="required"/>
+																</xsd:complexType>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element ref="ClassOfServiceList" minOccurs="0"/>
+												<xsd:element ref="ContentSourceList" minOccurs="0"/>
+												<xsd:element name="DescriptionList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>Description Details</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element ref="Description" maxOccurs="unbounded"/>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element ref="DisclosureList" minOccurs="0"/>
+												<xsd:element ref="FareList" minOccurs="0"/>
+												<xsd:element name="FlightSegmentList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>List of Flight Segments</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="FlightSegment" type="ListOfFlightSegmentType" maxOccurs="unbounded"/>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="FlightList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>List of Flight elements.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="Flight" maxOccurs="unbounded">
+																<xsd:annotation>
+																	<xsd:documentation>Journey information describing the travel between an airport/city where travel commences and an airport/city where travel ultimately terminates. A journey may be comprised of one or more segments. Note: This node will be renamed to journey in future releases.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element name="Journey" type="TotalJourneyType" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Flight journey information.</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element ref="SegmentReferences"/>
+																		<xsd:element name="Settlement" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Interline Settlement information between airlines, including method of settlement, interline settlement value and currency.</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:sequence>
+																					<xsd:element name="Method" type="IATA_CodeType">
+																						<xsd:annotation>
+																							<xsd:documentation source="description" xml:lang="en">Service settlement method.
+Examples:
+AD (Internal Airline Document)
+DS (Direct Settlement)
+EA (EMD Associated or Internal Airline Document)
+ES (EMD Standalone )
+FI (Fare Integrated)
+MA (Flight Associated, Settled via MCO)
+MS (Standalone, Settled via MCO)
+
+Encoding Scheme: IATA PADIS Codeset SST (Service Settlement Type)</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																					<xsd:element name="InterlineSettlementValue" type="CurrencyAmountOptType" minOccurs="0">
+																						<xsd:annotation>
+																							<xsd:documentation source="description" xml:lang="en">Settlement (Price) Value. Example: 300 (USD)
+
+Note: This represents a Settlement value that is only used between the POA and ORA.</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																				</xsd:sequence>
+																			</xsd:complexType>
+																		</xsd:element>
+																	</xsd:sequence>
+																	<xsd:attributeGroup ref="ObjAssociationAttrGroup"/>
+																	<xsd:attribute name="FlightKey" type="KeyIdentifier">
+																		<xsd:annotation>
+																			<xsd:documentation>A globally unique identifier for this Flight instance. Example: flight1</xsd:documentation>
+																		</xsd:annotation>
+																	</xsd:attribute>
+																</xsd:complexType>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="OriginDestinationList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>List of Origin/Destination elements.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element ref="OriginDestination" maxOccurs="unbounded"/>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element ref="InstructionsList" minOccurs="0"/>
+												<xsd:element ref="MediaList" minOccurs="0"/>
+												<xsd:element ref="PenaltyList" minOccurs="0"/>
+												<xsd:element name="PriceClassList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>Price Class list.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="PriceClass" type="PriceClassType" maxOccurs="unbounded"/>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="ServiceDefinitionList" minOccurs="0">
+													<xsd:annotation>
+														<xsd:documentation>Description and characteristics of a Service</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="ServiceDefinition" type="ServiceDefinitionType" maxOccurs="unbounded"/>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element ref="TermsList" minOccurs="0"/>
+												<xsd:element name="SeatDefinitionList" minOccurs="0">
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="SeatDefinition" minOccurs="0" maxOccurs="unbounded">
+																<xsd:annotation>
+																	<xsd:documentation>Seat information by aircraft section.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element name="Description" minOccurs="0" maxOccurs="unbounded">
+																			<xsd:complexType>
+																				<xsd:sequence>
+																					<xsd:sequence>
+																						<xsd:element name="Text" minOccurs="0">
+																							<xsd:annotation>
+																								<xsd:documentation source="description" xml:lang="en">Description value.</xsd:documentation>
+																							</xsd:annotation>
+																							<xsd:complexType>
+																								<xsd:simpleContent>
+																									<xsd:extension base="DescriptionSimpleType">
+																										<xsd:attributeGroup ref="ObjAssociationAttrGroup"/>
+																									</xsd:extension>
+																								</xsd:simpleContent>
+																							</xsd:complexType>
+																						</xsd:element>
+																						<xsd:element name="MarkupStyle" type="ProperNameSimpleType" minOccurs="0">
+																							<xsd:annotation>
+																								<xsd:documentation source="description" xml:lang="en">Mark-up Style. Example: HTML</xsd:documentation>
+																							</xsd:annotation>
+																						</xsd:element>
+																					</xsd:sequence>
+																					<xsd:element name="Link" type="xsd:string" minOccurs="0">
+																						<xsd:annotation>
+																							<xsd:documentation source="description" xml:lang="en">LINK to Description information source.</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																					<xsd:element name="Media" minOccurs="0" maxOccurs="unbounded">
+																						<xsd:annotation>
+																							<xsd:documentation source="description" xml:lang="en">Description-associated Media Object(s).</xsd:documentation>
+																						</xsd:annotation>
+																						<xsd:complexType>
+																							<xsd:choice>
+																								<xsd:element name="ObjectID" type="MediaID_Type">
+																									<xsd:annotation>
+																										<xsd:documentation source="description" xml:lang="en">Description-associated MEDIA OBJECT ID or Key. Example: IMG1</xsd:documentation>
+																									</xsd:annotation>
+																								</xsd:element>
+																								<xsd:element ref="MediaLink">
+																									<xsd:annotation>
+																										<xsd:documentation source="description" xml:lang="en">Description-associated MEDIA LINK.</xsd:documentation>
+																									</xsd:annotation>
+																								</xsd:element>
+																								<xsd:element name="AttachmentID" type="MediaID_Type">
+																									<xsd:annotation>
+																										<xsd:documentation source="description" xml:lang="en">Description-associated Media Attachment ID. Example: ATT1.</xsd:documentation>
+																									</xsd:annotation>
+																								</xsd:element>
+																							</xsd:choice>
+																						</xsd:complexType>
+																					</xsd:element>
+																				</xsd:sequence>
+																			</xsd:complexType>
+																		</xsd:element>
+																		<xsd:element name="Marketing" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Images and/or links for the entire section defined by the range of rows.</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:complexContent>
+																					<xsd:extension base="SeatMapMessageType"/>
+																				</xsd:complexContent>
+																			</xsd:complexType>
+																		</xsd:element>
+																		<xsd:element name="SeatCharacteristicCode" type="CodesetValueSimpleType" minOccurs="0" maxOccurs="unbounded">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Refers to aircraft seat characteristics; seat option codes.  Examples: E (EXIT ROW), M (Middle Seat), A (Aisle seat), L (Left side of aircraft), Q (Bulk Head).  Refer to PADIS code list 9825.</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="UOM" type="SizeUnitSimpleType" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Associated Keyword Unit of Measure, if relevant. Example: INCH</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="SeatWidthLow" type="xsd:decimal" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Lowest Width Measurement value for this section. Example: 20</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="SeatPitchLow" type="xsd:decimal" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Lowest Pitch Measurement value for this section. Example: 32</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="Keywords" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Seat Description Key-Value Word Pairs.
+Examples:
+ReclineDegree - 25
+BedLengthLowEnd - 68
+BedLengthHighEnd - 78
+WidthLowEnd - 20
+WidthHighEnd - 21.5
+PitchLowEnd - 32
+PitchHighEnd - 34.4
+</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:sequence>
+																					<xsd:element name="KeyWord" type="KeyWordType" maxOccurs="unbounded">
+																						<xsd:annotation>
+																							<xsd:documentation source="description" xml:lang="en">Key-Value detail.</xsd:documentation>
+																						</xsd:annotation>
+																					</xsd:element>
+																				</xsd:sequence>
+																			</xsd:complexType>
+																		</xsd:element>
+																	</xsd:sequence>
+																	<xsd:attribute name="SeatDefinitionID" type="xsd:ID" use="required"/>
+																</xsd:complexType>
+															</xsd:element>
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+									<xsd:element name="Metadata" type="OrdViewMetadataType" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation source="description" xml:lang="en">Metadata List(s).</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="OrderViewProcessing" type="OrderViewProcessType">
+		<xsd:annotation>
+			<xsd:documentation>Transaction Processing Results, including processing status, alerts, business warnings, supplemental marketing messages and policy.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OrdViewMetadataType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Metadata definition.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PassengerMetadata" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Other" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation source="description" xml:lang="en">Other Metadata Lists(s).</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="OtherMetadata" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation source="description" xml:lang="en">Other Metadata List.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice>
+									<xsd:element ref="AddressMetadatas"/>
+									<xsd:element ref="AircraftMetadatas"/>
+									<xsd:element ref="AirportMetadatas"/>
+									<xsd:element ref="CityMetadatas"/>
+									<xsd:element ref="CodesetMetadatas"/>
+									<xsd:element ref="ContactMetadatas"/>
+									<xsd:element ref="ContentMetadatas"/>
+									<xsd:element ref="CountryMetadatas"/>
+									<xsd:element ref="CurrencyMetadatas"/>
+									<xsd:element ref="DescriptionMetadatas"/>
+									<xsd:element ref="EquivalentID_Metadatas"/>
+									<xsd:element ref="LanguageMetadatas"/>
+									<xsd:element ref="PaymentCardMetadatas"/>
+									<xsd:element ref="PaymentFormMetadatas"/>
+									<xsd:element ref="PriceMetadatas"/>
+									<xsd:element ref="RuleMetadatas"/>
+									<xsd:element ref="StateProvMetadatas"/>
+									<xsd:element ref="ZoneMetadatas"/>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="OrderViewProcessType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Response Message Processing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="OrderProcessResultType">
+				<xsd:sequence>
+					<xsd:element ref="Alerts" minOccurs="0"/>
+					<xsd:element ref="Notices" minOccurs="0"/>
+					<xsd:element ref="Remarks" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

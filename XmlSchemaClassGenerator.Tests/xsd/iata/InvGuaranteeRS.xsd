@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iata.org/IATA/EDIST/2017.2" targetNamespace="http://www.iata.org/IATA/EDIST/2017.2" elementFormDefault="qualified" attributeFormDefault="unqualified" version="5.001" id="IATA2017.2">
+	<xsd:include schemaLocation="edist_commontypes.xsd"/>
+	<xsd:include schemaLocation="aidm_commontypes.xsd"/>
+	<!--
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+
+    I N V E N T O R Y   G U A R A N T E E   R E S P O N S E   B U S I N E S S   O B J E C T
+
+= / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / = / =
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+	<xsd:element name="InvGuaranteeRS">
+		<xsd:annotation>
+			<xsd:documentation source="DESCRIPTION" xml:lang="en">The InventoryGuarantee transaction set requests that inventory is guaranteed for specified Offers, pending their conversion into a completed Order.
+
+The response returns an indication if the inventory has been guaranteed, and if so, the associated inventory guarantee time limit and a unique inventory guarantee reference ID.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Document"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="Success" type="SuccessType">
+							<xsd:annotation>
+								<xsd:documentation>The presence of the empty Success element explicitly indicates that the message succeeded.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Warnings" type="WarningsType" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Used in conjunction with the Success element to define one or more business errors.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Response">
+							<xsd:annotation>
+								<xsd:documentation>Query Results.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element ref="InvGuaranteeProcessing" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Transaction Processing Results, including processing status, business warnings, supplemental marketing messages and/ or additional information required to complete a transaction.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element name="Guarantees" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Guaranteed Inventory information.</xsd:documentation>
+										</xsd:annotation>
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="Guarantee" maxOccurs="unbounded">
+													<xsd:annotation>
+														<xsd:documentation>Guaranteed Inventory Item detail.</xsd:documentation>
+													</xsd:annotation>
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element name="InvGuaranteeID" type="UniqueStringID_SimpleType">
+																<xsd:annotation>
+																	<xsd:documentation source="description" xml:lang="en">Unique Inventory Guarantee ID. Examples: INVREF123456, 68E0-675C
+
+Note: This is a unique identifier issued by an Airline to reference that inventory for a specified offer will be guaranteed as available for a period.</xsd:documentation>
+																</xsd:annotation>
+															</xsd:element>
+															<xsd:element ref="InventoryGuaranteeTimeLimits"/>
+															<xsd:element name="Associations" minOccurs="0">
+																<xsd:annotation>
+																	<xsd:documentation>Guaranteed Inventory associations.</xsd:documentation>
+																</xsd:annotation>
+																<xsd:complexType>
+																	<xsd:sequence>
+																		<xsd:element ref="ServiceID" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Associated Service ID(s). Example: SRVC0001</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element ref="OfferItemID" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Associated Offer Item ID(s).
+Example: OFFER1226</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element ref="OrderID" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Associated Order ID
+Example: ORDER7333</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element ref="OrderItemID" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation>Associated Order Item ID(s).
+Example: ORD7333-001</xsd:documentation>
+																			</xsd:annotation>
+																		</xsd:element>
+																		<xsd:element name="OtherAssociation" minOccurs="0">
+																			<xsd:annotation>
+																				<xsd:documentation source="description" xml:lang="en">Other Named Association(s).
+
+Note: Includes an association type choice (e.g. MediaGroup) and an instance association value (e.g. mediagrp1).</xsd:documentation>
+																			</xsd:annotation>
+																			<xsd:complexType>
+																				<xsd:attribute name="Type" type="OtherOrderAssocListType" use="required">
+																					<xsd:annotation>
+																						<xsd:documentation>Named Instance Association Type. Examples: CarryOnAllowance, MediaGroup</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																				<xsd:attribute name="ReferenceValue" type="xsd:IDREF" use="required">
+																					<xsd:annotation>
+																						<xsd:documentation>Associated object instance value.
+Example: mediagrp1</xsd:documentation>
+																					</xsd:annotation>
+																				</xsd:attribute>
+																			</xsd:complexType>
+																		</xsd:element>
+																	</xsd:sequence>
+																</xsd:complexType>
+															</xsd:element>
+															<xsd:element name="Price" minOccurs="0">
+																<xsd:complexType>
+																	<xsd:complexContent>
+																		<xsd:extension base="PriceCoreType">
+																			<xsd:sequence>
+																				<xsd:element name="Amount" type="CurrencyAmountOptType" minOccurs="0"/>
+																			</xsd:sequence>
+																		</xsd:extension>
+																	</xsd:complexContent>
+																</xsd:complexType>
+															</xsd:element>
+															<xsd:element ref="ShoppingResponseID"/>
+														</xsd:sequence>
+														<xsd:attribute name="WaitlistInd" type="xsd:boolean" use="optional">
+															<xsd:annotation>
+																<xsd:documentation>When true, the inventory is waitlisted.</xsd:documentation>
+															</xsd:annotation>
+														</xsd:attribute>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+								<xsd:attribute name="NoGuaranteeInd" type="xsd:boolean" use="optional">
+									<xsd:annotation>
+										<xsd:documentation>When true, no inventory could be guaranteed.</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="DataLists" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Data Lists(s).</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:complexContent>
+									<xsd:extension base="DataListType">
+										<xsd:sequence>
+											<xsd:element name="PassengerList" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Passenger data list definition.</xsd:documentation>
+												</xsd:annotation>
+												<xsd:complexType>
+													<xsd:sequence>
+														<xsd:element name="Passenger" type="PassengerType" maxOccurs="unbounded">
+															<xsd:annotation>
+																<xsd:documentation>Any person except members of the crew carried or to be carried with the consent of the carrier, on board of any transport vehicle such as aircraft, train, bus, ship.</xsd:documentation>
+															</xsd:annotation>
+														</xsd:element>
+													</xsd:sequence>
+												</xsd:complexType>
+											</xsd:element>
+											<xsd:element name="ContactList" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Contact data list definition.</xsd:documentation>
+												</xsd:annotation>
+												<xsd:complexType>
+													<xsd:sequence>
+														<xsd:element name="ContactInformation" type="ContactInformationType" maxOccurs="unbounded">
+															<xsd:annotation>
+																<xsd:documentation>The electronic or geographic address which a party has provided as the contact channel. For example, contact email, contact postal address, contact phone number.</xsd:documentation>
+															</xsd:annotation>
+														</xsd:element>
+													</xsd:sequence>
+												</xsd:complexType>
+											</xsd:element>
+										</xsd:sequence>
+									</xsd:extension>
+								</xsd:complexContent>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="Metadata" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Metadata List(s).</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element ref="CurrencyMetadatas"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:element ref="Errors"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attributeGroup ref="IATA_PayloadStdAttributes"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="InvGuarResProcessType">
+		<xsd:annotation>
+			<xsd:documentation source="description" xml:lang="en">Response Message Processing.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AssociatedObjectBaseType">
+				<xsd:sequence>
+					<xsd:element ref="Remarks" minOccurs="0"/>
+					<xsd:element ref="Policies" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation source="description" xml:lang="en">Message Policy information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="WarningInd" type="xsd:boolean" use="optional">
+					<xsd:annotation>
+						<xsd:documentation source="description" xml:lang="en">When true, business warnings have been generated and the Notification/Warning node should be parsed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="InvGuaranteeProcessing" type="InvGuarResProcessType">
+		<xsd:annotation>
+			<xsd:documentation>Transaction Processing Results, including processing status, payload content notifices, , business warnings and supplemental marketing messages.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+</xsd:schema>
