@@ -230,6 +230,12 @@ public partial class B: ICommon
 }
 ```
 
+Collection types
+----------------
+
+Values for the `--collectionType` and `--collectionImplementationType` options have to be given in the format accepted by
+the [`Type.GetType()`](https://docs.microsoft.com/en-us/dotnet/api/system.type.gettype) method. For the `System.Collections.Generic.List<T>` class this means ``System.Collections.Generic.List`1``.
+
 Contributing
 ------------
 
