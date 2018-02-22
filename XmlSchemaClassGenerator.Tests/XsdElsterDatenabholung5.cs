@@ -88,7 +88,7 @@ namespace XmlSchemaClassGenerator.Tests
             var outputName = Path.Combine(outputPath, "Elster.Test.dll");
             var fileNames = new DirectoryInfo(inputPath).GetFiles("*.cs").Select(x => x.FullName).ToArray();
             var results = provider.CompileAssemblyFromFile(new CompilerParameters(assemblies, outputName), fileNames);
-            Assert.Equal(0, results.Errors.Count);
+            Assert.Empty(results.Errors);
             results.CompiledAssembly.GetType("Elster.Datenabholung5.Elster", true);
             results.CompiledAssembly.GetType("Elster.Basis.TransferHeaderCType", true);
         }

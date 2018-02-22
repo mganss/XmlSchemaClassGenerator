@@ -597,10 +597,9 @@ namespace XmlSchemaClassGenerator
 
         private void AddDocs(CodeTypeMember member)
         {
-            var simpleType = PropertyType as SimpleModel;
             var docs = new List<DocumentationModel>(Documentation);
 
-            if (simpleType != null)
+            if (PropertyType is SimpleModel simpleType)
             {
                 docs.AddRange(simpleType.Documentation);
                 docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = "en", Text = r.Description }));

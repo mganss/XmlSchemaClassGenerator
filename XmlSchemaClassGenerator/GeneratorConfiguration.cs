@@ -11,6 +11,8 @@ namespace XmlSchemaClassGenerator
 {
     public class GeneratorConfiguration
     {
+        public static Regex IdentifierRegex = new Regex(@"^@?[_\p{L}\p{Nl}][\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
+
         public GeneratorConfiguration()
         {
             NamespaceProvider = new NamespaceProvider()
@@ -19,7 +21,7 @@ namespace XmlSchemaClassGenerator
                 {
                     var xn = key.XmlSchemaNamespace;
                     var name = string.Join(".",
-                        xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
+                        xn.Split('/').Where(p => p != "schema" && IdentifierRegex.IsMatch(p))
                             .Select(n => n.ToTitleCase(NamingScheme.PascalCase)));
                     if (!string.IsNullOrEmpty(NamespacePrefix))
                     {

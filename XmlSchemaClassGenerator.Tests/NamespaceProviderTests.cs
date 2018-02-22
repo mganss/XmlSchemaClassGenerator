@@ -20,7 +20,7 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.True(ns.ContainsKey(new NamespaceKey("y")));
             Assert.False(ns.ContainsKey(new NamespaceKey("z")));
             ns.Clear();
-            Assert.Equal(0, ns.Count);
+            Assert.Empty(ns);
         }
 
         [Fact]
@@ -37,9 +37,9 @@ namespace XmlSchemaClassGenerator.Tests
             var ns = new NamespaceProvider();
             ns[new NamespaceKey("x")] = "c";
             ns.GenerateNamespace = k => k.XmlSchemaNamespace != "z" ? k.XmlSchemaNamespace : null;
-            Assert.Equal(ns[new NamespaceKey("x")], "c");
-            Assert.Equal(ns[new NamespaceKey("y")], "y");
-            Assert.Equal(ns[new NamespaceKey("y")], "y");
+            Assert.Equal("c", ns[new NamespaceKey("x")]);
+            Assert.Equal("y", ns[new NamespaceKey("y")]);
+            Assert.Equal("y", ns[new NamespaceKey("y")]);
             Assert.Throws<KeyNotFoundException>(() => ns[new NamespaceKey("z")]);
         }
     }

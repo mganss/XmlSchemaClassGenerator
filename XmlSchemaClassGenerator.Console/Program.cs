@@ -92,7 +92,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
                 var xn = key.XmlSchemaNamespace;
-                var name = string.Join(".", xn.Split('/').Where(p => Regex.IsMatch(p, @"^[A-Za-z]+$") && p != "schema")
+                var name = string.Join(".", xn.Split('/').Where(p => p != "schema" && GeneratorConfiguration.IdentifierRegex.IsMatch(p))
                     .Select(n => n.ToTitleCase(NamingScheme.PascalCase)));
                 if (!string.IsNullOrEmpty(namespacePrefix)) { name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name)); }
                 return name;
@@ -132,7 +132,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             }
 
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
-            
+
             generator.Generate(files);
         }
 
