@@ -27,9 +27,9 @@ namespace XmlSchemaClassGenerator
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
-        public static string ToBackingField(this string propertyName)
+        public static string ToBackingField(this string propertyName, bool removeUderscoreInPriverMember)
         {
-            return string.Concat("_", propertyName.ToCamelCase());
+            return removeUderscoreInPriverMember ? propertyName.ToCamelCase(): string.Concat("_", propertyName.ToCamelCase());
         }
 
         private static bool? IsDataTypeAttributeAllowed(XmlTypeCode typeCode, GeneratorConfiguration configuration)
@@ -171,8 +171,8 @@ namespace XmlSchemaClassGenerator
 
         public static string GetUniqueFieldName(this TypeModel typeModel, PropertyModel propertyModel)
         {
-            var propBackingFieldName = propertyModel.Name.ToBackingField();
             var classModel = typeModel as ClassModel;
+            var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.RemoveUderscoreInPriverMember==true);
             if (classModel == null)
             {
                 return propBackingFieldName;
@@ -192,7 +192,7 @@ namespace XmlSchemaClassGenerator
                     break;
                 }
 
-                var backingFieldName = prop.Name.ToBackingField();
+                var backingFieldName = prop.Name.ToBackingField(classModel.RemoveUderscoreInPriverMember);
                 if (backingFieldName == propBackingFieldName)
                 {
                     i += 1;

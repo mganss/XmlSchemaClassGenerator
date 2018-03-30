@@ -211,6 +211,7 @@ namespace XmlSchemaClassGenerator
         public List<InterfaceModel> Interfaces { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
         public bool EnableDataBinding { get; set; }
+        public bool RemoveUderscoreInPriverMember { get; set; }
 
         public ClassModel(GeneratorConfiguration configuration)
             : base(configuration)
@@ -292,7 +293,7 @@ namespace XmlSchemaClassGenerator
 
                     if (EnableDataBinding)
                     {
-                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField())
+                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField(RemoveUderscoreInPriverMember))
                         {
                             Attributes = MemberAttributes.Private
                         };
@@ -691,7 +692,8 @@ namespace XmlSchemaClassGenerator
                 else
                     member = new CodeMemberField(typeReference, propertyName);
 
-                var isPrivateSetter = IsCollection || isArray;
+                var isPrivateSetter = !Configuration.GenerateSetterInCollection && (IsCollection || isArray);
+
                 if (requiresBackingField)
                 {
                     member.Name += GetAccessors(member.Name, backingField.Name,
