@@ -36,7 +36,7 @@ namespace XmlSchemaClassGenerator.Console
             var generateDebuggerStepThroughAttribute = true;
             var disableComments = false;
             var setterInCollection = false;
-            var removeUnderscoreInPrivateMember = false;
+            var doNotUseUnderscoreInPrivateMemberNames = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -80,7 +80,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null },
                 { "dc|disableComments", "do not include comments from xsd", v => disableComments = v != null },
                 { "sc|setterInCollection", "generate setter in Collection (default is false)", v => setterInCollection = v != null },
-                { "ru|removeUderscore", "do not generate uderscore in priver member name (default is false)", v => removeUnderscoreInPrivateMember = v != null },
+                { "nu|noUnderscore", "do not generate underscore in private member name (default is false)", v => doNotUseUnderscoreInPrivateMemberNames = v != null },
             };
 
             var files = options.Parse(args);
@@ -135,7 +135,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 generator.DataAnnotationMode = DataAnnotationMode.None;
             }
             generator.GenerateSetterInCollection = setterInCollection;
-            generator.RemoveUderscoreInPriverMember = removeUnderscoreInPrivateMember;
+            generator.DoNotUseUnderscoreInPrivateMemberNames = doNotUseUnderscoreInPrivateMemberNames;
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
             generator.Generate(files);

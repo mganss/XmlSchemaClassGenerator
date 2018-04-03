@@ -178,10 +178,10 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.GenerateSetterInCollection; }
             set { _configuration.GenerateSetterInCollection = value; }
         }
-        public bool RemoveUderscoreInPriverMember
+        public bool DoNotUseUnderscoreInPrivateMemberNames
         {
-            get { return _configuration.RemoveUderscoreInPriverMember; }
-            set { _configuration.RemoveUderscoreInPriverMember = value; }
+            get { return _configuration.DoNotUseUnderscoreInPrivateMemberNames; }
+            set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
         }
 
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
@@ -424,9 +424,7 @@ namespace XmlSchemaClassGenerator
                     IsAbstract = complexType.IsAbstract,
                     IsAnonymous = complexType.QualifiedName.Name == "",
                     IsMixed = complexType.IsMixed,
-                    IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty,
-                    EnableDataBinding = EnableDataBinding,
-                    RemoveUderscoreInPriverMember = RemoveUderscoreInPriverMember
+                    IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty
                 };
 
                 classModel.Documentation.AddRange(docs);

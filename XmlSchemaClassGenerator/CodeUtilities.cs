@@ -27,9 +27,9 @@ namespace XmlSchemaClassGenerator
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
-        public static string ToBackingField(this string propertyName, bool removeUderscoreInPriverMember)
+        public static string ToBackingField(this string propertyName, bool doNotUseUnderscoreInPrivateMemberNames)
         {
-            return removeUderscoreInPriverMember ? propertyName.ToCamelCase(): string.Concat("_", propertyName.ToCamelCase());
+            return doNotUseUnderscoreInPrivateMemberNames ? propertyName.ToCamelCase() : string.Concat("_", propertyName.ToCamelCase());
         }
 
         private static bool? IsDataTypeAttributeAllowed(XmlTypeCode typeCode, GeneratorConfiguration configuration)
@@ -172,16 +172,20 @@ namespace XmlSchemaClassGenerator
         public static string GetUniqueFieldName(this TypeModel typeModel, PropertyModel propertyModel)
         {
             var classModel = typeModel as ClassModel;
-            var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.RemoveUderscoreInPriverMember==true);
+            var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.DoNotUseUnderscoreInPrivateMemberNames == true);
+
+            if (CShaprpKeywords.Contains(propBackingFieldName.ToLower()))
+                propBackingFieldName = "@" + propBackingFieldName;
+
             if (classModel == null)
             {
                 return propBackingFieldName;
             }
-            
+
             var i = 0;
             foreach (var prop in classModel.Properties)
             {
-                if (!classModel.EnableDataBinding && !(prop.Type is SimpleModel))
+                if (!classModel.Configuration.EnableDataBinding && !(prop.Type is SimpleModel))
                 {
                     continue;
                 }
@@ -192,7 +196,7 @@ namespace XmlSchemaClassGenerator
                     break;
                 }
 
-                var backingFieldName = prop.Name.ToBackingField(classModel.RemoveUderscoreInPriverMember);
+                var backingFieldName = prop.Name.ToBackingField(classModel.Configuration.DoNotUseUnderscoreInPrivateMemberNames);
                 if (backingFieldName == propBackingFieldName)
                 {
                     i += 1;
@@ -207,11 +211,35 @@ namespace XmlSchemaClassGenerator
             return string.Format("{0}{1}", propBackingFieldName, i);
         }
 
-        static readonly Regex NormalizeNewlinesRegex = new Regex(@"(^|[^\r])\n",RegexOptions.Compiled);
+        static readonly Regex NormalizeNewlinesRegex = new Regex(@"(^|[^\r])\n", RegexOptions.Compiled);
 
         internal static string NormalizeNewlines(string text)
         {
             return NormalizeNewlinesRegex.Replace(text, "$1\r\n");
         }
+
+        static readonly List<string> CShaprpKeywords = new List<string>
+        {
+            "abstract", "as", "base", "bool",
+            "break", "byte", "case", "catch",
+            "char", "checked", "class   const",
+            "continue", "decimal", "default", "delegate",
+            "do", "double", "else", "enum",
+            "event", " explicit", "extern", "false",
+            "finally", "fixed float", "for",
+            "foreach", "goto", "if", "implicit",
+            "in", "int interface", "internal",
+            "is", "lock", "long", "namespace",
+            "new", "null", "object operator",
+            "out", "override", "params  private",
+            "protected", "public", "readonly", "ref",
+            "return", "sbyte sealed short",
+            "sizeof", "stackalloc", "static string",
+            "struct", "switch", "this", "throw",
+            "true", "try", "typeof", "uint",
+            "ulong", "unchecked", "unsafe ushort",
+            "using", "using static", "virtual void",
+            "volatile", "while"
+        };
     }
 }

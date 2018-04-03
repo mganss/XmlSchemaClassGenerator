@@ -159,7 +159,7 @@ namespace XmlSchemaClassGenerator
 
         public bool DisableComments { get; set; }
         public bool GenerateSetterInCollection { get; set; }
-        public bool RemoveUderscoreInPriverMember { get; set; }
+        public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
 
     }
 }
