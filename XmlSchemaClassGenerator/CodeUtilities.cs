@@ -174,7 +174,7 @@ namespace XmlSchemaClassGenerator
             var classModel = typeModel as ClassModel;
             var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.DoNotUseUnderscoreInPrivateMemberNames == true);
 
-            if (CShaprpKeywords.Contains(propBackingFieldName.ToLower()))
+            if (CSharpKeywords.Contains(propBackingFieldName.ToLower()))
                 propBackingFieldName = "@" + propBackingFieldName;
 
             if (classModel == null)
@@ -218,7 +218,7 @@ namespace XmlSchemaClassGenerator
             return NormalizeNewlinesRegex.Replace(text, "$1\r\n");
         }
 
-        static readonly List<string> CShaprpKeywords = new List<string>
+        static readonly List<string> CSharpKeywords = new List<string>
         {
             "abstract", "as", "base", "bool",
             "break", "byte", "case", "catch",
