@@ -689,7 +689,7 @@ namespace XmlSchemaClassGenerator
                 else
                     member = new CodeMemberField(typeReference, propertyName);
 
-                var isPrivateSetter = !Configuration.GenerateSetterInCollection && (IsCollection || isArray);
+                var isPrivateSetter = IsCollection || isArray;
 
                 if (requiresBackingField)
                 {

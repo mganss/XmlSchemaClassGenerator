@@ -172,12 +172,7 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.DisableComments; }
             set { _configuration.DisableComments = value; }
         }
-
-        public bool GenerateSetterInCollection
-        {
-            get { return _configuration.GenerateSetterInCollection; }
-            set { _configuration.GenerateSetterInCollection = value; }
-        }
+        
         public bool DoNotUseUnderscoreInPrivateMemberNames
         {
             get { return _configuration.DoNotUseUnderscoreInPrivateMemberNames; }
