@@ -35,6 +35,7 @@ namespace XmlSchemaClassGenerator.Console
             string textValuePropertyName = "Value";
             var generateDebuggerStepThroughAttribute = true;
             var disableComments = false;
+            var doNotUseUnderscoreInPrivateMemberNames = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -77,6 +78,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v },
                 { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null },
                 { "dc|disableComments", "do not include comments from xsd", v => disableComments = v != null },
+                { "nu|noUnderscore", "do not generate underscore in private member name (default is false)", v => doNotUseUnderscoreInPrivateMemberNames = v != null },
             };
 
             var files = options.Parse(args);
@@ -130,7 +132,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 generator.GenerateDebuggerStepThroughAttribute = false;
                 generator.DataAnnotationMode = DataAnnotationMode.None;
             }
-
+            generator.DoNotUseUnderscoreInPrivateMemberNames = doNotUseUnderscoreInPrivateMemberNames;
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
             generator.Generate(files);
