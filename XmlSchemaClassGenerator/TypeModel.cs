@@ -45,7 +45,7 @@ namespace XmlSchemaClassGenerator
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Xml.Serialization"));
 
             var typeModels = parts.SelectMany(x => x.Types.Values).ToList();
-            if (typeModels.OfType<ClassModel>().Any(x => x.EnableDataBinding))
+            if (typeModels.OfType<ClassModel>().Any(x => x.Configuration.EnableDataBinding))
             {
                 codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
                 codeNamespace.Imports.Add(new CodeNamespaceImport("System.ComponentModel"));
@@ -210,8 +210,6 @@ namespace XmlSchemaClassGenerator
         public List<PropertyModel> Properties { get; set; }
         public List<InterfaceModel> Interfaces { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
-        public bool EnableDataBinding { get; set; }
-
         public ClassModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
@@ -243,7 +241,7 @@ namespace XmlSchemaClassGenerator
             classDeclaration.IsClass = true;
             classDeclaration.IsPartial = true;
 
-            if (EnableDataBinding)
+            if (Configuration.EnableDataBinding)
             {
                 classDeclaration.Members.Add(new CodeMemberEvent()
                 {
@@ -290,9 +288,9 @@ namespace XmlSchemaClassGenerator
                         Attributes = MemberAttributes.Public,
                     };
 
-                    if (EnableDataBinding)
+                    if (Configuration.EnableDataBinding)
                     {
-                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField())
+                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField(Configuration.DoNotUseUnderscoreInPrivateMemberNames))
                         {
                             Attributes = MemberAttributes.Private
                         };
@@ -325,7 +323,7 @@ namespace XmlSchemaClassGenerator
                 }
             }
 
-            if (EnableDataBinding)
+            if (Configuration.EnableDataBinding)
             {
                 classDeclaration.BaseTypes.Add(new CodeTypeReference(typeof(INotifyPropertyChanged), Configuration.CodeTypeReferenceOptions));
             }
@@ -353,7 +351,7 @@ namespace XmlSchemaClassGenerator
             }
 
             foreach (var property in Properties)
-                property.AddMembersTo(classDeclaration, EnableDataBinding);
+                property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
 
             if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
             {
@@ -692,6 +690,7 @@ namespace XmlSchemaClassGenerator
                     member = new CodeMemberField(typeReference, propertyName);
 
                 var isPrivateSetter = IsCollection || isArray;
+
                 if (requiresBackingField)
                 {
                     member.Name += GetAccessors(member.Name, backingField.Name,

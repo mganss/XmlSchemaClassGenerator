@@ -158,5 +158,7 @@ namespace XmlSchemaClassGenerator
         public NamingProvider NamingProvider { get; set; }
 
         public bool DisableComments { get; set; }
+        public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
+
     }
 }

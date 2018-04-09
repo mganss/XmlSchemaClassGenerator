@@ -172,6 +172,12 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.DisableComments; }
             set { _configuration.DisableComments = value; }
         }
+        
+        public bool DoNotUseUnderscoreInPrivateMemberNames
+        {
+            get { return _configuration.DoNotUseUnderscoreInPrivateMemberNames; }
+            set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
+        }
 
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
@@ -413,8 +419,7 @@ namespace XmlSchemaClassGenerator
                     IsAbstract = complexType.IsAbstract,
                     IsAnonymous = complexType.QualifiedName.Name == "",
                     IsMixed = complexType.IsMixed,
-                    IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty,
-                    EnableDataBinding = EnableDataBinding,
+                    IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty
                 };
 
                 classModel.Documentation.AddRange(docs);
