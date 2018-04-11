@@ -206,6 +206,8 @@ namespace XmlSchemaClassGenerator
 
             var provider = new Microsoft.CSharp.CSharpCodeProvider();
 
+            var outputFolder = this.OutputFolder ?? ".";
+
             foreach (var ns in namespaces)
             {
                 var compileUnit = new CodeCompileUnit();
@@ -221,7 +223,7 @@ namespace XmlSchemaClassGenerator
                 {
                     provider.GenerateCodeFromCompileUnit(compileUnit, sw, new CodeGeneratorOptions { VerbatimOrder = true, BracingStyle = "C" });
                     var s = sw.ToString().Replace("};", "}"); // remove ';' at end of automatic properties
-                    var path = Path.Combine(OutputFolder, ns.Name + ".cs");
+                    var path = Path.Combine(outputFolder, ns.Name + ".cs");
                     Log?.Invoke(path); File.WriteAllText(path, s);
                 }
             }
