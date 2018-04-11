@@ -42,7 +42,7 @@ From the command line:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 1.0.58.0
+Version 2.0.95.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -93,6 +93,10 @@ Options:
       --dst, --debuggerStepThrough
                              generate DebuggerStepThroughAttribute (default is
                                enabled)
+      --dc, --disableComments
+                             do not include comments from xsd
+      --nu, --noUnderscore   do not generate underscore in private member name (
+                               default is false)
 ```
 
 From code:
