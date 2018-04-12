@@ -37,7 +37,10 @@ Unsupported:
 Usage
 -----
 
-From the command line:
+For command line use, choose your preferred installation:
+- Binary zips included in the [releases on GitHub](https://github.com/mganss/XmlSchemaClassGenerator/releases)
+- Binaries in the tools folder in the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/)
+- .NET Core CLI tool available in the [dotnet-xscgen NuGet package](https://www.nuget.org/packages/dotnet-xscgen/)
 
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
