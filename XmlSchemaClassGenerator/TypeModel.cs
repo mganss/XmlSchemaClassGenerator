@@ -2,16 +2,12 @@
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -526,6 +522,10 @@ namespace XmlSchemaClassGenerator
             get
             {{
                 return this.{0};
+            }}
+            private set
+            {{
+                this.{0} = value;
             }}
         }}", backingFieldName));
             }
