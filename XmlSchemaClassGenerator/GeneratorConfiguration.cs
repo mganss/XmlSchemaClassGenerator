@@ -159,6 +159,10 @@ namespace XmlSchemaClassGenerator
 
         public bool DisableComments { get; set; }
         public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
-
+        
+        /// <summary>
+        /// Default data type for time fields. Defaults to string if not set.
+        /// </summary>
+        public Type TimeDataType { get; set; }
     }
 }

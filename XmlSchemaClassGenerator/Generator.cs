@@ -178,6 +178,12 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.DoNotUseUnderscoreInPrivateMemberNames; }
             set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
         }
+        
+        public Type TimeDataType
+        {
+            get { return _configuration.TimeDataType; }
+            set { _configuration.TimeDataType = value; }
+        }
 
         private readonly XmlSchemaSet Set = new XmlSchemaSet();
         private Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
