@@ -80,7 +80,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null },
                 { "dc|disableComments", "do not include comments from xsd", v => disableComments = v != null },
                 { "nu|noUnderscore", "do not generate underscore in private member name (default is false)", v => doNotUseUnderscoreInPrivateMemberNames = v != null },
-                { "tt|timeAsDatetime", "map xs:time to DateTime instead of string.", v => timeType = v != null },
+                { "tt|timeAsDateTime", "map xs:time to DateTime instead of string", v => timeType = v != null },
             };
 
             var files = options.Parse(args);
