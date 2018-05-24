@@ -53,7 +53,8 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
                 EntityFramework = generatorPrototype.EntityFramework,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
-                MemberVisitor = generatorPrototype.MemberVisitor
+                MemberVisitor = generatorPrototype.MemberVisitor,
+                TimeDataType = generatorPrototype.TimeDataType
             };
 
             var files = Glob.Glob.ExpandNames(pattern);
@@ -92,6 +93,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string WadlPattern = @"xsd\wadl\wadl.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
         const string IataPattern = @"xsd\iata\????[^_][^_]?[^-]*.xsd";
+        const string TimePattern = @"xsd\time\time.xsd";
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
@@ -309,6 +311,69 @@ namespace XmlSchemaClassGenerator.Tests
             var folder = Directory.GetCurrentDirectory();
             var xml = File.ReadAllText(string.Format(@"{0}\xml\{1}.xml", folder, name));
             return xml;
+        }
+
+        /// <summary>
+        /// When the TimeDataType is set to use the DateTime, creating a serialiser against types
+        /// that use xsd:time should no longer throw exceptions.
+        /// </summary>
+        [Fact]
+        public void CreateDeserialiser_NoException_WhereTimeXsdPresent_AndTimeDataTypeSet()
+        {
+            Compile("Time1", TimePattern, new Generator
+            {
+                EntityFramework = true,
+                DataAnnotationMode = DataAnnotationMode.All,
+                NamespaceProvider = new Dictionary<NamespaceKey, string>
+                    {
+                        {new NamespaceKey("http://hic.gov.au/hiconline/medicare/version-4"), "hiconline"}
+                    }
+                    .ToNamespaceProvider(new GeneratorConfiguration {NamespacePrefix = "time"}.NamespaceProvider
+                        .GenerateNamespace),
+                MemberVisitor = (member, model) => { },
+                GenerateInterfaces = true,
+                TimeDataType = typeof(DateTime)
+            });
+            
+            Assemblies.TryGetValue("Time1", out Assembly assembly);
+            Assert.NotNull(assembly);
+
+            var type = assembly.GetType("hiconline.Service");
+            Assert.NotNull(type);
+            
+            var serializer = new XmlSerializer(type); // exception not thrown
+            Assert.NotNull(serializer);
+        }
+        
+        /// <summary>
+        /// Test to ensure existing behaviour not changed.
+        /// </summary>
+        [Fact]
+        public void CreateDeserialiser_ThrowsException_WhereTimeXsdPresent_AndTimeDataTypeNotSet()
+        {
+            Compile("Time2", TimePattern, new Generator
+            {
+                EntityFramework = true,
+                DataAnnotationMode = DataAnnotationMode.All,
+                NamespaceProvider = new Dictionary<NamespaceKey, string>
+                    {
+                        {new NamespaceKey("http://hic.gov.au/hiconline/medicare/version-4"), "hiconline"}
+                    }
+                    .ToNamespaceProvider(new GeneratorConfiguration {NamespacePrefix = "time"}.NamespaceProvider
+                        .GenerateNamespace),
+                MemberVisitor = (member, model) => { },
+                GenerateInterfaces = true
+            });
+            
+            Assemblies.TryGetValue("Time2", out Assembly assembly);
+            Assert.NotNull(assembly);
+
+            var type = assembly.GetType("hiconline.Service");
+            Assert.NotNull(type);
+            
+            var ex = Assert.Throws<InvalidOperationException>(() => new XmlSerializer(type));
+            Assert.NotNull(ex);
+            Assert.Equal("There was an error reflecting type 'hiconline.Service'.", ex.Message);
         }
     }
 }
