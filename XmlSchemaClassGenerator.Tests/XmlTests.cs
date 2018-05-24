@@ -334,17 +334,17 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateInterfaces = true,
                 TimeDataType = typeof(DateTime)
             });
-            
+
             Assemblies.TryGetValue("Time1", out Assembly assembly);
             Assert.NotNull(assembly);
 
             var type = assembly.GetType("hiconline.Service");
             Assert.NotNull(type);
-            
+
             var serializer = new XmlSerializer(type); // exception not thrown
             Assert.NotNull(serializer);
         }
-        
+
         /// <summary>
         /// Test to ensure existing behaviour not changed.
         /// </summary>
@@ -364,13 +364,13 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = (member, model) => { },
                 GenerateInterfaces = true
             });
-            
+
             Assemblies.TryGetValue("Time2", out Assembly assembly);
             Assert.NotNull(assembly);
 
             var type = assembly.GetType("hiconline.Service");
             Assert.NotNull(type);
-            
+
             var ex = Assert.Throws<InvalidOperationException>(() => new XmlSerializer(type));
             Assert.NotNull(ex);
             Assert.Equal("There was an error reflecting type 'hiconline.Service'.", ex.Message);
