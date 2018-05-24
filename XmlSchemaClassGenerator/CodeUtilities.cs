@@ -92,8 +92,19 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.GMonthDay:
                 case XmlTypeCode.GYear:
                 case XmlTypeCode.GYearMonth:
-                case XmlTypeCode.Time:
                     result = variety == XmlSchemaDatatypeVariety.List ? typeof(string[]) : typeof(string);
+                    break;
+                case XmlTypeCode.Time:
+                    if (configuration.TimeDataType == null || configuration.TimeDataType == typeof(string))
+                    {
+                        // default to string
+                        result = typeof(string);
+                    }
+                    else
+                    {
+                        // otherwise, use the specified type
+                        result = configuration.TimeDataType;
+                    }
                     break;
                 case XmlTypeCode.Integer:
                 case XmlTypeCode.NegativeInteger:
