@@ -132,6 +132,14 @@ var generator = new Generator
 };
 ```
 
+### Mapping xsd files to C# namespaces
+
+Using the optional `|` syntax of the `-n` command line option you can map individual xsd files to C# namespaces. If you have several input files using the same XML namespace you can still generate an individual C# namespace for the types defined within a single xsd file. For example, if you have two input files `a.xsd` and `b.xsd` both of which have the same `targetNamespace` of `http://example.com/namespace` you can generate the C# namespaces `Example.NamespaceA` and `Example.NamespaceB`:
+
+```
+dotnet-xscgen.exe -n "|a.xsd=Example.NamespaceA" -n "|b.xsd=Example.NamespaceB" a.xsd b.xsd
+```
+
 Nullables<a name="nullables"></a>
 ---------------------------------
 
