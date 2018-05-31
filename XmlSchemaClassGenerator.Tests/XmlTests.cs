@@ -24,6 +24,20 @@ namespace XmlSchemaClassGenerator.Tests
 
         private Assembly Compile(string name, string pattern, Generator generatorPrototype = null)
         {
+            var files = Glob.Glob.ExpandNames(pattern);
+
+            return CompileFiles(name, files, generatorPrototype);
+        }
+
+        private Assembly CompileXml(string name, string xsd, Generator generatorPrototype = null)
+        {
+            var path = Path.GetTempFileName();
+            File.WriteAllText(path, xsd);
+            return CompileFiles(name, new[] { path }, generatorPrototype);
+        }
+
+        private Assembly CompileFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null)
+        {
             if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
 
             var cs = new List<string>();
@@ -56,8 +70,6 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = generatorPrototype.MemberVisitor,
                 TimeDataType = generatorPrototype.TimeDataType
             };
-
-            var files = Glob.Glob.ExpandNames(pattern);
 
             gen.Generate(files);
 
@@ -328,7 +340,7 @@ namespace XmlSchemaClassGenerator.Tests
                     {
                         {new NamespaceKey("http://hic.gov.au/hiconline/medicare/version-4"), "hiconline"}
                     }
-                    .ToNamespaceProvider(new GeneratorConfiguration {NamespacePrefix = "time"}.NamespaceProvider
+                    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "time" }.NamespaceProvider
                         .GenerateNamespace),
                 MemberVisitor = (member, model) => { },
                 GenerateInterfaces = true,
@@ -359,7 +371,7 @@ namespace XmlSchemaClassGenerator.Tests
                     {
                         {new NamespaceKey("http://hic.gov.au/hiconline/medicare/version-4"), "hiconline"}
                     }
-                    .ToNamespaceProvider(new GeneratorConfiguration {NamespacePrefix = "time"}.NamespaceProvider
+                    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "time" }.NamespaceProvider
                         .GenerateNamespace),
                 MemberVisitor = (member, model) => { },
                 GenerateInterfaces = true
@@ -374,6 +386,55 @@ namespace XmlSchemaClassGenerator.Tests
             var ex = Assert.Throws<InvalidOperationException>(() => new XmlSerializer(type));
             Assert.NotNull(ex);
             Assert.Equal("There was an error reflecting type 'hiconline.Service'.", ex.Message);
+        }
+
+        [Fact]
+        public void ComplexTypeWithAttributeGroupExtension()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+  <xs:attributeGroup name=""justify"">
+    <xs:attribute name=""justify"" type=""simpleType""/>
+  </xs:attributeGroup>
+  <xs:complexType name=""group-name"">
+    <xs:simpleContent>
+      <xs:extension base=""xs:string"">
+        <xs:attributeGroup ref=""justify""/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name=""simpleType"">
+    <xs:restriction base=""xs:token"">
+      <xs:enumeration value=""foo""/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                GenerateInterfaces = false,
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+
+            var assembly = CompileXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+
+            var simpleType = assembly.GetType("Test.SimpleType");
+            Assert.NotNull(simpleType);
+
+            var groupName = assembly.GetType("Test.Group_Name");
+            Assert.NotNull(groupName);
+
+            var value = groupName.GetProperty("Value");
+            Assert.Equal(typeof(string), value.PropertyType);
+
+            var justify = groupName.GetProperty("Justify");
+            Assert.Equal(simpleType, justify.PropertyType);
+
+            var justifySpecified = groupName.GetProperty("JustifySpecified");
+            Assert.Equal(typeof(bool), justifySpecified.PropertyType);
         }
     }
 }
