@@ -164,7 +164,7 @@ namespace XmlSchemaClassGenerator
         public Action<CodeTypeMember, PropertyModel> MemberVisitor
         {
             get { return _configuration.MemberVisitor; }
-            set { _configuration.MemberVisitor = value;}
+            set { _configuration.MemberVisitor = value; }
         }
 
         public bool DisableComments
@@ -172,13 +172,13 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.DisableComments; }
             set { _configuration.DisableComments = value; }
         }
-        
+
         public bool DoNotUseUnderscoreInPrivateMemberNames
         {
             get { return _configuration.DoNotUseUnderscoreInPrivateMemberNames; }
             set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
         }
-        
+
         public Type TimeDataType
         {
             get { return _configuration.TimeDataType; }
@@ -200,7 +200,7 @@ namespace XmlSchemaClassGenerator
             }));
 
             foreach (var s in schemas)
-            {                    
+            {
                 Set.Add(s.TargetNamespace, s.SourceUri);
             }
 
@@ -624,9 +624,8 @@ namespace XmlSchemaClassGenerator
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
                         var attributeName = ToTitleCase(attribute.QualifiedName.Name);
 
-                        if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup && attributeGroup.QualifiedName != typeModel.XmlSchemaName)
+                        if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup && attributeGroup.QualifiedName != typeModel.XmlSchemaName && Types.TryGetValue(attributeGroup.QualifiedName, out var typeModelValue) && typeModelValue is InterfaceModel interfaceTypeModel)
                         {
-                            var interfaceTypeModel = (InterfaceModel)Types[attributeGroup.QualifiedName];
                             var interfaceProperty = interfaceTypeModel.Properties.Single(p => p.XmlSchemaName == attribute.QualifiedName);
                             attributeQualifiedName = interfaceProperty.Type.XmlSchemaName;
                             attributeName = interfaceProperty.Name;
@@ -696,7 +695,7 @@ namespace XmlSchemaClassGenerator
             return properties;
         }
 
-        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle,  IEnumerable<Particle> items)
+        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle, IEnumerable<Particle> items)
         {
             var properties = new List<PropertyModel>();
             var order = 0;
