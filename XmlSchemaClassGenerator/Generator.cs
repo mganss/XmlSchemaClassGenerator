@@ -11,7 +11,7 @@ using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
 {
-    public partial class Generator
+    public class Generator
     {
         private readonly GeneratorConfiguration _configuration = new GeneratorConfiguration();
 
@@ -186,25 +186,30 @@ namespace XmlSchemaClassGenerator
 
         public void Generate(IEnumerable<string> files)
         {
-            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f, new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore }), (s, e) =>
+            var set = new XmlSchemaSet();
+            var settings = new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Ignore
+            };
+
+            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f, settings), (s, e) =>
             {
                 Trace.TraceError(e.Message);
             }));
 
             foreach (var s in schemas)
             {
-                Set.Add(s.TargetNamespace, s.SourceUri);
+                set.Add(s.TargetNamespace, s.SourceUri);
             }
+            
+            set.Compile();
 
-            Set.Compile();
-
-            BuildModel();
-
-            var namespaces = GenerateCode();
+            var m = new ModelBuilder(_configuration, set);
+            var namespaces = m.GenerateCode();
 
             var provider = new Microsoft.CSharp.CSharpCodeProvider();
 
-            var outputFolder = this.OutputFolder ?? ".";
+            var outputFolder = OutputFolder ?? ".";
 
             foreach (var ns in namespaces)
             {
