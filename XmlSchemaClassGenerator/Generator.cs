@@ -201,7 +201,12 @@ namespace XmlSchemaClassGenerator
             {
                 set.Add(s.TargetNamespace, s.SourceUri);
             }
-            
+
+            Generate(set);
+        }
+
+        public void Generate(XmlSchemaSet set)
+        {
             set.Compile();
 
             var m = new ModelBuilder(_configuration, set);
