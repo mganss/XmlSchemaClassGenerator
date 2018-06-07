@@ -47,7 +47,7 @@ namespace XmlSchemaClassGenerator
             foreach (var globalType in set.GlobalTypes.Values.Cast<XmlSchemaType>())
             {
                 var schema = globalType.GetSchema();
-                var source = (schema == null ? null : new Uri(schema.SourceUri));
+                var source = string.IsNullOrEmpty(schema?.SourceUri) ? null : new Uri(schema.SourceUri);
                 var type = CreateTypeModel(source, globalType, globalType.QualifiedName);
             }
 
@@ -111,11 +111,7 @@ namespace XmlSchemaClassGenerator
         private TypeModel CreateTypeModel(Uri source, XmlSchemaAnnotated type, XmlQualifiedName qualifiedName)
         {
             if (!qualifiedName.IsEmpty && Types.TryGetValue(qualifiedName, out TypeModel typeModel)) { return typeModel; }
-
-            if (source == null)
-            {
-                throw new ArgumentNullException("source");
-            }
+            
             var namespaceModel = CreateNamespaceModel(source, qualifiedName);
 
             var docs = GetDocumentation(type);

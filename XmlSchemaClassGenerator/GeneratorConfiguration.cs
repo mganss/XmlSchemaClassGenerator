@@ -40,6 +40,11 @@ namespace XmlSchemaClassGenerator
         }
 
         /// <summary>
+        /// The writer to be used to generate the code files
+        /// </summary>
+        public OutputWriter OutputWriter { get; set; }
+
+        /// <summary>
         /// The prefix which gets added to all automatically generated namespaces
         /// </summary>
         public string NamespacePrefix { get; set; }
