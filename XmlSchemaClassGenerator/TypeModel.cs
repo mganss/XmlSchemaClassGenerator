@@ -110,13 +110,9 @@ namespace XmlSchemaClassGenerator
 
             typeDeclaration.Comments.AddRange(DocumentationModel.GetComments(Documentation).ToArray());
 
-            var title = ((AssemblyTitleAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(),
-                typeof(AssemblyTitleAttribute))).Title;
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
             var generatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(GeneratedCodeAttribute), Configuration.CodeTypeReferenceOptions),
-                new CodeAttributeArgument(new CodePrimitiveExpression(title)),
-                new CodeAttributeArgument(new CodePrimitiveExpression(version)));
+                new CodeAttributeArgument(new CodePrimitiveExpression(Configuration.Version.Title)),
+                new CodeAttributeArgument(new CodePrimitiveExpression(Configuration.Version.Version)));
             typeDeclaration.CustomAttributes.Add(generatedAttribute);
 
             return typeDeclaration;

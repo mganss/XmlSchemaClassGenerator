@@ -1,11 +1,8 @@
 ﻿using System;
 using System.CodeDom;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace XmlSchemaClassGenerator
 {
@@ -37,7 +34,18 @@ namespace XmlSchemaClassGenerator
             CollectionType = typeof(Collection<>);
             MemberVisitor = (member, model) => { };
             NamingProvider = new NamingProvider(NamingScheme);
+            Version = VersionProvider.CreateFromAssembly();
         }
+
+        /// <summary>
+        /// The writer to be used to generate the code files
+        /// </summary>
+        public OutputWriter OutputWriter { get; set; }
+
+        /// <summary>
+        /// A provider to obtain the name and version of the tool
+        /// </summary>
+        public VersionProvider Version { get; set; }
 
         /// <summary>
         /// The prefix which gets added to all automatically generated namespaces
@@ -159,7 +167,7 @@ namespace XmlSchemaClassGenerator
 
         public bool DisableComments { get; set; }
         public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
-        
+
         /// <summary>
         /// Default data type for time fields. Defaults to string if not set.
         /// </summary>
