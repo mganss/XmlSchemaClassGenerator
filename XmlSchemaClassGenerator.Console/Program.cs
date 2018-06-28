@@ -18,7 +18,7 @@ namespace XmlSchemaClassGenerator.Console
         {
             var showHelp = args.Length == 0;
             var namespaces = new List<string>();
-            var outputFolder = "";
+            var outputFolder = (string)null;
             var integerType = typeof(string);
             var namespacePrefix = "";
             var verbose = false;
