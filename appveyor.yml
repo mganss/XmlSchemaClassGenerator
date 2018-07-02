@@ -1,6 +1,9 @@
 version: 2.0.{build}
 skip_tags: true
 image: Visual Studio 2017 Preview
+environment:
+  access_token:
+    secure: Eq6BjtZ80BXKLwFMg76IjuQAvbLjbojIF/X/ARouGVhxPneJtgDfCXMPNgJ7KBKq
 build_script:
   - ps: (Get-Content XmlSchemaClassGenerator\XmlSchemaClassGenerator.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content XmlSchemaClassGenerator\XmlSchemaClassGenerator.csproj
   - ps: (Get-Content XmlSchemaClassGenerator.Console\XmlSchemaClassGenerator.Console.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content XmlSchemaClassGenerator.Console\XmlSchemaClassGenerator.Console.csproj
@@ -25,3 +28,10 @@ artifacts:
   - path: 'XmlSchemaClassGenerator.Console\**\*.nupkg'
   - path: 'xscgen\**\*.nupkg'
   - path: XmlSchemaClassGenerator.%APPVEYOR_BUILD_VERSION%.zip
+on_success:
+  - git config --global credential.helper store
+  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+  - git config --global user.email "michael@ganss.org"
+  - git config --global user.name "Michael Ganss"
+  - git tag v%APPVEYOR_BUILD_VERSION%
+  - git push origin --tags
