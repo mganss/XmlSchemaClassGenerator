@@ -1,9 +1,9 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Xunit;
+using System.Text;
 
 namespace XmlSchemaClassGenerator.Tests
 {
@@ -14,6 +14,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             // Ensure that the output directories are empty.
             Directory.Delete(GetOutputPath(string.Empty), true);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
         [Fact, TestPriority(1)]
@@ -67,6 +68,8 @@ namespace XmlSchemaClassGenerator.Tests
                     "datenabholung_5.xsd",
                     "elster0810_datenabholung_5.xsd",
                 }.Select(x => Path.Combine(InputPath, x)).ToList();
+            var encodings = System.Text.Encoding.GetEncodings();
+            System.Text.Encoding.GetEncoding("ISO-8859-15");
             gen.Generate(xsdFiles);
         }
 
@@ -74,23 +77,11 @@ namespace XmlSchemaClassGenerator.Tests
         public void CanCompileClasses()
         {
             var inputPath = GetOutputPath("CanGenerateClasses");
-            var outputPath = GetOutputPath("CanCompileClasses");
-            var provider = CodeDomProvider.CreateProvider("CSharp");
-            var assemblies = new[]
-            {
-                "System.dll",
-                "System.Core.dll",
-                "System.Xml.dll",
-                "System.Xml.Linq.dll",
-                "System.Xml.Serialization.dll",
-                "System.ServiceModel.dll",
-            };
-            var outputName = Path.Combine(outputPath, "Elster.Test.dll");
             var fileNames = new DirectoryInfo(inputPath).GetFiles("*.cs").Select(x => x.FullName).ToArray();
-            var results = provider.CompileAssemblyFromFile(new CompilerParameters(assemblies, outputName), fileNames);
-            Assert.Empty(results.Errors);
-            results.CompiledAssembly.GetType("Elster.Datenabholung5.Elster", true);
-            results.CompiledAssembly.GetType("Elster.Basis.TransferHeaderCType", true);
+            var assembly = Compiler.CompileFiles("Elster.Test", fileNames);
+
+            assembly.GetType("Elster.Datenabholung5.Elster", true);
+            assembly.GetType("Elster.Basis.TransferHeaderCType", true);
         }
 
         private static string InputPath

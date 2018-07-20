@@ -9,7 +9,7 @@ namespace Microsoft.Xml.XMLGen {
        using System.Xml.XPath;
        using System.Globalization;
        using System.Reflection;
-    
+
     internal enum AddSubtractState {
         StartPlusInc = 0,
         StartMinusInc = 1,
@@ -27,7 +27,7 @@ namespace Microsoft.Xml.XMLGen {
 
         protected ArrayList AllowedValues = null;
         protected int occurNum = 0;
-        
+
         string prefix = null;
         XmlSchemaDatatype datatype;
 
@@ -41,7 +41,7 @@ namespace Microsoft.Xml.XMLGen {
                 return ids;
             }
         }
-               
+
         public virtual string Prefix {
             get {
                return prefix;
@@ -56,7 +56,7 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         public abstract string GenerateValue();
-        
+
         public XmlSchemaDatatype Datatype {
             get {
                 return datatype;
@@ -217,18 +217,18 @@ namespace Microsoft.Xml.XMLGen {
             generator.SetDatatype(datatype);
             return generator;
         }
-        
+
         private static XmlValueGenerator CreateUnionGenerator(XmlSchemaDatatype dtype, CompiledFacets facets, int listLength) {
-            XmlSchemaSimpleType[] memberTypes = (XmlSchemaSimpleType[])dtype.GetType().InvokeMember("types", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, dtype, null);
+            XmlSchemaSimpleType[] memberTypes = (XmlSchemaSimpleType[])dtype.GetType().InvokeMember("_types", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, dtype, null);
             Generator_Union union_genr = new Generator_Union(facets);
             foreach(XmlSchemaSimpleType st1 in memberTypes) {
                 union_genr.AddGenerator(XmlValueGenerator.CreateGenerator(st1.Datatype, listLength));
             }
             return union_genr;
         }
-        
+
         private static XmlValueGenerator CreateListGenerator(XmlSchemaDatatype dtype, CompiledFacets facets, int listLength) {
-            XmlSchemaDatatype itemType = (XmlSchemaDatatype)dtype.GetType().InvokeMember("itemType", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, dtype, null);
+            XmlSchemaDatatype itemType = (XmlSchemaDatatype)dtype.GetType().InvokeMember("_itemType", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, dtype, null);
             Generator_List list_genr = new Generator_List(facets);
             list_genr.ListLength = listLength;
             list_genr.AddGenerator(XmlValueGenerator.CreateGenerator(itemType, listLength));
@@ -254,7 +254,7 @@ namespace Microsoft.Xml.XMLGen {
                 return value;
             }
         }
-        
+
         internal class Generator_facetBase : XmlValueGenerator {
 
             protected int minLength = -1;
@@ -265,7 +265,7 @@ namespace Microsoft.Xml.XMLGen {
                   if(genFacets != null) {
                     RestrictionFlags flags = genFacets.Flags;
                     if ((flags & RestrictionFlags.Length) != 0) {
-                        length = genFacets.Length;    
+                        length = genFacets.Length;
                     }
                     if ((flags & RestrictionFlags.MinLength) != 0) {
                         minLength = genFacets.MinLength;
@@ -278,7 +278,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                   }
             }
-            
+
             public override string GenerateValue() {
                 return string.Empty;
             }
@@ -345,7 +345,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
             }
 
-            
+
             public override string GenerateValue() {
                 if(AllowedValues != null) {
                     object enumValue = GetEnumerationValue();
@@ -372,7 +372,7 @@ namespace Microsoft.Xml.XMLGen {
                             ProcessLengthFacet(ref genString, endValue);
                             genString.Append(endValue);
                         }
-                        else { 
+                        else {
                             if(minLength != -1) {
                                 ProcessMinLengthFacet(ref genString, endValue);
                             }
@@ -388,20 +388,20 @@ namespace Microsoft.Xml.XMLGen {
                 }
             } // End of genValue
         }
-        
+
         internal class Generator_decimal : XmlValueGenerator {
             protected decimal increment = 0;
             protected decimal startValue = 1;
             protected decimal step = 0.1m;
             protected decimal maxBound = decimal.MaxValue;
             protected decimal minBound = decimal.MinValue;
-           
+
             int stateStep = 1;
 
             public Generator_decimal(CompiledFacets rFacets) {
                 CheckFacets(rFacets);
             }
-            
+
             public Generator_decimal() {
             }
 
@@ -410,7 +410,7 @@ namespace Microsoft.Xml.XMLGen {
                     startValue = value;
                 }
             }
-            
+
             public void CheckFacets(CompiledFacets genFacets) {
               if(genFacets != null) {
                 RestrictionFlags flags = genFacets.Flags;
@@ -437,7 +437,7 @@ namespace Microsoft.Xml.XMLGen {
                         maxBound = Math.Min(maxBound, totalDigitsValue);
                         minBound = Math.Max(minBound, Math.Min(maxBound,  0 - maxBound));
                     }
-                    
+
                 }
                 if ((flags & RestrictionFlags.FractionDigits) != 0 && genFacets.FractionDigits > 0) {
                     if ((flags & RestrictionFlags.TotalDigits) != 0) {
@@ -461,8 +461,8 @@ namespace Microsoft.Xml.XMLGen {
                 }
               }
             }
-            
-           public override string GenerateValue() { 
+
+           public override string GenerateValue() {
                 decimal result = 0;
                 if(AllowedValues != null) {
                     try {
@@ -496,12 +496,12 @@ namespace Microsoft.Xml.XMLGen {
                                 increment = increment + step; //stateStep is 1 or 2, we need to increment now
                                 result = startValue - increment;
                                 break;
-                            
+
                             default:
                                 Debug.Assert(false);
                                 break;
                         }
-                        occurNum = occurNum + stateStep; 
+                        occurNum = occurNum + stateStep;
                     }
                     catch (OverflowException) { //reset
                         result = ResetState();
@@ -514,7 +514,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
                 return result.ToString(null, NumberFormatInfo.InvariantInfo);
-            } 
+            }
 
            private decimal ResetState() {
                 increment = 0;
@@ -527,7 +527,7 @@ namespace Microsoft.Xml.XMLGen {
                     stateStep = 2;
                 }
                 return startValue;
-           }                
+           }
         }
 
 
@@ -546,9 +546,9 @@ namespace Microsoft.Xml.XMLGen {
                 step = 1;
             }
          }
-        
+
         internal class Generator_nonPositiveInteger : Generator_integer {
-            
+
             public Generator_nonPositiveInteger() {
             }
 
@@ -559,7 +559,7 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_negativeInteger : Generator_nonPositiveInteger {
             public Generator_negativeInteger(CompiledFacets rFacets) {
                 startValue = -1;
@@ -567,9 +567,9 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_long : Generator_integer {
-            
+
             public Generator_long() {
                 maxBound = 9223372036854775807;
                 minBound = -9223372036854775807;
@@ -581,9 +581,9 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_int : Generator_long {
-            
+
             public Generator_int() {
                 maxBound = 2147483647;
                 minBound = -2147483647;
@@ -597,7 +597,7 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         internal class Generator_short : Generator_int {
-            
+
             public Generator_short() {
                 maxBound = 32767;
                 minBound = -32768;
@@ -608,11 +608,11 @@ namespace Microsoft.Xml.XMLGen {
                 minBound = -32768;
                 CheckFacets(rFacets);
             }
-            
+
         }
-        
+
         internal class Generator_byte : Generator_short {
-            
+
             public Generator_byte(CompiledFacets rFacets) {
                 maxBound = 127;
                 minBound = -128;
@@ -621,7 +621,7 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         internal class Generator_nonNegativeInteger : Generator_integer {
-            
+
             public Generator_nonNegativeInteger() {
                 startValue = 0;
                 minBound = 0;
@@ -633,9 +633,9 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_unsignedLong : Generator_nonNegativeInteger {
-            
+
             public Generator_unsignedLong() {
             }
 
@@ -644,9 +644,9 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_unsignedInt : Generator_unsignedLong {
-            
+
             public Generator_unsignedInt() {
             }
 
@@ -655,9 +655,9 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_unsignedShort : Generator_unsignedInt {
-            
+
             public Generator_unsignedShort() {
             }
 
@@ -666,9 +666,9 @@ namespace Microsoft.Xml.XMLGen {
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_unsignedByte : Generator_unsignedShort {
-            
+
             public Generator_unsignedByte() {
             }
 
@@ -679,17 +679,17 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         internal class Generator_positiveInteger : Generator_nonNegativeInteger {
-            
+
             public Generator_positiveInteger(CompiledFacets rFacets) {
                 startValue = 1;
                 minBound = 1;
                 CheckFacets(rFacets);
             }
         }
-        
+
 
         internal class Generator_boolean : XmlValueGenerator {
-            public override string GenerateValue() { 
+            public override string GenerateValue() {
                 if ((occurNum & 0x1) == 0) {
                     occurNum = 1;
                     return "true";
@@ -700,7 +700,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
             }
         }
-        
+
         internal class Generator_double : XmlValueGenerator {
             double increment = 0F;
             protected double startValue = 1;
@@ -748,7 +748,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
             }
 
-            public override string GenerateValue() { 
+            public override string GenerateValue() {
                 double result = 0;
                 if(AllowedValues != null) {
                     try {
@@ -782,12 +782,12 @@ namespace Microsoft.Xml.XMLGen {
                                 increment = increment + step; //stateStep is 1 or 2, we need to increment now
                                 result = startValue - increment;
                                 break;
-                            
+
                             default:
                                 Debug.Assert(false);
                                 break;
                         }
-                        occurNum = occurNum + stateStep; 
+                        occurNum = occurNum + stateStep;
                     }
                     catch (OverflowException) { //reset
                         result = ResetState();
@@ -800,7 +800,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
                 return XmlConvert.ToString(result);
-            } 
+            }
 
            private double ResetState() {
                 increment = 0F;
@@ -815,7 +815,7 @@ namespace Microsoft.Xml.XMLGen {
                 return startValue;
            }
         }
-        
+
         internal class Generator_float : XmlValueGenerator {
             float increment = 0F;
             float startValue = 1;
@@ -858,9 +858,9 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
             }
-            
+
             public override string GenerateValue() {
-                float result = 0; 
+                float result = 0;
                 if(AllowedValues != null) {
                     try {
                         result = (float)AllowedValues[occurNum++ % AllowedValues.Count];
@@ -893,12 +893,12 @@ namespace Microsoft.Xml.XMLGen {
                                 increment = increment + step; //stateStep is 1 or 2, we need to increment now
                                 result = startValue - increment;
                                 break;
-                            
+
                             default:
                                 Debug.Assert(false);
                                 break;
                         }
-                        occurNum = occurNum + stateStep; 
+                        occurNum = occurNum + stateStep;
                     }
                     catch (OverflowException) { //reset
                         result = ResetState();
@@ -911,7 +911,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
                 return XmlConvert.ToString(result);
-            } 
+            }
 
            private float ResetState() {
                 increment = 0F;
@@ -926,7 +926,7 @@ namespace Microsoft.Xml.XMLGen {
                 return startValue;
            }
         }
-        
+
         internal class Generator_duration : XmlValueGenerator {
             TimeSpan startValue = XmlConvert.ToTimeSpan("P1Y1M1DT1H1M1S");
             TimeSpan step       = XmlConvert.ToTimeSpan("P1Y");
@@ -939,7 +939,7 @@ namespace Microsoft.Xml.XMLGen {
             public Generator_duration(CompiledFacets rFacets) {
                 CheckFacets(rFacets);
             }
-            
+
             public void CheckFacets(CompiledFacets genFacets) {
                  if(genFacets != null) {
                     RestrictionFlags flags = genFacets.Flags;
@@ -972,7 +972,7 @@ namespace Microsoft.Xml.XMLGen {
             }
 
             public override string GenerateValue() {
-                TimeSpan result = TimeSpan.Zero; 
+                TimeSpan result = TimeSpan.Zero;
                 if(AllowedValues != null) {
                     try {
                         result = (TimeSpan)AllowedValues[occurNum++ % AllowedValues.Count];
@@ -1005,12 +1005,12 @@ namespace Microsoft.Xml.XMLGen {
                                 increment = increment + step; //stateStep is 1 or 2, we need to increment now
                                 result = startValue - increment;
                                 break;
-                            
+
                             default:
                                 Debug.Assert(false);
                                 break;
                         }
-                        occurNum = occurNum + stateStep; 
+                        occurNum = occurNum + stateStep;
                     }
                     catch (OverflowException) { //Reset
                         result = ResetState();
@@ -1023,7 +1023,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
                 return XmlConvert.ToString(result);
-            } 
+            }
 
            private TimeSpan ResetState() {
                 increment = TimeSpan.Zero;
@@ -1046,7 +1046,7 @@ namespace Microsoft.Xml.XMLGen {
             protected TimeSpan step       = XmlConvert.ToTimeSpan("P32D");
             protected DateTime minBound   = DateTime.MinValue;
             protected DateTime maxBound   = DateTime.MaxValue;
-            
+
             int stateStep = 1;
             public Generator_dateTime() {
             }
@@ -1054,7 +1054,7 @@ namespace Microsoft.Xml.XMLGen {
             public Generator_dateTime (CompiledFacets rFacets) {
                 CheckFacets(rFacets);
             }
-            
+
             public void CheckFacets(CompiledFacets genFacets) {
                  if(genFacets != null) {
                     RestrictionFlags flags = genFacets.Flags;
@@ -1084,10 +1084,10 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
             }
-            public override string GenerateValue() { 
+            public override string GenerateValue() {
                 DateTime result = GenerateDate();
                 return XmlConvert.ToString(result, XmlDateTimeSerializationMode.RoundtripKind);
-           } 
+           }
 
            protected DateTime GenerateDate() {
                 if (AllowedValues != null) {
@@ -1123,10 +1123,10 @@ namespace Microsoft.Xml.XMLGen {
                                 increment = increment + step; //stateStep is 1 or 2, we need to increment now
                                 result = startValue.Subtract(increment);
                                 break;
-                            
+
                             default:
                                 Debug.Assert(false);
-                                break;                            
+                                break;
                         }
                         occurNum = occurNum + stateStep;
                     }
@@ -1139,7 +1139,7 @@ namespace Microsoft.Xml.XMLGen {
                     else if (result <= minBound) {
                         result = minBound;
                     }
-                    return result; 
+                    return result;
                 }
            }
 
@@ -1156,7 +1156,7 @@ namespace Microsoft.Xml.XMLGen {
                 return startValue;
             }
       }// End of class dateTime
-    
+
       internal class Generator_date : Generator_dateTime {
             public Generator_date(CompiledFacets rFacets) : base (rFacets){
             }
@@ -1166,7 +1166,7 @@ namespace Microsoft.Xml.XMLGen {
                 return XmlConvert.ToString(result.Date, "yyyy-MM-dd");
             }
       }
-      
+
       internal class Generator_gYearMonth : Generator_dateTime {
             public Generator_gYearMonth(CompiledFacets rFacets) {
                 step = XmlConvert.ToTimeSpan("P32D");
@@ -1178,7 +1178,7 @@ namespace Microsoft.Xml.XMLGen {
                 return XmlConvert.ToString(result.Date, "yyyy-MM");
             }
       }
-    
+
       internal class Generator_gYear : Generator_dateTime {
             public Generator_gYear(CompiledFacets rFacets) {
                 step = XmlConvert.ToTimeSpan("P380D");
@@ -1212,7 +1212,7 @@ namespace Microsoft.Xml.XMLGen {
                 return XmlConvert.ToString(result.Date, "---dd");
             }
       }
-       
+
       internal class Generator_gMonth : Generator_dateTime {
             public Generator_gMonth(CompiledFacets rFacets) {
                 step = XmlConvert.ToTimeSpan("P32D");
@@ -1224,7 +1224,7 @@ namespace Microsoft.Xml.XMLGen {
                 return XmlConvert.ToString(GenerateDate().Date, "--MM--");
             }
       }
-      
+
       internal class Generator_time : Generator_dateTime {
             public Generator_time(CompiledFacets rFacets) {
                 step = XmlConvert.ToTimeSpan("PT1M30S");
@@ -1236,11 +1236,11 @@ namespace Microsoft.Xml.XMLGen {
             }
       }
 
-      
+
 
       internal class Generator_hexBinary : Generator_facetBase {
           Generator_integer binGen = new Generator_int();
-           
+
           public Generator_hexBinary(CompiledFacets rFacets) {
              binGen.StartValue = 4023;
              base.CheckFacets(rFacets);
@@ -1265,8 +1265,8 @@ namespace Microsoft.Xml.XMLGen {
                     }
                     return str.ToString();
                 }
-          } // End of GenValue     
-       
+          } // End of GenValue
+
           private void ProcessLengthFacet(ref StringBuilder str) {
                 int pLength = str.Length;
                 if (pLength % 2 != 0) {
@@ -1274,7 +1274,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
                 int correctLen = pLength / 2;
 
-                if(correctLen > length) { //Need to remove (correctLen - length) * 2 chars 
+                if(correctLen > length) { //Need to remove (correctLen - length) * 2 chars
                     str.Remove(length,(correctLen - length) * 2 );
                 }
                 else if(correctLen < length) { //Need to add (length - correctLen) * 2 chars
@@ -1300,7 +1300,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                 }
                 else { //if maxLength != -1
-                    if(correctLen > maxLength) { //Need to remove (correctLen - maxlength) * 2 chars 
+                    if(correctLen > maxLength) { //Need to remove (correctLen - maxlength) * 2 chars
                         str.Remove(maxLength,(correctLen - maxLength) * 2 );
                     }
                 }
@@ -1308,7 +1308,7 @@ namespace Microsoft.Xml.XMLGen {
       }
 
       internal class Generator_base64Binary : Generator_facetBase {
-            
+
           public Generator_base64Binary(CompiledFacets rFacets) {
                 CheckFacets(rFacets);
           }
@@ -1321,10 +1321,10 @@ namespace Microsoft.Xml.XMLGen {
                 else {
                     return "base64Binary Content";
                 }
-          }            
+          }
       }
-    
-      
+
+
       internal class Generator_QName : Generator_string {
           public Generator_QName() {
           }
@@ -1342,14 +1342,14 @@ namespace Microsoft.Xml.XMLGen {
                 return result;
           }
       }
-      
+
       internal class Generator_Notation : Generator_QName {
-                      
+
           public Generator_Notation(CompiledFacets rFacets) {
              CheckFacets(rFacets);
           }
       }
-    
+
       internal class Generator_normalizedString : Generator_string {
           public Generator_normalizedString() {
           }
@@ -1385,7 +1385,7 @@ namespace Microsoft.Xml.XMLGen {
 
           public Generator_NMTOKEN() {
           }
-            
+
           public Generator_NMTOKEN(CompiledFacets rFacets) : base(rFacets){
           }
       }
@@ -1407,11 +1407,11 @@ namespace Microsoft.Xml.XMLGen {
       }
 
       internal class Generator_ID : Generator_string {
-          
+
           public Generator_ID() {
               Prefix="ID";
           }
-        
+
           public override string GenerateValue() {
                 if (IDRef) {
                     IDRef = false;
@@ -1441,17 +1441,17 @@ namespace Microsoft.Xml.XMLGen {
                 return (string)IDList[refCnt++];
           }
       }
-      
+
         internal class Generator_anyURI : Generator_string {
             public Generator_anyURI(CompiledFacets rFacets) {
                 Prefix = "http://uri";
                 CheckFacets(rFacets);
             }
         }
-        
+
         internal class Generator_Union : Generator_facetBase {
            ArrayList unionGens = new ArrayList();
-            
+
            public Generator_Union() {
            }
 
@@ -1462,7 +1462,7 @@ namespace Microsoft.Xml.XMLGen {
            public override void AddGenerator(XmlValueGenerator genr) {
                 unionGens.Add(genr);
            }
-           
+
            internal ArrayList Generators {
                get {
                    return unionGens;
@@ -1473,9 +1473,9 @@ namespace Microsoft.Xml.XMLGen {
                 if(AllowedValues != null) {
                     object enumValue = GetEnumerationValue();
                     //Unpack the union enumeration value into memberType and typedValue
-                    object typedValue = CompiledFacets.XsdSimpleValueType.InvokeMember("typedValue", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, enumValue, null);
+                    object typedValue = CompiledFacets.XsdSimpleValueType.InvokeMember("_typedValue", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, enumValue, null);
                     return (string)this.Datatype.ChangeType(typedValue, TypeOfString);
-                } 
+                }
                 else if (unionGens.Count > 0){
                     XmlValueGenerator genr = (XmlValueGenerator)(unionGens[occurNum % unionGens.Count]);
                     genr.Prefix = this.Prefix;
@@ -1489,8 +1489,8 @@ namespace Microsoft.Xml.XMLGen {
         internal class Generator_List : Generator_facetBase {
            XmlValueGenerator genr;
            int listLength;
-           StringBuilder resultBuilder; 
-           
+           StringBuilder resultBuilder;
+
            public Generator_List() {
            }
 
@@ -1537,7 +1537,7 @@ namespace Microsoft.Xml.XMLGen {
                     for(int i=0; i < NoItems; i++) {
                         resultBuilder.Append(genr.GenerateValue());
                         resultBuilder.Append(" ");
-                    }             
+                    }
                 }
                 return resultBuilder.ToString().Trim();
             }

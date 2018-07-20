@@ -1,11 +1,12 @@
-﻿using Microsoft.Xml.XMLGen;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.Xml.XMLGen;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -16,15 +17,6 @@ namespace XmlSchemaClassGenerator.Tests
     [TestCaseOrderer("XmlSchemaClassGenerator.Tests.PriorityOrderer", "XmlSchemaClassGenerator.Tests")]
     public class XmlTests
     {
-        private static Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
-
-        private Assembly Compile(string name, string pattern, Generator generatorPrototype = null)
-        {
-            var files = Glob.Glob.ExpandNames(pattern);
-
-            return CompileFiles(name, files, generatorPrototype);
-        }
-
         private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
         {
             var writer = new MemoryOutputWriter();
@@ -61,69 +53,9 @@ namespace XmlSchemaClassGenerator.Tests
             return writer.Content;
         }
 
-        private Assembly CompileFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null)
-        {
-            if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
-
-            generatorPrototype = generatorPrototype ?? new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = name
-            };
-
-            var output = new FileWatcherOutputWriter(Path.Combine("output", name));
-
-            var gen = new Generator
-            {
-                OutputWriter = output,
-                NamespaceProvider = generatorPrototype.NamespaceProvider,
-                GenerateNullables = generatorPrototype.GenerateNullables,
-                IntegerDataType = generatorPrototype.IntegerDataType,
-                DataAnnotationMode = generatorPrototype.DataAnnotationMode,
-                GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
-                EntityFramework = generatorPrototype.EntityFramework,
-                GenerateInterfaces = generatorPrototype.GenerateInterfaces,
-                MemberVisitor = generatorPrototype.MemberVisitor,
-                TimeDataType = generatorPrototype.TimeDataType
-            };
-
-            gen.Generate(files);
-
-            var provider = CodeDomProvider.CreateProvider("CSharp");
-            var assemblies = new[]
-            {
-                "System.dll",
-                "System.Core.dll",
-                "System.Xml.dll",
-                "System.Xml.Linq.dll",
-                "System.Xml.Serialization.dll",
-                "System.ServiceModel.dll",
-                "System.ComponentModel.DataAnnotations.dll",
-            };
-
-            var binFolder = Path.Combine(output.OutputDirectory, "bin");
-            Directory.CreateDirectory(binFolder);
-            var results = provider.CompileAssemblyFromFile(new CompilerParameters(assemblies, Path.Combine(binFolder, name + ".dll")), output.Files.ToArray());
-
-            Assert.False(results.Errors.HasErrors, string.Join("\n", results.Output.Cast<string>()));
-            Assert.False(results.Errors.HasWarnings, string.Join("\n", results.Output.Cast<string>()));
-            Assert.NotNull(results.CompiledAssembly);
-
-            var assembly = Assembly.Load(results.CompiledAssembly.GetName());
-
-            Assemblies[name] = assembly;
-
-            return assembly;
-        }
-
         const string IS24Pattern = @"xsd\is24\*\*.xsd";
         const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
-        const string WadlPattern = @"xsd\wadl\wadl.xsd";
+        const string WadlPattern = @"xsd\wadl\*.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
         const string IataPattern = @"xsd\iata\????[^_][^_]?[^-]*.xsd";
         const string TimePattern = @"xsd\time\time.xsd";
@@ -132,11 +64,11 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void CanDeserializeSampleXml()
         {
-            Compile("Client", ClientPattern);
+            Compiler.Generate("Client", ClientPattern);
             TestSamples("Client", ClientPattern);
-            Compile("IS24RestApi", IS24Pattern);
+            Compiler.Generate("IS24RestApi", IS24Pattern);
             TestSamples("IS24RestApi", IS24Pattern);
-            Compile("Wadl", WadlPattern, new Generator
+            Compiler.Generate("Wadl", WadlPattern, new Generator
             {
                 EntityFramework = true,
                 DataAnnotationMode = DataAnnotationMode.All,
@@ -144,9 +76,9 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = (member, model) => { }
             });
             TestSamples("Wadl", WadlPattern);
-            Compile("IS24ImmoTransfer", IS24ImmoTransferPattern);
+            Compiler.Generate("IS24ImmoTransfer", IS24ImmoTransferPattern);
             TestSamples("IS24ImmoTransfer", IS24ImmoTransferPattern);
-            Compile("Iata", IataPattern, new Generator
+            Compiler.Generate("Iata", IataPattern, new Generator
             {
                 EntityFramework = true,
                 DataAnnotationMode = DataAnnotationMode.All,
@@ -160,7 +92,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         private void TestSamples(string name, string pattern)
         {
-            Assemblies.TryGetValue(name, out Assembly assembly);
+            var assembly = Compiler.GetAssembly(name);
             Assert.NotNull(assembly);
             DeserializeSampleXml(pattern, assembly);
         }
@@ -242,7 +174,7 @@ namespace XmlSchemaClassGenerator.Tests
                     && a.NamedArguments.Any(n => n.MemberName == "Namespace" && (string)n.TypedValue.Value == xmlQualifiedName.Namespace)));
         }
 
-        static string[] Classes = new[] { "ApartmentBuy",
+        static readonly string[] Classes = new[] { "ApartmentBuy",
                 "ApartmentRent",
                 "AssistedLiving",
                 "CompulsoryAuction",
@@ -266,7 +198,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact, TestPriority(2)]
         public void ProducesSameXmlAsXsd()
         {
-            var assembly = Compile("IS24RestApi", IS24Pattern);
+            var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
 
             foreach (var c in Classes)
             {
@@ -301,7 +233,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact, TestPriority(3)]
         public void CanSerializeAndDeserializeAllExampleXmlFiles()
         {
-            var assembly = Compile("IS24RestApi", IS24Pattern);
+            var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
 
             foreach (var c in Classes)
             {
@@ -353,7 +285,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact]
         public void CreateDeserialiser_NoException_WhereTimeXsdPresent_AndTimeDataTypeSet()
         {
-            Compile("Time1", TimePattern, new Generator
+            Compiler.Generate("Time1", TimePattern, new Generator
             {
                 EntityFramework = true,
                 DataAnnotationMode = DataAnnotationMode.All,
@@ -368,7 +300,7 @@ namespace XmlSchemaClassGenerator.Tests
                 TimeDataType = typeof(DateTime)
             });
 
-            Assemblies.TryGetValue("Time1", out Assembly assembly);
+            var assembly = Compiler.GetAssembly("Time1");
             Assert.NotNull(assembly);
 
             var type = assembly.GetType("hiconline.Service");
@@ -384,7 +316,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact]
         public void CreateDeserialiser_ThrowsException_WhereTimeXsdPresent_AndTimeDataTypeNotSet()
         {
-            Compile("Time2", TimePattern, new Generator
+            Compiler.Generate("Time2", TimePattern, new Generator
             {
                 EntityFramework = true,
                 DataAnnotationMode = DataAnnotationMode.All,
@@ -398,7 +330,7 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateInterfaces = true
             });
 
-            Assemblies.TryGetValue("Time2", out Assembly assembly);
+            var assembly = Compiler.GetAssembly("Time2");
             Assert.NotNull(assembly);
 
             var type = assembly.GetType("hiconline.Service");
@@ -462,8 +394,8 @@ namespace Test
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Xml.Serialization;
-    
-    
+
+
     /// <summary>
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute(""Tests"", ""1.0.0.1"")]
@@ -472,19 +404,19 @@ namespace Test
     [System.ComponentModel.DesignerCategoryAttribute(""code"")]
     public partial class Group_Name
     {
-        
+
         /// <summary>
         /// <para xml:lang=""de"">Ruft den Text ab oder legt diesen fest.</para>
         /// <para xml:lang=""en"">Gets or sets the text value.</para>
         /// </summary>
         [System.Xml.Serialization.XmlTextAttribute(DataType=""string"")]
         public string Value { get; set; }
-        
+
         /// <summary>
         /// </summary>
         [System.Xml.Serialization.XmlAttributeAttribute(""justify"", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
         public SimpleType Justify { get; set; }
-        
+
         /// <summary>
         /// <para xml:lang=""de"">Ruft einen Wert ab, der angibt, ob die Justify-Eigenschaft spezifiziert ist, oder legt diesen fest.</para>
         /// <para xml:lang=""en"">Gets or sets a value indicating whether the Justify property is specified.</para>
@@ -492,7 +424,7 @@ namespace Test
         [System.Xml.Serialization.XmlIgnoreAttribute()]
         public bool JustifySpecified { get; set; }
     }
-    
+
     /// <summary>
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute(""Tests"", ""1.0.0.1"")]
@@ -500,7 +432,7 @@ namespace Test
     [System.Xml.Serialization.XmlTypeAttribute(""simpleType"", Namespace="""")]
     public enum SimpleType
     {
-        
+
         /// <summary>
         /// </summary>
         [System.Xml.Serialization.XmlEnumAttribute(""foo"")]
@@ -512,7 +444,7 @@ namespace Test
 
         private static void CompareOutput(string expected, string actual)
         {
-            string Normalize(string input) => input.Replace("\r\n", "\n");
+            string Normalize(string input) => Regex.Replace(input, @"\s*\r\n", "\n");
             Assert.Equal(Normalize(expected), Normalize(actual));
         }
     }
