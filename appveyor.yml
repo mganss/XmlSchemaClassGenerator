@@ -17,10 +17,8 @@ build_script:
   - dotnet pack --include-symbols --include-source -c Release xscgen
   - 7z a -mx=9 XmlSchemaClassGenerator.%APPVEYOR_BUILD_VERSION%.zip ".\XmlSchemaClassGenerator.Console\bin\Release\net45\publish\*"
 test_script:
-  - dotnet test XmlSchemaClassGenerator.Tests\XmlSchemaClassGenerator.Tests.csproj
-  - nuget.exe install OpenCover -ExcludeVersion
-  - OpenCover\tools\OpenCover.Console.exe -register:user -filter:"+[XmlSchemaClassGenerator]*" -target:"C:\Program Files\dotnet\dotnet.exe" "-targetargs:test XmlSchemaClassGenerator.Tests\XmlSchemaClassGenerator.Tests.csproj" -returntargetcode -hideskipped:All -output:coverage.xml
-  - "SET PATH=C:\\Python34;C:\\Python34\\Scripts;%PATH%"
+  - dotnet tool install --global coverlet.console
+  - coverlet XmlSchemaClassGenerator.Tests\bin\Debug\netcoreapp2.1\XmlSchemaClassGenerator.Tests.dll --target dotnet --targetargs "test XmlSchemaClassGenerator.Tests\XmlSchemaClassGenerator.Tests.csproj --no-build" --format opencover --output ".\coverage.xml" --exclude "[XmlSampleGenerator]*"
   - pip install codecov
   - codecov -f "coverage.xml"
 artifacts:
