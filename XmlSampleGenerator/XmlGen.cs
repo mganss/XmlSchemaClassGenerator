@@ -60,8 +60,10 @@ namespace XmlTools {
                 WriteHelp();
                 return;
             }
-            XmlTextWriter textWriter = new XmlTextWriter("Sample.xml", null);
-            textWriter.Formatting = Formatting.Indented;
+            XmlTextWriter textWriter = new XmlTextWriter("Sample.xml", null)
+            {
+                Formatting = Formatting.Indented
+            };
             XmlSampleGenerator genr = new XmlSampleGenerator(schemas, qname);
             if (max > 0) { genr.MaxThreshold = max; }
             if (listLength > 0) { genr.ListLength = listLength; }

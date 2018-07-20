@@ -26,7 +26,7 @@ namespace Microsoft.Xml.XMLGen {
             TotalDigits         = 0x0400,
             FractionDigits      = 0x0800,
         }
-    
+
         internal class CompiledFacets {
 
             static FieldInfo lengthInfo;
@@ -45,11 +45,11 @@ namespace Microsoft.Xml.XMLGen {
 
             static FieldInfo restrictionFlagsInfo;
             static FieldInfo restrictionFixedFlagsInfo;
-            
+
             public static Type XsdSimpleValueType;
             public static Type XmlSchemaDatatypeType;
 
-            object compiledRestriction;
+            readonly object compiledRestriction;
 
             static CompiledFacets() {
                 Assembly systemXmlAsm = typeof(XmlSchema).Assembly;
@@ -80,7 +80,7 @@ namespace Microsoft.Xml.XMLGen {
             public CompiledFacets(object restriction) {
                 this.compiledRestriction = restriction;
             }
-    
+
             public int Length {
                 get {
                     if (compiledRestriction == null) {
@@ -132,7 +132,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                     return (XmlSchemaWhiteSpace)whitespaceInfo.GetValue(compiledRestriction);
                 }
-            }   
+            }
 
             public object MaxInclusive {
                 get {
@@ -141,7 +141,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                     return maxInclusiveInfo.GetValue(compiledRestriction);
                 }
-            }  
+            }
             public object MaxExclusive {
                 get {
                     if (compiledRestriction == null) {

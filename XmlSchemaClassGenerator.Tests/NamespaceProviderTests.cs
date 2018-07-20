@@ -34,9 +34,12 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact]
         public void IndexTest()
         {
-            var ns = new NamespaceProvider();
-            ns[new NamespaceKey("x")] = "c";
-            ns.GenerateNamespace = k => k.XmlSchemaNamespace != "z" ? k.XmlSchemaNamespace : null;
+            var ns = new NamespaceProvider
+            {
+                [new NamespaceKey("x")] = "c",
+                GenerateNamespace = k => k.XmlSchemaNamespace != "z" ? k.XmlSchemaNamespace : null
+            };
+
             Assert.Equal("c", ns[new NamespaceKey("x")]);
             Assert.Equal("y", ns[new NamespaceKey("y")]);
             Assert.Equal("y", ns[new NamespaceKey("y")]);

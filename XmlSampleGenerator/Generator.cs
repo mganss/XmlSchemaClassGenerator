@@ -229,8 +229,10 @@ namespace Microsoft.Xml.XMLGen {
 
         private static XmlValueGenerator CreateListGenerator(XmlSchemaDatatype dtype, CompiledFacets facets, int listLength) {
             XmlSchemaDatatype itemType = (XmlSchemaDatatype)dtype.GetType().InvokeMember("_itemType", BindingFlags.GetField | BindingFlags.NonPublic | BindingFlags.Instance, null, dtype, null);
-            Generator_List list_genr = new Generator_List(facets);
-            list_genr.ListLength = listLength;
+            Generator_List list_genr = new Generator_List(facets)
+            {
+                ListLength = listLength
+            };
             list_genr.AddGenerator(XmlValueGenerator.CreateGenerator(itemType, listLength));
             return list_genr;
         }
@@ -242,14 +244,14 @@ namespace Microsoft.Xml.XMLGen {
 
 
         internal class Generator_anyType : XmlValueGenerator {
-            string value = "anyType";
+            readonly string value = "anyType";
             public override string GenerateValue() {
                 return value;
             }
         }
 
         internal class Generator_anySimpleType : XmlValueGenerator {
-            string value = "anySimpleType";
+            readonly string value = "anySimpleType";
             public override string GenerateValue() {
                 return value;
             }
@@ -332,7 +334,7 @@ namespace Microsoft.Xml.XMLGen {
         } //End of class stringBase
 
         internal class Generator_string : Generator_facetBase {
-            int step = 1;
+            readonly int step = 1;
             int endValue = 0;
             StringBuilder genString;
 
@@ -819,7 +821,7 @@ namespace Microsoft.Xml.XMLGen {
         internal class Generator_float : XmlValueGenerator {
             float increment = 0F;
             float startValue = 1;
-            float step = 1.1F;
+            readonly float step = 1.1F;
             float maxBound = float.MaxValue;
             float minBound = float.MinValue;
 
@@ -929,9 +931,9 @@ namespace Microsoft.Xml.XMLGen {
 
         internal class Generator_duration : XmlValueGenerator {
             TimeSpan startValue = XmlConvert.ToTimeSpan("P1Y1M1DT1H1M1S");
-            TimeSpan step       = XmlConvert.ToTimeSpan("P1Y");
+            readonly TimeSpan step       = XmlConvert.ToTimeSpan("P1Y");
             TimeSpan increment  = new TimeSpan(0,0,0,0);
-            TimeSpan endValue   = new TimeSpan(1,0,0,0);
+            readonly TimeSpan endValue   = new TimeSpan(1,0,0,0);
             TimeSpan minBound   = new TimeSpan(TimeSpan.MinValue.Days,TimeSpan.MinValue.Hours,TimeSpan.MinValue.Minutes,TimeSpan.MinValue.Seconds,TimeSpan.MinValue.Milliseconds);
             TimeSpan maxBound   = new TimeSpan(TimeSpan.MaxValue.Days,TimeSpan.MaxValue.Hours,TimeSpan.MaxValue.Minutes,TimeSpan.MaxValue.Seconds,TimeSpan.MaxValue.Milliseconds);
 

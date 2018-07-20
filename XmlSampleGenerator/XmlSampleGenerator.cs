@@ -7,11 +7,11 @@ using System.Collections;
 using System.Diagnostics;
 
 namespace Microsoft.Xml.XMLGen {
-    
+
     //To build substitutionGroups
     internal class SubstitutionGroupWrapper {
         XmlQualifiedName head;
-        ArrayList members = new ArrayList();
+        readonly ArrayList members = new ArrayList();
 
         internal XmlQualifiedName Head {
             get {
@@ -30,10 +30,10 @@ namespace Microsoft.Xml.XMLGen {
     }
 
     public class XmlSampleGenerator {
-        private XmlSchemaSet schemaSet;     
+        private XmlSchemaSet schemaSet;
         private XmlWriter writer;
         private XmlResolver xmlResolver;
-        private InstanceElement instanceRoot; 
+        private InstanceElement instanceRoot;
         private XmlQualifiedName rootElement;
         private string rootTargetNamespace;
 
@@ -42,7 +42,7 @@ namespace Microsoft.Xml.XMLGen {
         internal const string NsXml = "http://www.w3.org/XML/1998/namespace";
         internal XmlQualifiedName QnXsdAnyType= new XmlQualifiedName("anyType", NsXsd );
         internal XmlQualifiedName XsdNil= new XmlQualifiedName("nil", NsXsi );
-        
+
         //Default options
         private int maxThreshold = 5;
         private int listLength = 3;
@@ -54,8 +54,8 @@ namespace Microsoft.Xml.XMLGen {
         //Handle substitutionGroups
         private Hashtable substitutionGroupsTable;
 
-        private XmlSchemaType AnyType;        
-        
+        private readonly XmlSchemaType AnyType;
+
         public int MaxThreshold {
             get {
                 return maxThreshold;
@@ -64,7 +64,7 @@ namespace Microsoft.Xml.XMLGen {
                 maxThreshold = value;
             }
         }
-        
+
         public int ListLength {
             get {
                 return listLength;
@@ -73,7 +73,7 @@ namespace Microsoft.Xml.XMLGen {
                 listLength = value;
             }
         }
-        
+
         public XmlResolver XmlResolver {
             set {
                 xmlResolver = value;
@@ -85,7 +85,7 @@ namespace Microsoft.Xml.XMLGen {
 
         public XmlSampleGenerator(XmlSchema schema, XmlQualifiedName rootElem) {
             if (schema == null) {
-                throw new Exception("Provided Schema is null. Xml cannot be generated.");           
+                throw new Exception("Provided Schema is null. Xml cannot be generated.");
             }
             rootElement = rootElem;
             schemaSet = new XmlSchemaSet();
@@ -112,12 +112,9 @@ namespace Microsoft.Xml.XMLGen {
             rootElement = rootElem;
             AnyType = XmlSchemaType.GetBuiltInComplexType(XmlTypeCode.Item);
         }
-        
+
         public void WriteXml (XmlWriter writer) {
-            if (writer == null) {
-                throw new ArgumentNullException("writer");
-            }
-            this.writer = writer;
+            this.writer = writer ?? throw new ArgumentNullException("writer");
             elementTypesProcessed = new Hashtable();
             if(ProcessSchemaSet()) { //Only if valid schemas were loaded
                 if (instanceRoot != null) { //If found a root to generate XML
@@ -127,8 +124,8 @@ namespace Microsoft.Xml.XMLGen {
                 this.writer.Flush();
             }
         }
-    
-        
+
+
         private bool ProcessSchemaSet() {
             //Add all the Elements from all schemas into the Elements table
             schemaSet.Compile();
@@ -137,9 +134,9 @@ namespace Microsoft.Xml.XMLGen {
                 if (rootElement == null) {
                     rootElement = XmlQualifiedName.Empty;
                 }
-                schemaElem = schemaSet.GlobalElements[rootElement] as XmlSchemaElement; 
+                schemaElem = schemaSet.GlobalElements[rootElement] as XmlSchemaElement;
                 if (schemaElem == null) { //If element by name is not found, Get first non-abstract root element
-                    foreach(XmlSchemaElement elem1 in schemaSet.GlobalElements.Values) { 
+                    foreach(XmlSchemaElement elem1 in schemaSet.GlobalElements.Values) {
                         if (elem1.IsAbstract) {
                             continue;
                         }
@@ -159,9 +156,9 @@ namespace Microsoft.Xml.XMLGen {
             }
             return false;
         }
-        
+
         private bool GenerateElement(XmlSchemaElement e, bool root, InstanceGroup parentElem, XmlSchemaAny any) {
-          XmlSchemaElement eGlobalDecl = e;            
+          XmlSchemaElement eGlobalDecl = e;
 
           if (!e.RefName.IsEmpty) {
                 eGlobalDecl = (XmlSchemaElement)schemaSet.GlobalElements[e.QualifiedName];
@@ -180,7 +177,7 @@ namespace Microsoft.Xml.XMLGen {
                         }
                         parentElem.AddChild(elem.Clone(occurs));
                     }
-                    return false;   
+                    return false;
                 }
                 elem = new InstanceElement(eGlobalDecl.QualifiedName);
 
@@ -208,25 +205,29 @@ namespace Microsoft.Xml.XMLGen {
                     elem.ValueGenerator = XmlValueGenerator.AnyGenerator;
                 }
                 else {
-                    XmlSchemaComplexType ct = eGlobalDecl.ElementSchemaType as XmlSchemaComplexType;
-                    if (ct != null) {
+                    if (eGlobalDecl.ElementSchemaType is XmlSchemaComplexType ct)
+                    {
                         elementTypesProcessed.Add(eGlobalDecl, elem);
-                        if (!ct.IsAbstract) {
+                        if (!ct.IsAbstract)
+                        {
                             elem.IsMixed = ct.IsMixed;
                             ProcessComplexType(ct, elem);
-                        } 
-                        else { // Ct is abstract, need to generate instance elements with xsi:type
+                        }
+                        else
+                        { // Ct is abstract, need to generate instance elements with xsi:type
                             XmlSchemaComplexType dt = GetDerivedType(ct);
-                            if (dt != null) {
+                            if (dt != null)
+                            {
                                 elem.XsiType = dt.QualifiedName;
                                 ProcessComplexType(dt, elem);
                             }
                         }
                     }
-                    else { //elementType is XmlSchemaSimpleType
+                    else
+                    { //elementType is XmlSchemaSimpleType
                         elem.ValueGenerator = XmlValueGenerator.CreateGenerator(eGlobalDecl.ElementSchemaType.Datatype, listLength);
                     }
-                }                    
+                }
                 if (elem.ValueGenerator != null && elem.ValueGenerator.Prefix == null) {
                     elem.ValueGenerator.Prefix = elem.QualifiedName.Name;
                 }
@@ -234,10 +235,10 @@ namespace Microsoft.Xml.XMLGen {
           } // End of e.IsAbstract
           return false;
         }
-        
+
         private void ProcessComplexType(XmlSchemaComplexType ct, InstanceElement elem) {
             if (ct.ContentModel != null && ct.ContentModel is XmlSchemaSimpleContent) {
-                elem.ValueGenerator = XmlValueGenerator.CreateGenerator(ct.Datatype, listLength);    
+                elem.ValueGenerator = XmlValueGenerator.CreateGenerator(ct.Datatype, listLength);
             }
             else {
                 GenerateParticle(ct.ContentTypeParticle, false, elem);
@@ -255,8 +256,8 @@ namespace Microsoft.Xml.XMLGen {
 
         private XmlSchemaComplexType GetDerivedType(XmlSchemaType baseType) { //To get derived type of an abstract type for xsi:type value in the instance
             foreach(XmlSchemaType type in schemaSet.GlobalTypes.Values) {
-                XmlSchemaComplexType ct = type as XmlSchemaComplexType;
-                if (ct != null && !ct.IsAbstract && XmlSchemaType.IsDerivedFrom(ct, baseType, XmlSchemaDerivationMethod.None)) {
+                if (type is XmlSchemaComplexType ct && !ct.IsAbstract && XmlSchemaType.IsDerivedFrom(ct, baseType, XmlSchemaDerivationMethod.None))
+                {
                     return ct;
                 }
             }
@@ -292,7 +293,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
             }
             switch(namespaceList) {
-                case "##any"   : 
+                case "##any"   :
                 case "##targetNamespace" :
                     anyAttr = GetAttributeFromNS(rootTargetNamespace, attributes);
                     break;
@@ -332,7 +333,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
             }
         }
-       
+
         private XmlSchemaAttribute GetAttributeFromNS(string ns, XmlSchemaObjectTable attributes) {
             return GetAttributeFromNS(ns, false, attributes);
         }
@@ -354,7 +355,7 @@ namespace Microsoft.Xml.XMLGen {
             }
             return null;
         }
- 
+
         private void GenerateAttribute(XmlSchemaObjectTable attributes, InstanceElement elem) {
             IDictionaryEnumerator ienum = attributes.GetEnumerator();
             while (ienum.MoveNext()) {
@@ -368,64 +369,79 @@ namespace Microsoft.Xml.XMLGen {
             if (attr.Use == XmlSchemaUse.Prohibited || attr.AttributeSchemaType == null) {
                 return;
             }
-            InstanceAttribute iAttr = new InstanceAttribute(attr.QualifiedName);
-            iAttr.DefaultValue = attr.DefaultValue;
-            iAttr.FixedValue = attr.FixedValue;
-            iAttr.AttrUse = attr.Use;
-            iAttr.ValueGenerator = XmlValueGenerator.CreateGenerator(attr.AttributeSchemaType.Datatype, listLength);
+            InstanceAttribute iAttr = new InstanceAttribute(attr.QualifiedName)
+            {
+                DefaultValue = attr.DefaultValue,
+                FixedValue = attr.FixedValue,
+                AttrUse = attr.Use,
+                ValueGenerator = XmlValueGenerator.CreateGenerator(attr.AttributeSchemaType.Datatype, listLength)
+            };
             if (iAttr.ValueGenerator != null && iAttr.ValueGenerator.Prefix == null) {
                     iAttr.ValueGenerator.Prefix = iAttr.QualifiedName.Name;
             }
             elem.AddAttribute(iAttr);
         }
 
-        
+
         private void GenerateParticle(XmlSchemaParticle particle, bool root, InstanceGroup iGrp) {
             decimal max;
             max = particle.MaxOccurs >= maxThreshold ? maxThreshold : particle.MaxOccurs;
             max = particle.MinOccurs > max ? particle.MinOccurs : max;
 
-            if (particle is XmlSchemaSequence ) {
-                XmlSchemaSequence seq = (XmlSchemaSequence)particle;
-                InstanceGroup grp = new InstanceGroup();
-                grp.Occurs = max;
+            if (particle is XmlSchemaSequence seq)
+            {
+                InstanceGroup grp = new InstanceGroup
+                {
+                    Occurs = max
+                };
                 iGrp.AddChild(grp);
                 GenerateGroupBase(seq, grp);
             }
-            else if (particle is XmlSchemaChoice) {
+            else if (particle is XmlSchemaChoice)
+            {
                 XmlSchemaChoice ch = (XmlSchemaChoice)particle;
-                if (ch.MaxOccurs == 1) {
+                if (ch.MaxOccurs == 1)
+                {
                     XmlSchemaParticle pt = (XmlSchemaParticle)(ch.Items[0]);
                     GenerateParticle(pt, false, iGrp);
                 }
-                else {
-                    InstanceGroup grp = new InstanceGroup();
-                    grp.Occurs = max;
-                    grp.IsChoice = true;
+                else
+                {
+                    InstanceGroup grp = new InstanceGroup
+                    {
+                        Occurs = max,
+                        IsChoice = true
+                    };
                     iGrp.AddChild(grp);
-                    GenerateGroupBase(ch,grp);
+                    GenerateGroupBase(ch, grp);
                 }
             }
-            else if (particle is XmlSchemaAll) {
+            else if (particle is XmlSchemaAll)
+            {
                 GenerateAll((XmlSchemaAll)particle, iGrp);
             }
-            else if (particle is XmlSchemaElement) {
+            else if (particle is XmlSchemaElement)
+            {
                 XmlSchemaElement elem = particle as XmlSchemaElement;
                 XmlSchemaChoice ch = null;
-                if (!elem.RefName.IsEmpty) {
+                if (!elem.RefName.IsEmpty)
+                {
                     ch = GetSubstitutionChoice(elem);
                 }
-                if (ch != null) {
+                if (ch != null)
+                {
                     GenerateParticle(ch, false, iGrp);
                 }
-                else {
+                else
+                {
                     GenerateElement(elem, false, iGrp, null);
                 }
             }
-            else if (particle is XmlSchemaAny && particle.MinOccurs > 0) { //Generate any only if we should
+            else if (particle is XmlSchemaAny && particle.MinOccurs > 0)
+            { //Generate any only if we should
                 GenerateAny((XmlSchemaAny)particle, iGrp);
             }
-            
+
         }
 
         private void GenerateGroupBase(XmlSchemaGroupBase gBase, InstanceGroup grp) {
@@ -440,9 +456,9 @@ namespace Microsoft.Xml.XMLGen {
                 pt = (XmlSchemaParticle)(all.Items[i-1]);
                 GenerateParticle(pt,false, grp);
             }
-            
+
         }
-        
+
         private void GenerateAny(XmlSchemaAny any, InstanceGroup grp) {
             InstanceElement parentElem = grp as InstanceElement;
             char[] whitespace = new char[] {' ', '\t', '\n', '\r'};
@@ -472,7 +488,7 @@ namespace Microsoft.Xml.XMLGen {
             }
             //ProcessContents = strict || namespaceList is actually a list of namespaces
             switch(namespaceList) {
-                case "##any"   : 
+                case "##any"   :
                 case "##targetNamespace" :
                     anyElem = GetElementFromNS(rootTargetNamespace);
                     break;
@@ -504,7 +520,7 @@ namespace Microsoft.Xml.XMLGen {
                     break;
                 }
                 if (anyElem != null && GenerateElement(anyElem, false, grp, any)) {
-                    return;                    
+                    return;
                 }
                 else { //Write comment in generated XML that match for wild card cd not be found.
                     if (parentElem == null) {
@@ -568,8 +584,10 @@ namespace Microsoft.Xml.XMLGen {
                     }
                     SubstitutionGroupWrapper substitutionGroup = (SubstitutionGroupWrapper)substitutionGroupsTable[head];
                     if (substitutionGroup == null) {
-                        substitutionGroup = new SubstitutionGroupWrapper();
-                        substitutionGroup.Head = head;
+                        substitutionGroup = new SubstitutionGroupWrapper
+                        {
+                            Head = head
+                        };
                         substitutionGroupsTable.Add(head, substitutionGroup);
                     }
                     ArrayList members = substitutionGroup.Members;
@@ -621,7 +639,7 @@ namespace Microsoft.Xml.XMLGen {
             if (substitutionGroupsTable != null) {
                 SubstitutionGroupWrapper substitutionGroup = (SubstitutionGroupWrapper)substitutionGroupsTable[element.QualifiedName];
                 if (substitutionGroup != null) { //Element is head of a substitutionGroup
-                    XmlSchemaChoice choice = new XmlSchemaChoice(); 
+                    XmlSchemaChoice choice = new XmlSchemaChoice();
                     foreach(XmlSchemaElement elem in substitutionGroup.Members) {
                         choice.Items.Add(elem);
                     }
@@ -669,7 +687,7 @@ namespace Microsoft.Xml.XMLGen {
                 writer.WriteComment("Schema did not lead to generation of a valid XML document");
             }
         }
-        
+
         private void ProcessGroup(InstanceGroup grp) {
             if(grp is InstanceElement) {
                 ProcessElement((InstanceElement)grp);
@@ -689,7 +707,7 @@ namespace Microsoft.Xml.XMLGen {
                 }
             }
         }
-        
+
         private void ProcessChoiceGroup(InstanceGroup grp) {
             for (int i=0; i < grp.Occurs; i++) { //Cyclically iterate over the children of choice
                 ProcessGroup(grp.GetChild(i % grp.NoOfChildren));
@@ -717,7 +735,7 @@ namespace Microsoft.Xml.XMLGen {
                         elem.GenNil = true;
                     }
                 }
-                
+
                 if(elem.ValueGenerator != null) {
                     if (elem.IsFixed) {
                         writer.WriteString(elem.FixedValue);
@@ -725,7 +743,7 @@ namespace Microsoft.Xml.XMLGen {
                     else if(elem.HasDefault) {
                         writer.WriteString(elem.DefaultValue);
                     }
-                    else { 
+                    else {
                         writer.WriteString(elem.ValueGenerator.GenerateValue());
                     }
                 }
@@ -740,7 +758,7 @@ namespace Microsoft.Xml.XMLGen {
             }
             instanceElementsProcessed.Remove(elem);
         }
-        
+
         private void ProcessComment(InstanceElement elem) {
             if (elem.Comment.Length > 0) {
                 writer.WriteComment(elem.Comment.ToString());
@@ -751,7 +769,7 @@ namespace Microsoft.Xml.XMLGen {
                 writer.WriteString("text");
             }
         }
-        
+
         private void WriteNillable() {
             writer.WriteStartAttribute(XsdNil.Name, XsdNil.Namespace);
             writer.WriteString("true");
@@ -772,7 +790,7 @@ namespace Microsoft.Xml.XMLGen {
 
             InstanceAttribute attr = elem.FirstAttribute;
             while (attr != null) {
-                if (attr.AttrUse != XmlSchemaUse.Prohibited) { 
+                if (attr.AttrUse != XmlSchemaUse.Prohibited) {
                     if (attr.QualifiedName.Namespace == NsXml) {
                         writer.WriteStartAttribute("xml", attr.QualifiedName.Name, attr.QualifiedName.Namespace);
                     }
@@ -781,7 +799,7 @@ namespace Microsoft.Xml.XMLGen {
                     }
                     if(attr.HasDefault && !(attr.ValueGenerator is Generator_QName)) {
                         writer.WriteString(attr.DefaultValue);
-                    } 
+                    }
                     else if (attr.IsFixed) {
                         writer.WriteString(attr.FixedValue);
                     }

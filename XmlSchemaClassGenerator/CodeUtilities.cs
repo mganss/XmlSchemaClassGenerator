@@ -147,8 +147,7 @@ namespace XmlSchemaClassGenerator
         public static XmlQualifiedName GetQualifiedName(this TypeModel typeModel)
         {
             XmlQualifiedName qualifiedName;
-            var simpleTypeModel = typeModel as SimpleModel;
-            if (simpleTypeModel == null)
+            if (!(typeModel is SimpleModel simpleTypeModel))
             {
                 qualifiedName = typeModel.XmlSchemaType.GetQualifiedName();
             }
