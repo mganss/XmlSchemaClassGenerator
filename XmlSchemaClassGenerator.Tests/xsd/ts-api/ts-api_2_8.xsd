@@ -1,0 +1,816 @@
+<?xml version="1.0"?>
+<xs:schema xmlns="http://tableau.com/api" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://tableau.com/api" elementFormDefault="qualified">
+
+
+    <!--
+        Definition of request and response elements that wrap all payloads.
+        Definition of the error message payload.
+    -->
+
+    <xs:element name="tsRequest">
+        <xs:complexType>
+            <xs:choice>
+                <xs:element name="connection" type="connectionType" />
+                <xs:element name="credentials" type="tableauCredentialsType" />
+                <xs:element name="datasource" type="dataSourceType" />
+                <xs:element name="favorite" type="favoriteType" />
+                <xs:element name="group" type="groupType" />
+                <xs:element name="permissions" type="permissionsType" />
+                <xs:element name="project" type="projectType" />
+                <xs:element name="schedule" type="scheduleType" />
+                <xs:element name="site" type="siteType" />
+                <xs:element name="tags" type="tagListType" />
+                <xs:element name="user" type="userType" />
+                <xs:element name="workbook" type="workbookType" />
+                <xs:element name="subscription" type="subscriptionType" />
+                <xs:element name="task" type="taskType" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="tsResponse">
+        <xs:complexType>
+            <xs:choice>
+                <xs:group ref="paginatedResponseGroup" />
+                <xs:element name="connection" type="connectionType" />
+                <xs:element name="connections" type="connectionListType" />
+                <xs:element name="credentials" type="tableauCredentialsType" />
+                <xs:element name="datasource" type="dataSourceType" />
+                <xs:element name="error" type="errorType" />
+                <xs:element name="favorites" type="favoriteListType" />
+                <xs:element name="fileUpload" type="fileUploadType" />
+                <xs:element name="group" type="groupType" />
+                <xs:element name="job" type="jobType" />
+                <xs:element name="permissions" type="permissionsType" />
+                <xs:element name="project" type="projectType" />
+                <xs:element name="schedule" type="scheduleType" />
+                <xs:element name="serverInfo" type="serverInfo" />
+                <xs:element name="site" type="siteType" />
+                <xs:element name="tags" type="tagListType" />
+                <xs:element name="user" type="userType" />
+                <xs:element name="views" type="viewListType" />
+                <xs:element name="workbook" type="workbookType" />
+                <xs:element name="subscription" type="subscriptionType" />
+                <xs:element name="task" type="taskType" />
+                <xs:element name="tasks" type="taskListType" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:group name="paginatedResponseGroup">
+        <xs:sequence>
+            <xs:element name="pagination" type="paginationType" />
+            <xs:choice>
+                <xs:element name="datasources" type="dataSourceListType" />
+                <xs:element name="extracts" type="extractListType" />
+                <xs:element name="groups" type="groupListType" />
+                <xs:element name="projects" type="projectListType" />
+                <xs:element name="revisions" type="revisionListType" />
+                <xs:element name="schedules" type="scheduleListType" />
+                <xs:element name="sites" type="siteListType" />
+                <xs:element name="users" type="userListType" />
+                <xs:element name="workbooks" type="workbookListType" />
+                <xs:element name="subscriptions" type="subscriptionListType"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:group>
+
+    <xs:complexType name="errorType">
+        <xs:sequence>
+            <xs:element name="summary" type="xs:string" />
+            <xs:element name="detail" type="xs:string" />
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:positiveInteger" use="required" />
+    </xs:complexType>
+
+
+    <!--
+        Definition of types for the primary entities that are included in the payloads of requests and responses.
+    -->
+
+    <!-- Credentials for a workbook or datasource connection -->
+    <xs:complexType name="connectionCredentialsType">
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="password" type="xs:string" />
+        <xs:attribute name="embed" type="xs:boolean" />
+        <xs:attribute name="oAuth" type="xs:boolean" />
+    </xs:complexType>
+
+    <xs:complexType name="connectionListType">
+        <xs:sequence>
+            <xs:element name="connection" type="connectionType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="connectionType">
+        <xs:sequence>
+            <xs:element name="datasource" type="dataSourceType" minOccurs="0" maxOccurs="1" />
+         </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="type" type="xs:string" />
+        <xs:attribute name="serverAddress" type="xs:string" />
+        <xs:attribute name="serverPort" type="xs:nonNegativeInteger" />
+        <xs:attribute name="userName" type="xs:string" />
+        <xs:attribute name="password" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="dataSourceListType">
+        <xs:sequence>
+            <xs:element name="datasource" type="dataSourceType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="dataSourceType">
+        <xs:sequence>
+            <xs:element name="connectionCredentials" type="connectionCredentialsType" minOccurs="0" />
+            <xs:element name="site" type="siteType" minOccurs="0" />
+            <xs:element name="project" type="projectType" minOccurs="0" />
+            <xs:element name="owner" type="userType" minOccurs="0" />
+            <xs:element name="tags" type="tagListType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="contentUrl" type="xs:string" />
+        <xs:attribute name="description" type="xs:string" />
+        <xs:attribute name="type" type="xs:string" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime" />
+        <xs:attribute name="isCertified" type="xs:boolean" />
+        <xs:attribute name="certificationNote" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="revisionListType">
+        <xs:sequence>
+            <xs:element name="revision" type="revisionType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="revisionType">
+        <xs:sequence>
+            <xs:element name="publisher" type="userType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="revisionNumber" type="xs:nonNegativeInteger" />
+        <xs:attribute name="publishedAt" type="xs:dateTime" />
+        <xs:attribute name="deleted" type="xs:boolean" />
+        <xs:attribute name="current" type="xs:boolean" />
+        <xs:attribute name="sizeInBytes" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="extractListType">
+        <xs:sequence>
+            <xs:element name="extract" type="extractType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="extractType">
+        <xs:choice>
+            <xs:element name="datasource" type="dataSourceType" />
+            <xs:element name="workbook" type="workbookType" />
+        </xs:choice>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="priority" type="xs:nonNegativeInteger" />
+        <xs:attribute name="type" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="IncrementalRefresh" />
+                    <xs:enumeration value="FullRefresh" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="favoriteListType">
+        <xs:sequence>
+            <xs:element name="favorite" type="favoriteType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="favoriteType">
+        <xs:choice>
+            <xs:element name="view" type="viewType" />
+            <xs:element name="workbook" type="workbookType" />
+            <xs:element name="datasource" type="dataSourceType" />
+        </xs:choice>
+        <xs:attribute name="label" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="fileUploadType">
+        <xs:attribute name="uploadSessionId" type="fileUploadSessionIdType" use="required" />
+        <xs:attribute name="fileSize" type="xs:nonNegativeInteger" />
+    </xs:complexType>
+
+    <xs:complexType name="groupListType">
+        <xs:sequence>
+            <xs:element name="group" type="groupType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="groupType">
+        <xs:sequence>
+            <xs:element name="domain" type="domainDirectiveType" minOccurs="0" />
+            <xs:element name="import" type="importDirectiveType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+    </xs:complexType>
+
+    <!-- Probably want more in here than just the notes like information about the thing refreshed -->
+    <xs:complexType name="extractRefreshJobType">
+        <xs:sequence>
+            <xs:element name="notes" type="xs:string" />
+            <xs:choice>
+                <xs:element name="view" type="viewType" />
+                <xs:element name="workbook" type="workbookType" />
+                <xs:element name="datasource" type="dataSourceType" />
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="jobType">
+        <xs:sequence>
+            <xs:element name="statusNotes" type="statusNoteListType" minOccurs="0" />
+            <xs:element name="extractRefreshJob" type="extractRefreshJobType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="mode">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Asynchronous" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="type">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="GroupSync" />
+                    <xs:enumeration value="RefreshExtract" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="progress" type="xs:nonNegativeInteger" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="startedAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime" />
+        <xs:attribute name="completedAt" type="xs:dateTime" />
+        <xs:attribute name="finishCode" type="xs:integer" />
+    </xs:complexType>
+
+    <xs:complexType name="permissionsType">
+        <xs:sequence>
+            <xs:element name="parent" type="parentType" minOccurs="0" maxOccurs="1" />
+            <xs:choice minOccurs="0" >
+                <xs:element name="datasource" type="dataSourceType" />
+                <xs:element name="project" type="projectType" />
+                <xs:element name="workbook" type="workbookType" />
+            </xs:choice>
+            <xs:element name="granteeCapabilities" type="granteeCapabilitiesType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="projectListType">
+        <xs:sequence>
+            <xs:element name="project" type="projectType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="projectType">
+        <xs:sequence>
+            <xs:element name="owner" type="userType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="parentProjectId" type="resourceIdType" />
+        <xs:attribute name="topLevelProject" type="xs:boolean" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="description" type="xs:string" />
+        <xs:attribute name="contentPermissions">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="LockedToProject" />
+                    <xs:enumeration value="ManagedByOwner" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="scheduleListType">
+        <xs:sequence>
+            <xs:element name="schedule" type="scheduleType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="scheduleType">
+        <xs:sequence>
+            <xs:element name="frequencyDetails" type="frequencyDetailsType" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="state" type="stateType" />
+        <xs:attribute name="priority" type="xs:nonNegativeInteger" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime" />
+        <xs:attribute name="type" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Extract" />
+                    <xs:enumeration value="Subscription" />
+                    <xs:enumeration value="ActiveDirectorySync" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="frequency">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Hourly" />
+                    <xs:enumeration value="Daily" />
+                    <xs:enumeration value="Weekly" />
+                    <xs:enumeration value="Monthly" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="nextRunAt" type="xs:dateTime" />
+        <xs:attribute name="endScheduleAt" type="xs:dateTime" />
+        <xs:attribute name="executionOrder" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Parallel" />
+                    <xs:enumeration value="Serial" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="siteListType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="siteType">
+        <xs:sequence>
+            <xs:element name="usage" minOccurs="0">
+                <xs:complexType>
+                    <xs:attribute name="numUsers" type="xs:nonNegativeInteger" use="required" />
+                    <xs:attribute name="storage" type="xs:nonNegativeInteger" use="required" />
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="contentUrl" type="xs:string" /> <!-- consider restricting to a rex for valid URLs -->
+        <xs:attribute name="adminMode">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="ContentOnly" />
+                    <xs:enumeration value="ContentAndUsers" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="userQuota" type="siteQuotaType" />
+        <xs:attribute name="storageQuota" type="siteQuotaType" />
+        <xs:attribute name="tierInteractorCapacity" type="siteCapacityType" />
+        <xs:attribute name="tierBasicUserCapacity" type="siteCapacityType" />
+        <xs:attribute name="disableSubscriptions" type="xs:boolean" />
+        <xs:attribute name="state" type="stateType" />
+        <xs:attribute name="revisionHistoryEnabled" type="xs:boolean" />
+        <xs:attribute name="revisionLimit" type="revisionLimitType" />
+        <xs:attribute name="subscribeOthersEnabled" type="xs:boolean" />
+        <xs:attribute name="guestAccessEnabled" type="xs:boolean" />
+        <xs:attribute name="cacheWarmupEnabled" type="xs:boolean" />
+        <xs:attribute name="commentingEnabled" type="xs:boolean" />
+        <xs:attribute name="cacheeWarmupThreshold" type="xs:nonNegativeInteger" />
+    </xs:complexType>
+
+    <!-- Credentials for accessing Tableau Server -->
+    <xs:complexType name="tableauCredentialsType">
+        <xs:sequence>
+            <xs:element name="site" type="siteType" minOccurs="1" maxOccurs="1" />
+            <xs:element name="user" type="userType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="password" type="xs:string" />
+        <xs:attribute name="token" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="tagListType">
+        <xs:sequence>
+            <xs:element name="tag" type="tagType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="tagType">
+        <xs:attribute name="label" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="userListType">
+        <xs:sequence>
+            <xs:element name="user" type="userType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="userType">
+        <xs:sequence>
+            <xs:element name="domain" type="domainDirectiveType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="fullName" type="xs:string" />
+        <xs:attribute name="email" type="xs:string" />
+        <xs:attribute name="password" type="xs:string" />
+        <xs:attribute name="siteRole" type="siteRoleType" />
+        <xs:attribute name="authSetting" type="siteUserAuthSettingType" />
+        <xs:attribute name="lastLogin" type="xs:dateTime" />
+        <xs:attribute name="externalAuthUserId" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="viewListType">
+        <xs:sequence>
+            <xs:element name="view" type="viewType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="viewType">
+        <xs:sequence>
+            <xs:element name="workbook" type="workbookType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="owner" type="userType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="tags" type="tagListType" minOccurs="0" />
+            <xs:element name="usage" minOccurs="0">
+                <xs:complexType>
+                    <xs:attribute name="totalViewCount" type="xs:nonNegativeInteger" use="required" />
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="contentUrl" type="xs:string" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime" />
+    </xs:complexType>
+
+    <xs:complexType name="workbookListType">
+        <xs:sequence>
+            <xs:element name="workbook" type="workbookType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="workbookType">
+        <xs:sequence>
+            <xs:element name="connectionCredentials" type="connectionCredentialsType" minOccurs="0" />
+            <xs:element name="site" type="siteType" minOccurs="0" />
+            <xs:element name="project" type="projectType" minOccurs="0" />
+            <xs:element name="owner" type="userType" minOccurs="0" />
+            <xs:element name="tags" type="tagListType" minOccurs="0" />
+            <xs:element name="views" type="viewListType" minOccurs="0" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="description" type="xs:string" />
+        <xs:attribute name="contentUrl" type="xs:string" />
+        <xs:attribute name="showTabs" type="xs:boolean" />
+        <xs:attribute name="size" type="xs:nonNegativeInteger" />
+        <xs:attribute name="createdAt" type="xs:dateTime" />
+        <xs:attribute name="updatedAt" type="xs:dateTime"/>
+    </xs:complexType>
+
+    <!--
+        Definition of supporting types for message payloads
+    -->
+
+    <xs:complexType name="capabilityType">
+        <xs:attribute name="name" use="required" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="AddComment" />
+                    <xs:enumeration value="ChangeHierarchy" />
+                    <xs:enumeration value="ChangePermissions" />
+                    <xs:enumeration value="Connect" />
+                    <xs:enumeration value="Delete" />
+                    <xs:enumeration value="ExportData" />
+                    <xs:enumeration value="ExportImage" />
+                    <xs:enumeration value="ExportXml" />
+                    <xs:enumeration value="Filter" />
+                    <xs:enumeration value="ProjectLeader" />
+                    <xs:enumeration value="Read" />
+                    <xs:enumeration value="ShareView" />
+                    <xs:enumeration value="ViewComments" />
+                    <xs:enumeration value="ViewUnderlyingData" />
+                    <xs:enumeration value="WebAuthoring" />
+                    <xs:enumeration value="Write" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="mode" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Allow" />
+                    <xs:enumeration value="Deny" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:simpleType name="fileUploadSessionIdType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([0-9]+:[0-9a-fA-F]+)-([0-9]+:[0-9]+)"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="domainDirectiveType">
+        <xs:attribute name="name" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:complexType name="importDirectiveType">
+        <xs:attribute name="source" type="importSourceType" use="required" />
+        <xs:attribute name="domainName" type="xs:string" use="required" />
+        <xs:attribute name="siteRole" type="siteRoleType" use="required" />
+    </xs:complexType>
+
+    <xs:simpleType name="importSourceType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ActiveDirectory" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="granteeCapabilitiesType">
+        <xs:sequence>
+            <xs:choice>
+                <xs:element name="group" type="groupType" />
+                <xs:element name="user" type="userType" />
+            </xs:choice>
+            <xs:element name="capabilities">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="capability" type="capabilityType" maxOccurs="unbounded" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="paginationType">
+        <xs:attribute name="pageNumber" type="xs:positiveInteger" use="required" />
+        <xs:attribute name="pageSize" type="xs:nonNegativeInteger" use="required" />
+        <xs:attribute name="totalAvailable" type="xs:nonNegativeInteger" use="required" />
+    </xs:complexType>
+
+    <xs:simpleType name="resourceIdType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="siteRoleType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Guest" />
+            <xs:enumeration value="Interactor" />
+            <xs:enumeration value="Publisher" />
+            <xs:enumeration value="ServerAdministrator" />
+            <xs:enumeration value="SiteAdministrator" />
+            <xs:enumeration value="Unlicensed" />
+            <xs:enumeration value="UnlicensedWithPublish" />
+            <xs:enumeration value="Viewer" />
+            <xs:enumeration value="ViewerWithPublish" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="siteUserAuthSettingType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="ServerDefault" />
+            <xs:enumeration value="SAML" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="stateType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Active" />
+            <xs:enumeration value="Suspended" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="statusNoteListType">
+        <xs:sequence>
+            <xs:element name="statusNote" type="statusNoteType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="statusNoteType">
+        <xs:attribute name="type" use="required" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="CountOfUsersAddedToGroup" />
+                    <xs:enumeration value="CountOfUsersAddedToSite" />
+                    <xs:enumeration value="CountOfUsersWithInsufficientLicenses" />
+                    <xs:enumeration value="CountOfUsersInActiveDirectoryGroup" />
+                    <xs:enumeration value="CountOfUsersProcessed" />
+                    <xs:enumeration value="CountOfUsersSkipped" />
+                    <xs:enumeration value="CountOfUsersInformationUpdated" />
+                    <xs:enumeration value="CountOfUsersSiteRoleUpdated" />
+                    <xs:enumeration value="CountOfUsersRemovedFromGroup" />
+                    <xs:enumeration value="CountOfUsersUnlicensed" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="value" type="xs:string" />
+        <xs:attribute name="text" type="xs:string" />
+    </xs:complexType>
+
+    <xs:simpleType name="siteQuotaType">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="-1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="siteCapacityType">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="revisionLimitType">
+        <xs:union>
+            <xs:simpleType>
+                <xs:annotation>
+                    <xs:documentation>Not a real value. Used to specify 'no limit' when site is created or updated. Never returned from server in response.</xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:integer">
+                    <xs:enumeration value="-1"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="2"/>
+                    <xs:maxInclusive value="10000"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+    </xs:simpleType>
+
+    <xs:complexType name="parentType">
+      <xs:attribute name="id" type="resourceIdType" use="required" />
+      <xs:attribute name="type" use="required" >
+          <xs:simpleType>
+              <xs:restriction base="xs:string">
+                  <xs:enumeration value="Project" />
+              </xs:restriction>
+          </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="name" use="optional" />
+    </xs:complexType>
+
+    <xs:complexType name="frequencyDetailsType">
+        <xs:sequence>
+            <xs:element name="intervals" minOccurs="1" maxOccurs="1">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="interval" type="intervalType" minOccurs="1" maxOccurs="7" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="start" type="xs:time" use="required" />
+        <xs:attribute name="end" type="xs:time" />
+    </xs:complexType>
+
+    <xs:complexType name="intervalType">
+        <xs:attribute name="minutes">
+            <xs:simpleType>
+                <xs:restriction base="xs:nonNegativeInteger">
+                    <xs:enumeration value="15" />
+                    <xs:enumeration value="30" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="hours">
+            <xs:simpleType>
+                <xs:restriction base="xs:nonNegativeInteger">
+                    <xs:enumeration value="1" />
+                    <xs:enumeration value="2" />
+                    <xs:enumeration value="4" />
+                    <xs:enumeration value="6" />
+                    <xs:enumeration value="8" />
+                    <xs:enumeration value="12" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="weekDay" >
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Monday" />
+                    <xs:enumeration value="Tuesday" />
+                    <xs:enumeration value="Wednesday" />
+                    <xs:enumeration value="Thursday" />
+                    <xs:enumeration value="Friday" />
+                    <xs:enumeration value="Saturday" />
+                    <xs:enumeration value="Sunday" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="monthDay" >
+            <xs:simpleType>
+                <xs:union>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:integer">
+                            <xs:minInclusive value="1" />
+                            <xs:maxInclusive value="31" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="LastDay" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:union>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <!-- Subscription -->
+    <xs:complexType name="subscriptionListType">
+        <xs:sequence>
+            <xs:element name="subscription" type="subscriptionType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="subscriptionType">
+        <xs:sequence>
+            <xs:element name="content" type="subscriptionContentType" />
+            <xs:element name="schedule" type="scheduleType" />
+            <xs:element name="user" type="userType" />
+        </xs:sequence>
+        <xs:attribute name="id" type="resourceIdType" />
+        <xs:attribute name="subject" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="subscriptionContentType">
+      <xs:attribute name="id" type="resourceIdType" use="required" />
+      <xs:attribute name="type" use="required" >
+          <xs:simpleType>
+              <xs:restriction base="xs:string">
+                  <xs:enumeration value="Workbook" />
+                  <xs:enumeration value="View" />
+              </xs:restriction>
+          </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="name" use="optional" />
+    </xs:complexType>
+
+    <!-- ServerInfo -->
+    <xs:complexType name="serverInfo">
+        <xs:sequence>
+            <xs:element name="productVersion" type="productVersion"/>
+            <xs:element name="restApiVersion" type="restApiVersion"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="productVersion">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="build" >
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9]{5}.[0-9]{2}.[0-9]{4}.[0-9]{4}" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="restApiVersion">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{5}.[0-9]{2}.[0-9]{4}.[0-9]{4}" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Tasks -->
+    <xs:complexType name="taskListType">
+        <xs:sequence>
+            <xs:element name="task" type="taskType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="taskType">
+        <xs:choice>
+            <xs:element name="extractRefresh" type="taskExtractRefreshType" />
+        </xs:choice>
+        <xs:attribute name="runNow" type="xs:boolean" />
+
+    </xs:complexType>
+    
+
+    <xs:complexType name="taskExtractRefreshType">
+        <xs:sequence>
+            <xs:element name="schedule" type="scheduleType" minOccurs="0" maxOccurs="1" />
+            <xs:choice>
+                <xs:element name="view" type="viewType" />
+                <xs:element name="workbook" type="workbookType" />
+                <xs:element name="datasource" type="dataSourceType" />
+            </xs:choice>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string"/>
+        <xs:attribute name="priority" type="xs:nonNegativeInteger"/>
+        <xs:attribute name="consecutiveFailedCount" type="xs:nonNegativeInteger"/>
+        <xs:attribute name="type" type="xs:string" />
+        <xs:attribute name="incremental" type="xs:boolean" />
+    </xs:complexType>
+
+</xs:schema>

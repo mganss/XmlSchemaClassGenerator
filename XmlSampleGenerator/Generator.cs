@@ -297,8 +297,7 @@ namespace Microsoft.Xml.XMLGen {
             }
             public void ProcessLengthFacet(ref StringBuilder genString, int index) {
                 int pLength = genString.Length;
-                int indexLen = index.ToString().Length;
-                int correctLen = length - indexLen;
+                int correctLen = length;
                 if(pLength > correctLen) {
                     genString.Remove(correctLen,pLength-correctLen);
                 }
@@ -324,8 +323,7 @@ namespace Microsoft.Xml.XMLGen {
 
             public void ProcessMaxLengthFacet(ref StringBuilder genString, int index) {
                 int pLength = genString.Length;
-                int indexLen = index.ToString().Length;
-                int correctLen = maxLength - indexLen;
+                int correctLen = maxLength;
                 if(pLength > correctLen) {
                     genString.Remove(correctLen,pLength-correctLen);
                 }
@@ -371,17 +369,17 @@ namespace Microsoft.Xml.XMLGen {
                     }
                     else {
                         if(length != -1) { // The length facet is set
-                            ProcessLengthFacet(ref genString, endValue);
                             genString.Append(endValue);
+                            ProcessLengthFacet(ref genString, endValue);
                         }
                         else {
-                            if(minLength != -1) {
+                            genString.Append(endValue);
+                            if (minLength != -1) {
                                 ProcessMinLengthFacet(ref genString, endValue);
                             }
                             if(maxLength != -1) {
                                 ProcessMaxLengthFacet(ref genString, endValue);
                             }
-                            genString.Append(endValue);
                         }
                     }
                     string result = genString.ToString();

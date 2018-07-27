@@ -33,7 +33,6 @@ namespace XmlSchemaClassGenerator.Tests
                 EntityFramework = generatorPrototype.EntityFramework,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
                 MemberVisitor = generatorPrototype.MemberVisitor,
-                TimeDataType = generatorPrototype.TimeDataType
             };
 
             var set = new XmlSchemaSet();
@@ -57,17 +56,48 @@ namespace XmlSchemaClassGenerator.Tests
         const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
         const string WadlPattern = @"xsd\wadl\*.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
-        const string IataPattern = @"xsd\iata\????[^_][^_]?[^-]*.xsd";
+        const string IataPattern = @"xsd\iata\*.xsd";
         const string TimePattern = @"xsd\time\time.xsd";
+        const string TableauPattern = @"xsd\ts-api\*.xsd";
+
+        // IATA test takes too long to perform every time
+
+        //[Fact, TestPriority(1)]
+        //[UseCulture("en-US")]
+        //public void TestIata()
+        //{
+        //    Compiler.Generate("Iata", IataPattern, new Generator
+        //    {
+        //        EntityFramework = true,
+        //        DataAnnotationMode = DataAnnotationMode.All,
+        //        NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
+        //            .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Iata" }.NamespaceProvider.GenerateNamespace),
+        //        MemberVisitor = (member, model) => { },
+        //        GenerateInterfaces = true
+        //    });
+        //    TestSamples("Iata", IataPattern);
+        //}
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
-        public void CanDeserializeSampleXml()
+        public void TestClient()
         {
             Compiler.Generate("Client", ClientPattern);
             TestSamples("Client", ClientPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestIS24RestApi()
+        {
             Compiler.Generate("IS24RestApi", IS24Pattern);
             TestSamples("IS24RestApi", IS24Pattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestWadl()
+        {
             Compiler.Generate("Wadl", WadlPattern, new Generator
             {
                 EntityFramework = true,
@@ -76,18 +106,22 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = (member, model) => { }
             });
             TestSamples("Wadl", WadlPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestIS24ImmoTransfer()
+        {
             Compiler.Generate("IS24ImmoTransfer", IS24ImmoTransferPattern);
             TestSamples("IS24ImmoTransfer", IS24ImmoTransferPattern);
-            Compiler.Generate("Iata", IataPattern, new Generator
-            {
-                EntityFramework = true,
-                DataAnnotationMode = DataAnnotationMode.All,
-                NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
-                    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace),
-                MemberVisitor = (member, model) => { },
-                GenerateInterfaces = true
-            });
-            TestSamples("Iata", IataPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestTableau()
+        {
+            Compiler.Generate("Tableau", TableauPattern, new Generator());
+            TestSamples("Tableau", TableauPattern);
         }
 
         private void TestSamples(string name, string pattern)
@@ -115,7 +149,7 @@ namespace XmlSchemaClassGenerator.Tests
 
             set.Compile();
 
-            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract))
+            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract && !(e.ElementSchemaType is XmlSchemaSimpleType)))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);
@@ -126,6 +160,27 @@ namespace XmlSchemaClassGenerator.Tests
                     // generate sample xml
                     generator.WriteXml(xw);
                     var xml = sb.ToString();
+
+                    // validate serialized xml
+                    var settings = new XmlReaderSettings
+                    {
+                        ValidationType = ValidationType.Schema,
+                        Schemas = set
+                    };
+
+                    var invalid = false;
+
+                    settings.ValidationEventHandler += (s, e) =>
+                    {
+                        if (e.Severity == XmlSeverityType.Error)
+                            invalid = true;
+                    };
+
+                    var reader = XmlReader.Create(new StringReader(xml), settings);
+                    while (reader.Read()) ;
+
+                    // generated xml is not schema valid -> skip
+                    if (invalid) continue;
 
                     File.WriteAllText("xml.xml", xml);
 
@@ -138,23 +193,12 @@ namespace XmlSchemaClassGenerator.Tests
 
                     File.WriteAllText("xml2.xml", xml2);
 
-                    // validate serialized xml
-                    XmlReaderSettings settings = new XmlReaderSettings
-                    {
-                        ValidationType = ValidationType.Schema,
-                        Schemas = set
-                    };
-
                     settings.ValidationEventHandler += (s, e) =>
                     {
-                        // generator doesn't generate valid values where pattern restrictions exist, e.g. email
-                        if (!e.Message.Contains("The Pattern constraint failed"))
-                        {
-                            Assert.True(false, e.Message);
-                        }
+                        throw e.Exception;
                     };
 
-                    XmlReader reader = XmlReader.Create(new StringReader(xml2), settings);
+                    reader = XmlReader.Create(new StringReader(xml2), settings);
                     while (reader.Read()) ;
 
                     // deserialize again
@@ -278,67 +322,19 @@ namespace XmlSchemaClassGenerator.Tests
             return xml;
         }
 
-        /// <summary>
-        /// When the TimeDataType is set to use the DateTime, creating a serialiser against types
-        /// that use xsd:time should no longer throw exceptions.
-        /// </summary>
         [Fact]
-        public void CreateDeserialiser_NoException_WhereTimeXsdPresent_AndTimeDataTypeSet()
+        public void DontGenerateElementForEmptyCollectionInChoice()
         {
-            Compiler.Generate("Time1", TimePattern, new Generator
-            {
-                EntityFramework = true,
-                DataAnnotationMode = DataAnnotationMode.All,
-                NamespaceProvider = new Dictionary<NamespaceKey, string>
-                    {
-                        {new NamespaceKey("http://hic.gov.au/hiconline/medicare/version-4"), "hiconline"}
-                    }
-                    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "time" }.NamespaceProvider
-                        .GenerateNamespace),
-                MemberVisitor = (member, model) => { },
-                GenerateInterfaces = true,
-                TimeDataType = typeof(DateTime)
-            });
-
-            var assembly = Compiler.GetAssembly("Time1");
+            var assembly = Compiler.Generate("Tableau", TableauPattern, new Generator());
             Assert.NotNull(assembly);
-
-            var type = assembly.GetType("hiconline.Service");
-            Assert.NotNull(type);
-
-            var serializer = new XmlSerializer(type); // exception not thrown
-            Assert.NotNull(serializer);
-        }
-
-        /// <summary>
-        /// Test to ensure existing behaviour not changed.
-        /// </summary>
-        [Fact]
-        public void CreateDeserialiser_ThrowsException_WhereTimeXsdPresent_AndTimeDataTypeNotSet()
-        {
-            Compiler.Generate("Time2", TimePattern, new Generator
-            {
-                EntityFramework = true,
-                DataAnnotationMode = DataAnnotationMode.All,
-                NamespaceProvider = new Dictionary<NamespaceKey, string>
-                    {
-                        {new NamespaceKey("http://hic.gov.au/hiconline/medicare/version-4"), "hiconline"}
-                    }
-                    .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "time" }.NamespaceProvider
-                        .GenerateNamespace),
-                MemberVisitor = (member, model) => { },
-                GenerateInterfaces = true
-            });
-
-            var assembly = Compiler.GetAssembly("Time2");
-            Assert.NotNull(assembly);
-
-            var type = assembly.GetType("hiconline.Service");
-            Assert.NotNull(type);
-
-            var ex = Assert.Throws<InvalidOperationException>(() => new XmlSerializer(type));
-            Assert.NotNull(ex);
-            Assert.Equal("There was an error reflecting type 'hiconline.Service'.", ex.Message);
+            var requestType = assembly.GetType("Api.TsRequest");
+            Assert.NotNull(requestType);
+            var r = Activator.CreateInstance(requestType);
+            var s = new XmlSerializer(requestType);
+            var sw = new StringWriter();
+            s.Serialize(sw, r);
+            var xml = sw.ToString();
+            Assert.DoesNotContain("tags", xml, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]

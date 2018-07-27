@@ -519,9 +519,9 @@ namespace XmlSchemaClassGenerator
                         Name = propertyName,
                         Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
                         IsNillable = element.IsNillable,
-                        IsNullable = item.MinOccurs < 1.0m,
+                        IsNullable = item.MinOccurs < 1.0m || (particle is XmlSchemaChoice),
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                        DefaultValue = element.DefaultValue ?? (item.MinOccurs >= 1.0m ? element.FixedValue : null),
+                        DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !(particle is XmlSchemaChoice)) ? element.FixedValue : null),
                         Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
                         XmlNamespace = element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
                     };
@@ -535,7 +535,7 @@ namespace XmlSchemaClassGenerator
                             OwningType = typeModel,
                             Name = "Any",
                             Type = new SimpleModel(_configuration) { ValueType = (_configuration.UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
-                            IsNullable = item.MinOccurs < 1.0m,
+                            IsNullable = item.MinOccurs < 1.0m || (particle is XmlSchemaChoice),
                             IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                             IsAny = true,
                         };

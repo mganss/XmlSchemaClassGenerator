@@ -187,12 +187,6 @@ namespace XmlSchemaClassGenerator
             set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
         }
 
-        public Type TimeDataType
-        {
-            get { return _configuration.TimeDataType; }
-            set { _configuration.TimeDataType = value; }
-        }
-
         public void Generate(IEnumerable<string> files)
         {
             var set = new XmlSchemaSet();

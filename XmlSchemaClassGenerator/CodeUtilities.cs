@@ -95,16 +95,10 @@ namespace XmlSchemaClassGenerator
                     result = variety == XmlSchemaDatatypeVariety.List ? typeof(string[]) : typeof(string);
                     break;
                 case XmlTypeCode.Time:
-                    if (configuration.TimeDataType == null || configuration.TimeDataType == typeof(string))
-                    {
-                        // default to string
-                        result = typeof(string);
-                    }
-                    else
-                    {
-                        // otherwise, use the specified type
-                        result = configuration.TimeDataType;
-                    }
+                    result = typeof(DateTime);
+                    break;
+                case XmlTypeCode.Idref:
+                    result = typeof(string);
                     break;
                 case XmlTypeCode.Integer:
                 case XmlTypeCode.NegativeInteger:

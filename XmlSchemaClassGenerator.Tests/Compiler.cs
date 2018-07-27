@@ -78,7 +78,6 @@ namespace XmlSchemaClassGenerator.Tests
                 EntityFramework = generatorPrototype.EntityFramework,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
                 MemberVisitor = generatorPrototype.MemberVisitor,
-                TimeDataType = generatorPrototype.TimeDataType
             };
 
             gen.Generate(files);
