@@ -192,6 +192,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    [DebuggerDisplay("[ClassModel] Name = {Name}")]
     public class ClassModel : TypeModel
     {
         public bool IsAbstract { get; set; }
@@ -399,6 +400,11 @@ namespace XmlSchemaClassGenerator
 
         public override CodeExpression GetDefaultValueFor(string defaultString)
         {
+            if (defaultString == "false")
+            {
+                return null;
+            }
+
             if (BaseClass is SimpleModel)
             {
                 string reference, val;
@@ -423,6 +429,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    [DebuggerDisplay("Name = {Name}")]
     public class PropertyModel
     {
         public TypeModel OwningType { get; set; }
