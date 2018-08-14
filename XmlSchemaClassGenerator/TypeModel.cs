@@ -222,6 +222,19 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        public IEnumerable<TypeModel> AllBaseTypes
+        {
+            get
+            {
+                var baseType = BaseClass;
+                while (baseType != null)
+                {
+                    yield return baseType;
+                    baseType = (baseType as ClassModel)?.BaseClass;
+                }
+            }
+        }
+
         public override CodeTypeDeclaration Generate()
         {
             var classDeclaration = base.Generate();
@@ -399,13 +412,15 @@ namespace XmlSchemaClassGenerator
 
         public override CodeExpression GetDefaultValueFor(string defaultString)
         {
-            if (BaseClass is SimpleModel)
+            var rootClass = AllBaseTypes.LastOrDefault();
+
+            if (rootClass is SimpleModel)
             {
                 string reference, val;
 
                 using (var writer = new System.IO.StringWriter())
                 {
-                    CSharpProvider.GenerateCodeFromExpression(BaseClass.GetDefaultValueFor(defaultString), writer, new CodeGeneratorOptions());
+                    CSharpProvider.GenerateCodeFromExpression(rootClass.GetDefaultValueFor(defaultString), writer, new CodeGeneratorOptions());
                     val = writer.ToString();
                 }
 
