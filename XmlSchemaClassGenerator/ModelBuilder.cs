@@ -243,7 +243,7 @@ namespace XmlSchemaClassGenerator
             }
             else particle = complexType.ContentTypeParticle;
 
-            var items = GetElements(particle);
+            var items = GetElements(particle, complexType);
             var properties = CreatePropertiesForElements(source, classModel, particle, items);
             classModel.Properties.AddRange(properties);
 
@@ -519,11 +519,13 @@ namespace XmlSchemaClassGenerator
                         Name = propertyName,
                         Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
                         IsNillable = element.IsNillable,
-                        IsNullable = item.MinOccurs < 1.0m || (particle is XmlSchemaChoice),
+                        IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                        DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !(particle is XmlSchemaChoice)) ? element.FixedValue : null),
+                        DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !(item.XmlParent is XmlSchemaChoice)) ? element.FixedValue : null),
                         Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
                         XmlNamespace = element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
+                        XmlParticle = item.XmlParticle,
+                        XmlParent = item.XmlParent,
                     };
                 }
                 else
@@ -535,9 +537,11 @@ namespace XmlSchemaClassGenerator
                             OwningType = typeModel,
                             Name = "Any",
                             Type = new SimpleModel(_configuration) { ValueType = (_configuration.UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
-                            IsNullable = item.MinOccurs < 1.0m || (particle is XmlSchemaChoice),
+                            IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),
                             IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                             IsAny = true,
+                            XmlParticle = item.XmlParticle,
+                            XmlParent = item.XmlParent,
                         };
                     }
                     else
@@ -656,7 +660,7 @@ namespace XmlSchemaClassGenerator
         {
             foreach (var item in groupBase.Items)
             {
-                foreach (var element in GetElements(item))
+                foreach (var element in GetElements(item, groupBase))
                 {
                     element.MaxOccurs = Math.Max(element.MaxOccurs, groupBase.MaxOccurs);
                     element.MinOccurs = Math.Min(element.MinOccurs, groupBase.MinOccurs);
@@ -665,15 +669,15 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        public IEnumerable<Particle> GetElements(XmlSchemaObject item)
+        public IEnumerable<Particle> GetElements(XmlSchemaObject item, XmlSchemaObject parent)
         {
             if (item == null) { yield break; }
 
-            if (item is XmlSchemaElement element) { yield return new Particle(element); }
+            if (item is XmlSchemaElement element) { yield return new Particle(element, parent); }
 
-            if (item is XmlSchemaAny any) { yield return new Particle(any); }
+            if (item is XmlSchemaAny any) { yield return new Particle(any, parent); }
 
-            if (item is XmlSchemaGroupRef groupRef) { yield return new Particle(groupRef); }
+            if (item is XmlSchemaGroupRef groupRef) { yield return new Particle(groupRef, parent); }
 
             if (item is XmlSchemaGroupBase itemGroupBase)
             {
