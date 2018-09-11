@@ -438,6 +438,51 @@ namespace Test
 ", csharp);
         }
 
+        [Fact]
+        public void ChoiceMembersAreNullable()
+        {
+            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+            // as a proxy.
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+    <xs:complexType name=""Root"">
+      <xs:sequence>
+      <!-- Choice directly inside a complex type -->
+      <xs:element name=""Sub"">
+        <xs:complexType>
+          <xs:choice>
+              <xs:element name=""Opt1"" type=""xs:int""/>
+              <xs:element name=""Opt2"" type=""xs:int""/>
+          </xs:choice>
+        </xs:complexType>
+        </xs:element>
+        <!-- Choice as part of a larger sequence -->
+        <xs:choice>
+          <xs:element name=""Opt3"" type=""xs:int""/>
+          <xs:element name=""Opt4"" type=""xs:int""/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("Opt1Specified", content);
+            Assert.Contains("Opt2Specified", content);
+            Assert.Contains("Opt3Specified", content);
+            Assert.Contains("Opt4Specified", content);
+        }
+
         private static void CompareOutput(string expected, string actual)
         {
             string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
