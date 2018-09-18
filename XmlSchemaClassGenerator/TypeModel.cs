@@ -456,6 +456,8 @@ namespace XmlSchemaClassGenerator
         public bool IsAny { get; set; }
         public int? Order { get; set; }
         public bool IsKey { get; set; }
+        public XmlSchemaParticle XmlParticle { get; set; }
+        public XmlSchemaObject XmlParent { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
 
         public PropertyModel(GeneratorConfiguration configuration)
