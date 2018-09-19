@@ -35,6 +35,7 @@ namespace XmlSchemaClassGenerator.Tests
                 NamingScheme = NamingScheme.Direct,
                 DataAnnotationMode = DataAnnotationMode.None,
                 EmitOrder = true,
+                GenerateDescriptionAttribute = true,
                 NamespaceProvider = new NamespaceProvider
                 {
                     GenerateNamespace = key =>

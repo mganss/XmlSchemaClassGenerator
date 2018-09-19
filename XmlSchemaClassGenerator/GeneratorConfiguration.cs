@@ -124,6 +124,10 @@ namespace XmlSchemaClassGenerator
         /// Generate interfaces for groups and attribute groups
         /// </summary>
         public bool GenerateInterfaces { get; set; }
+        /// <summary>
+        /// Generate <see cref="System.ComponentModel.DescriptionAttribute"/> from XML comments.
+        /// </summary>
+        public bool GenerateDescriptionAttribute { get; set; }
 
         /// <summary>
         /// Generator Code reference options

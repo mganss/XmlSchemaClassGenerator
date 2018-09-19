@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -77,11 +78,33 @@ namespace XmlSchemaClassGenerator
             {
                 var text = doc.Text;
                 var comment = string.Format(@"<para{0}>{1}</para>",
-                    string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language), CodeUtilities.NormalizeNewlines(text));
+                    string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language), CodeUtilities.NormalizeNewlines(text).Trim());
                 yield return new CodeCommentStatement(comment, true);
             }
 
             yield return new CodeCommentStatement("</summary>", true);
+        }
+
+        public static void AddDescription(CodeAttributeDeclarationCollection attributes, IEnumerable<DocumentationModel> docs, GeneratorConfiguration conf)
+        {
+            if (!conf.GenerateDescriptionAttribute || DisableComments || !docs.Any()) return;
+
+            var doc = GetSingleDoc(docs);
+
+            if (doc != null)
+            {
+                var descriptionAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DescriptionAttribute), conf.CodeTypeReferenceOptions),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(Regex.Replace(doc.Text, @"\s+", " ").Trim())));
+                attributes.Add(descriptionAttribute);
+            }
+        }
+
+        private static DocumentationModel GetSingleDoc(IEnumerable<DocumentationModel> docs)
+        {
+            if (docs.Count() == 1) return docs.Single();
+            var englishDoc = docs.Where(d => string.IsNullOrEmpty(d.Language) || d.Language.StartsWith("en", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            if (englishDoc != null) return englishDoc;
+            return docs.FirstOrDefault();
         }
     }
 
@@ -109,6 +132,8 @@ namespace XmlSchemaClassGenerator
             var typeDeclaration = new CodeTypeDeclaration { Name = Name };
 
             typeDeclaration.Comments.AddRange(DocumentationModel.GetComments(Documentation).ToArray());
+
+            DocumentationModel.AddDescription(typeDeclaration.CustomAttributes, Documentation, Configuration);
 
             var generatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(GeneratedCodeAttribute), Configuration.CodeTypeReferenceOptions),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Configuration.Version.Title)),
@@ -609,6 +634,8 @@ namespace XmlSchemaClassGenerator
         {
             var docs = new List<DocumentationModel>(Documentation);
 
+            DocumentationModel.AddDescription(member.CustomAttributes, docs, Configuration);
+
             if (PropertyType is SimpleModel simpleType)
             {
                 docs.AddRange(simpleType.Documentation);
@@ -1070,6 +1097,8 @@ namespace XmlSchemaClassGenerator
             {
                 var member = new CodeMemberField { Name = val.Name };
                 var docs = new List<DocumentationModel>(val.Documentation);
+
+                DocumentationModel.AddDescription(member.CustomAttributes, docs, Configuration);
 
                 if (val.Name != val.Value) // illegal identifier chars in value
                 {

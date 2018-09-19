@@ -148,6 +148,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.GenerateInterfaces = value; }
         }
 
+        public bool GenerateDescriptionAttribute
+        {
+            get { return _configuration.GenerateDescriptionAttribute; }
+            set { _configuration.GenerateDescriptionAttribute = value; }
+        }
+
         public CodeTypeReferenceOptions CodeTypeReferenceOptions
         {
             get { return _configuration.CodeTypeReferenceOptions; }

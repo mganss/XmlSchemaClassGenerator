@@ -62,7 +62,8 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateDesignerCategoryAttribute = false,
                 EntityFramework = false,
                 GenerateInterfaces = true,
-                NamespacePrefix = name
+                NamespacePrefix = name,
+                GenerateDescriptionAttribute = true
             };
 
             var output = new FileWatcherOutputWriter(Path.Combine("output", name));
@@ -78,6 +79,7 @@ namespace XmlSchemaClassGenerator.Tests
                 EntityFramework = generatorPrototype.EntityFramework,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
                 MemberVisitor = generatorPrototype.MemberVisitor,
+                GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute
             };
 
             gen.Generate(files);
