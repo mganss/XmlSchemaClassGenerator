@@ -101,6 +101,7 @@ Options:
                              do not include comments from xsd
       --nu, --noUnderscore   do not generate underscore in private member name (
                                default is false)
+      --da, --description    generate DescriptionAttribute (default is true)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
