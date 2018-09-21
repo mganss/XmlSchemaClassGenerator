@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Ganss.IO;
+using Microsoft.CodeAnalysis;
 using Microsoft.Xml.XMLGen;
 using System;
 using System.Collections.Generic;
@@ -133,7 +134,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         private void DeserializeSampleXml(string pattern, Assembly assembly)
         {
-            var files = Glob.Glob.ExpandNames(pattern);
+            var files = Glob.ExpandNames(pattern);
 
             var set = new XmlSchemaSet();
 

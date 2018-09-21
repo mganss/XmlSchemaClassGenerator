@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 using Xunit;
+using Ganss.IO;
 
 namespace XmlSchemaClassGenerator.Tests
 {
@@ -45,7 +46,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
 
-            var files = Glob.Glob.ExpandNames(pattern);
+            var files = Glob.ExpandNames(pattern);
 
             return GenerateFiles(name, files, generatorPrototype);
         }

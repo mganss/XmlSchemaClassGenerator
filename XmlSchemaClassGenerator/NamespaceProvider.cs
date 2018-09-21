@@ -11,7 +11,7 @@ namespace XmlSchemaClassGenerator
     {
         private readonly Dictionary<NamespaceKey, string> InternalDictionary = new Dictionary<NamespaceKey, string>();
 
-        public GenerateNamespaceDelegate GenerateNamespace;
+        public GenerateNamespaceDelegate GenerateNamespace { get; set; }
 
         protected virtual string OnGenerateNamespace(NamespaceKey key)
         {

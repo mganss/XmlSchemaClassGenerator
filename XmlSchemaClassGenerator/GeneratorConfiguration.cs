@@ -8,7 +8,7 @@ namespace XmlSchemaClassGenerator
 {
     public class GeneratorConfiguration
     {
-        public static Regex IdentifierRegex = new Regex(@"^@?[_\p{L}\p{Nl}][\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
+        public static Regex IdentifierRegex { get; } = new Regex(@"^@?[_\p{L}\p{Nl}][\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
 
         public GeneratorConfiguration()
         {
