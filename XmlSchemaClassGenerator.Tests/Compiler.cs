@@ -9,6 +9,7 @@ using System.Text;
 using System.Linq;
 using Xunit;
 using Ganss.IO;
+using System.Collections.Concurrent;
 
 namespace XmlSchemaClassGenerator.Tests
 {
@@ -34,7 +35,7 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        private static Dictionary<string, Assembly> Assemblies = new Dictionary<string, Assembly>();
+        private static ConcurrentDictionary<string, Assembly> Assemblies = new ConcurrentDictionary<string, Assembly>();
 
         public static Assembly GetAssembly(string name)
         {
