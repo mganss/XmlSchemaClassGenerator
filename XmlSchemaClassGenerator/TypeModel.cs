@@ -102,7 +102,7 @@ namespace XmlSchemaClassGenerator
         private static DocumentationModel GetSingleDoc(IEnumerable<DocumentationModel> docs)
         {
             if (docs.Count() == 1) return docs.Single();
-            var englishDoc = docs.Where(d => string.IsNullOrEmpty(d.Language) || d.Language.StartsWith("en", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            var englishDoc = docs.FirstOrDefault(d => string.IsNullOrEmpty(d.Language) || d.Language.StartsWith("en", StringComparison.OrdinalIgnoreCase));
             if (englishDoc != null) return englishDoc;
             return docs.FirstOrDefault();
         }
@@ -150,14 +150,11 @@ namespace XmlSchemaClassGenerator
                 var typeAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTypeAttribute), Configuration.CodeTypeReferenceOptions),
                     new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)),
                     new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlSchemaName.Namespace)));
-                if (IsAnonymous)
+                if (IsAnonymous && (!(this is ClassModel classModel) || classModel.BaseClass == null))
                 {
                     // don't generate AnonymousType if it's derived class, otherwise XmlSerializer will
                     // complain with "InvalidOperationException: Cannot include anonymous type '...'"
-                    if (!(this is ClassModel classModel) || classModel.BaseClass == null)
-                    {
-                        typeAttribute.Arguments.Add(new CodeAttributeArgument("AnonymousType", new CodePrimitiveExpression(true)));
-                    }
+                    typeAttribute.Arguments.Add(new CodeAttributeArgument("AnonymousType", new CodePrimitiveExpression(true)));
                 }
                 typeDeclaration.CustomAttributes.Add(typeAttribute);
             }
@@ -175,11 +172,17 @@ namespace XmlSchemaClassGenerator
 
         public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection, bool forInit = false)
         {
-            var name = referencingNamespace == Namespace ? Name : string.Format("{2}{0}.{1}", Namespace.Name, Name, ((referencingNamespace ?? Namespace).IsAmbiguous ? "global::" : string.Empty));
+            string name;
+            if (referencingNamespace == Namespace)
+                name = Name;
+            else
+                name = string.Format("{2}{0}.{1}", Namespace.Name, Name, ((referencingNamespace ?? Namespace).IsAmbiguous ? "global::" : string.Empty));
+
             if (collection)
             {
                 name = forInit ? SimpleModel.GetCollectionImplementationName(name, Configuration) : SimpleModel.GetCollectionDefinitionName(name, Configuration);
             }
+
             return new CodeTypeReference(name);
         }
 
@@ -650,12 +653,10 @@ namespace XmlSchemaClassGenerator
         {
             CodeTypeMember member;
 
-            var typeClassModel = TypeClassModel;
             var isArray = IsArray;
             var propertyType = PropertyType;
             var isNullableValueType = IsNullableValueType;
             var typeReference = TypeReference;
-            var simpleType = propertyType as SimpleModel;
 
             if (isNullableValueType && Configuration.GenerateNullables)
             {
@@ -699,7 +700,6 @@ namespace XmlSchemaClassGenerator
             var propertyType = PropertyType;
             var isNullableValueType = IsNullableValueType;
             var typeReference = TypeReference;
-            var simpleType = propertyType as SimpleModel;
 
             var requiresBackingField = withDataBinding || DefaultValue != null || IsCollection || isArray;
             var backingField = new CodeMemberField(typeReference, OwningType.GetUniqueFieldName(this))
@@ -758,14 +758,11 @@ namespace XmlSchemaClassGenerator
 
                 member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(), false, withDataBinding);
 
-                if (IsNullable)
+                if (IsNullable && ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression)))
                 {
-                    if ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression))
-                    {
-                        var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions),
-                            new CodeAttributeArgument(defaultValueExpression));
-                        member.CustomAttributes.Add(defaultValueAttribute);
-                    }
+                    var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions),
+                        new CodeAttributeArgument(defaultValueExpression));
+                    member.CustomAttributes.Add(defaultValueAttribute);
                 }
             }
 
@@ -777,8 +774,6 @@ namespace XmlSchemaClassGenerator
             if (IsDeprecated)
             {
                 // From .NET 3.5 XmlSerializer doesn't serialize objects with [Obsolete] >(
-                //var deprecatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(ObsoleteAttribute)));
-                //member.CustomAttributes.Add(deprecatedAttribute);
             }
 
             if (isNullableValueType)
@@ -802,16 +797,6 @@ namespace XmlSchemaClassGenerator
 
                 if (Configuration.GenerateNullables)
                 {
-                    // public X? Name
-                    // {
-                    //      get { return NameSpecified ? NameValue : null; }
-                    //      set
-                    //      {
-                    //          NameValue = value.GetValueOrDefault();
-                    //          NameSpecified = value.HasValue;
-                    //      }
-                    // }
-
                     var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions);
                     nullableType.TypeArguments.Add(typeReference);
                     var nullableMember = new CodeMemberProperty
@@ -1110,8 +1095,6 @@ namespace XmlSchemaClassGenerator
                 if (val.IsDeprecated)
                 {
                     // From .NET 3.5 XmlSerializer doesn't serialize objects with [Obsolete] >(
-                    //var deprecatedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(ObsoleteAttribute)));
-                    //member.CustomAttributes.Add(deprecatedAttribute);
 
                     var obsolete = new DocumentationModel { Language = "en", Text = "[Obsolete]" };
                     docs.Add(obsolete);

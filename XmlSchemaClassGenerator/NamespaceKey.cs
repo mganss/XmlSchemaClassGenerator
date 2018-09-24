@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XmlSchemaClassGenerator
 {
-    public class NamespaceKey : IComparable<NamespaceKey>, IEquatable<NamespaceKey>, IComparable
+    public sealed class NamespaceKey : IComparable<NamespaceKey>, IEquatable<NamespaceKey>, IComparable
     {
         private const UriComponents CompareComponentsAbs = UriComponents.Host | UriComponents.Scheme | UriComponents.Path;
         private const UriFormat CompareFormat = UriFormat.Unescaped;
@@ -94,6 +94,26 @@ namespace XmlSchemaClassGenerator
         int IComparable.CompareTo(object obj)
         {
             return CompareTo((NamespaceKey)obj);
+        }
+
+        public static bool operator ==(NamespaceKey left, NamespaceKey right)
+        {
+            if (left is null)
+                return right is null;
+            return left.Equals(right);
+        }
+
+        public static bool operator >(NamespaceKey left, NamespaceKey right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+        public static bool operator <(NamespaceKey left, NamespaceKey right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+        public static bool operator !=(NamespaceKey left, NamespaceKey right)
+        {
+            return !(left == right);
         }
     }
 }

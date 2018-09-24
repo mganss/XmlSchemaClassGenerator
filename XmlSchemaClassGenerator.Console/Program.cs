@@ -13,7 +13,7 @@ using Ganss.IO;
 
 namespace XmlSchemaClassGenerator.Console
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

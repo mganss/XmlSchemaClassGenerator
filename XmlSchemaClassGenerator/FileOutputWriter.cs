@@ -27,10 +27,21 @@ namespace XmlSchemaClassGenerator
 
         protected virtual void WriteFile(string path, CodeCompileUnit cu)
         {
-            using (var fs = new FileStream(path, FileMode.Create))
-            using (var writer = new StreamWriter(fs))
+            FileStream fs = null;
+
+            try
             {
-                Write(writer, cu);
+                fs = new FileStream(path, FileMode.Create);
+                using (var writer = new StreamWriter(fs))
+                {
+                    fs = null;
+                    Write(writer, cu);
+                }
+            }
+            finally
+            {
+                if (fs != null)
+                    fs.Dispose();
             }
         }
     }

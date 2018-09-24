@@ -48,7 +48,7 @@ namespace XmlSchemaClassGenerator
             {
                 var schema = globalType.GetSchema();
                 var source = string.IsNullOrEmpty(schema?.SourceUri) ? null : new Uri(schema.SourceUri);
-                var type = CreateTypeModel(source, globalType, globalType.QualifiedName);
+                CreateTypeModel(source, globalType, globalType.QualifiedName);
             }
 
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
@@ -60,7 +60,7 @@ namespace XmlSchemaClassGenerator
 
                 if (type.RootElementName != null)
                 {
-                    if (type is ClassModel)
+                    if (type is ClassModel classModel)
                     {
                         // There is already another global element with this type.
                         // Need to create an empty derived class.
@@ -81,7 +81,7 @@ namespace XmlSchemaClassGenerator
 
                         Types[rootElement.QualifiedName] = derivedClassModel;
 
-                        derivedClassModel.BaseClass = (ClassModel)type;
+                        derivedClassModel.BaseClass = classModel;
                         ((ClassModel)derivedClassModel.BaseClass).DerivedTypes.Add(derivedClassModel);
 
                         derivedClassModel.RootElementName = rootElement.QualifiedName;
@@ -131,10 +131,10 @@ namespace XmlSchemaClassGenerator
             }
             else if (type is XmlSchemaSimpleType simpleType)
             {
-                return CreateTypeModel(source, simpleType, namespaceModel, qualifiedName, docs);
+                return CreateTypeModel(simpleType, namespaceModel, qualifiedName, docs);
             }
 
-            throw new Exception($"Cannot build declaration for {qualifiedName}");
+            throw new NotSupportedException($"Cannot build declaration for {qualifiedName}");
         }
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaGroup group, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
@@ -225,21 +225,19 @@ namespace XmlSchemaClassGenerator
             {
                 var baseModel = CreateTypeModel(source, complexType.BaseXmlSchemaType, complexType.BaseXmlSchemaType.QualifiedName);
                 classModel.BaseClass = baseModel;
-                if (baseModel is ClassModel) { ((ClassModel)classModel.BaseClass).DerivedTypes.Add(classModel); }
+                if (baseModel is ClassModel baseClassModel) { baseClassModel.DerivedTypes.Add(classModel); }
             }
 
             XmlSchemaParticle particle = null;
             if (classModel.BaseClass != null)
             {
-                if (complexType.ContentModel.Content is XmlSchemaComplexContentExtension)
+                if (complexType.ContentModel.Content is XmlSchemaComplexContentExtension complexContent)
                 {
-                    particle = ((XmlSchemaComplexContentExtension)complexType.ContentModel.Content).Particle;
+                    particle = complexContent.Particle;
                 }
 
                 // If it's a restriction, do not duplicate elements on the derived class, they're already in the base class.
                 // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
-                //else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
-                //    particle = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Particle;
             }
             else particle = complexType.ContentTypeParticle;
 
@@ -257,21 +255,17 @@ namespace XmlSchemaClassGenerator
             XmlSchemaObjectCollection attributes = null;
             if (classModel.BaseClass != null)
             {
-                if (complexType.ContentModel.Content is XmlSchemaComplexContentExtension)
+                if (complexType.ContentModel.Content is XmlSchemaComplexContentExtension complexContent)
                 {
-                    attributes = ((XmlSchemaComplexContentExtension)complexType.ContentModel.Content).Attributes;
+                    attributes = complexContent.Attributes;
                 }
-                else if (complexType.ContentModel.Content is XmlSchemaSimpleContentExtension)
+                else if (complexType.ContentModel.Content is XmlSchemaSimpleContentExtension simpleContent)
                 {
-                    attributes = ((XmlSchemaSimpleContentExtension)complexType.ContentModel.Content).Attributes;
+                    attributes = simpleContent.Attributes;
                 }
 
                 // If it's a restriction, do not duplicate attributes on the derived class, they're already in the base class.
                 // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
-                //else if (complexType.ContentModel.Content is XmlSchemaComplexContentRestriction)
-                //    attributes = ((XmlSchemaComplexContentRestriction)complexType.ContentModel.Content).Attributes;
-                //else if (complexType.ContentModel.Content is XmlSchemaSimpleContentRestriction)
-                //    attributes = ((XmlSchemaSimpleContentRestriction)complexType.ContentModel.Content).Attributes;
             }
             else { attributes = complexType.Attributes; }
 
@@ -309,7 +303,7 @@ namespace XmlSchemaClassGenerator
             return classModel;
         }
 
-        private TypeModel CreateTypeModel(Uri source, XmlSchemaSimpleType simpleType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
+        private TypeModel CreateTypeModel(XmlSchemaSimpleType simpleType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
             var restrictions = new List<RestrictionModel>();
 
@@ -714,7 +708,7 @@ namespace XmlSchemaClassGenerator
                 return result;
             }
 
-            throw new Exception(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
+            throw new ArgumentException(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
         }
 
         private string ToTitleCase(string s)

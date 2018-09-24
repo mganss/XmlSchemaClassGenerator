@@ -43,7 +43,6 @@ namespace XmlSchemaClassGenerator
                 ['\x1D'] = "GroupSeparator",
                 ['\x1E'] = "RecordSeparator",
                 ['\x1F'] = "UnitSeparator",
-                //invalidChars['\x20'] = "Space";
                 ['\x21'] = "ExclamationMark",
                 ['\x22'] = "Quote",
                 ['\x23'] = "Hash",
@@ -56,7 +55,6 @@ namespace XmlSchemaClassGenerator
                 ['\x2A'] = "Asterisk",
                 ['\x2B'] = "Plus",
                 ['\x2C'] = "Comma",
-                //invalidChars['\x2D'] = "Minus";
                 ['\x2E'] = "Period",
                 ['\x2F'] = "Slash",
                 ['\x3A'] = "Colon",
@@ -70,7 +68,6 @@ namespace XmlSchemaClassGenerator
                 ['\x5C'] = "Backslash",
                 ['\x5D'] = "RightSquareBracket",
                 ['\x5E'] = "Caret",
-                //invalidChars['\x5F'] = "Underscore";
                 ['\x60'] = "Backquote",
                 ['\x7B'] = "LeftCurlyBrace",
                 ['\x7C'] = "Pipe",
