@@ -45,6 +45,8 @@ namespace XmlSchemaClassGenerator
 
         public int CompareTo(NamespaceKey other)
         {
+            if (other == null) return 1;
+
             if (Source == null && other.Source != null)
             {
                 return -1;
@@ -107,9 +109,17 @@ namespace XmlSchemaClassGenerator
         {
             return left.CompareTo(right) > 0;
         }
+        public static bool operator >=(NamespaceKey left, NamespaceKey right)
+        {
+            return left.CompareTo(right) >= 0;
+        }
         public static bool operator <(NamespaceKey left, NamespaceKey right)
         {
             return left.CompareTo(right) < 0;
+        }
+        public static bool operator <=(NamespaceKey left, NamespaceKey right)
+        {
+            return left.CompareTo(right) <= 0;
         }
         public static bool operator !=(NamespaceKey left, NamespaceKey right)
         {

@@ -45,5 +45,23 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.Equal("y", ns[new NamespaceKey("y")]);
             Assert.Throws<KeyNotFoundException>(() => ns[new NamespaceKey("z")]);
         }
+
+        [Fact]
+        public void NamespaceKeyComparableTest()
+        {
+            Assert.Equal(-1, new NamespaceKey((Uri)null).CompareTo(new NamespaceKey(new Uri("http://test"))));
+            Assert.Equal(1, new NamespaceKey(new Uri("http://test")).CompareTo(new NamespaceKey((Uri)null)));
+            Assert.NotEqual(0, new NamespaceKey(new Uri("http://test")).CompareTo(new NamespaceKey(new Uri("http://test2"))));
+            Assert.True(new NamespaceKey("http://test").Equals((object)new NamespaceKey("http://test")));
+            Assert.False(new NamespaceKey("http://test").Equals((object)null));
+            Assert.NotEqual(0, ((IComparable)new NamespaceKey("http://test")).CompareTo(null));
+            Assert.True(new NamespaceKey("http://test") == new NamespaceKey("http://test"));
+            Assert.True(((NamespaceKey)null) == ((NamespaceKey)null));
+            Assert.True(new NamespaceKey("http://test") > null);
+            Assert.False(new NamespaceKey("http://test") < null);
+            Assert.True(new NamespaceKey("http://test") >= null);
+            Assert.False(new NamespaceKey("http://test") <= null);
+            Assert.True(new NamespaceKey("http://test") != null);
+        }
     }
 }

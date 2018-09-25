@@ -1131,22 +1131,17 @@ namespace XmlSchemaClassGenerator
         public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
         {
             var typeRef = new CodeTypeReference(configuration.CollectionType, configuration.CodeTypeReferenceOptions);
-            if (configuration.CollectionType.IsGenericTypeDefinition)
-            {
-                typeRef.TypeArguments.Add(typeName);
-            }
-            var typeOfExpr = new CodeTypeOfExpression(typeRef);
-            var writer = new System.IO.StringWriter();
-            CSharpProvider.GenerateCodeFromExpression(typeOfExpr, writer, new CodeGeneratorOptions());
-            var fullTypeName = writer.ToString();
-            Debug.Assert(fullTypeName.StartsWith("typeof(") && fullTypeName.EndsWith(")"));
-            fullTypeName = fullTypeName.Substring(7, fullTypeName.Length - 8);
-            return fullTypeName;
+            return GetFullTypeName(typeName, configuration, typeRef);
         }
 
         public static string GetCollectionImplementationName(string typeName, GeneratorConfiguration configuration)
         {
             var typeRef = new CodeTypeReference(configuration.CollectionImplementationType ?? configuration.CollectionType, configuration.CodeTypeReferenceOptions);
+            return GetFullTypeName(typeName, configuration, typeRef);
+        }
+
+        private static string GetFullTypeName(string typeName, GeneratorConfiguration configuration, CodeTypeReference typeRef)
+        {
             if (configuration.CollectionType.IsGenericTypeDefinition)
             {
                 typeRef.TypeArguments.Add(typeName);
