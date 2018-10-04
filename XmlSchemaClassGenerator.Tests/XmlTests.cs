@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.Xml.XMLGen;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace XmlSchemaClassGenerator.Tests
                 EntityFramework = generatorPrototype.EntityFramework,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
                 MemberVisitor = generatorPrototype.MemberVisitor,
+				CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions
             };
 
             var set = new XmlSchemaSet();
@@ -338,7 +340,45 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.DoesNotContain("tags", xml, StringComparison.OrdinalIgnoreCase);
         }
 
-        [Fact]
+
+	    [Theory]
+	    [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
+	    [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
+		public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
+	    {
+		    const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">  
+		<xs:complexType name=""document"">
+			<xs:attribute name=""some-value"">
+				<xs:simpleType>
+					<xs:restriction base=""xs:string"">
+						<xs:enumeration value=""one""/>
+						<xs:enumeration value=""two""/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name=""system"" type=""xs:string""/>
+		</xs:complexType>	
+</xs:schema>";
+
+		    var generatedType = ConvertXml(nameof(EditorBrowsableAttributeRespectsCodeTypeReferenceOptions), xsd, new Generator
+		    {
+			    CodeTypeReferenceOptions = codeTypeReferenceOptions,
+			    GenerateNullables = true,
+			    GenerateInterfaces = false,
+			    NamespaceProvider = new NamespaceProvider
+			    {
+				    GenerateNamespace = key => "Test"
+			    }
+		    });
+
+		    Assert.Contains(
+			    expectedLine,
+			    generatedType.First());
+	    }
+
+
+		[Fact]
         public void ComplexTypeWithAttributeGroupExtension()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
