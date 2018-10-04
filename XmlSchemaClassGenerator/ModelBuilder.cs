@@ -96,6 +96,11 @@ namespace XmlSchemaClassGenerator
                     if (type is ClassModel classModel)
                     {
                         classModel.Documentation.AddRange(GetDocumentation(rootElement));
+                        if (!rootElement.SubstitutionGroup.IsEmpty)
+                        {
+                            classModel.IsSubstitution = true;
+                            classModel.SubstitutionName = rootElement.QualifiedName;
+                        }
                     }
 
                     type.RootElementName = rootElement.QualifiedName;
