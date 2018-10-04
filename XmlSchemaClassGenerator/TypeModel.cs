@@ -225,6 +225,7 @@ namespace XmlSchemaClassGenerator
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
+        public XmlQualifiedName SubstitutionName { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<InterfaceModel> Interfaces { get; set; }
@@ -974,7 +975,7 @@ namespace XmlSchemaClassGenerator
                         foreach (var derivedType in derivedTypes)
                         {
                             var derivedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
-                                new CodeAttributeArgument(new CodePrimitiveExpression(derivedType.XmlSchemaName.Name)),
+                                new CodeAttributeArgument(new CodePrimitiveExpression((derivedType.SubstitutionName ?? derivedType.XmlSchemaName).Name)),
                                 new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace, false))));
                             if (Order != null)
                             {
