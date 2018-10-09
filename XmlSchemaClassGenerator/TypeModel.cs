@@ -383,10 +383,21 @@ namespace XmlSchemaClassGenerator
                 keyProperty.IsKey = true;
             }
 
-            foreach (var property in Properties)
-                property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+	        foreach (var property in Properties.GroupBy(x => x.Name))
+	        {
+		        var propertyIndex = 0;
+		        foreach (var p in property)
+		        {
+			        if (propertyIndex > 0)
+			        {
+				        p.Name += $"_{propertyIndex}";
+					}
+			        p.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+					propertyIndex++;
+		        }
+	        }
 
-            if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
+	        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
             {
                 var text = new CodeMemberField(typeof(string), "Text");
                 // hack to generate automatic property

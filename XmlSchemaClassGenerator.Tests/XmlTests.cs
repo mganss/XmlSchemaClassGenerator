@@ -378,6 +378,16 @@ namespace XmlSchemaClassGenerator.Tests
 	    }
 
 
+	    [Theory]
+		[InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
+	    public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
+	    {
+			// Compilation would previously throw due to duplicate type name within type
+		    var assembly = Compiler.GenerateFiles("AttributesWithSameName", files);		    
+
+			Assert.NotNull(assembly);
+	    }
+
 		[Fact]
         public void ComplexTypeWithAttributeGroupExtension()
         {
