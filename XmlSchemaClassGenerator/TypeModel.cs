@@ -385,19 +385,16 @@ namespace XmlSchemaClassGenerator
 
 	        foreach (var property in Properties.GroupBy(x => x.Name))
 	        {
-		        property.First().AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
-
-				if (property.Count() > 1)
-		        {			        
-					var propertyIndex = 1;
-			        foreach (var n in property.Skip(1))
+		        var propertyIndex = 0;
+		        foreach (var p in property)
+		        {
+			        if (propertyIndex > 0)
 			        {
-				        n.Name += $"_{propertyIndex}";
-				        propertyIndex++;
-				        n.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+				        p.Name += $"_{propertyIndex}";
 					}
-				}
-		        
+			        p.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+					propertyIndex++;
+		        }
 	        }
 
 	        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
