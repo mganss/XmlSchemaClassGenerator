@@ -377,8 +377,32 @@ namespace XmlSchemaClassGenerator.Tests
 			    generatedType.First());
 	    }
 
+		[Fact]
+		public void MixedTypeMustNotCollideWithExistingMembers()
+		{
+			const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">  
+	<xs:element name=""document"" type=""l:elem"">			
+	</xs:element>
+	<xs:complexType name=""elem"" mixed=""true"">
+		<xs:attribute name=""Text"" type=""xs:string""/>
+	</xs:complexType>	
+</xs:schema>";
 
-	    [Theory]
+			var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+			{
+				NamespaceProvider = new NamespaceProvider
+				{
+					GenerateNamespace = key => "Test"
+				}
+			});
+
+			Assert.Contains(
+				@"public string[] Text_1 { get; set; }",
+				generatedType.First());
+		}
+
+		[Theory]
 		[InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
 	    public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
 	    {
