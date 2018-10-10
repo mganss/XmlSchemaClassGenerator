@@ -402,7 +402,7 @@ namespace XmlSchemaClassGenerator
 		        var propName = "Text";		        
 
 				// To not collide with any existing members
-				for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)); propertyIndex++)
+				for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
 		        {					
 			        propName = $"Text_{propertyIndex}";			        
 				} 
