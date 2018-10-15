@@ -20,7 +20,7 @@ Features
 from schema restrictions
 * Use [`Collection<T>`](http://msdn.microsoft.com/en-us/library/ms132397.aspx) properties 
 (initialized in constructor and with private setter)
-* Use either int, long, decimal, or string for xs:integer and derived types
+* Map xs:integer and derived types to the closest possible .NET type, if not possible - fall back to string. Can be overriden by explicitly defined type (int, long, or decimal)
 * Automatic properties
 * Pascal case for classes and properties
 * Generate nullable adapter properties for optional elements and attributes without default values (see [below](#nullables))
@@ -254,6 +254,26 @@ Collection types
 
 Values for the `--collectionType` and `--collectionImplementationType` options have to be given in the format accepted by
 the [`Type.GetType()`](https://docs.microsoft.com/en-us/dotnet/api/system.type.gettype) method. For the `System.Collections.Generic.List<T>` class this means ``System.Collections.Generic.List`1``.
+
+Integer and derived types
+---------------------
+Not all numeric types defined by XML Schema can be safely and accurately mapped to .NET numeric data types, however, it's possible to approximate the mapping based on the integer bounds and restrictions such as `totalDigits`.  
+If an explicit integer type mapping is specified via `--integer=TYPE`, that type will be used, otherwise an approximation will be made based on the following table:
+
+| XML Schema type | totalDigits | C# type|
+|-----------------|-------------|---------|
+| xs:positiveInteger, xs:nonNegativeInteger| <3 | byte |
+| xs:positiveInteger, xs:nonNegativeInteger| <5 | ushort |
+| xs:positiveInteger, xs:nonNegativeInteger| <10 | uint |
+| xs:positiveInteger, xs:nonNegativeInteger| <20 | ulong |
+| xs:positiveInteger, xs:nonNegativeInteger| <30 | decimal |
+| xs:positiveInteger, xs:nonNegativeInteger| >=30 | string |
+| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <3 | sbyte |
+| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <5 | short |
+| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <10 | int |
+| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <19 | long |
+| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <29 | decimal |
+| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| >=29 | string |
 
 Contributing
 ------------

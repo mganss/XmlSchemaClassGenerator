@@ -377,7 +377,7 @@ namespace XmlSchemaClassGenerator
                 Namespace = namespaceModel,
                 XmlSchemaName = qualifiedName,
                 XmlSchemaType = simpleType,
-                ValueType = simpleType.Datatype.GetEffectiveType(_configuration),
+                ValueType = simpleType.Datatype.GetEffectiveType(_configuration, restrictions),
             };
 
             simpleModel.Documentation.AddRange(docs);
