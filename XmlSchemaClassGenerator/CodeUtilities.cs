@@ -12,6 +12,12 @@ namespace XmlSchemaClassGenerator
         // Match non-letter followed by letter
         static Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
 
+        private static readonly XmlTypeCode[] IntegerDerivedTypeCodes =
+        {
+            XmlTypeCode.Integer, XmlTypeCode.NegativeInteger, XmlTypeCode.NonNegativeInteger,
+            XmlTypeCode.NonPositiveInteger, XmlTypeCode.PositiveInteger
+        };
+
         // Uppercases first letter and all letters following non-letters.
         // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
         public static string ToPascalCase(this string s)
@@ -76,7 +82,78 @@ namespace XmlSchemaClassGenerator
             return IsDataTypeAttributeAllowed(type.TypeCode, configuration);
         }
 
-        private static Type GetEffectiveType(XmlTypeCode typeCode, XmlSchemaDatatypeVariety variety, GeneratorConfiguration configuration)
+        private static Type GetIntegerDerivedType(XmlSchemaDatatype type, GeneratorConfiguration configuration,
+            IEnumerable<RestrictionModel> restrictions)
+        {
+            if (configuration.IntegerDataType != null) return configuration.IntegerDataType;
+
+            var xmlTypeCode = type.TypeCode;
+
+            Type result = null;
+
+            if (!(restrictions.SingleOrDefault(r => r is TotalDigitsRestrictionModel) is TotalDigitsRestrictionModel totalDigits)
+                || ((xmlTypeCode == XmlTypeCode.PositiveInteger
+                     || xmlTypeCode == XmlTypeCode.NonNegativeInteger) && totalDigits.Value >= 30)
+                || ((xmlTypeCode == XmlTypeCode.Integer
+                     || xmlTypeCode == XmlTypeCode.NegativeInteger
+                     || xmlTypeCode == XmlTypeCode.NonPositiveInteger) && totalDigits.Value >= 29))
+            {
+                return typeof(string);
+            }
+
+            switch (xmlTypeCode)
+            {
+                case XmlTypeCode.PositiveInteger:
+                case XmlTypeCode.NonNegativeInteger:
+                    switch (totalDigits.Value)
+                    {
+                        case int n when (n < 3):
+                            result = typeof(byte);
+                            break;
+                        case int n when (n < 5):
+                            result = typeof(ushort);
+                            break;
+                        case int n when (n < 10):
+                            result = typeof(uint);
+                            break;
+                        case int n when (n < 20):
+                            result = typeof(ulong);
+                            break;
+                        case int n when (n < 30):
+                            result = typeof(decimal);
+                            break;
+                    }
+
+                    break;
+
+                case XmlTypeCode.Integer:
+                case XmlTypeCode.NegativeInteger:
+                case XmlTypeCode.NonPositiveInteger:
+                    switch (totalDigits.Value)
+                    {
+                        case int n when (n < 3):
+                            result = typeof(sbyte);
+                            break;
+                        case int n when (n < 5):
+                            result = typeof(short);
+                            break;
+                        case int n when (n < 10):
+                            result = typeof(int);
+                            break;
+                        case int n when (n < 19):
+                            result = typeof(long);
+                            break;
+                        case int n when (n < 29):
+                            result = typeof(decimal);
+                            break;
+                    }
+                    break;
+            }
+
+            return result;
+        }
+
+        private static Type GetEffectiveType(XmlTypeCode typeCode, XmlSchemaDatatypeVariety variety)
         {
             Type result;
             switch (typeCode)
@@ -100,20 +177,6 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.Idref:
                     result = typeof(string);
                     break;
-                case XmlTypeCode.Integer:
-                case XmlTypeCode.NegativeInteger:
-                case XmlTypeCode.NonNegativeInteger:
-                case XmlTypeCode.NonPositiveInteger:
-                case XmlTypeCode.PositiveInteger:
-                    if (configuration.IntegerDataType == null || configuration.IntegerDataType == typeof(string))
-                    {
-                        result = typeof(string);
-                    }
-                    else
-                    {
-                        result = configuration.IntegerDataType;
-                    }
-                    break;
                 default:
                     result = null;
                     break;
@@ -121,14 +184,20 @@ namespace XmlSchemaClassGenerator
             return result;
         }
 
-        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
+        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration,
+            IEnumerable<RestrictionModel> restrictions)
         {
-            return GetEffectiveType(type.TypeCode, type.Variety, configuration) ?? type.ValueType;
+            var xmlTypeCode = type.TypeCode;
+
+            return IntegerDerivedTypeCodes.Contains(xmlTypeCode)
+                ? GetIntegerDerivedType(type, configuration, restrictions) ?? type.ValueType
+                : GetEffectiveType(xmlTypeCode, type.Variety) ?? type.ValueType;
         }
 
-        public static Type GetEffectiveType(this XmlSchemaType type, GeneratorConfiguration configuration)
+        public static Type GetEffectiveType(this XmlSchemaType type, GeneratorConfiguration configuration,
+            IEnumerable<RestrictionModel> restrictions)
         {
-            return GetEffectiveType(type.TypeCode, type.Datatype.Variety, configuration) ?? type.Datatype.ValueType;
+            return GetEffectiveType(type.Datatype, configuration, restrictions);
         }
 
         public static XmlQualifiedName GetQualifiedName(this XmlSchemaType schemaType)
