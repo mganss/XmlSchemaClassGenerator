@@ -48,7 +48,7 @@ For command line use, choose your preferred installation:
 ```
 Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 2.0.95.0
+Version 2.0.183.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -65,7 +65,7 @@ Options:
                                name is generated automatically (may fail).
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
-                               of string
+                               of automatic approximation
                                TYPE can be i[nt], l[ong], or d[ecimal].
   -e, --edb, --enable-data-binding
                              enable INotifyPropertyChanged data binding
