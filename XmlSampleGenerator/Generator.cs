@@ -1319,7 +1319,7 @@ namespace Microsoft.Xml.XMLGen {
                     return Convert.ToBase64String(enumValue as byte[]);
                 }
                 else {
-                    return "base64Binary Content";
+                    return "cnRjbGNyZW9scg==";
                 }
           }
       }

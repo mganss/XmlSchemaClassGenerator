@@ -12,12 +12,20 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace XmlSchemaClassGenerator.Tests
 {
     [TestCaseOrderer("XmlSchemaClassGenerator.Tests.PriorityOrderer", "XmlSchemaClassGenerator.Tests")]
     public class XmlTests
     {
+        private readonly ITestOutputHelper Output;
+
+        public XmlTests(ITestOutputHelper output)
+        {
+            Output = output;
+        }
+
         private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
         {
             var writer = new MemoryOutputWriter();
@@ -56,6 +64,8 @@ namespace XmlSchemaClassGenerator.Tests
         const string IS24Pattern = @"xsd\is24\*\*.xsd";
         const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
         const string WadlPattern = @"xsd\wadl\*.xsd";
+        const string ListPattern = @"xsd\list\list.xsd";
+        const string SimplePattern = @"xsd\simple\simple.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
         const string IataPattern = @"xsd\iata\*.xsd";
         const string TimePattern = @"xsd\time\time.xsd";
@@ -85,6 +95,22 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("Client", ClientPattern);
             TestSamples("Client", ClientPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestList()
+        {
+            Compiler.Generate("List", ListPattern);
+            TestSamples("List", ListPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestSimple()
+        {
+            Compiler.Generate("Simple", SimplePattern);
+            TestSamples("Simple", SimplePattern);
         }
 
         [Fact, TestPriority(1)]
@@ -132,6 +158,16 @@ namespace XmlSchemaClassGenerator.Tests
             DeserializeSampleXml(pattern, assembly);
         }
 
+        private bool HandleValidationError(string xml, ValidationEventArgs e)
+        {
+            var line = xml.Split('\n')[e.Exception.LineNumber - 1].Substring(e.Exception.LinePosition - 1);
+            var severity = e.Severity == XmlSeverityType.Error ? "Error" : "Warning";
+            Output.WriteLine($"{severity} at line {e.Exception.LineNumber}, column {e.Exception.LinePosition}: {e.Message}");
+            Output.WriteLine(line);
+            return (e.Severity == XmlSeverityType.Error
+                && !e.Message.Contains("The Pattern constraint failed"));  // generator doesn't generate valid values where pattern restrictions exist, e.g. email
+        }
+
         private void DeserializeSampleXml(string pattern, Assembly assembly)
         {
             var files = Glob.ExpandNames(pattern);
@@ -150,6 +186,8 @@ namespace XmlSchemaClassGenerator.Tests
 
             set.Compile();
 
+            var anyValidXml = false;
+
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract && !(e.ElementSchemaType is XmlSchemaSimpleType)))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);
@@ -162,6 +200,8 @@ namespace XmlSchemaClassGenerator.Tests
                     generator.WriteXml(xw);
                     var xml = sb.ToString();
 
+                    File.WriteAllText("xml.xml", xml);
+
                     // validate serialized xml
                     var settings = new XmlReaderSettings
                     {
@@ -171,19 +211,21 @@ namespace XmlSchemaClassGenerator.Tests
 
                     var invalid = false;
 
-                    settings.ValidationEventHandler += (s, e) =>
-                    {
-                        if (e.Severity == XmlSeverityType.Error)
-                            invalid = true;
-                    };
+                    void validate(object s, ValidationEventArgs e)
+                    { 
+                        if (HandleValidationError(xml, e)) invalid = true;
+                    }
+
+                    settings.ValidationEventHandler += validate;
 
                     var reader = XmlReader.Create(new StringReader(xml), settings);
                     while (reader.Read()) ;
 
+                    settings.ValidationEventHandler -= validate;
+
                     // generated xml is not schema valid -> skip
                     if (invalid) continue;
-
-                    File.WriteAllText("xml.xml", xml);
+                    anyValidXml = true;
 
                     // deserialize from sample
                     var sr = new StringReader(xml);
@@ -194,13 +236,17 @@ namespace XmlSchemaClassGenerator.Tests
 
                     File.WriteAllText("xml2.xml", xml2);
 
-                    settings.ValidationEventHandler += (s, e) =>
+                    void validate2(object s, ValidationEventArgs e)
                     {
-                        throw e.Exception;
+                        if (HandleValidationError(xml2, e)) throw e.Exception;
                     };
+
+                    settings.ValidationEventHandler += validate2;
 
                     reader = XmlReader.Create(new StringReader(xml2), settings);
                     while (reader.Read()) ;
+
+                    settings.ValidationEventHandler -= validate2;
 
                     // deserialize again
                     sr = new StringReader(xml2);
@@ -209,6 +255,8 @@ namespace XmlSchemaClassGenerator.Tests
                     AssertEx.Equal(o, o2);
                 }
             }
+
+            Assert.True(anyValidXml, "No valid generated XML for this test");
         }
 
         private Type FindType(Assembly assembly, XmlQualifiedName xmlQualifiedName)
@@ -406,7 +454,7 @@ namespace Test
         /// <para xml:lang=""de"">Ruft den Text ab oder legt diesen fest.</para>
         /// <para xml:lang=""en"">Gets or sets the text value.</para>
         /// </summary>
-        [System.Xml.Serialization.XmlTextAttribute(DataType=""string"")]
+        [System.Xml.Serialization.XmlTextAttribute()]
         public string Value { get; set; }
 
         /// <summary>

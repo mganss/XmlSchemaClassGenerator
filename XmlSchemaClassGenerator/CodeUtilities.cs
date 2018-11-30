@@ -32,58 +32,38 @@ namespace XmlSchemaClassGenerator
             return doNotUseUnderscoreInPrivateMemberNames ? propertyName.ToCamelCase() : string.Concat("_", propertyName.ToCamelCase());
         }
 
-        private static bool? IsDataTypeAttributeAllowed(XmlTypeCode typeCode, GeneratorConfiguration configuration)
+        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
         {
             bool? result;
-            switch (typeCode)
+            switch (type.TypeCode)
             {
                 case XmlTypeCode.AnyAtomicType:
                     // union
                     result = false;
                     break;
-                case XmlTypeCode.Integer:
-                case XmlTypeCode.NegativeInteger:
-                case XmlTypeCode.NonNegativeInteger:
-                case XmlTypeCode.NonPositiveInteger:
-                case XmlTypeCode.PositiveInteger:
-                    if (configuration.IntegerDataType != null && configuration.IntegerDataType != typeof(string))
-                    {
-                        result = false;
-                    }
-                    else
-                    {
-                        result = null;
-                    }
-                    break;
+                case XmlTypeCode.DateTime:
+                case XmlTypeCode.Time:
+                case XmlTypeCode.Date:
                 case XmlTypeCode.Base64Binary:
                 case XmlTypeCode.HexBinary:
                     result = true;
                     break;
                 default:
-                    result = null;
+                    result = false;
                     break;
             }
             return result;
         }
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
+        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, bool attribute = false)
         {
-            return IsDataTypeAttributeAllowed(type.TypeCode, configuration);
-        }
+            Type resultType;
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaType type, GeneratorConfiguration configuration)
-        {
-            return IsDataTypeAttributeAllowed(type.TypeCode, configuration);
-        }
-
-        private static Type GetEffectiveType(XmlTypeCode typeCode, XmlSchemaDatatypeVariety variety, GeneratorConfiguration configuration)
-        {
-            Type result;
-            switch (typeCode)
+            switch (type.TypeCode)
             {
                 case XmlTypeCode.AnyAtomicType:
                     // union
-                    result = typeof(string);
+                    resultType = typeof(string);
                     break;
                 case XmlTypeCode.AnyUri:
                 case XmlTypeCode.Duration:
@@ -92,43 +72,41 @@ namespace XmlSchemaClassGenerator
                 case XmlTypeCode.GMonthDay:
                 case XmlTypeCode.GYear:
                 case XmlTypeCode.GYearMonth:
-                    result = variety == XmlSchemaDatatypeVariety.List ? typeof(string[]) : typeof(string);
+                    resultType = typeof(string);
                     break;
                 case XmlTypeCode.Time:
-                    result = typeof(DateTime);
+                    resultType = typeof(DateTime);
                     break;
                 case XmlTypeCode.Idref:
-                    result = typeof(string);
+                    resultType = typeof(string);
                     break;
                 case XmlTypeCode.Integer:
                 case XmlTypeCode.NegativeInteger:
                 case XmlTypeCode.NonNegativeInteger:
                 case XmlTypeCode.NonPositiveInteger:
                 case XmlTypeCode.PositiveInteger:
-                    if (configuration.IntegerDataType == null || configuration.IntegerDataType == typeof(string))
-                    {
-                        result = typeof(string);
-                    }
-                    else
-                    {
-                        result = configuration.IntegerDataType;
-                    }
+                    resultType = configuration.IntegerDataType ?? typeof(string);
                     break;
                 default:
-                    result = null;
+                    resultType = type.ValueType;
                     break;
             }
-            return result;
-        }
 
-        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
-        {
-            return GetEffectiveType(type.TypeCode, type.Variety, configuration) ?? type.ValueType;
-        }
+            if (type.Variety == XmlSchemaDatatypeVariety.List)
+            {
+                if (resultType.IsArray)
+                    resultType = resultType.GetElementType();
 
-        public static Type GetEffectiveType(this XmlSchemaType type, GeneratorConfiguration configuration)
-        {
-            return GetEffectiveType(type.TypeCode, type.Datatype.Variety, configuration) ?? type.Datatype.ValueType;
+                // XmlSerializer doesn't support xsd:list for elements, only for attributes:
+                // https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/t84dzyst(v%3dvs.100)
+                
+                // Also, de/serialization fails when the XML schema type is ambiguous (DateTime -> date, datetime, or time)
+
+                if (!attribute || resultType == typeof(DateTime))
+                    resultType = typeof(string);
+            }
+
+            return resultType;
         }
 
         public static XmlQualifiedName GetQualifiedName(this XmlSchemaType schemaType)
