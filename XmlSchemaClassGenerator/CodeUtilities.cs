@@ -12,12 +12,6 @@ namespace XmlSchemaClassGenerator
         // Match non-letter followed by letter
         static Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
 
-        private static readonly XmlTypeCode[] IntegerDerivedTypeCodes =
-        {
-            XmlTypeCode.Integer, XmlTypeCode.NegativeInteger, XmlTypeCode.NonNegativeInteger,
-            XmlTypeCode.NonPositiveInteger, XmlTypeCode.PositiveInteger
-        };
-
         // Uppercases first letter and all letters following non-letters.
         // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
         public static string ToPascalCase(this string s)
