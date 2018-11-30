@@ -260,20 +260,25 @@ Integer and derived types
 Not all numeric types defined by XML Schema can be safely and accurately mapped to .NET numeric data types, however, it's possible to approximate the mapping based on the integer bounds and restrictions such as `totalDigits`.  
 If an explicit integer type mapping is specified via `--integer=TYPE`, that type will be used, otherwise an approximation will be made based on the following table:
 
-| XML Schema type | totalDigits | C# type|
-|-----------------|-------------|---------|
-| xs:positiveInteger, xs:nonNegativeInteger| <3 | byte |
-| xs:positiveInteger, xs:nonNegativeInteger| <5 | ushort |
-| xs:positiveInteger, xs:nonNegativeInteger| <10 | uint |
-| xs:positiveInteger, xs:nonNegativeInteger| <20 | ulong |
-| xs:positiveInteger, xs:nonNegativeInteger| <30 | decimal |
-| xs:positiveInteger, xs:nonNegativeInteger| >=30 | string |
-| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <3 | sbyte |
-| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <5 | short |
-| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <10 | int |
-| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <19 | long |
-| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| <29 | decimal |
-| xs:integer, xs:nonPositiveInteger, xs:negativeInteger| >=29 | string |
+<table>
+  <tr>
+    <th>XML Schema type</th>
+    <th>totalDigits</th>
+    <th>C# type</th>
+  </tr>
+  <tr><td rowspan="6">xs:positiveInteger<br>xs:nonNegativeInteger</td><td>&lt;3</td><td>byte</td></tr>
+  <tr><td>&lt;5</td><td>ushort</td></tr>
+  <tr><td>&lt;10</td><td>uint</td></tr>
+  <tr><td>&lt;20</td><td>ulong</td></tr>
+  <tr><td>&lt;30</td><td>decimal</td></tr>
+  <tr><td>&gt;=30</td><td>string</td></tr>
+  <tr><td rowspan="6">xs:integer<br>xs:nonPositiveInteger<br>xs:negativeInteger</td><td>&lt;3</td><td>sbyte</td></tr>
+  <tr><td>&lt;5</td><td>short</td></tr>
+  <tr><td>&lt;10</td><td>int</td></tr>
+  <tr><td>&lt;19</td><td>long</td></tr>
+  <tr><td>&lt;29</td><td>decimal</td></tr>
+  <tr><td>&gt;=29</td><td>string</td></tr>
+</table>
 
 Contributing
 ------------
