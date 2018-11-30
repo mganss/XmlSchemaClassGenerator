@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
@@ -225,6 +224,7 @@ namespace XmlSchemaClassGenerator
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
+        public XmlQualifiedName SubstitutionName { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<PropertyModel> Properties { get; set; }
         public List<InterfaceModel> Interfaces { get; set; }
@@ -382,12 +382,30 @@ namespace XmlSchemaClassGenerator
                 keyProperty.IsKey = true;
             }
 
-            foreach (var property in Properties)
-                property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+	        foreach (var property in Properties.GroupBy(x => x.Name))
+	        {
+		        var propertyIndex = 0;
+		        foreach (var p in property)
+		        {
+			        if (propertyIndex > 0)
+			        {
+				        p.Name += $"_{propertyIndex}";
+					}
+			        p.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+					propertyIndex++;
+		        }
+	        }
 
-            if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
-            {
-                var text = new CodeMemberField(typeof(string), "Text");
+	        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
+	        {
+		        var propName = "Text";		        
+
+				// To not collide with any existing members
+				for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
+		        {					
+			        propName = $"Text_{propertyIndex}";			        
+				} 
+                var text = new CodeMemberField(typeof(string[]), propName);
                 // hack to generate automatic property
                 text.Name += " { get; set; }";
                 text.Attributes = MemberAttributes.Public;
@@ -862,8 +880,8 @@ namespace XmlSchemaClassGenerator
                     typeDeclaration.Members.Add(nullableMember);
 
                     var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute), Configuration.CodeTypeReferenceOptions));
-                    editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(EditorBrowsableState)), "Never")));
-                    specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
+                    editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(EditorBrowsableState), Configuration.CodeTypeReferenceOptions)), "Never")));
+					specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
                     member.CustomAttributes.Add(editorBrowsableAttribute);
                     if (Configuration.EntityFramework) { member.CustomAttributes.Add(notMappedAttribute); }
                 }
@@ -987,7 +1005,7 @@ namespace XmlSchemaClassGenerator
                         foreach (var derivedType in derivedTypes)
                         {
                             var derivedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
-                                new CodeAttributeArgument(new CodePrimitiveExpression(derivedType.XmlSchemaName.Name)),
+                                new CodeAttributeArgument(new CodePrimitiveExpression((derivedType.SubstitutionName ?? derivedType.XmlSchemaName).Name)),
                                 new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace))));
                             if (Order != null)
                             {
@@ -1184,7 +1202,7 @@ namespace XmlSchemaClassGenerator
                 // http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlelementattribute.datatype(v=vs.110).aspx
                 // XmlSerializer is inconsistent: maps xs:decimal to decimal but xs:integer to string,
                 // even though xs:integer is a restriction of xs:decimal
-                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, attribute);
+                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, attribute);
                 UseDataTypeAttribute = XmlSchemaType.Datatype.IsDataTypeAttributeAllowed(Configuration) ?? UseDataTypeAttribute;
             }
 

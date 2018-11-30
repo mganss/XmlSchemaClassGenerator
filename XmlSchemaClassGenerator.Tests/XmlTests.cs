@@ -1,7 +1,5 @@
-﻿using Ganss.IO;
-using Microsoft.CodeAnalysis;
-using Microsoft.Xml.XMLGen;
-using System;
+﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +9,9 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Ganss.IO;
+using Microsoft.CodeAnalysis;
+using Microsoft.Xml.XMLGen;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,6 +43,7 @@ namespace XmlSchemaClassGenerator.Tests
                 EntityFramework = generatorPrototype.EntityFramework,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
                 MemberVisitor = generatorPrototype.MemberVisitor,
+				CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions
             };
 
             var set = new XmlSchemaSet();
@@ -386,7 +388,103 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.DoesNotContain("tags", xml, StringComparison.OrdinalIgnoreCase);
         }
 
-        [Fact]
+
+	    [Theory]
+	    [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
+	    [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
+		public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
+	    {
+		    const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+		<xs:complexType name=""document"">
+			<xs:attribute name=""some-value"">
+				<xs:simpleType>
+					<xs:restriction base=""xs:string"">
+						<xs:enumeration value=""one""/>
+						<xs:enumeration value=""two""/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name=""system"" type=""xs:string""/>
+		</xs:complexType>
+</xs:schema>";
+
+		    var generatedType = ConvertXml(nameof(EditorBrowsableAttributeRespectsCodeTypeReferenceOptions), xsd, new Generator
+		    {
+			    CodeTypeReferenceOptions = codeTypeReferenceOptions,
+			    GenerateNullables = true,
+			    GenerateInterfaces = false,
+			    NamespaceProvider = new NamespaceProvider
+			    {
+				    GenerateNamespace = key => "Test"
+			    }
+		    });
+
+		    Assert.Contains(
+			    expectedLine,
+			    generatedType.First());
+	    }
+
+		[Fact]
+		public void MixedTypeMustNotCollideWithExistingMembers()
+		{
+			const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
+	<xs:element name=""document"" type=""l:elem"">
+	</xs:element>
+	<xs:complexType name=""elem"" mixed=""true"">
+		<xs:attribute name=""Text"" type=""xs:string""/>
+	</xs:complexType>
+</xs:schema>";
+
+			var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+			{
+				NamespaceProvider = new NamespaceProvider
+				{
+					GenerateNamespace = key => "Test"
+				}
+			});
+
+			Assert.Contains(
+				@"public string[] Text_1 { get; set; }",
+				generatedType.First());
+		}
+
+	    [Fact]
+	    public void MixedTypeMustNotCollideWithContainingTypeName()
+	    {
+		    const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
+	<xs:element name=""document"" type=""l:Text"">
+	</xs:element>
+	<xs:complexType name=""Text"" mixed=""true"">
+	</xs:complexType>
+</xs:schema>";
+
+		    var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+		    {
+			    NamespaceProvider = new NamespaceProvider
+			    {
+				    GenerateNamespace = key => "Test"
+			    }
+		    });
+
+		    Assert.Contains(
+			    @"public string[] Text_1 { get; set; }",
+			    generatedType.First());
+	    }
+
+		[Theory]
+		[InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
+	    public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
+	    {
+			// Compilation would previously throw due to duplicate type name within type
+		    var assembly = Compiler.GenerateFiles("AttributesWithSameName", files);
+
+			Assert.NotNull(assembly);
+	    }
+
+		[Fact]
         public void ComplexTypeWithAttributeGroupExtension()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -536,6 +634,155 @@ namespace Test
         {
             string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
             Assert.Equal(Normalize(expected), Normalize(actual));
+        }
+
+
+        [Theory]
+        [InlineData(typeof(decimal), "decimal")]
+        [InlineData(typeof(long), "long")]
+        [InlineData(null, "string")]
+        public void UnmappedIntegerDerivedTypesAreMappedToExpectedCSharpType(Type integerDataType, string expectedTypeName)
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+    <xs:complexType name=""root"">
+        <xs:sequence>
+	        <xs:element name=""unboundedInteger01"" type=""xs:integer""/>
+	        <xs:element name=""unboundedInteger02"" type=""xs:nonNegativeInteger""/>
+	        <xs:element name=""unboundedInteger03"" type=""xs:positiveInteger""/>
+	        <xs:element name=""unboundedInteger04"" type=""xs:nonPositiveInteger""/>
+	        <xs:element name=""unboundedInteger05"" type=""xs:negativeInteger""/>
+
+	        <xs:element name=""outOfBoundsInteger01"" type=""tooLongPositiveInteger""/>
+	        <xs:element name=""outOfBoundsInteger02"" type=""tooLongNonNegativeInteger""/>
+	        <xs:element name=""outOfBoundsInteger03"" type=""tooLongInteger""/>
+	        <xs:element name=""outOfBoundsInteger04"" type=""tooLongNegativeInteger""/>
+	        <xs:element name=""outOfBoundsInteger05"" type=""tooLongNonPositiveInteger""/>
+        </xs:sequence>
+	</xs:complexType>
+
+    <xs:simpleType name=""tooLongPositiveInteger"">
+	    <xs:restriction base=""xs:positiveInteger"">
+		    <xs:totalDigits value=""30""/>
+	    </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name=""tooLongNonNegativeInteger"">
+	    <xs:restriction base=""xs:nonNegativeInteger"">
+		    <xs:totalDigits value=""30""/>
+	    </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name=""tooLongInteger"">
+	    <xs:restriction base=""xs:integer"">
+		    <xs:totalDigits value=""29""/>
+	    </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name=""tooLongNegativeInteger"">
+	    <xs:restriction base=""xs:negativeInteger"">
+		    <xs:totalDigits value=""29""/>
+	    </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name=""tooLongNonPositiveInteger"">
+	    <xs:restriction base=""xs:nonPositiveInteger"">
+		    <xs:totalDigits value=""29""/>
+	    </xs:restriction>
+    </xs:simpleType>
+</xs:schema>";
+
+            var generatedType = ConvertXml(nameof(UnmappedIntegerDerivedTypesAreMappedToExpectedCSharpType), xsd, new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateNullables = true,
+                NamingScheme = NamingScheme.PascalCase,
+                IntegerDataType = integerDataType,
+            }).First();
+
+            Assert.Contains($"public {expectedTypeName} UnboundedInteger01", generatedType);
+            Assert.Contains($"public {expectedTypeName} UnboundedInteger02", generatedType);
+            Assert.Contains($"public {expectedTypeName} UnboundedInteger03", generatedType);
+            Assert.Contains($"public {expectedTypeName} UnboundedInteger04", generatedType);
+            Assert.Contains($"public {expectedTypeName} UnboundedInteger05", generatedType);
+            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger01", generatedType);
+            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger02", generatedType);
+            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger03", generatedType);
+            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger04", generatedType);
+            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger05", generatedType);
+        }
+
+        [Theory]
+        [InlineData("xs:positiveInteger", 1, 2, "byte")]
+        [InlineData("xs:nonNegativeInteger", 1, 2, "byte")]
+        [InlineData("xs:integer", 1, 2, "sbyte")]
+        [InlineData("xs:negativeInteger", 1, 2, "sbyte")]
+        [InlineData("xs:nonPositiveInteger", 1, 2, "sbyte")]
+        [InlineData("xs:positiveInteger", 3, 4, "ushort")]
+        [InlineData("xs:nonNegativeInteger", 3, 4, "ushort")]
+        [InlineData("xs:integer", 3, 4, "short")]
+        [InlineData("xs:negativeInteger", 3, 4, "short")]
+        [InlineData("xs:nonPositiveInteger", 3, 4, "short")]
+        [InlineData("xs:positiveInteger", 5, 9, "uint")]
+        [InlineData("xs:nonNegativeInteger", 5, 9, "uint")]
+        [InlineData("xs:integer", 5, 9, "int")]
+        [InlineData("xs:negativeInteger", 5, 9, "int")]
+        [InlineData("xs:nonPositiveInteger", 5, 9, "int")]
+        [InlineData("xs:positiveInteger", 10, 19, "ulong")]
+        [InlineData("xs:nonNegativeInteger", 10, 19, "ulong")]
+        [InlineData("xs:integer", 10, 18, "long")]
+        [InlineData("xs:negativeInteger", 10, 18, "long")]
+        [InlineData("xs:nonPositiveInteger", 10, 18, "long")]
+        [InlineData("xs:positiveInteger", 20, 29, "decimal")]
+        [InlineData("xs:nonNegativeInteger", 20, 29, "decimal")]
+        [InlineData("xs:integer", 20, 28, "decimal")]
+        [InlineData("xs:negativeInteger", 20, 28, "decimal")]
+        [InlineData("xs:nonPositiveInteger", 20, 28, "decimal")]
+        public void RestrictedIntegerDerivedTypesAreMappedToExpectedCSharpTypes(string restrictionBase, int totalDigitsRangeFrom, int totalDigitsRangeTo, string expectedTypeName)
+        {
+            const string xsdTemplate = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+    <xs:complexType name=""root"">
+        <xs:sequence>
+	        {0}
+        </xs:sequence>
+	</xs:complexType>
+
+    {1}
+</xs:schema>";
+
+            const string elementTemplate = @"<xs:element name=""restrictedInteger{0}"" type=""RestrictedInteger{0}""/>";
+
+            const string simpleTypeTemplate = @"
+<xs:simpleType name=""RestrictedInteger{1}"">
+	<xs:restriction base=""{0}"">
+		<xs:totalDigits value=""{1}""/>
+	</xs:restriction>
+</xs:simpleType>
+";
+
+            string elementDefinitions = "", simpleTypeDefinitions = "";
+            for (var i = totalDigitsRangeFrom; i <= totalDigitsRangeTo; i++)
+            {
+                elementDefinitions += string.Format(elementTemplate, i);
+                simpleTypeDefinitions += string.Format(simpleTypeTemplate, restrictionBase, i);
+            }
+
+            var xsd = string.Format(xsdTemplate, elementDefinitions, simpleTypeDefinitions);
+            var generatedType = ConvertXml(nameof(RestrictedIntegerDerivedTypesAreMappedToExpectedCSharpTypes), xsd,
+                new Generator
+                {
+                    NamespaceProvider = new NamespaceProvider
+                    {
+                        GenerateNamespace = key => "Test",
+                    },
+                    GenerateNullables = true,
+                    NamingScheme = NamingScheme.PascalCase,
+                }).First();
+
+            for (var i = totalDigitsRangeFrom; i <= totalDigitsRangeTo; i++)
+            {
+                Assert.Contains($"public {expectedTypeName} RestrictedInteger{i}", generatedType);
+            }
         }
     }
 }

@@ -53,7 +53,8 @@ namespace XmlSchemaClassGenerator
 
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
             {
-                var source = new Uri(rootElement.GetSchema().SourceUri);
+	            var rootSchema = rootElement.GetSchema();
+				var source = !string.IsNullOrEmpty(rootSchema.SourceUri) ? new Uri(rootElement.GetSchema().SourceUri) : default(Uri);
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) { qualifiedName = rootElement.QualifiedName; }
                 var type = CreateTypeModel(source, rootElement.ElementSchemaType, qualifiedName);
@@ -96,6 +97,11 @@ namespace XmlSchemaClassGenerator
                     if (type is ClassModel classModel)
                     {
                         classModel.Documentation.AddRange(GetDocumentation(rootElement));
+                        if (!rootElement.SubstitutionGroup.IsEmpty)
+                        {
+                            classModel.IsSubstitution = true;
+                            classModel.SubstitutionName = rootElement.QualifiedName;
+                        }
                     }
 
                     type.RootElementName = rootElement.QualifiedName;
@@ -371,7 +377,7 @@ namespace XmlSchemaClassGenerator
                 Namespace = namespaceModel,
                 XmlSchemaName = qualifiedName,
                 XmlSchemaType = simpleType,
-                ValueType = simpleType.Datatype.GetEffectiveType(_configuration),
+                ValueType = simpleType.Datatype.GetEffectiveType(_configuration, restrictions),
             };
 
             simpleModel.Documentation.AddRange(docs);
