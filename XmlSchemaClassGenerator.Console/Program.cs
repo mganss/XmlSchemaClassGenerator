@@ -47,7 +47,7 @@ One option must be given for each namespace to be mapped.
 A file name may be given by appending a pipe sign (|) followed by a file name (like schema.xsd) to the XML namespace.
 If no mapping is found for an XML namespace, a name is generated automatically (may fail).", v => namespaces.Add(v) },
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
-                { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of string
+                { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of automatic approximation
 {TYPE} can be i[nt], l[ong], or d[ecimal].", v => {
                                          switch (v)
                                          {
