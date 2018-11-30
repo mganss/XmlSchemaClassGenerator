@@ -170,9 +170,11 @@ namespace XmlSchemaClassGenerator
                 // XmlSerializer doesn't support xsd:list for elements, only for attributes:
                 // https://docs.microsoft.com/en-us/previous-versions/dotnet/netframework-4.0/t84dzyst(v%3dvs.100)
 
-                // Also, de/serialization fails when the XML schema type is ambiguous (DateTime -> date, datetime, or time)
+                // Also, de/serialization fails when the XML schema type is ambiguous
+                // DateTime -> date, datetime, or time
+                // byte[] -> hexBinary or base64Binary
 
-                if (!attribute || resultType == typeof(DateTime))
+                if (!attribute || resultType == typeof(DateTime) || resultType == typeof(byte[]))
                     resultType = typeof(string);
             }
 
