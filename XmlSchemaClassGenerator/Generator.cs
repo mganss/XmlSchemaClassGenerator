@@ -193,6 +193,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
         }
 
+        public bool EnableUpaCheck
+        {
+            get { return _configuration.EnableUpaCheck; }
+            set { _configuration.EnableUpaCheck = value; }
+        }
+
         public void Generate(IEnumerable<string> files)
         {
             var set = new XmlSchemaSet();
@@ -216,6 +222,7 @@ namespace XmlSchemaClassGenerator
 
         public void Generate(XmlSchemaSet set)
         {
+            set.CompilationSettings.EnableUpaCheck = EnableUpaCheck;
             set.Compile();
 
             var m = new ModelBuilder(_configuration, set);
