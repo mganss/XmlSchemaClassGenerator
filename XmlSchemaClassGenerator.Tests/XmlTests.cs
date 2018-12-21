@@ -214,7 +214,7 @@ namespace XmlSchemaClassGenerator.Tests
                     var invalid = false;
 
                     void validate(object s, ValidationEventArgs e)
-                    { 
+                    {
                         if (HandleValidationError(xml, e)) invalid = true;
                     }
 

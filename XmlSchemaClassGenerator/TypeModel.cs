@@ -185,7 +185,7 @@ namespace XmlSchemaClassGenerator
             return new CodeTypeReference(name);
         }
 
-        public virtual CodeExpression GetDefaultValueFor(string defaultString)
+        public virtual CodeExpression GetDefaultValueFor(string defaultString, bool attribute)
         {
             throw new NotSupportedException(string.Format("Getting default value for {0} not supported.", defaultString));
         }
@@ -398,13 +398,13 @@ namespace XmlSchemaClassGenerator
 
 	        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
 	        {
-		        var propName = "Text";		        
+		        var propName = "Text";
 
 				// To not collide with any existing members
 				for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
-		        {					
-			        propName = $"Text_{propertyIndex}";			        
-				} 
+		        {
+			        propName = $"Text_{propertyIndex}";
+				}
                 var text = new CodeMemberField(typeof(string[]), propName);
                 // hack to generate automatic property
                 text.Name += " { get; set; }";
@@ -456,7 +456,7 @@ namespace XmlSchemaClassGenerator
             return allDerivedTypes;
         }
 
-        public override CodeExpression GetDefaultValueFor(string defaultString)
+        public override CodeExpression GetDefaultValueFor(string defaultString, bool attribute)
         {
             var rootClass = AllBaseTypes.LastOrDefault();
 
@@ -466,7 +466,7 @@ namespace XmlSchemaClassGenerator
 
                 using (var writer = new System.IO.StringWriter())
                 {
-                    CSharpProvider.GenerateCodeFromExpression(rootClass.GetDefaultValueFor(defaultString), writer, new CodeGeneratorOptions());
+                    CSharpProvider.GenerateCodeFromExpression(rootClass.GetDefaultValueFor(defaultString, attribute), writer, new CodeGeneratorOptions());
                     val = writer.ToString();
                 }
 
@@ -480,7 +480,7 @@ namespace XmlSchemaClassGenerator
                 return dv;
             }
 
-            return base.GetDefaultValueFor(defaultString);
+            return base.GetDefaultValueFor(defaultString, attribute);
         }
     }
 
@@ -658,8 +658,8 @@ namespace XmlSchemaClassGenerator
         {
             get
             {
-                return PropertyType.GetReferenceFor(OwningType.Namespace, 
-                    collection: IsCollection || IsArray || (IsList && IsAttribute), 
+                return PropertyType.GetReferenceFor(OwningType.Namespace,
+                    collection: IsCollection || IsArray || (IsList && IsAttribute),
                     attribute: IsAttribute);
             }
         }
@@ -678,6 +678,20 @@ namespace XmlSchemaClassGenerator
             }
 
             member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
+        }
+
+        private CodeAttributeDeclaration CreateDefaultValueAttribute(CodeTypeReference typeReference, CodeExpression defaultValueExpression)
+        {
+            var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions));
+            if (typeReference.BaseType == "System.Decimal")
+            {
+                defaultValueAttribute.Arguments.Add(new CodeAttributeArgument(new CodeTypeOfExpression(typeof(decimal))));
+                defaultValueAttribute.Arguments.Add(new CodeAttributeArgument(new CodePrimitiveExpression(DefaultValue)));
+            }
+            else
+                defaultValueAttribute.Arguments.Add(new CodeAttributeArgument(defaultValueExpression));
+
+            return defaultValueAttribute;
         }
 
         public void AddInterfaceMembersTo(CodeTypeDeclaration typeDeclaration)
@@ -706,12 +720,11 @@ namespace XmlSchemaClassGenerator
 
             if (DefaultValue != null && IsNullable)
             {
-                var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
+                var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue, IsAttribute);
 
                 if ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression))
                 {
-                    var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions),
-                        new CodeAttributeArgument(defaultValueExpression));
+                    var defaultValueAttribute = CreateDefaultValueAttribute(typeReference, defaultValueExpression);
                     member.CustomAttributes.Add(defaultValueAttribute);
                 }
             }
@@ -759,7 +772,7 @@ namespace XmlSchemaClassGenerator
                 else
                     member = new CodeMemberField(typeReference, propertyName);
 
-                var isPrivateSetter = IsCollection || isArray;
+                var isPrivateSetter = IsCollection || isArray || (IsList && IsAttribute);
 
                 if (requiresBackingField)
                 {
@@ -775,7 +788,7 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
-                var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue);
+                var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue, IsAttribute);
                 backingField.InitExpression = defaultValueExpression;
 
                 if (IsNillableValueType)
@@ -791,8 +804,7 @@ namespace XmlSchemaClassGenerator
 
                 if (IsNullable && ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression)))
                 {
-                    var defaultValueAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(DefaultValueAttribute), Configuration.CodeTypeReferenceOptions),
-                        new CodeAttributeArgument(defaultValueExpression));
+                    var defaultValueAttribute = CreateDefaultValueAttribute(typeReference, defaultValueExpression);
                     member.CustomAttributes.Add(defaultValueAttribute);
                 }
             }
@@ -1139,7 +1151,7 @@ namespace XmlSchemaClassGenerator
             return enumDeclaration;
         }
 
-        public override CodeExpression GetDefaultValueFor(string defaultString)
+        public override CodeExpression GetDefaultValueFor(string defaultString, bool attribute)
         {
             return new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(GetReferenceFor(referencingNamespace: null)),
                 Values.First(v => v.Value == defaultString).Name);
@@ -1221,9 +1233,16 @@ namespace XmlSchemaClassGenerator
             return new CodeTypeReference(type, Configuration.CodeTypeReferenceOptions);
         }
 
-        public override CodeExpression GetDefaultValueFor(string defaultString)
+        public override CodeExpression GetDefaultValueFor(string defaultString, bool attribute)
         {
-            if (ValueType == typeof(XmlQualifiedName))
+            var type = ValueType;
+
+            if (XmlSchemaType != null)
+            {
+                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, attribute);
+            }
+
+            if (type == typeof(XmlQualifiedName))
             {
                 if (defaultString.StartsWith("xs:", StringComparison.OrdinalIgnoreCase))
                 {
@@ -1235,6 +1254,12 @@ namespace XmlSchemaClassGenerator
                 }
                 throw new NotSupportedException(string.Format("Resolving default value {0} for QName not supported.", defaultString));
             }
+            else if (type == typeof(DateTime))
+            {
+                var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(typeof(DateTime)), "Parse", new CodePrimitiveExpression(defaultString));
+                return rv;
+            }
+
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
         }
 

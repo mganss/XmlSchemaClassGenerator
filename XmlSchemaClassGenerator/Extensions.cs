@@ -11,7 +11,7 @@ namespace XmlSchemaClassGenerator
     {
         public static XmlSchema GetSchema(this XmlSchemaObject xmlSchemaObject)
         {
-            while (xmlSchemaObject != null && !(xmlSchemaObject is XmlSchema)) 
+            while (xmlSchemaObject != null && !(xmlSchemaObject is XmlSchema))
                 xmlSchemaObject = xmlSchemaObject.Parent;
             return (XmlSchema)xmlSchemaObject;
         }
