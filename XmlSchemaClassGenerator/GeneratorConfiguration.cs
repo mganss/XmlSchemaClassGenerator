@@ -35,6 +35,7 @@ namespace XmlSchemaClassGenerator
             MemberVisitor = (member, model) => { };
             NamingProvider = new NamingProvider(NamingScheme);
             Version = VersionProvider.CreateFromAssembly();
+            EnableUpaCheck = true;
         }
 
         /// <summary>
@@ -171,5 +172,10 @@ namespace XmlSchemaClassGenerator
 
         public bool DisableComments { get; set; }
         public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
+        
+        /// <summary>
+        /// Check for Unique Particle Attribution (UPA) violations
+        /// </summary>
+        public bool EnableUpaCheck { get; set; }
     }
 }

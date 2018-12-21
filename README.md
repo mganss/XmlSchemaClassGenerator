@@ -83,6 +83,8 @@ Options:
                                groups (default is enabled)
   -a, --pascal               use Pascal case for class and property names (
                                default is enabled)
+  -u, --enableUpaCheck       should XmlSchemaSet check for Unique Particle 
+                               Attribution (UPA) (default is enabled)
       --ct, --collectionType=VALUE
                              collection type to use (default is System.
                                Collections.ObjectModel.Collection`1)

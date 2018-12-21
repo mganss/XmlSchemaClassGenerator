@@ -38,6 +38,7 @@ namespace XmlSchemaClassGenerator.Console
             var disableComments = false;
             var doNotUseUnderscoreInPrivateMemberNames = false;
             var generateDescriptionAttribute = true;
+            var enableUpaCheck = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -74,6 +75,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "f|ef", "generate Entity Framework Code First compatible classes", v => entityFramework = v != null },
                 { "t|interface", "generate interfaces for groups and attribute groups (default is enabled)", v => interfaces = v != null },
                 { "a|pascal", "use Pascal case for class and property names (default is enabled)", v => pascal = v != null },
+                { "u|enableUpaCheck", "should XmlSchemaSet check for Unique Particle Attribution (UPA) (default is enabled)", v => enableUpaCheck = v != null },
                 { "ct|collectionType=", "collection type to use (default is " + typeof(Collection<>).FullName + ")", v => collectionType = v == null ? typeof(Collection<>) : Type.GetType(v, true) },
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
                 { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default(CodeTypeReferenceOptions) : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) },
@@ -126,7 +128,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 GenerateDebuggerStepThroughAttribute = generateDebuggerStepThroughAttribute,
                 DisableComments = disableComments,
                 GenerateDescriptionAttribute = generateDescriptionAttribute,
-                DoNotUseUnderscoreInPrivateMemberNames = doNotUseUnderscoreInPrivateMemberNames
+                DoNotUseUnderscoreInPrivateMemberNames = doNotUseUnderscoreInPrivateMemberNames,
+                EnableUpaCheck = enableUpaCheck
             };
 
             if (pclCompatible)
