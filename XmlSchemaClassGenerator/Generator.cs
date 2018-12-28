@@ -75,6 +75,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.NamingScheme = value; }
         }
 
+        public bool AssemblyVisible
+        {
+            get { return _configuration.AssemblyVisible; }
+            set { _configuration.AssemblyVisible = value; }
+        }
+
         /// <summary>
         /// Emit the "Order" attribute value for XmlElementAttribute to ensure the correct order
         /// of the serialized XML elements.
