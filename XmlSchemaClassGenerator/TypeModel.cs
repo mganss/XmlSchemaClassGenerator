@@ -272,6 +272,11 @@ namespace XmlSchemaClassGenerator
 
             classDeclaration.IsClass = true;
             classDeclaration.IsPartial = true;
+            if (Configuration.AssemblyVisible)
+            {
+                classDeclaration.TypeAttributes = (classDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+            }
+
 
             if (Configuration.EnableDataBinding)
             {
@@ -382,29 +387,29 @@ namespace XmlSchemaClassGenerator
                 keyProperty.IsKey = true;
             }
 
-	        foreach (var property in Properties.GroupBy(x => x.Name))
-	        {
-		        var propertyIndex = 0;
-		        foreach (var p in property)
-		        {
-			        if (propertyIndex > 0)
-			        {
-				        p.Name += $"_{propertyIndex}";
-					}
-			        p.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
-					propertyIndex++;
-		        }
-	        }
+            foreach (var property in Properties.GroupBy(x => x.Name))
+            {
+                var propertyIndex = 0;
+                foreach (var p in property)
+                {
+                    if (propertyIndex > 0)
+                    {
+                        p.Name += $"_{propertyIndex}";
+                    }
+                    p.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+                    propertyIndex++;
+                }
+            }
 
-	        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
-	        {
-		        var propName = "Text";
+            if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
+            {
+                var propName = "Text";
 
-				// To not collide with any existing members
-				for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
-		        {
-			        propName = $"Text_{propertyIndex}";
-				}
+                // To not collide with any existing members
+                for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
+                {
+                    propName = $"Text_{propertyIndex}";
+                }
                 var text = new CodeMemberField(typeof(string[]), propName);
                 // hack to generate automatic property
                 text.Name += " { get; set; }";
@@ -893,7 +898,7 @@ namespace XmlSchemaClassGenerator
 
                     var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute), Configuration.CodeTypeReferenceOptions));
                     editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(EditorBrowsableState), Configuration.CodeTypeReferenceOptions)), "Never")));
-					specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
+                    specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
                     member.CustomAttributes.Add(editorBrowsableAttribute);
                     if (Configuration.EntityFramework) { member.CustomAttributes.Add(notMappedAttribute); }
                 }

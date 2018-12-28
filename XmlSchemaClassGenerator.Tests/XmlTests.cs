@@ -41,9 +41,10 @@ namespace XmlSchemaClassGenerator.Tests
                 DataAnnotationMode = generatorPrototype.DataAnnotationMode,
                 GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
                 EntityFramework = generatorPrototype.EntityFramework,
+                AssemblyVisible = generatorPrototype.AssemblyVisible,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
                 MemberVisitor = generatorPrototype.MemberVisitor,
-				CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions
+                CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions
             };
 
             var set = new XmlSchemaSet();
@@ -389,12 +390,12 @@ namespace XmlSchemaClassGenerator.Tests
         }
 
 
-	    [Theory]
-	    [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
-	    [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
-		public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
-	    {
-		    const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        [Theory]
+        [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
+        [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
+        public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 		<xs:complexType name=""document"">
 			<xs:attribute name=""some-value"">
@@ -409,26 +410,26 @@ namespace XmlSchemaClassGenerator.Tests
 		</xs:complexType>
 </xs:schema>";
 
-		    var generatedType = ConvertXml(nameof(EditorBrowsableAttributeRespectsCodeTypeReferenceOptions), xsd, new Generator
-		    {
-			    CodeTypeReferenceOptions = codeTypeReferenceOptions,
-			    GenerateNullables = true,
-			    GenerateInterfaces = false,
-			    NamespaceProvider = new NamespaceProvider
-			    {
-				    GenerateNamespace = key => "Test"
-			    }
-		    });
+            var generatedType = ConvertXml(nameof(EditorBrowsableAttributeRespectsCodeTypeReferenceOptions), xsd, new Generator
+            {
+                CodeTypeReferenceOptions = codeTypeReferenceOptions,
+                GenerateNullables = true,
+                GenerateInterfaces = false,
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            });
 
-		    Assert.Contains(
-			    expectedLine,
-			    generatedType.First());
-	    }
+            Assert.Contains(
+                expectedLine,
+                generatedType.First());
+        }
 
-		[Fact]
-		public void MixedTypeMustNotCollideWithExistingMembers()
-		{
-			const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        [Fact]
+        public void MixedTypeMustNotCollideWithExistingMembers()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
 	<xs:element name=""document"" type=""l:elem"">
 	</xs:element>
@@ -437,23 +438,23 @@ namespace XmlSchemaClassGenerator.Tests
 	</xs:complexType>
 </xs:schema>";
 
-			var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
-			{
-				NamespaceProvider = new NamespaceProvider
-				{
-					GenerateNamespace = key => "Test"
-				}
-			});
+            var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            });
 
-			Assert.Contains(
-				@"public string[] Text_1 { get; set; }",
-				generatedType.First());
-		}
+            Assert.Contains(
+                @"public string[] Text_1 { get; set; }",
+                generatedType.First());
+        }
 
-	    [Fact]
-	    public void MixedTypeMustNotCollideWithContainingTypeName()
-	    {
-		    const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        [Fact]
+        public void MixedTypeMustNotCollideWithContainingTypeName()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
 	<xs:element name=""document"" type=""l:Text"">
 	</xs:element>
@@ -461,30 +462,30 @@ namespace XmlSchemaClassGenerator.Tests
 	</xs:complexType>
 </xs:schema>";
 
-		    var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
-		    {
-			    NamespaceProvider = new NamespaceProvider
-			    {
-				    GenerateNamespace = key => "Test"
-			    }
-		    });
+            var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            });
 
-		    Assert.Contains(
-			    @"public string[] Text_1 { get; set; }",
-			    generatedType.First());
-	    }
+            Assert.Contains(
+                @"public string[] Text_1 { get; set; }",
+                generatedType.First());
+        }
 
-		[Theory]
-		[InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
-	    public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
-	    {
-			// Compilation would previously throw due to duplicate type name within type
-		    var assembly = Compiler.GenerateFiles("AttributesWithSameName", files);
+        [Theory]
+        [InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
+        public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
+        {
+            // Compilation would previously throw due to duplicate type name within type
+            var assembly = Compiler.GenerateFiles("AttributesWithSameName", files);
 
-			Assert.NotNull(assembly);
-	    }
+            Assert.NotNull(assembly);
+        }
 
-		[Fact]
+        [Fact]
         public void ComplexTypeWithAttributeGroupExtension()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -628,6 +629,50 @@ namespace Test
             Assert.Contains("Opt2Specified", content);
             Assert.Contains("Opt3Specified", content);
             Assert.Contains("Opt4Specified", content);
+        }
+
+        [Fact]
+        public void AssemblyVisibleIsInternal()
+        {
+            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+            // as a proxy.
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+    <xs:complexType name=""Root"">
+      <xs:sequence>
+      <!-- Choice directly inside a complex type -->
+      <xs:element name=""Sub"">
+        <xs:complexType>
+          <xs:choice>
+              <xs:element name=""Opt1"" type=""xs:int""/>
+              <xs:element name=""Opt2"" type=""xs:int""/>
+          </xs:choice>
+        </xs:complexType>
+        </xs:element>
+        <!-- Choice as part of a larger sequence -->
+        <xs:choice>
+          <xs:element name=""Opt3"" type=""xs:int""/>
+          <xs:element name=""Opt4"" type=""xs:int""/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("internal partial class RootSub", content);
+            Assert.Contains("internal partial class Root", content);
         }
 
         private static void CompareOutput(string expected, string actual)
