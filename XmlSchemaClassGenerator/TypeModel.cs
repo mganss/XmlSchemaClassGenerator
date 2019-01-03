@@ -499,6 +499,7 @@ namespace XmlSchemaClassGenerator
         public bool IsNillable { get; set; }
         public bool IsCollection { get; set; }
         public string DefaultValue { get; set; }
+        public string FixedValue { get; set; }
         public XmlSchemaForm Form { get; set; }
         public string XmlNamespace { get; set; }
         public List<DocumentationModel> Documentation { get; private set; }
