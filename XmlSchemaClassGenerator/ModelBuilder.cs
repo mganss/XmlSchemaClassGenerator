@@ -448,6 +448,7 @@ namespace XmlSchemaClassGenerator
                             IsAttribute = true,
                             IsNullable = attribute.Use != XmlSchemaUse.Required,
                             DefaultValue = attribute.DefaultValue ?? (attribute.Use != XmlSchemaUse.Optional ? attribute.FixedValue : null),
+                            FixedValue = attribute.FixedValue,
                             Form = attribute.Form == XmlSchemaForm.None ? attribute.GetSchema().AttributeFormDefault : attribute.Form,
                             XmlNamespace = attribute.QualifiedName.Namespace != "" && attribute.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? attribute.QualifiedName.Namespace : null,
                         };
@@ -522,6 +523,7 @@ namespace XmlSchemaClassGenerator
                         IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                         DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !(item.XmlParent is XmlSchemaChoice)) ? element.FixedValue : null),
+                        FixedValue = element.FixedValue,
                         Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
                         XmlNamespace = element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
                         XmlParticle = item.XmlParticle,
