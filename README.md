@@ -146,6 +146,16 @@ Using the optional `|` syntax of the `-n` command line option you can map indivi
 dotnet-xscgen.exe -n "|a.xsd=Example.NamespaceA" -n "|b.xsd=Example.NamespaceB" a.xsd b.xsd
 ```
 
+#### Mapping empty XML namespaces
+
+In order to provide a C# namespace name for an empty XML namespace you can specify it on the command line like this:
+
+```
+XmlSchemaClassGenerator.Console.exe -n =Example example.xsd
+```
+
+Note the space between `-n` and `=Example`.
+
 Nullables<a name="nullables"></a>
 ---------------------------------
 
