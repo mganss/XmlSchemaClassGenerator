@@ -202,20 +202,13 @@ namespace XmlSchemaClassGenerator
         public void Generate(IEnumerable<string> files)
         {
             var set = new XmlSchemaSet();
-            var settings = new XmlReaderSettings
-            {
-                DtdProcessing = DtdProcessing.Ignore
-            };
+            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
+            var readers = files.Select(f => XmlReader.Create(f, settings));
 
-            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f, settings), (s, e) =>
-            {
-                Trace.TraceError(e.Message);
-            }));
+            set.ValidationEventHandler += (s, e) => Trace.TraceError(e.Message);
 
-            foreach (var s in schemas)
-            {
-                set.Add(s.TargetNamespace, s.SourceUri);
-            }
+            foreach (var reader in readers)
+                set.Add(null, reader);
 
             Generate(set);
         }
