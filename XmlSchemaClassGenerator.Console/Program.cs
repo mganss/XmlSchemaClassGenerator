@@ -30,6 +30,7 @@ namespace XmlSchemaClassGenerator.Console
             var entityFramework = false;
             var interfaces = true;
             var pascal = true;
+            var assembly = false;
             var collectionType = typeof(Collection<>);
             Type collectionImplementationType = null;
             var codeTypeReferenceOptions = default(CodeTypeReferenceOptions);
@@ -75,6 +76,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "f|ef", "generate Entity Framework Code First compatible classes", v => entityFramework = v != null },
                 { "t|interface", "generate interfaces for groups and attribute groups (default is enabled)", v => interfaces = v != null },
                 { "a|pascal", "use Pascal case for class and property names (default is enabled)", v => pascal = v != null },
+                { "av|assemblyVisible", "use the internal visibility modifier (default is false)", v => assembly = v != null },
                 { "u|enableUpaCheck", "should XmlSchemaSet check for Unique Particle Attribution (UPA) (default is enabled)", v => enableUpaCheck = v != null },
                 { "ct|collectionType=", "collection type to use (default is " + typeof(Collection<>).FullName + ")", v => collectionType = v == null ? typeof(Collection<>) : Type.GetType(v, true) },
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
@@ -121,6 +123,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
+                AssemblyVisible=assembly,
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
                 CodeTypeReferenceOptions = codeTypeReferenceOptions,

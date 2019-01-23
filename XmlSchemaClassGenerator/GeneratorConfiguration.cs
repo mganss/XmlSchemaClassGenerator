@@ -129,7 +129,10 @@ namespace XmlSchemaClassGenerator
         /// Generate <see cref="System.ComponentModel.DescriptionAttribute"/> from XML comments.
         /// </summary>
         public bool GenerateDescriptionAttribute { get; set; }
-
+        /// <summary>
+        /// Generate types as <c>internal</c> if <c>true</c>. <c>public</c> otherwise.
+        /// </summary>
+        public bool AssemblyVisible { get; set; }
         /// <summary>
         /// Generator Code reference options
         /// </summary>
@@ -172,7 +175,7 @@ namespace XmlSchemaClassGenerator
 
         public bool DisableComments { get; set; }
         public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
-        
+
         /// <summary>
         /// Check for Unique Particle Attribution (UPA) violations
         /// </summary>
