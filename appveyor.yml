@@ -12,6 +12,7 @@ build_script:
   - ps: (Get-Content XmlSchemaClassGenerator\XmlSchemaClassGenerator.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content XmlSchemaClassGenerator\XmlSchemaClassGenerator.csproj
   - ps: (Get-Content XmlSchemaClassGenerator.Console\XmlSchemaClassGenerator.Console.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content XmlSchemaClassGenerator.Console\XmlSchemaClassGenerator.Console.csproj
   - ps: (Get-Content xscgen\xscgen.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content xscgen\xscgen.csproj
+  - ps: (Get-Content xscgen\dotnet-xscgen.csproj).Replace("1.0.0-VERSION", $env:APPVEYOR_BUILD_VERSION) | Set-Content dotnet-xscgen\dotnet-xscgen.csproj
   - dotnet --info
   - dotnet restore
   - dotnet build -c Release
@@ -19,6 +20,7 @@ build_script:
   - dotnet pack --include-symbols --include-source -c Release XmlSchemaClassGenerator
   - dotnet pack --include-symbols --include-source -c Release XmlSchemaClassGenerator.Console
   - dotnet pack --include-symbols --include-source -c Release xscgen
+  - dotnet pack --include-symbols --include-source -c Release xscgen-csproj
   - 7z a -mx=9 XmlSchemaClassGenerator.%APPVEYOR_BUILD_VERSION%.zip ".\XmlSchemaClassGenerator.Console\bin\Release\net45\publish\*"
 test_script:
   - ps: |
@@ -38,6 +40,7 @@ artifacts:
   - path: 'XmlSchemaClassGenerator\**\*.nupkg'
   - path: 'XmlSchemaClassGenerator.Console\**\*.nupkg'
   - path: 'xscgen\**\*.nupkg'
+  - path: 'xscgen-csproj\**\*.nupkg'
   - path: XmlSchemaClassGenerator.%APPVEYOR_BUILD_VERSION%.zip
 on_success:
   - ps: |
