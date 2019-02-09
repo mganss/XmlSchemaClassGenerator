@@ -209,6 +209,11 @@ namespace XmlSchemaClassGenerator
 
             interfaceDeclaration.IsInterface = true;
             interfaceDeclaration.IsPartial = true;
+            if (Configuration.AssemblyVisible)
+            {
+                interfaceDeclaration.TypeAttributes = (interfaceDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+            }
+
 
             foreach (var property in Properties)
                 property.AddInterfaceMembersTo(interfaceDeclaration);
@@ -1126,6 +1131,10 @@ namespace XmlSchemaClassGenerator
             GenerateTypeAttribute(enumDeclaration);
 
             enumDeclaration.IsEnum = true;
+            if (Configuration.AssemblyVisible)
+            {
+                enumDeclaration.TypeAttributes = (enumDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+            }
 
             foreach (var val in Values)
             {
