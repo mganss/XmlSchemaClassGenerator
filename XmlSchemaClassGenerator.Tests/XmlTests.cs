@@ -53,7 +53,7 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 var schema = XmlSchema.Read(stringReader, (s, e) =>
                 {
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception);
                 });
 
                 set.Add(schema);
@@ -632,7 +632,7 @@ namespace Test
         }
 
         [Fact]
-        public void AssemblyVisibleIsInternal()
+        public void AssemblyVisibleIsInternalClass()
         {
             // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
             // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
@@ -673,6 +673,70 @@ namespace Test
 
             Assert.Contains("internal partial class RootSub", content);
             Assert.Contains("internal partial class Root", content);
+        }
+
+        [Fact]
+        public void AssemblyVisibleIsInternalEnum()
+        {
+            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+            // as a proxy.
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+  <xs:simpleType name=""Answer"">
+    <xs:restriction base=""xs:string"">
+      <xs:enumeration value=""Yes""/>
+      <xs:enumeration value=""No""/>
+      <xs:enumeration value=""Probably""/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("internal enum Answer", content);
+        }
+
+        [Fact]
+        public void AssemblyVisibleIsInternalInterface()
+        {
+            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+            // as a proxy.
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:tns=""http://test.test/schema/AssemblyVisibleIsInternalInterface"" targetNamespace=""http://test.test/schema/AssemblyVisibleIsInternalInterface"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+  <xs:complexType name=""NamedType"">
+    <xs:attributeGroup ref=""tns:NamedElement""/>
+  </xs:complexType>
+  <xs:attributeGroup name=""NamedElement"">
+    <xs:attribute name=""Name"" use=""required"" type=""xs:string"" />
+  </xs:attributeGroup>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("internal interface INamedElement", content);
         }
 
         private static void CompareOutput(string expected, string actual)
