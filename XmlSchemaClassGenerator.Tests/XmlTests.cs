@@ -736,7 +736,7 @@ namespace Test
             var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
             var content = Assert.Single(contents);
 
-            Assert.Contains("internal interface INamedElement", content);
+            Assert.Contains("internal partial interface INamedElement", content);
         }
 
         private static void CompareOutput(string expected, string actual)

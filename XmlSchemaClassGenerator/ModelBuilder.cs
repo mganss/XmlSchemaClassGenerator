@@ -47,14 +47,14 @@ namespace XmlSchemaClassGenerator
             foreach (var globalType in set.GlobalTypes.Values.Cast<XmlSchemaType>())
             {
                 var schema = globalType.GetSchema();
-                var source = string.IsNullOrEmpty(schema?.SourceUri) ? null : new Uri(schema.SourceUri);
+                var source = CodeUtilities.CreateUri(schema?.SourceUri);
                 CreateTypeModel(source, globalType, globalType.QualifiedName);
             }
 
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
             {
 	            var rootSchema = rootElement.GetSchema();
-				var source = !string.IsNullOrEmpty(rootSchema.SourceUri) ? new Uri(rootElement.GetSchema().SourceUri) : default(Uri);
+                var source = CodeUtilities.CreateUri(rootSchema.SourceUri);
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) { qualifiedName = rootElement.QualifiedName; }
                 var type = CreateTypeModel(source, rootElement.ElementSchemaType, qualifiedName);
@@ -165,7 +165,7 @@ namespace XmlSchemaClassGenerator
             var properties = CreatePropertiesForElements(source, interfaceModel, particle, items.Where(i => !(i.XmlParticle is XmlSchemaGroupRef)));
             interfaceModel.Properties.AddRange(properties);
             var interfaces = items.Select(i => i.XmlParticle).OfType<XmlSchemaGroupRef>()
-                .Select(i => (InterfaceModel)CreateTypeModel(new Uri(i.SourceUri), Groups[i.RefName], i.RefName));
+                .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), Groups[i.RefName], i.RefName));
             interfaceModel.Interfaces.AddRange(interfaces);
 
             return interfaceModel;
@@ -192,7 +192,7 @@ namespace XmlSchemaClassGenerator
             var properties = CreatePropertiesForAttributes(source, interfaceModel, items.OfType<XmlSchemaAttribute>());
             interfaceModel.Properties.AddRange(properties);
             var interfaces = items.OfType<XmlSchemaAttributeGroupRef>()
-                .Select(a => (InterfaceModel)CreateTypeModel(new Uri(a.SourceUri), AttributeGroups[a.RefName], a.RefName));
+                .Select(a => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(a.SourceUri), AttributeGroups[a.RefName], a.RefName));
             interfaceModel.Interfaces.AddRange(interfaces);
 
             return interfaceModel;
@@ -254,7 +254,7 @@ namespace XmlSchemaClassGenerator
             if (_configuration.GenerateInterfaces)
             {
                 var interfaces = items.Select(i => i.XmlParticle).OfType<XmlSchemaGroupRef>()
-                    .Select(i => (InterfaceModel)CreateTypeModel(new Uri(i.SourceUri), Groups[i.RefName], i.RefName));
+                    .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), Groups[i.RefName], i.RefName));
                 classModel.Interfaces.AddRange(interfaces);
             }
 
@@ -283,7 +283,7 @@ namespace XmlSchemaClassGenerator
                 if (_configuration.GenerateInterfaces)
                 {
                     var attributeInterfaces = attributes.OfType<XmlSchemaAttributeGroupRef>()
-                        .Select(i => (InterfaceModel)CreateTypeModel(new Uri(i.SourceUri), AttributeGroups[i.RefName], i.RefName));
+                        .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), AttributeGroups[i.RefName], i.RefName));
                     classModel.Interfaces.AddRange(attributeInterfaces);
                 }
             }
@@ -463,7 +463,7 @@ namespace XmlSchemaClassGenerator
                 {
                     if (_configuration.GenerateInterfaces)
                     {
-                        CreateTypeModel(new Uri(attributeGroupRef.SourceUri), AttributeGroups[attributeGroupRef.RefName], attributeGroupRef.RefName);
+                        CreateTypeModel(CodeUtilities.CreateUri(attributeGroupRef.SourceUri), AttributeGroups[attributeGroupRef.RefName], attributeGroupRef.RefName);
                     }
 
                     var groupItems = AttributeGroups[attributeGroupRef.RefName].Attributes;
@@ -552,7 +552,7 @@ namespace XmlSchemaClassGenerator
                         {
                             if (_configuration.GenerateInterfaces)
                             {
-                                CreateTypeModel(new Uri(groupRef.SourceUri), Groups[groupRef.RefName], groupRef.RefName);
+                                CreateTypeModel(CodeUtilities.CreateUri(groupRef.SourceUri), Groups[groupRef.RefName], groupRef.RefName);
                             }
 
                             var groupItems = GetElements(groupRef.Particle);

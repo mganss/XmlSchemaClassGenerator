@@ -295,5 +295,7 @@ namespace XmlSchemaClassGenerator
             "using", "using static", "virtual", "void",
             "volatile", "while"
         };
+
+        internal static Uri CreateUri(string uri) => string.IsNullOrEmpty(uri) ? null : new Uri(uri);
     }
 }
