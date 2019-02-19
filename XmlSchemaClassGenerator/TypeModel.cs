@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -1275,7 +1276,7 @@ namespace XmlSchemaClassGenerator
                 return rv;
             }
 
-            return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
+            return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
         }
 
         public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()

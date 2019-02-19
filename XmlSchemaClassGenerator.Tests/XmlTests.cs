@@ -739,12 +739,38 @@ namespace Test
             Assert.Contains("internal partial interface INamedElement", content);
         }
 
+        [Fact]
+        public void DecimalSeparatorTest()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/101
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+  <xs:complexType name=""NamedType"">
+    <xs:attribute name=""SomeAttr"" type=""xs:decimal"" default=""1.5"" />
+  </xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("private decimal _someAttr = 1.5m;", content);
+        }
+
         private static void CompareOutput(string expected, string actual)
         {
             string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
             Assert.Equal(Normalize(expected), Normalize(actual));
         }
-
 
         [Theory]
         [InlineData(typeof(decimal), "decimal")]
