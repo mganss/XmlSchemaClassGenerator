@@ -1264,7 +1264,18 @@ namespace XmlSchemaClassGenerator
             {
                 var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(typeof(DateTime)), "Parse", new CodePrimitiveExpression(defaultString));
                 return rv;
-            }
+            } 
+			else if (type == typeof(Boolean) && !String.IsNullOrEmpty(defaultString) && !String.IsNullOrWhiteSpace(defaultString)) { 
+				if (defaultString == "0") {
+					//alternate false
+					return new CodePrimitiveExpression(false);
+				} else if (defaultString == "1") {
+					return new CodePrimitiveExpression(true);
+				} else {
+					return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
+				}
+			}
+
 
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
         }
