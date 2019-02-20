@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -209,6 +210,11 @@ namespace XmlSchemaClassGenerator
 
             interfaceDeclaration.IsInterface = true;
             interfaceDeclaration.IsPartial = true;
+            if (Configuration.AssemblyVisible)
+            {
+                interfaceDeclaration.TypeAttributes = (interfaceDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+            }
+
 
             foreach (var property in Properties)
                 property.AddInterfaceMembersTo(interfaceDeclaration);
@@ -1126,6 +1132,10 @@ namespace XmlSchemaClassGenerator
             GenerateTypeAttribute(enumDeclaration);
 
             enumDeclaration.IsEnum = true;
+            if (Configuration.AssemblyVisible)
+            {
+                enumDeclaration.TypeAttributes = (enumDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+            }
 
             foreach (var val in Values)
             {
@@ -1277,7 +1287,7 @@ namespace XmlSchemaClassGenerator
 			}
 
 
-            return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
+            return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
         }
 
         public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()
