@@ -1274,18 +1274,16 @@ namespace XmlSchemaClassGenerator
             {
                 var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(typeof(DateTime)), "Parse", new CodePrimitiveExpression(defaultString));
                 return rv;
-            } 
-			else if (type == typeof(Boolean) && !String.IsNullOrEmpty(defaultString) && !String.IsNullOrWhiteSpace(defaultString)) { 
-				if (defaultString == "0") {
-					//alternate false
+            }
+			else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
+            {
+				if (defaultString == "0")
 					return new CodePrimitiveExpression(false);
-				} else if (defaultString == "1") {
+                else if (defaultString == "1")
 					return new CodePrimitiveExpression(true);
-				} else {
+                else
 					return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
-				}
 			}
-
 
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
         }

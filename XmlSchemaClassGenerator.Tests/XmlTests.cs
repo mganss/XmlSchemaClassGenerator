@@ -766,6 +766,39 @@ namespace Test
             Assert.Contains("private decimal _someAttr = 1.5m;", content);
         }
 
+        [Fact]
+        public void BoolTest()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/103
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+  <xs:complexType name=""NamedType"">
+    <xs:attribute name=""b0"" type=""xs:boolean"" default=""0"" />
+    <xs:attribute name=""b1"" type=""xs:boolean"" default=""1"" />
+    <xs:attribute name=""bf"" type=""xs:boolean"" default=""false"" />
+    <xs:attribute name=""bt"" type=""xs:boolean"" default=""true"" />
+  </xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("private bool _b0 = false;", content);
+            Assert.Contains("private bool _b1 = true;", content);
+            Assert.Contains("private bool _bf = false;", content);
+            Assert.Contains("private bool _bt = true;", content);
+        }
+
         private static void CompareOutput(string expected, string actual)
         {
             string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
