@@ -227,7 +227,7 @@ namespace XmlSchemaClassGenerator
 
             var m = new ModelBuilder(_configuration, set);
             var namespaces = m.GenerateCode();
-            var writer = _configuration.OutputWriter ?? new FileOutputWriter(OutputFolder ?? ".");
+            var writer = _configuration.OutputWriter ?? new FileOutputWriter(OutputFolder ?? ".") { Configuration = _configuration };
 
             foreach (var ns in namespaces)
             {

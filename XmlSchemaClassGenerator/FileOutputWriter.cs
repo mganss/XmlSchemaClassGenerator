@@ -5,6 +5,8 @@ namespace XmlSchemaClassGenerator
 {
     public class FileOutputWriter : OutputWriter
     {
+        public GeneratorConfiguration Configuration { get; set; }
+
         public FileOutputWriter(string directory, bool createIfNotExists = true)
         {
             OutputDirectory = directory;
@@ -22,7 +24,10 @@ namespace XmlSchemaClassGenerator
             var cu = new CodeCompileUnit();
             cu.Namespaces.Add(cn);
 
-            WriteFile(Path.Combine(OutputDirectory, cn.Name + ".cs"), cu);
+            var path = Path.Combine(OutputDirectory, cn.Name + ".cs");
+            Configuration?.WriteLog(path);
+
+            WriteFile(path, cu);
         }
 
         protected virtual void WriteFile(string path, CodeCompileUnit cu)
