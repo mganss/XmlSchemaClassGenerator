@@ -211,6 +211,7 @@ namespace XmlSchemaClassGenerator
             var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
             var readers = files.Select(f => XmlReader.Create(f, settings));
 
+            set.XmlResolver = new XmlUrlResolver();
             set.ValidationEventHandler += (s, e) => Trace.TraceError(e.Message);
 
             foreach (var reader in readers)
