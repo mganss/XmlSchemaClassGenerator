@@ -108,6 +108,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    [DebuggerDisplay("{Name}")]
     public abstract class TypeModel
     {
         protected static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
@@ -501,6 +502,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    [DebuggerDisplay("{Name}")]
     public class PropertyModel
     {
         public TypeModel OwningType { get; set; }
@@ -1281,15 +1283,15 @@ namespace XmlSchemaClassGenerator
                 var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(typeof(DateTime)), "Parse", new CodePrimitiveExpression(defaultString));
                 return rv;
             }
-			else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
+            else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
             {
-				if (defaultString == "0")
-					return new CodePrimitiveExpression(false);
+                if (defaultString == "0")
+                    return new CodePrimitiveExpression(false);
                 else if (defaultString == "1")
-					return new CodePrimitiveExpression(true);
+                    return new CodePrimitiveExpression(true);
                 else
-					return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
-			}
+                    return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
+            }
 
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
         }
