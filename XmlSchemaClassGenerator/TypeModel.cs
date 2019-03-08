@@ -548,7 +548,7 @@ namespace XmlSchemaClassGenerator
                 if (!{0}.Equals(value))
                 {{
                     {0} = value;
-                    OnPropertyChanged(""{1}"");
+                    OnPropertyChanged(nameof({1}));
                 }}
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
@@ -566,7 +566,7 @@ namespace XmlSchemaClassGenerator
                 if ({0} == null || value == null || !{0}.Equals(value))
                 {{
                     {0} = value;
-                    OnPropertyChanged(""{1}"");
+                    OnPropertyChanged(nameof({1}));
                 }}
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
@@ -584,7 +584,7 @@ namespace XmlSchemaClassGenerator
                 if ({0} == null || value == null || !{0}.SequenceEqual(value))
                 {{
                     {0} = value;
-                    OnPropertyChanged(""{1}"");
+                    OnPropertyChanged(nameof({1}));
                 }}
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
