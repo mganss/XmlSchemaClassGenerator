@@ -529,6 +529,11 @@ namespace XmlSchemaClassGenerator
                         XmlParticle = item.XmlParticle,
                         XmlParent = item.XmlParent,
                     };
+
+                    if (property.IsArray && !_configuration.GenerateComplexTypesForCollections)
+                    {
+                        property.Type.Namespace.Types.Remove(property.Type.Name);
+                    }
                 }
                 else
                 {

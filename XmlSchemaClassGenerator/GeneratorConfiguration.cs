@@ -180,5 +180,51 @@ namespace XmlSchemaClassGenerator
         /// Check for Unique Particle Attribution (UPA) violations
         /// </summary>
         public bool EnableUpaCheck { get; set; }
+
+        /// <summary>
+        /// When a ComplexType has a member that is used as a "collection" around another ComplexType
+        /// the serializer will output the intermediate ComplexType.
+        ///
+        /// <code>
+        /// &lt;xs:element name="books"&gt;
+        ///   &lt;xs:complexType&gt;
+        ///     &lt;xs:sequence&gt;
+        ///       &lt;xs:element name="components"&gt;
+        ///         &lt;xs:complexType&gt;
+        ///           &lt;xs:sequence&gt;
+        ///             &lt;xs:element name="component" type="componentType" maxOccurs="unbounded"/&gt;
+        ///           &lt;/xs:sequence&gt;
+        ///         &lt;/xs:complexType&gt;
+        ///       &lt;/xs:element&gt;
+        ///     &lt;/xs:sequence&gt;
+        ///   &lt;xs:complexType&gt;
+        /// &lt;/xs:element&gt;
+        /// </code>
+        ///
+        /// With <code>false</code> it generates the classes:
+        /// 
+        /// <code>
+        /// public class books {
+        ///     public Container&lt;componentType&gt; components {get; set;}
+        /// }
+        ///
+        /// public class componentType {} 
+        /// </code>
+        ///
+        /// With <code>true</code> it generates the classes:
+        /// 
+        /// <code>
+        /// public class books {
+        ///     public Container&lt;componentType&gt; components {get; set;}
+        /// }
+        ///
+        /// public class bookscomponents {
+        ///     public Container&lt;componentType&gt; components {get; set;}
+        /// }
+        ///
+        /// public class componentType {} 
+        /// </code>
+        /// </summary>
+        public bool GenerateComplexTypesForCollections { get; set; } = false;
     }
 }

@@ -30,6 +30,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.OutputWriter = value; }
         }
 
+        public bool GenerateComplexTypesForCollections
+        {
+            get { return _configuration.GenerateComplexTypesForCollections; }
+            set { _configuration.GenerateComplexTypesForCollections = value; }
+        }
+
         public string NamespacePrefix
         {
             get { return _configuration.NamespacePrefix; }
