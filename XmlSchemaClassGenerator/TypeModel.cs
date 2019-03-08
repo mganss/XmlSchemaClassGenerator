@@ -300,14 +300,20 @@ namespace XmlSchemaClassGenerator
                 };
                 var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName");
                 onPropChangedMethod.Parameters.Add(param);
+                var propChangedVar = new CodeVariableDeclarationStatement("var", "propChanged")
+                {
+                    InitExpression = new CodeEventReferenceExpression(new CodeThisReferenceExpression(), "PropertyChanged")
+                };
+                onPropChangedMethod.Statements.Add(propChangedVar);
+                    
                 onPropChangedMethod.Statements.Add(
                     new CodeConditionStatement(
                         new CodeBinaryOperatorExpression(
-                            new CodeEventReferenceExpression(null, "PropertyChanged"),
+                            new CodeVariableReferenceExpression(propChangedVar.Name), 
                             CodeBinaryOperatorType.IdentityInequality,
                             new CodePrimitiveExpression(null)),
                         new CodeExpressionStatement(new CodeDelegateInvokeExpression(
-                            new CodeEventReferenceExpression(null, "PropertyChanged"),
+                            new CodeVariableReferenceExpression(propChangedVar.Name),
                             new CodeThisReferenceExpression(),
                             new CodeObjectCreateExpression(
                                 "PropertyChangedEventArgs",
