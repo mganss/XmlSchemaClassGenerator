@@ -333,7 +333,7 @@ namespace XmlSchemaClassGenerator
 
                     if (Configuration.EnableDataBinding)
                     {
-                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField(Configuration.DoNotUseUnderscoreInPrivateMemberNames))
+                        var backingFieldMember = new CodeMemberField(typeReference, member.Name.ToBackingField(Configuration.PrivateMemberPrefix))
                         {
                             Attributes = MemberAttributes.Private
                         };
