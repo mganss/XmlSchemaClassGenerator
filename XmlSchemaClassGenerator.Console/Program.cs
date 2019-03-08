@@ -131,7 +131,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 GenerateDebuggerStepThroughAttribute = generateDebuggerStepThroughAttribute,
                 DisableComments = disableComments,
                 GenerateDescriptionAttribute = generateDescriptionAttribute,
-                DoNotUseUnderscoreInPrivateMemberNames = doNotUseUnderscoreInPrivateMemberNames,
+                PrivateMemberPrefix = doNotUseUnderscoreInPrivateMemberNames ? "" : "_",
                 EnableUpaCheck = enableUpaCheck
             };
 
