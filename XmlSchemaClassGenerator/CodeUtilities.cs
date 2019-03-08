@@ -27,9 +27,9 @@ namespace XmlSchemaClassGenerator
             return char.ToLowerInvariant(s[0]) + s.Substring(1);
         }
 
-        public static string ToBackingField(this string propertyName, bool doNotUseUnderscoreInPrivateMemberNames)
+        public static string ToBackingField(this string propertyName, string privateFieldPrefix)
         {
-            return doNotUseUnderscoreInPrivateMemberNames ? propertyName.ToCamelCase() : string.Concat("_", propertyName.ToCamelCase());
+            return string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
         }
 
         public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
@@ -226,7 +226,7 @@ namespace XmlSchemaClassGenerator
         public static string GetUniqueFieldName(this TypeModel typeModel, PropertyModel propertyModel)
         {
             var classModel = typeModel as ClassModel;
-            var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.DoNotUseUnderscoreInPrivateMemberNames == true);
+            var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.PrivateMemberPrefix);
 
             if (CSharpKeywords.Contains(propBackingFieldName.ToLower()))
                 propBackingFieldName = "@" + propBackingFieldName;
@@ -250,7 +250,7 @@ namespace XmlSchemaClassGenerator
                     break;
                 }
 
-                var backingFieldName = prop.Name.ToBackingField(classModel.Configuration.DoNotUseUnderscoreInPrivateMemberNames);
+                var backingFieldName = prop.Name.ToBackingField(classModel.Configuration.PrivateMemberPrefix);
                 if (backingFieldName == propBackingFieldName)
                 {
                     i += 1;

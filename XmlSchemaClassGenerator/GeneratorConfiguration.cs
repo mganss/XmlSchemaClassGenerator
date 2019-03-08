@@ -174,7 +174,8 @@ namespace XmlSchemaClassGenerator
         public NamingProvider NamingProvider { get; set; }
 
         public bool DisableComments { get; set; }
-        public bool DoNotUseUnderscoreInPrivateMemberNames { get; set; }
+
+        public string PrivateMemberPrefix { get; set; } = "_";
 
         /// <summary>
         /// Check for Unique Particle Attribution (UPA) violations

@@ -193,10 +193,10 @@ namespace XmlSchemaClassGenerator
             set { _configuration.DisableComments = value; }
         }
 
-        public bool DoNotUseUnderscoreInPrivateMemberNames
+        public string PrivateMemberPrefix
         {
-            get { return _configuration.DoNotUseUnderscoreInPrivateMemberNames; }
-            set { _configuration.DoNotUseUnderscoreInPrivateMemberNames = value; }
+            get { return _configuration.PrivateMemberPrefix; }
+            set { _configuration.PrivateMemberPrefix = value; }
         }
 
         public bool EnableUpaCheck
