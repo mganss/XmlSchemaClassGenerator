@@ -53,7 +53,7 @@ namespace XmlSchemaClassGenerator
 
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
             {
-	            var rootSchema = rootElement.GetSchema();
+                var rootSchema = rootElement.GetSchema();
                 var source = CodeUtilities.CreateUri(rootSchema.SourceUri);
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) { qualifiedName = rootElement.QualifiedName; }
@@ -68,7 +68,7 @@ namespace XmlSchemaClassGenerator
 
                         var derivedClassModel = new ClassModel(_configuration)
                         {
-                            Name = ToTitleCase(rootElement.QualifiedName.Name),
+                            Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(rootElement.QualifiedName),
                             Namespace = CreateNamespaceModel(source, rootElement.QualifiedName)
                         };
 
@@ -145,7 +145,7 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaGroup group, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
-            var name = "I" + ToTitleCase(qualifiedName.Name);
+            var name = "I" + _configuration.NamingProvider.GroupTypeNameFromQualifiedName(qualifiedName);
             if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
 
             var interfaceModel = new InterfaceModel(_configuration)
@@ -173,7 +173,7 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaAttributeGroup attributeGroup, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
-            var name = "I" + ToTitleCase(qualifiedName.Name);
+            var name = "I" + _configuration.NamingProvider.AttributeGroupTypeNameFromQualifiedName(qualifiedName);
             if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
 
             var interfaceModel = new InterfaceModel(_configuration)
@@ -200,7 +200,7 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaComplexType complexType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
-            var name = ToTitleCase(qualifiedName.Name);
+            var name = _configuration.NamingProvider.ComplexTypeNameFromQualifiedName(qualifiedName);
             if (namespaceModel != null)
             {
                 name = namespaceModel.GetUniqueTypeName(name);
@@ -321,7 +321,7 @@ namespace XmlSchemaClassGenerator
                 if (isEnum)
                 {
                     // we got an enum
-                    var name = ToTitleCase(qualifiedName.Name);
+                    var name = _configuration.NamingProvider.EnumTypeNameFromQualifiedName(qualifiedName);
                     if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
 
                     var enumModel = new EnumModel(_configuration)
@@ -368,7 +368,7 @@ namespace XmlSchemaClassGenerator
                 restrictions = GetRestrictions(typeRestriction.Facets.Cast<XmlSchemaFacet>(), simpleType).Where(r => r != null).Sanitize().ToList();
             }
 
-            var simpleModelName = ToTitleCase(qualifiedName.Name);
+            var simpleModelName = _configuration.NamingProvider.SimpleTypeNameFromQualifiedName(qualifiedName);
             if (namespaceModel != null) { simpleModelName = namespaceModel.GetUniqueTypeName(simpleModelName); }
 
             var simpleModel = new SimpleModel(_configuration)
@@ -404,7 +404,7 @@ namespace XmlSchemaClassGenerator
                     if (attribute.Use != XmlSchemaUse.Prohibited)
                     {
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
-                        var attributeName = ToTitleCase(attribute.QualifiedName.Name);
+                        var attributeName = _configuration.NamingProvider.AttributeNameFromQualifiedName(attribute.QualifiedName);
 
                         if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup && attributeGroup.QualifiedName != typeModel.XmlSchemaName && Types.TryGetValue(attributeGroup.QualifiedName, out var typeModelValue) && typeModelValue is InterfaceModel interfaceTypeModel)
                         {
@@ -507,7 +507,7 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    var propertyName = ToTitleCase(element.QualifiedName.Name);
+                    var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(element.QualifiedName);
                     if (propertyName == typeModel.Name)
                     {
                         propertyName += "Property"; // member names cannot be the same as their enclosing type
@@ -717,11 +717,6 @@ namespace XmlSchemaClassGenerator
             }
 
             throw new ArgumentException(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
-        }
-
-        private string ToTitleCase(string s)
-        {
-            return s.ToTitleCase(_configuration.NamingScheme);
         }
     }
 }

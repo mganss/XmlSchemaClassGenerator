@@ -1,9 +1,12 @@
 ﻿namespace XmlSchemaClassGenerator
 {
+    using System.Xml;
+
     /// <summary>
     /// Provides options to customize member names
     /// </summary>
     public class NamingProvider
+        : INamingProvider
     {
         private readonly NamingScheme _namingScheme;
 
@@ -47,6 +50,86 @@
         public virtual string EnumMemberNameFromValue(string enumName, string value)
         {
             return value.ToTitleCase(_namingScheme).ToNormalizedEnumName();
+        }
+
+        /// <summary>
+        /// Define the name to be used when a ComplexType is found in the XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string ComplexTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name to be used when a AttributeGroup is found in the XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string AttributeGroupTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name to be used when a GroupType is found in the XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string GroupTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name to be used when a SimpleType is found in the XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string SimpleTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name to be used for the root class.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string RootClassNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name to be used when an enum type is found in the XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string EnumTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name to be used when an attribute is found in the XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string AttributeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+        }
+
+        /// <summary>
+        /// Define the name of the C# class property from the element name in XSD.
+        /// </summary>
+        /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
+        /// <returns>A string with a valid C# identifier name.</returns>
+        public string ElementNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
         }
     }
 }
