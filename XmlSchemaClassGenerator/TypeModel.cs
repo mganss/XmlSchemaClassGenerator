@@ -613,7 +613,10 @@ namespace XmlSchemaClassGenerator
             get { return Type as ClassModel; }
         }
 
-        private bool IsArray
+        /// <summary>
+        /// A property is an array if it is a sequence containing a single element with maxOccurs > 1.
+        /// </summary>
+        public bool IsArray
         {
             get
             {

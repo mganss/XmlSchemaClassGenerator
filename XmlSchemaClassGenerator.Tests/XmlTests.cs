@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -40,6 +41,7 @@ namespace XmlSchemaClassGenerator.Tests
                 IntegerDataType = generatorPrototype.IntegerDataType,
                 DataAnnotationMode = generatorPrototype.DataAnnotationMode,
                 GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
+                GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
                 EntityFramework = generatorPrototype.EntityFramework,
                 AssemblyVisible = generatorPrototype.AssemblyVisible,
                 GenerateInterfaces = generatorPrototype.GenerateInterfaces,
@@ -764,6 +766,96 @@ namespace Test
             var content = Assert.Single(contents);
 
             Assert.Contains("private decimal _someAttr = 1.5m;", content);
+        }
+
+        [Fact]
+        public void DoNotGenerateIntermediaryClassForArrayElements()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/32
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema version=""1.0"" targetNamespace=""test""
+  elementFormDefault=""qualified""
+  xmlns:test=""test""
+  xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""foo"" type=""test:foo""/>
+<xs:complexType name=""foo"">
+       <xs:sequence>
+        <xs:element name=""bar"" minOccurs=""0"">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name=""baz"" type=""xs:string"" minOccurs=""0"" maxOccurs=""unbounded"">
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+</xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateComplexTypesForCollections = false,
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(DoNotGenerateIntermediaryClassForArrayElements), content, generator);
+
+            var fooType = Assert.Single(assembly.DefinedTypes);
+            Assert.NotNull(fooType);
+            Assert.True(fooType.FullName == "Test.Foo");
+        }
+
+        [Fact]
+        public void GenerateIntermediaryClassForArrayElements()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/32
+
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema version=""1.0"" targetNamespace=""test""
+  elementFormDefault=""qualified""
+  xmlns:test=""test""
+  xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""foo"" type=""test:foo""/>
+<xs:complexType name=""foo"">
+       <xs:sequence>
+        <xs:element name=""bar"" minOccurs=""0"">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name=""baz"" type=""xs:string"" minOccurs=""0"" maxOccurs=""unbounded"">
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+</xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateComplexTypesForCollections = true,
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(GenerateIntermediaryClassForArrayElements), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(GenerateIntermediaryClassForArrayElements), content, generator);
+
+            Assert.True(assembly.DefinedTypes.Count() == 2);
+            Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.Foo");
+            Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.FooBar");
         }
 
         [Fact]

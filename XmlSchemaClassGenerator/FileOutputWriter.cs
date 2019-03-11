@@ -1,4 +1,5 @@
 ﻿using System.CodeDom;
+using System.Collections.Generic;
 using System.IO;
 
 namespace XmlSchemaClassGenerator
@@ -18,6 +19,11 @@ namespace XmlSchemaClassGenerator
         }
 
         public string OutputDirectory { get; }
+
+        /// <summary>
+        /// A list of all the files written.
+        /// </summary>
+        public IList<string> WrittenFiles { get; } = new List<string>();
 
         public override void Write(CodeNamespace cn)
         {
@@ -42,6 +48,7 @@ namespace XmlSchemaClassGenerator
                     fs = null;
                     Write(writer, cu);
                 }
+                WrittenFiles.Add(path);
             }
             finally
             {
