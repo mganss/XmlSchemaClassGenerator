@@ -57,9 +57,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string ComplexTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string ComplexTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -67,9 +67,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string AttributeGroupTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string AttributeGroupTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -77,9 +77,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string GroupTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string GroupTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -87,9 +87,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string SimpleTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string SimpleTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -97,9 +97,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string RootClassNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string RootClassNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -107,9 +107,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string EnumTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string EnumTypeNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -117,9 +117,9 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string AttributeNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string AttributeNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
         }
 
         /// <summary>
@@ -127,9 +127,19 @@
         /// </summary>
         /// <param name="qualifiedName">The name as defined in the XSD if present.</param>
         /// <returns>A string with a valid C# identifier name.</returns>
-        public string ElementNameFromQualifiedName(XmlQualifiedName qualifiedName)
+        public virtual string ElementNameFromQualifiedName(XmlQualifiedName qualifiedName)
         {
-            return qualifiedName.Name.ToTitleCase(NamingScheme.PascalCase);
+            return QualifiedNameToTitleCase(qualifiedName);
+        }
+
+        /// <summary>
+        /// Used internally to make the QualifiedName have the desired naming schema.
+        /// </summary>
+        /// <param name="qualifiedName">Not null element.</param>
+        /// <returns>A string formatted as desired.</returns>
+        protected virtual string QualifiedNameToTitleCase(XmlQualifiedName qualifiedName)
+        {
+            return qualifiedName.Name.ToTitleCase(_namingScheme);
         }
     }
 }
