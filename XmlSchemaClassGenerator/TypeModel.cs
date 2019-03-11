@@ -287,12 +287,13 @@ namespace XmlSchemaClassGenerator
 
             if (Configuration.EnableDataBinding)
             {
-                classDeclaration.Members.Add(new CodeMemberEvent()
+                var propertyChangedEvent = new CodeMemberEvent()
                 {
                     Name = "PropertyChanged",
                     Type = new CodeTypeReference(typeof(PropertyChangedEventHandler), Configuration.CodeTypeReferenceOptions),
                     Attributes = MemberAttributes.Public,
-                });
+                };
+                classDeclaration.Members.Add(propertyChangedEvent);
 
                 var onPropChangedMethod = new CodeMemberMethod
                 {
@@ -301,25 +302,9 @@ namespace XmlSchemaClassGenerator
                 };
                 var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName");
                 onPropChangedMethod.Parameters.Add(param);
-                var propChangedVar = new CodeVariableDeclarationStatement("var", "propChanged")
-                {
-                    InitExpression = new CodeEventReferenceExpression(new CodeThisReferenceExpression(), "PropertyChanged")
-                };
-                onPropChangedMethod.Statements.Add(propChangedVar);
-                    
-                onPropChangedMethod.Statements.Add(
-                    new CodeConditionStatement(
-                        new CodeBinaryOperatorExpression(
-                            new CodeVariableReferenceExpression(propChangedVar.Name), 
-                            CodeBinaryOperatorType.IdentityInequality,
-                            new CodePrimitiveExpression(null)),
-                        new CodeExpressionStatement(new CodeDelegateInvokeExpression(
-                            new CodeVariableReferenceExpression(propChangedVar.Name),
-                            new CodeThisReferenceExpression(),
-                            new CodeObjectCreateExpression(
-                                "PropertyChangedEventArgs",
-                                new CodeArgumentReferenceExpression("propertyName"))
-                            ))));
+                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new PropertyChangedEventArgs({param.Name}))");
+
+                onPropChangedMethod.Statements.Add(threadSafeDelegateInvokeExpression);
                 classDeclaration.Members.Add(onPropChangedMethod);
             }
 
