@@ -806,7 +806,7 @@ namespace Test
             var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
             var content = Assert.Single(contents);
 
-            var assembly = Compiler.Compile(nameof(DoNotGenerateIntermediaryClassForArrayElements), content, generator);
+            var assembly = Compiler.Compile(nameof(DoNotGenerateIntermediaryClassForArrayElements), content);
 
             var fooType = Assert.Single(assembly.DefinedTypes);
             Assert.NotNull(fooType);
@@ -851,7 +851,7 @@ namespace Test
             var contents = ConvertXml(nameof(GenerateIntermediaryClassForArrayElements), xsd, generator);
             var content = Assert.Single(contents);
 
-            var assembly = Compiler.Compile(nameof(GenerateIntermediaryClassForArrayElements), content, generator);
+            var assembly = Compiler.Compile(nameof(GenerateIntermediaryClassForArrayElements), content);
 
             Assert.True(assembly.DefinedTypes.Count() == 2);
             Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.Foo");

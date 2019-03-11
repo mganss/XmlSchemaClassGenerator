@@ -109,27 +109,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         public static Assembly CompileFiles(string name, IEnumerable<string> files)
         {
-            var trustedAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
-            var references = trustedAssembliesPaths
-                .Where(p => DependencyAssemblies.Contains(Path.GetFileNameWithoutExtension(p)))
-                .Select(p => MetadataReference.CreateFromFile(p))
-                .ToList();
-            var syntaxTrees = files.Select(f => CSharpSyntaxTree.ParseText(File.ReadAllText(f))).ToList();
-            var compilation = CSharpCompilation.Create(name, syntaxTrees)
-                .AddReferences(references)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            var result = Compiler.GenerateAssembly(compilation);
-
-            Assert.True(result.Result.Success);
-            var errors = result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
-            Assert.False(errors.Any(), string.Join("\n", errors.Select(e => e.GetMessage())));
-            var warnings = result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning);
-            Assert.False(warnings.Any(), string.Join("\n", errors.Select(w => w.GetMessage())));
-            Assert.NotNull(result.Assembly);
-
-            Assemblies[name] = result.Assembly;
-
-            return result.Assembly;
+            return Compile(name, files.Select(f => File.ReadAllText(f)).ToArray());
         }
 
         private static readonly LanguageVersion MaxLanguageVersion = Enum
@@ -137,24 +117,19 @@ namespace XmlSchemaClassGenerator.Tests
             .Cast<LanguageVersion>()
             .Max();
 
-        public static Assembly Compile(string name, string contents, Generator generator)
+        public static Assembly Compile(string name, params string[] contents)
         {
             var trustedAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
             var references = trustedAssembliesPaths
                 .Where(p => DependencyAssemblies.Contains(Path.GetFileNameWithoutExtension(p)))
                 .Select(p => MetadataReference.CreateFromFile(p))
                 .ToList();
-
             var options = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: MaxLanguageVersion);
-
-            // Return a syntax tree of our source code
-            var syntaxTree = CSharpSyntaxTree.ParseText(contents, options);
-
-            var compilation = CSharpCompilation.Create(name, new[] { syntaxTree })
+            var syntaxTrees = contents.Select(c => CSharpSyntaxTree.ParseText(c, options));
+            var compilation = CSharpCompilation.Create(name, syntaxTrees)
                 .AddReferences(references)
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             var result = Compiler.GenerateAssembly(compilation);
-
 
             Assert.True(result.Result.Success);
             var errors = result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
@@ -162,6 +137,8 @@ namespace XmlSchemaClassGenerator.Tests
             var warnings = result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning).ToList();
             Assert.False(warnings.Any(), string.Join("\n", errors.Select(w => w.GetMessage())));
             Assert.NotNull(result.Assembly);
+
+            Assemblies[name] = result.Assembly;
 
             return result.Assembly;
         }
