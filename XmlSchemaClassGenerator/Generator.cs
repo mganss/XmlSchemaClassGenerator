@@ -18,7 +18,7 @@ namespace XmlSchemaClassGenerator
             set { _configuration.NamespaceProvider = value; }
         }
 
-        public NamingProvider NamingProvider
+        public INamingProvider NamingProvider
         {
             get { return _configuration.NamingProvider; }
             set { _configuration.NamingProvider = value; }
