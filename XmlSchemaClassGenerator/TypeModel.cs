@@ -621,7 +621,7 @@ namespace XmlSchemaClassGenerator
         }
 
         /// <summary>
-        /// A property is an array if is a sequence with a single element with maxOccurrance > 1.
+        /// A property is an array if it is a sequence containing a single element with maxOccurs > 1.
         /// </summary>
         public bool IsArray
         {
