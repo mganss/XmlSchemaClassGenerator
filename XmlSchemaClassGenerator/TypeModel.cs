@@ -108,6 +108,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    [DebuggerDisplay("{Name}")]
     public abstract class TypeModel
     {
         protected static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
@@ -286,12 +287,13 @@ namespace XmlSchemaClassGenerator
 
             if (Configuration.EnableDataBinding)
             {
-                classDeclaration.Members.Add(new CodeMemberEvent()
+                var propertyChangedEvent = new CodeMemberEvent()
                 {
                     Name = "PropertyChanged",
                     Type = new CodeTypeReference(typeof(PropertyChangedEventHandler), Configuration.CodeTypeReferenceOptions),
                     Attributes = MemberAttributes.Public,
-                });
+                };
+                classDeclaration.Members.Add(propertyChangedEvent);
 
                 var onPropChangedMethod = new CodeMemberMethod
                 {
@@ -300,19 +302,9 @@ namespace XmlSchemaClassGenerator
                 };
                 var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName");
                 onPropChangedMethod.Parameters.Add(param);
-                onPropChangedMethod.Statements.Add(
-                    new CodeConditionStatement(
-                        new CodeBinaryOperatorExpression(
-                            new CodeEventReferenceExpression(null, "PropertyChanged"),
-                            CodeBinaryOperatorType.IdentityInequality,
-                            new CodePrimitiveExpression(null)),
-                        new CodeExpressionStatement(new CodeDelegateInvokeExpression(
-                            new CodeEventReferenceExpression(null, "PropertyChanged"),
-                            new CodeThisReferenceExpression(),
-                            new CodeObjectCreateExpression(
-                                "PropertyChangedEventArgs",
-                                new CodeArgumentReferenceExpression("propertyName"))
-                            ))));
+                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new PropertyChangedEventArgs({param.Name}))");
+
+                onPropChangedMethod.Statements.Add(threadSafeDelegateInvokeExpression);
                 classDeclaration.Members.Add(onPropChangedMethod);
             }
 
@@ -495,6 +487,7 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    [DebuggerDisplay("{Name}")]
     public class PropertyModel
     {
         public TypeModel OwningType { get; set; }
@@ -542,7 +535,7 @@ namespace XmlSchemaClassGenerator
                 if (!{0}.Equals(value))
                 {{
                     {0} = value;
-                    OnPropertyChanged(""{1}"");
+                    OnPropertyChanged(nameof({1}));
                 }}
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
@@ -560,7 +553,7 @@ namespace XmlSchemaClassGenerator
                 if ({0} == null || value == null || !{0}.Equals(value))
                 {{
                     {0} = value;
-                    OnPropertyChanged(""{1}"");
+                    OnPropertyChanged(nameof({1}));
                 }}
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
@@ -578,7 +571,7 @@ namespace XmlSchemaClassGenerator
                 if ({0} == null || value == null || !{0}.SequenceEqual(value))
                 {{
                     {0} = value;
-                    OnPropertyChanged(""{1}"");
+                    OnPropertyChanged(nameof({1}));
                 }}
             }}
         }}", backingFieldName, memberName, (privateSetter ? "private " : string.Empty)));
@@ -1275,15 +1268,15 @@ namespace XmlSchemaClassGenerator
                 var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(typeof(DateTime)), "Parse", new CodePrimitiveExpression(defaultString));
                 return rv;
             }
-			else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
+            else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
             {
-				if (defaultString == "0")
-					return new CodePrimitiveExpression(false);
+                if (defaultString == "0")
+                    return new CodePrimitiveExpression(false);
                 else if (defaultString == "1")
-					return new CodePrimitiveExpression(true);
+                    return new CodePrimitiveExpression(true);
                 else
-					return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
-			}
+                    return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
+            }
 
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
         }
