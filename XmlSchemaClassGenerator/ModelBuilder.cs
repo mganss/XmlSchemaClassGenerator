@@ -245,7 +245,7 @@ namespace XmlSchemaClassGenerator
                 // If it's a restriction, do not duplicate elements on the derived class, they're already in the base class.
                 // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
             }
-            else particle = complexType.ContentTypeParticle;
+            else particle = complexType.Particle ?? complexType.ContentTypeParticle;
 
             var items = GetElements(particle, complexType);
             var properties = CreatePropertiesForElements(source, classModel, particle, items);
@@ -479,6 +479,7 @@ namespace XmlSchemaClassGenerator
         {
             var properties = new List<PropertyModel>();
             var order = 0;
+
             foreach (var item in items)
             {
                 PropertyModel property = null;
@@ -495,7 +496,8 @@ namespace XmlSchemaClassGenerator
                         if (elementQualifiedName.IsEmpty)
                         {
                             // inner type, have to generate a type name
-                            var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModel.Name, element.QualifiedName.Name);
+                            var typeModelName = particle is XmlSchemaGroupRef groupRef ? groupRef.RefName : typeModel.XmlSchemaName;
+                            var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModelName.Name, element.QualifiedName.Name);
                             elementQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                             // try to avoid name clashes
                             if (NameExists(elementQualifiedName))
