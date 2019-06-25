@@ -89,7 +89,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            var a = new CodeAttributeDeclaration(new CodeTypeReference(typeof(StringLengthAttribute)),
+            var a = new CodeAttributeDeclaration(new CodeTypeReference(typeof(StringLengthAttribute), Configuration.CodeTypeReferenceOptions),
                 new CodeAttributeArgument(Max > 0 ? (CodeExpression)new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
             if (Min > 0) { a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min))); }
 
@@ -120,7 +120,8 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MaxLengthAttribute)), new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
+            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MaxLengthAttribute), Configuration.CodeTypeReferenceOptions),
+                new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
 
@@ -147,7 +148,8 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MinLengthAttribute)), new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
+            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MinLengthAttribute), Configuration.CodeTypeReferenceOptions),
+                new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
 
@@ -218,7 +220,8 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(RegularExpressionAttribute)), new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
+            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(RegularExpressionAttribute), Configuration.CodeTypeReferenceOptions),
+                new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
 

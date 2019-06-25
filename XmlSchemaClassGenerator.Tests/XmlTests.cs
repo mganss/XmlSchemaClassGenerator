@@ -114,7 +114,19 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void TestSimple()
         {
-            Compiler.Generate("Simple", SimplePattern);
+            Compiler.Generate("Simple", SimplePattern, new Generator
+            {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "Simple",
+                GenerateDescriptionAttribute = true,
+                CodeTypeReferenceOptions = CodeTypeReferenceOptions.GlobalReference
+            });
             TestSamples("Simple", SimplePattern);
         }
 

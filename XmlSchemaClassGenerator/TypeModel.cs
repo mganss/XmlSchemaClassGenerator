@@ -184,7 +184,7 @@ namespace XmlSchemaClassGenerator
                 name = forInit ? SimpleModel.GetCollectionImplementationName(name, Configuration) : SimpleModel.GetCollectionDefinitionName(name, Configuration);
             }
 
-            return new CodeTypeReference(name);
+            return new CodeTypeReference(name, Configuration.CodeTypeReferenceOptions);
         }
 
         public virtual CodeExpression GetDefaultValueFor(string defaultString, bool attribute)
@@ -910,7 +910,7 @@ namespace XmlSchemaClassGenerator
             {
                 var specifiedProperty = new CodeMemberProperty
                 {
-                    Type = new CodeTypeReference(typeof(bool)),
+                    Type = new CodeTypeReference(typeof(bool), Configuration.CodeTypeReferenceOptions),
                     Name = Name + "Specified",
                     HasSet = false,
                     HasGet = true,
@@ -1268,7 +1268,8 @@ namespace XmlSchemaClassGenerator
             }
             else if (type == typeof(DateTime))
             {
-                var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(typeof(DateTime)), "Parse", new CodePrimitiveExpression(defaultString));
+                var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(DateTime), Configuration.CodeTypeReferenceOptions)),
+                    "Parse", new CodePrimitiveExpression(defaultString));
                 return rv;
             }
             else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
