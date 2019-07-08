@@ -709,8 +709,12 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         private void ProcessChoiceGroup(InstanceGroup grp) {
-            for (int i=0; i < grp.Occurs; i++) { //Cyclically iterate over the children of choice
-                ProcessGroup(grp.GetChild(i % grp.NoOfChildren));
+            if (grp.NoOfChildren > 0)
+            {
+                for (int i = 0; i < grp.Occurs; i++)
+                { //Cyclically iterate over the children of choice
+                    ProcessGroup(grp.GetChild(i % grp.NoOfChildren));
+                }
             }
         }
 

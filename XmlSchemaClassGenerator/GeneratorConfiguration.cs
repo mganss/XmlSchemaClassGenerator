@@ -226,6 +226,6 @@ namespace XmlSchemaClassGenerator
         /// public class componentType {} 
         /// </code>
         /// </summary>
-        public bool GenerateComplexTypesForCollections { get; set; } = false;
+        public bool GenerateComplexTypesForCollections { get; set; } = true;
     }
 }

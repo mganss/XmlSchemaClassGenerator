@@ -40,6 +40,7 @@ namespace XmlSchemaClassGenerator.Console
             var doNotUseUnderscoreInPrivateMemberNames = false;
             var generateDescriptionAttribute = true;
             var enableUpaCheck = true;
+            var generateComplexTypesForCollections = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -86,6 +87,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "dc|disableComments", "do not include comments from xsd", v => disableComments = v != null },
                 { "nu|noUnderscore", "do not generate underscore in private member name (default is false)", v => doNotUseUnderscoreInPrivateMemberNames = v != null },
                 { "da|description", "generate DescriptionAttribute (default is true)", v => generateDescriptionAttribute = v != null },
+                { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
             };
 
             var files = options.Parse(args);
@@ -132,7 +134,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 DisableComments = disableComments,
                 GenerateDescriptionAttribute = generateDescriptionAttribute,
                 PrivateMemberPrefix = doNotUseUnderscoreInPrivateMemberNames ? "" : "_",
-                EnableUpaCheck = enableUpaCheck
+                EnableUpaCheck = enableUpaCheck,
+                GenerateComplexTypesForCollections = generateComplexTypesForCollections
             };
 
             if (pclCompatible)

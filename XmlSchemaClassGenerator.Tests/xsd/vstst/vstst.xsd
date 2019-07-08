@@ -1,0 +1,3011 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xs:schema xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://microsoft.com/schemas/VisualStudio/TeamTest/2010"
+           elementFormDefault="qualified" attributeFormDefault="unqualified" version="2010.04">
+  <xs:complexType name="BaseTestType" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Shared between all test types.</xs:documentation>
+    </xs:annotation>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Css" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Currituck subsystem something ... </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="projectStructure" type="xs:string" use="required"/>
+          <xs:attribute name="iteration" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Description" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Describes the test. This is shown in the properties window.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="Agent" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="AgentAttribute" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="value" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="abortRunOnFailure" type="xs:boolean" use="optional" default="false"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Owners" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>At the moment only one owner is allowed, but in the future we might extend to multiple owner support.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Owner">
+              <xs:annotation>
+                <xs:documentation>For example REDMOND\user1</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="DeploymentItems" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Files to deploy before executing this test.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="DeploymentItemsType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestCategory" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Categories applied to the test</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="TestCategoryType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Execution" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="optional" default="00000000-0000-0000-0000-000000000000"/>
+          <xs:attribute name="parentId" type="xs:string" use="optional" default="00000000-0000-0000-0000-000000000000"/>
+          <xs:attribute name="isRunOnRestart" type="xs:boolean" use="optional" default="false"/>
+          <xs:attribute name="timeOut" type="xs:int" use="optional" default="0"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Properties" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Key" />
+                  <xs:element name="Value" />
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="WorkItemIDs" type="WorkItemIDsType" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>References to workitems (bugs, issues) related to this test on the team server.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="TcmInformation" type="TcmInformationType" minOccurs="0"/>
+    </xs:choice>
+    <xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="id" type="IDSimpleType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="isGroupable" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="priority" type="xs:int" use="optional" default="2147483647"/>
+    <xs:attribute name="namedCategory" type="xs:string" use="optional" default=""/>
+    <xs:attribute name="storage" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="TcmInformationType">
+    <xs:attribute name="testCaseId" type="positiveInt" use="required"/>
+    <xs:attribute name="testRunId" type="positiveInt" use="required"/>
+    <xs:attribute name="testResultId" type="positiveInt" use="required"/>
+    <xs:attribute name="testIterationId" type="xs:nonNegativeInteger" use="optional"/>
+  </xs:complexType>
+  <xs:simpleType name="positiveInt">
+    <xs:restriction base="xs:int">
+      <xs:minExclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="BrowserType">
+    <xs:sequence>
+      <xs:element name="Headers" type="HeadersType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="MaxConnections" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="CodedWebTestElementType">
+    <xs:annotation>
+      <xs:documentation>Coded web test in TRX file</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="BaseTestType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="WebTestClass" minOccurs="0">
+            <xs:complexType>
+              <xs:attribute name="assembly" use="required"/>
+              <xs:attribute name="namespace" use="required"/>
+              <xs:attribute name="class" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="IncludedWebTests" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="IncludedWebTest" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:attribute name="name" use="required"/>
+                    <xs:attribute name="path" use="required"/>
+                    <xs:attribute name="testId" use="required"/>
+                    <xs:attribute name="isCodedWebTest" type="xs:boolean" default="false"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="CounterDescriptorType">
+    <xs:attribute name="machineName" type="xs:string" use="required"/>
+    <xs:attribute name="categoryName" type="xs:string"/>
+    <xs:attribute name="counterName" type="xs:string" use="required"/>
+    <xs:attribute name="instanceName" type="xs:string" use="required"/>
+    <xs:attribute name="baseInstanceName" type="xs:string" use="required"/>
+    <xs:attribute name="loadTestItemId" type="xs:int" default="-1"/>
+  </xs:complexType>
+  <xs:complexType name="CounterSetType">
+    <xs:sequence>
+      <xs:element name="CounterCategories" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CounterCategory" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Counters">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Counter" type="CounterType" minOccurs="0" maxOccurs="unbounded"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="Instances"/>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="counterSetType" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="CountersType">
+    <xs:attribute name="total" type="xs:int" use="optional"/>
+    <xs:attribute name="error" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="failed" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="timeout" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="aborted" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="inconclusive" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="passedButRunAborted" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="notRunnable" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="notExecuted" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="executed" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="disconnected" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="warning" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="passed" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="completed" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="inProgress" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="pending" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="value" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="CounterType">
+    <xs:sequence>
+      <xs:element name="ThresholdRules" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ThresholdRule" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Parameters">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="RuleParameter" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:attribute name="name" type="xs:string" use="required"/>
+                            <xs:attribute name="value" type="xs:string" use="required"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="className" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="DeclarativeWebTestElementType">
+    <xs:annotation>
+      <xs:documentation>Declarative web test in TRX file</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="BaseTestType">
+        <xs:attribute name="persistedWebTest" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DeploymentItemsType">
+    <xs:sequence>
+      <xs:element name="DeploymentItem" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="filename" type="xs:string" use="required"/>
+          <xs:attribute name="outputDirectory" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TestCategoryType">
+    <xs:sequence>
+      <xs:element name="TestCategoryItem" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="TestCategory" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DevelopmentServerType">
+    <xs:attribute name="pathToWebSite" type="xs:string" use="required"/>
+    <xs:attribute name="webApplicationRoot" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:simpleType name="ExecutionTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="local"/>
+      <xs:enumeration value="remote"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HostProcessPlatformTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MSIL"/>
+      <xs:enumeration value="X86"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="GenericTest" type="GenericTestType"/>
+  <xs:complexType name="GenericTestType">
+    <xs:complexContent>
+      <xs:extension base="BaseTestType">
+        <xs:choice minOccurs="0" maxOccurs="2">
+          <xs:element name="Command" maxOccurs="1">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="EnvironmentVariables" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="EnvironmentVariable" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="name" type="xs:string" use="required"/>
+                          <xs:attribute name="value" type="xs:string" use="required"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="filename" type="xs:string" use="required"/>
+              <xs:attribute name="arguments" type="xs:string" use="optional"/>
+              <xs:attribute name="workingDirectory" type="xs:string" use="optional"/>
+              <xs:attribute name="maxDuration" type="xs:int" use="optional" default="3600000">
+                <xs:annotation>
+                  <xs:documentation>This is in addition to the timeout to distinguish between a failed command and a test that timed out.</xs:documentation>
+                </xs:annotation>
+              </xs:attribute>
+              <xs:attribute name="redirectStandardOutputAndError" type="xs:boolean" use="optional" default="true"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="SummaryXmlFile" minOccurs="0" maxOccurs="1">
+            <xs:annotation>
+              <xs:documentation>
+                If this element does not exist it's the same as if it was not enabled.
+                But if it's not enabled, we still allow the user to change the file location and persist the file location for later use.
+              </xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:attribute name="path" type="xs:string" use="required"/>
+              <xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="GraphDescriptorType">
+    <xs:sequence>
+      <xs:element name="HorizontalZoomRange" type="RangeType" minOccurs="0"/>
+      <xs:element name="VerticalZoomRange" type="RangeType" minOccurs="0"/>
+      <xs:element name="PlotDescriptors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="PlotDescriptor" type="PlotDescriptorType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="graphName" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="HeadersType">
+    <xs:sequence>
+      <xs:element name="Header" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+          <xs:attribute name="value" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="IDSimpleType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="IDElementType">
+    <xs:attribute name="id" type="IDSimpleType" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="LinkType">
+    <xs:attribute name="id" type="IDSimpleType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="optional"/>
+    <xs:attribute name="storage" type="xs:string" use="required"/>
+    <xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="type" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="LoadRunConfigurationType">
+    <xs:sequence>
+      <xs:element name="CounterSetMappings">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CounterSetMapping" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="CounterSetReferences">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="CounterSetReference">
+                          <xs:complexType>
+                            <xs:attribute name="counterSetName"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="computerName" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ContextParameters"/>
+      <xs:element name="ApplicationsUnderTest" />
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="description" type="xs:string" use="optional"/>
+    <xs:attribute name="timingDetailsStorage" type="xs:int" use="optional"/>
+    <xs:attribute name="resultsStoreType" type="xs:int" use="optional" default="1"/>
+    <xs:attribute name="saveTestLogsOnError" type="xs:boolean" use="optional"/>
+    <xs:attribute name="saveTestLogsFrequency" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="maxErrorDetails" type="xs:int" use="optional" default="100"/>
+    <xs:attribute name="maxErrorsPerType" type="xs:int" use="optional" default="1000"/>
+    <xs:attribute name="maxThresholdViolations" type="xs:int" use="optional" default="1000"/>
+    <xs:attribute name="maxRequestUrlsReported" type="xs:int" use="required"/>
+    <xs:attribute name="useTestIterations" type="xs:boolean" use="optional"/>
+    <xs:attribute name="runDuration" type="xs:int" use="required"/>
+    <xs:attribute name="warmupTime" type="xs:int" use="required"/>
+    <xs:attribute name="coolDownTime" type="xs:int" use="optional"/>
+    <xs:attribute name="testIterations" type="xs:int" use="optional"/>
+    <xs:attribute name="webTestConnectionModel" type="xs:string" use="optional"/>
+    <xs:attribute name="webTestConnectionPoolSize" type="xs:int" use="optional"/>
+    <xs:attribute name="sampleRate" type="xs:int" use="required"/>
+    <xs:attribute name="validationLevel" type="xs:int" use="required"/>
+    <xs:attribute name="sqlTracingConnectString" type="xs:string" use="optional"/>
+    <xs:attribute name="sqlTracingConnectStringDisplayValue" type="xs:string" use="optional"/>
+    <xs:attribute name="sqlTracingDirectory" type="xs:string" use="optional"/>
+    <xs:attribute name="sqlTracingEnabled" type="xs:boolean" use="optional"/>
+    <xs:attribute name="sqlTracingFileCount" type="xs:int" use="optional" />
+    <xs:attribute name="sqlTracingRolloverEnabled" type="xs:boolean" use="optional" />
+    <xs:attribute name="sqlTracingMinimumDuration" type="xs:int" use="optional"/>
+    <xs:attribute name="runUnitTestsInAppDomain" type="xs:boolean" use="optional"/>
+    <xs:attribute name="resourcesRetentionTimeInMinutes" type="xs:int" use="optional" default="0"/>
+  </xs:complexType>
+  <xs:complexType name="LoadTestResultType">
+    <xs:complexContent>
+      <xs:extension base="TestResultAggregationType">
+        <xs:sequence>
+          <xs:element name="AnalyzerViewState" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="LoadTestRunDescriptor" type="LoadTestRunDescriptorType" minOccurs="0"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Summary" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="PerformanceCounterResults" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="PerformanceCounterResult" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="machineName" type="xs:string" use="required"/>
+                          <xs:attribute name="categoryName" type="xs:string" use="required"/>
+                          <xs:attribute name="instanceName" type="xs:string" use="required"/>
+                          <xs:attribute name="counterName" type="xs:string" use="required"/>
+                          <xs:attribute name="value" type="xs:double" use="required"/>
+                          <xs:attribute name="isOverallResultCounter" type="xs:boolean" use="optional" default="true"/>
+                          <xs:attribute name="higherIsBetter" type="xs:boolean" use="optional" default="true"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="PageSummaries" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="PageSummary" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="scenarioName" use="required"/>
+                          <xs:attribute name="testName" use="required"/>
+                          <xs:attribute name="url" use="required"/>
+                          <xs:attribute name="pageCount" type="xs:int" use="required"/>
+                          <xs:attribute name="responseTime" type="xs:int" use="required"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="TestSummaries" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="TestSummary" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="scenarioName" type="xs:string" use="required"/>
+                          <xs:attribute name="testName" type="xs:string" use="required"/>
+                          <xs:attribute name="totalTests" type="xs:int" use="required"/>
+                          <xs:attribute name="testsFailed" type="xs:int" use="required"/>
+                          <xs:attribute name="averageDuration" type="xs:int" use="required"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="TransactionSummaries" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="TransactionSummary" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:attribute name="scenarioName" type="xs:string" use="required"/>
+                          <xs:attribute name="testName" type="xs:string" use="required"/>
+                          <xs:attribute name="transactionName" type="xs:string" use="required"/>
+                          <xs:attribute name="transactionCount" type="xs:int" use="required"/>
+                          <xs:attribute name="elapsedTime" type="xs:string" use="required"/>
+                          <xs:attribute name="responseTime" type="xs:string" use="required"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="runStatus" type="LoadTestRunStatusType" use="optional" default="NotStarted"/>
+        <xs:attribute name="runId" type="xs:int" use="required"/>
+        <xs:attribute name="controllerStartTime" type="xs:string" use="optional"/>
+        <xs:attribute name="loadTestDuration" type="xs:int" use="optional"/>
+        <xs:attribute name="loadTestWarmupTime" type="xs:int" use="optional"/>
+        <xs:attribute name="previouslyViewed" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="resultsRepositoryConnectString" type="xs:string" use="optional"/>
+        <xs:attribute name="resultsStoreType" type="LoadTestResultStoreType" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="LoadTestRunDescriptorType">
+    <xs:sequence>
+      <xs:element name="GraphDescriptors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="GraphDescriptor" type="GraphDescriptorType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="isLegendPanelVisible" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="isOverviewPanelVisible" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="isCounterPanelVisible" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="scrollingGraph" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="minMaxGraph" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="showHorizontalGridOnGraph" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="showThresholdsOnGraph" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="showComparison" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="showZoom" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="lockZoom" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="activeConsoleView" type="LoadTestRunDescriptorViewType" use="optional" default="Graph"/>
+    <xs:attribute name="selectedGraphPanel1" type="xs:string" use="optional"/>
+    <xs:attribute name="selectedGraphPanel2" type="xs:string" use="optional"/>
+    <xs:attribute name="selectedGraphPanel3" type="xs:string" use="optional"/>
+    <xs:attribute name="selectedGraphPanel4" type="xs:string" use="optional"/>
+    <xs:attribute name="graphPanelLayout" type="PanelLayoutType" use="optional" default="FourGrid"/>
+    <xs:attribute name="tablePanelLayout" type="PanelLayoutType" use="optional" default="TwoHorizontal"/>
+    <xs:attribute name="selectedTablePanel1" type="xs:string" use="optional" default="Tests"/>
+    <xs:attribute name="selectedTablePanel2" type="xs:string" use="optional" default="Errors"/>
+    <xs:attribute name="selectedTablePanel3" type="xs:string" use="optional" default="Thresholds"/>
+    <xs:attribute name="selectedTablePanel4" type="xs:string" use="optional" default="Transactions"/>
+    <xs:attribute name="controllerName" type="xs:string" use="optional"/>
+    <xs:attribute name="isLocalRun" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="testRunId" type="IDSimpleType" use="required"/>
+    <xs:attribute name="repositoryRunId" type="xs:int" use="optional" default="0"/>
+  </xs:complexType>
+  <xs:simpleType name="LoadTestRunDescriptorViewType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Graph"/>
+      <xs:enumeration value="Summary"/>
+      <xs:enumeration value="Table"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LoadTestRunStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Connecting"/>
+      <xs:enumeration value="InitializingResultsCollection"/>
+      <xs:enumeration value="NotStarted"/>
+      <xs:enumeration value="Queued"/>
+      <xs:enumeration value="Starting"/>
+      <xs:enumeration value="Stopping"/>
+      <xs:enumeration value="Stopped"/>
+      <xs:enumeration value="WarmingUp"/>
+      <xs:enumeration value="WritingResults"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="LoadTest" type="LoadTestType"/>
+  <xs:complexType name="LoadTestType">
+    <xs:sequence maxOccurs="1">
+      <xs:element name="Scenarios">
+        <xs:complexType>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element name="Scenario">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="ThinkProfile">
+                    <xs:complexType>
+                      <xs:attribute name="Pattern" type="xs:string" use="optional" form="unqualified"/>
+                      <xs:attribute name="Value" type="xs:float" use="required" form="unqualified"/>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="LoadProfile">
+                    <xs:complexType>
+                      <xs:attribute name="Pattern" type="xs:string" use="required" form="unqualified"/>
+                      <xs:attribute name="InitialUsers" type="xs:int" use="required" form="unqualified"/>
+                      <xs:attribute name="MaxUsers" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="StepUsers" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="StepDuration" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="StepRampTime" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="CounterPath" type="xs:string" use="optional" form="unqualified"/>
+                      <xs:attribute name="MachineName" type="xs:string" use="optional" form="unqualified"/>
+                      <xs:attribute name="CategoryName" type="xs:string" use="optional" form="unqualified"/>
+                      <xs:attribute name="CounterName" type="xs:string" use="optional" form="unqualified"/>
+                      <xs:attribute name="InstanceName" type="xs:string" use="optional" form="unqualified"/>
+                      <xs:attribute name="MinUserCount" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="MaxUserCount" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="MaxUserCountIncrease" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="MaxUserCountDecrease" type="xs:int" use="optional" form="unqualified"/>
+                      <xs:attribute name="MinTargetValue" type="xs:double" use="optional" form="unqualified"/>
+                      <xs:attribute name="MaxTargetValue" type="xs:double" use="optional" form="unqualified"/>
+                      <xs:attribute name="HigherValuesBetter" type="xs:boolean" use="optional" form="unqualified"/>
+                      <xs:attribute name="StopAdjustingAtGoal" type="xs:boolean" use="optional" form="unqualified"/>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="InitializeTest">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="TestProfile" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Path" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Id" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Percentage" type="xs:float" use="required" form="unqualified"/>
+                            <xs:attribute name="Type" type="xs:string" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="TerminateTest">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="TestProfile" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Path" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Id" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Percentage" type="xs:float" use="required" form="unqualified"/>
+                            <xs:attribute name="Type" type="xs:string" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="TestMix">
+                    <xs:complexType>
+                      <xs:sequence maxOccurs="unbounded">
+                        <xs:element name="TestProfile" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Path" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Id" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Percentage" type="xs:float" use="required" form="unqualified"/>
+                            <xs:attribute name="Type" type="xs:string" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="BrowserMix" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence maxOccurs="unbounded">
+                        <xs:element name="BrowserProfile">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="Browser">
+                                <xs:complexType>
+                                  <xs:sequence>
+                                    <xs:element name="Headers">
+                                      <xs:complexType>
+                                        <xs:sequence maxOccurs="unbounded">
+                                          <xs:element name="Header">
+                                            <xs:complexType>
+                                              <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                                              <xs:attribute name="Value" type="xs:string" use="required" form="unqualified"/>
+                                            </xs:complexType>
+                                          </xs:element>
+                                        </xs:sequence>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                  <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                                  <xs:attribute name="MaxConnections" type="xs:int" use="optional" form="unqualified"/>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                            <xs:attribute name="Percentage" type="xs:float" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="NetworkMix" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence maxOccurs="unbounded">
+                        <xs:element name="NetworkProfile">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="Network" type="NetworkType"/>
+                            </xs:sequence>
+                            <xs:attribute name="Percentage" type="xs:float" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                <xs:attribute name="AllowedAgents" type="xs:string" use="optional" form="unqualified"/>
+                <xs:attribute name="IPSwitching" type="xs:boolean" use="optional" form="unqualified"/>
+                <xs:attribute name="DisableDuringWarmup" type="xs:boolean" use="optional" form="unqualified"/>
+                <xs:attribute name="DelayStartTime" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="DelayBetweenIterations" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="MaxTestIterations" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="PercentNewUsers" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="TestMixType" type="TestMixType" use="optional" form="unqualified"/>
+                <xs:attribute name="ApplyDistributionToPacingDelay" type="xs:boolean" use="optional" form="unqualified"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CounterSets">
+        <xs:complexType>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element name="CounterSet">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="CounterCategories">
+                    <xs:complexType>
+                      <xs:sequence maxOccurs="unbounded">
+                        <xs:element name="CounterCategory">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="Counters">
+                                <xs:complexType>
+                                  <xs:sequence maxOccurs="unbounded">
+                                    <xs:element name="Counter">
+                                      <xs:complexType>
+                                        <xs:sequence minOccurs="0">
+                                          <xs:element name="ThresholdRules">
+                                            <xs:complexType>
+                                              <xs:sequence maxOccurs="unbounded">
+                                                <xs:element name="ThresholdRule">
+                                                  <xs:complexType>
+                                                    <xs:sequence>
+                                                      <xs:element name="RuleParameters">
+                                                        <xs:complexType>
+                                                          <xs:sequence maxOccurs="unbounded">
+                                                            <xs:element name="RuleParameter">
+                                                              <xs:complexType>
+                                                                <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                                                                <xs:attribute name="Value" type="xs:string" use="required" form="unqualified"/>
+                                                              </xs:complexType>
+                                                            </xs:element>
+                                                          </xs:sequence>
+                                                        </xs:complexType>
+                                                      </xs:element>
+                                                    </xs:sequence>
+                                                    <xs:attribute name="Classname" type="xs:string" use="required" form="unqualified"/>
+                                                  </xs:complexType>
+                                                </xs:element>
+                                              </xs:sequence>
+                                            </xs:complexType>
+                                          </xs:element>
+                                        </xs:sequence>
+                                        <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                                        <xs:attribute name="Range" type="xs:int"  use="optional" form="unqualified" />
+                                        <xs:attribute name="RangeGroup" type="xs:string"  use="optional" form="unqualified"/>
+                                        <xs:attribute name="HigherIsBetter" type="xs:boolean" use="optional" default="false" form="unqualified"/>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                              <xs:element name="Instances" minOccurs="0">
+                                <xs:complexType>
+                                  <xs:sequence maxOccurs="unbounded">
+                                    <xs:element name="Instance">
+                                      <xs:complexType>
+                                        <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                            <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="DefaultCountersForAutomaticGraphs" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="DefaultCounter" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:attribute name="CategoryName"/>
+                            <xs:attribute name="CounterName"/>
+                            <xs:attribute name="InstanceName"/>
+                            <xs:attribute name="GraphName"/>
+                            <xs:attribute name="Range" type="xs:int" use="optional" />
+                            <xs:attribute name="RunType"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                <xs:attribute name="CounterSetType" type="xs:string" use="required" form="unqualified"/>
+                <xs:attribute name="LocId" type="xs:string" use="required" form="unqualified"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="RunConfigurations">
+        <xs:complexType>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element name="RunConfiguration">
+              <xs:complexType>
+                <xs:annotation>
+                  <xs:documentation>TODO: leave up to NC: this type is a duplicate of LoadTestRunCOnfigurationType. The differentces are results of WebTestSuiteSerializer (upper case for attributes and enums are strings vs ints)</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                  <xs:element name="CounterSetMappings">
+                    <xs:complexType>
+                      <xs:sequence minOccurs="0" maxOccurs="1">
+                        <xs:element name="CounterSetMapping">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="CounterSetReferences">
+                                <xs:complexType>
+                                  <xs:sequence maxOccurs="unbounded">
+                                    <xs:element name="CounterSetReference">
+                                      <xs:complexType>
+                                        <xs:attribute name="CounterSetName" type="xs:string" use="required" form="unqualified"/>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                            <xs:attribute name="ComputerName" type="xs:string" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                        <xs:element name="ApplicationsUnderTestSettings" minOccurs="0">
+                          <xs:complexType>
+                            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                              <xs:element name="ApplicationUnderTestGroup">
+                                <xs:complexType>
+                                  <xs:sequence minOccurs="0" maxOccurs="1">
+                                    <xs:element name="ApplicationsUnderTest">
+                                      <xs:complexType>
+                                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                          <xs:element name="ApplicationUnderTest" >
+                                            <xs:complexType>
+                                              <xs:sequence>
+                                                <xs:element name="Properties" type="PropertiesType" />
+                                              </xs:sequence>
+                                              <xs:attribute name="Name" type="xs:string" use="required" />
+                                              <xs:attribute name="Path" type="xs:string" use="required" />
+                                            </xs:complexType>
+                                          </xs:element>
+                                        </xs:sequence>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                  <xs:attribute name="Type" type="xs:string" use="required" />
+                                  <xs:attribute name="Name" type="xs:string" use="required" />
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="Applications" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="AutComponent">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="AutCounters">
+                                <xs:complexType>
+                                  <xs:sequence maxOccurs="unbounded">
+                                    <xs:element name="AutCounter">
+                                      <xs:complexType>
+                                        <xs:attribute name="Description" type="xs:string" use="required" form="unqualified"/>
+                                        <xs:attribute name="Id" type="xs:string" use="required" form="unqualified"/>
+                                        <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                                        <xs:attribute name="Path" type="xs:string" use="required" form="unqualified"/>
+                                      </xs:complexType>
+                                    </xs:element>
+                                  </xs:sequence>
+                                </xs:complexType>
+                              </xs:element>
+                            </xs:sequence>
+                            <xs:attribute name="Description" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Id" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Type" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Separator" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Version" type="xs:string" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="LoadGeneratorLocations" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                        <xs:element name="GeoLocation">
+                          <xs:complexType>
+                            <xs:attribute name="Location" type="xs:string" use="required" form="unqualified"/>
+                            <xs:attribute name="Percentange" type="xs:int" use="required" form="unqualified"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="ContextParameters">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="ContextParameter" maxOccurs="unbounded" minOccurs="0">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:string">
+                                <xs:attribute type="xs:string" name="Name" use="optional"/>
+                                <xs:attribute type="xs:string" name="Value" use="optional"/>
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+                <xs:attribute name="Description" type="xs:string" use="optional" form="unqualified"/>
+                <xs:attribute name="ResultsStoreType" type="xs:string" use="required" form="unqualified"/>
+                <xs:attribute name="TimingDetailsStorage" type="xs:string" use="required" form="unqualified"/>
+                <xs:attribute name="MaxErrorDetails" type="xs:int" use="required" form="unqualified"/>
+                <xs:attribute name="MaxRequestUrlsReported" type="xs:int" use="required" form="unqualified"/>
+                <xs:attribute name="MaxErrorsPerType" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="MaxThresholdViolations" type="xs:int" use="optional" form="unqualified" />
+                <xs:attribute name="UseTestIterations" type="xs:boolean" use="optional"/>
+                <xs:attribute name="RunDuration" type="xs:int" use="required" form="unqualified"/>
+                <xs:attribute name="WarmupTime" type="xs:int" use="required" form="unqualified"/>
+                <xs:attribute name="CoolDownTime" type="xs:int" use="optional"/>
+                <xs:attribute name="TestIterations" type="xs:int" use="optional"/>
+                <xs:attribute name="WebTestConnectionModel" type="WebTestConnectionModel" use="required" form="unqualified"/>
+                <xs:attribute name="WebTestConnectionPoolSize" type="xs:int" use="required" form="unqualified"/>
+                <xs:attribute name="SampleRate" type="xs:int" use="required" form="unqualified"/>
+                <xs:attribute name="ValidationLevel" type="LoadTestValidationLevel" use="required" form="unqualified"/>
+                <xs:attribute name="SqlTracingConnectString" type="xs:string" use="optional" form="unqualified"/>
+                <xs:attribute name="SqlTracingConnectStringDisplayValue" type="xs:string" use="optional" form="unqualified"/>
+                <xs:attribute name="SqlTracingDirectory" type="xs:string" use="optional" form="unqualified"/>
+                <xs:attribute name="SqlTracingEnabled" type="xs:boolean" use="optional" form="unqualified"/>
+                <xs:attribute name="SqlTracingFileCount" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="SqlTracingRolloverEnabled" type="xs:boolean" use="optional" form="unqualified"/>
+                <xs:attribute name="SqlTracingMinimumDuration" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="RunUnitTestsInAppDomain" type="xs:boolean" use="optional" form="unqualified"/>
+                <xs:attribute name="SaveTestLogsOnError" type="xs:boolean" use="optional" form="unqualified"/>
+                <xs:attribute name="SaveTestLogsFrequency" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="CoreCount" type="xs:int" use="optional" form="unqualified"/>
+                <xs:attribute name="UseMultipleIPs" type="xs:boolean" use="optional" default="false"/>
+                <xs:attribute name="TestAgentConfiguration" type="LoadTestAgentConfiguration" use="optional" form="unqualified" default="Default"/>				
+                <xs:attribute name="AgentDiagnosticsLevel" type="AgentDiagnosticsTraceLevel" use="optional" form="unqualified" default="Warning"/>
+                <xs:attribute name="ResourcesRetentionTimeInMinutes" type="xs:int" use="optional" form="unqualified"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="LoadTestPlugins">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="LoadTestPlugin" maxOccurs="unbounded" minOccurs="0">
+              <xs:complexType mixed="true">
+                <xs:sequence>
+                  <xs:element name="RuleParameters" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="RuleParameter" maxOccurs="unbounded" minOccurs="0">
+                          <xs:complexType>
+                            <xs:simpleContent>
+                              <xs:extension base="xs:string">
+                                <xs:attribute type="xs:string" name="Name" use="optional"/>
+                                <xs:attribute type="xs:string" name="Value" use="optional"/>
+                              </xs:extension>
+                            </xs:simpleContent>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:string" name="Classname" use="optional"/>
+                <xs:attribute type="xs:string" name="DisplayName" use="optional"/>
+                <xs:attribute type="xs:string" name="Description" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Id" type="xs:string" use="required" form="unqualified"/>
+    <xs:attribute name="Name" type="xs:string" use="required" form="unqualified"/>
+    <xs:attribute name="Description" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="Owner" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="storage" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="Priority" type="xs:int" use="optional" form="unqualified"/>
+    <xs:attribute name="Enabled" type="xs:boolean" use="optional" form="unqualified"/>
+    <xs:attribute name="CssProjectStructure" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="CssIteration" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="DeploymentItemsEditable" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="WorkItemIds" type="xs:string" form="unqualified"/>
+    <xs:attribute name="TraceLevel" type="xs:string" use="optional" form="unqualified"/>
+    <xs:attribute name="CurrentRunConfig" type="xs:string" use="required" form="unqualified"/>
+  </xs:complexType>
+  <xs:element name="ManualTest" type="PlainTextManualTestType"/>
+  <xs:complexType name="ManualTestResultType">
+    <xs:complexContent>
+      <xs:extension base="TestResultType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="Comments" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="testFile" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="NetworkType">
+    <xs:attribute name="Name" type="xs:string" use="required"/>
+    <xs:attribute name="BandwidthInKbps" type="xs:float" use="required"/>
+    <xs:attribute name="NetworkProfileConfigurationXml" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:element name="OrderedTest" type="OrderedTestType"/>
+  <xs:complexType name="OrderedTestType">
+    <xs:complexContent>
+      <xs:extension base="BaseTestType">
+        <xs:sequence>
+          <xs:element name="TestLinks" type="TestLinksType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="continueAfterFailure" type="xs:boolean" use="optional" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TestRunOutputType">
+    <xs:all minOccurs="0">
+      <xs:element name="StdOut" minOccurs="0"/>
+      <xs:element name="StdErr" minOccurs="0"/>
+      <xs:element name="DebugTrace" minOccurs="0"/>
+      <xs:element name="TraceInfo" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="OutputType">
+    <xs:all minOccurs="0">
+      <xs:element name="StdOut" minOccurs="0"/>
+      <xs:element name="StdErr" minOccurs="0"/>
+      <xs:element name="DebugTrace" minOccurs="0"/>
+      <xs:element name="TraceInfo" minOccurs="0"/>
+      <xs:element name="ErrorInfo" minOccurs="0">
+        <xs:complexType>
+          <xs:all minOccurs="0">
+            <xs:element name="Message" minOccurs="0" />
+            <xs:element name="StackTrace" minOccurs="0" />
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Exception" minOccurs="0" />
+      <xs:element name="TextMessages" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Message" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ResultFilesType">
+    <xs:sequence>
+      <xs:element name="ResultFile" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="path" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CollectorDataEntriesType">
+    <xs:sequence>
+      <xs:element name="Collector" minOccurs="0" maxOccurs="unbounded" type="CollectorType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CollectorType">
+    <xs:sequence>
+      <xs:element name="UriAttachments" minOccurs="0" maxOccurs="1" type="UriAttachmentsType"/>
+    </xs:sequence>
+    <xs:attribute name="agentName" type="xs:string" use="required"/>
+    <xs:attribute name="agentDisplayName" type="xs:string" use="optional"/>
+    <xs:attribute name="collectorDisplayName" type="xs:string" use="optional"/>
+    <xs:attribute name="isFromRemoteAgent" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="uri" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="FileUrisType">
+    <xs:sequence>
+      <xs:element name="FileUri" minOccurs="0" maxOccurs="unbounded" type="FileUriType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FileUriType">
+    <xs:attribute name="file" use="required" type="xs:string"/>
+    <xs:attribute name="uri" use="required" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="UriAttachmentsType">
+    <xs:sequence>
+      <xs:element name="UriAttachment" minOccurs="0" maxOccurs="unbounded" type="UriAttachmentType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UriAttachmentType">
+    <xs:sequence>
+      <xs:element name="A" minOccurs="1" maxOccurs="1">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="href" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DataCollectorMessagesType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="DataCollectorMessage" minOccurs="0" maxOccurs="unbounded" type="DataCollectorMessageType" />
+      <xs:element name="DataCollectorExceptionMessage" minOccurs="0" maxOccurs="unbounded" type="DataCollectorExceptionMessageType" />
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="DataCollectorMessageType">
+    <xs:sequence>
+      <xs:element name="Text" minOccurs="1" maxOccurs="1" type="xs:string" />
+    </xs:sequence>
+    <xs:attribute name="level" type="DataCollectorMessageLevelType" use="required"/>
+    <xs:attribute name="agentName" type="xs:string" use="required"/>
+    <xs:attribute name="timestamp" type="xs:string" use="required"/>
+    <xs:attribute name="dataCollectorUri" type="xs:string" use="optional"/>
+    <xs:attribute name="dataCollectorFriendlyName" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:simpleType name="DataCollectorMessageLevelType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Error" />
+      <xs:enumeration value="Warning" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="DataCollectorExceptionMessageType">
+    <xs:complexContent>
+      <xs:extension base="DataCollectorMessageType">
+        <xs:sequence>
+          <xs:element name="ExceptionType" minOccurs="1" maxOccurs="1" type="xs:string" />
+          <xs:element name="ExceptionMessage" minOccurs="0" maxOccurs="1" type="xs:string" />
+          <xs:element name="StackTrace" minOccurs="0" maxOccurs="1" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="PanelLayoutType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="One"/>
+      <xs:enumeration value="TwoHorizontal"/>
+      <xs:enumeration value="TwoVertical"/>
+      <xs:enumeration value="ThreeLeft"/>
+      <xs:enumeration value="ThreeRight"/>
+      <xs:enumeration value="ThreeTop"/>
+      <xs:enumeration value="ThreeBottom"/>
+      <xs:enumeration value="ThreeHorizontal"/>
+      <xs:enumeration value="ThreeVertical"/>
+      <xs:enumeration value="FourHorizontal"/>
+      <xs:enumeration value="FourVertical"/>
+      <xs:enumeration value="FourGrid"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="PlainTextManualTestType">
+    <xs:complexContent>
+      <xs:extension base="BaseTestType">
+        <xs:sequence>
+          <xs:element name="BodyText" minOccurs="0">
+            <xs:complexType mixed="true">
+              <xs:sequence>
+                <xs:any namespace="##any" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PlotDescriptorType">
+    <xs:sequence>
+      <xs:element name="CounterDescriptor" type="CounterDescriptorType"/>
+    </xs:sequence>
+    <xs:attribute name="colorArgb" type="xs:int" use="required"/>
+    <xs:attribute name="lineStyle" type="xs:int" use="required"/>
+    <xs:attribute name="fixedRange" type="xs:double" use="required"/>
+    <xs:attribute name="showOnGraph" type="xs:boolean" default="true"/>
+    <xs:attribute name="isSelected" type="xs:boolean" default="false"/>
+    <xs:attribute name="counterMetadata" type="xs:string" use="optional"/>
+    <xs:attribute name="rangeGroup" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="RangeType">
+    <xs:attribute name="lower" use="required"/>
+    <xs:attribute name="upper" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="ResultsType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="UnitTestResult" type="UnitTestResultType"/>
+        <xs:element name="GenericTestResult" type="TestResultAggregationType"/>
+        <xs:element name="TestResult" type="TestResultType"/>
+        <xs:element name="ManualTestResult" type="ManualTestResultType"/>
+        <xs:element name="TestResultAggregation" type="TestResultAggregationType">
+          <xs:annotation>
+            <xs:documentation>This one can be used by any other test type as they all can internally call another set of tests and produce results, which are later merged into this aggregation for unified presentation to the caller.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="WebTestResult" type="WebTestResultType"/>
+        <xs:element name="LoadTestResult" type="LoadTestResultType"/>
+        <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="RuleResultType">
+    <xs:sequence>
+      <xs:element name="RuleProperties" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RuleProperty" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" use="required"/>
+                <xs:attribute name="value" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" use="required"/>
+    <xs:attribute name="ruleType" use="required"/>
+    <xs:attribute name="success" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="message" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="ScenarioType">
+    <xs:sequence>
+      <xs:element name="LoadProfile">
+        <xs:complexType>
+          <xs:attribute name="pattern" type="xs:int" use="optional" default="0"/>
+          <xs:attribute name="initialUsers" type="xs:int" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ThinkProfile">
+        <xs:complexType>
+          <xs:attribute name="pattern" type="xs:int" use="optional" default="0"/>
+          <xs:attribute name="value" type="xs:double" use="optional" default="0"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestMix">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TestProfile" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Percentage">
+                    <xs:complexType>
+                      <xs:attribute name="hi" type="xs:int" use="optional" default="0"/>
+                      <xs:attribute name="lo" type="xs:int" use="optional" default="0"/>
+                      <xs:attribute name="mid" type="xs:int" use="optional" default="0"/>
+                      <xs:attribute name="flags" type="xs:int" use="optional" default="0"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="percentage"/>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="path" type="xs:string" use="required"/>
+                <xs:attribute name="type" type="xs:string" use="required"/>
+                <xs:attribute name="id" type="IDSimpleType" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BrowserMix">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="BrowserProfile" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Browser" type="BrowserType"/>
+                </xs:sequence>
+                <xs:attribute name="percentage" type="xs:int"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="NetworkMix">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="NetworkProfile" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Network" type="NetworkType"/>
+                </xs:sequence>
+                <xs:attribute name="percentage" type="xs:int"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="testMixType"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="allowedAgents" type="xs:string" use="optional" default=""/>
+    <xs:attribute name="ipSwitching" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="disableDuringWarmup" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="delayBetweenIterations" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="maxTestIterations" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="delayStartTime" type="xs:int" use="optional" default="0"/>
+    <xs:attribute name="percentNewUsers" type="xs:int" use="optional" default="100"/>
+  </xs:complexType>
+  <xs:complexType name="TestEntriesType">
+    <xs:sequence>
+      <xs:element name="TestEntry" type="TestEntryType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TestEntryType">
+    <xs:sequence>
+      <xs:element name="TcmInformation" type="TcmInformationType" minOccurs="0"/>
+      <xs:element name="TestEntries" type="TestEntriesType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="testId" type="IDSimpleType" use="required"/>
+    <xs:attribute name="executionId" type="IDSimpleType" use="required"/>
+    <xs:attribute name="parentExecutionId" type="IDSimpleType" use="optional" default="00000000-0000-0000-0000-000000000000"/>
+    <xs:attribute name="testListId" type="IDSimpleType" use="required"/>
+    <xs:attribute name="isTransparent" type="xs:boolean" use="optional" default="true"/>
+  </xs:complexType>
+  <xs:complexType name="TestLinksType">
+    <xs:sequence>
+      <xs:element name="TestLink" type="LinkType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="TestLists">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="TestList" type="TestListType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="TestListType">
+    <xs:sequence>
+      <xs:element name="Description" minOccurs="0"/>
+      <xs:element name="RunConfiguration" type="LinkType" minOccurs="0"/>
+      <xs:element name="TestLinks" type="TestLinksType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="IDSimpleType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="parentListId" type="IDSimpleType" use="optional" default="00000000-0000-0000-0000-000000000000"/>
+  </xs:complexType>
+  <xs:complexType name="TestResultAggregationType">
+    <xs:complexContent>
+      <xs:extension base="TestResultType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="Counters" type="CountersType" minOccurs="0"/>
+          <xs:element name="InnerResults" type="ResultsType" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TestResultType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Output" minOccurs="0" type="OutputType" />
+      <xs:element name="WorkItems" type="WorkItemIDsType" minOccurs="0" />
+      <xs:element name="Timers" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Timer" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="startTime" type="xs:string" use="required"/>
+                <xs:attribute name="duration" type="xs:int" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ResultFiles" minOccurs="0" type="ResultFilesType"/>
+      <xs:element name="FileUris" minOccurs="0" maxOccurs="1" type="FileUrisType"/>
+      <xs:element name="CollectorDataEntries" minOccurs="0" maxOccurs="1" type="CollectorDataEntriesType"/>
+      <xs:element name="DataCollectorMessages" minOccurs="0" maxOccurs="1" type="DataCollectorMessagesType" />
+      <xs:element name="TcmInformation" minOccurs="0" maxOccurs="1" type="TcmInformationType"/>
+    </xs:choice>
+    <xs:attribute name="testName" type="xs:string" use="required"/>
+    <xs:attribute name="testType" type="IDSimpleType" use="required"/>
+    <xs:attribute name="testId" type="IDSimpleType" use="required"/>
+    <xs:attribute name="executionId" type="IDSimpleType" use="optional"/>
+    <xs:attribute name="parentExecutionId" type="IDSimpleType" use="optional"/>
+    <xs:attribute name="testListId" type="IDSimpleType" use="required"/>
+    <xs:attribute name="outcome" type="xs:string" use="optional"/>
+    <xs:attribute name="computerName" type="xs:string" use="required"/>
+    <xs:attribute name="relativeResultsDirectory" type="xs:string" use="optional"/>
+    <xs:attribute name="startTime" type="xs:string" use="optional"/>
+    <xs:attribute name="endTime" type="xs:string" use="optional"/>
+    <xs:attribute name="duration" type="xs:string" use="optional"/>
+    <xs:attribute name="spoolMessage" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="processExitCode" type="xs:int" use="optional"/>
+    <xs:attribute name="isAborted" type="xs:boolean" use="optional"/>
+    <xs:attribute name="relativeTestOutputDirectory" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:element name="TestRunConfiguration" type="TestRunConfiguration"/>
+  <xs:complexType name="TestRunConfiguration">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="Description" minOccurs="0"/>
+      <xs:element name="CodeCoverage" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Regular" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="CodeCoverageItem" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence minOccurs="0">
+                        <xs:element name="KeyFile" minOccurs="0" maxOccurs="unbounded">
+                          <xs:complexType>
+                            <xs:attribute name="path" type="xs:string" use="required"/>
+                            <xs:attribute name="isPublicKey" type="xs:boolean" use="optional" default="false"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="binaryFile" type="xs:string" use="required"/>
+                      <xs:attribute name="pdbFile" type="xs:string" use="optional"/>
+                      <xs:attribute name="outputDirectory" type="xs:string" use="optional"/>
+                      <xs:attribute name="instrumentInPlace" type="xs:boolean" use="optional" default="false"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="AspNet" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="AspNetCodeCoverageItem" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:attribute name="id" type="IDSimpleType" use="required"/>
+                      <xs:attribute name="name" type="xs:string" use="required"/>
+                      <xs:attribute name="applicationRoot" type="xs:string" use="required"/>
+                      <xs:attribute name="url" type="xs:string" use="required"/>
+                      <xs:attribute name="isIIS" type="xs:boolean" use="optional"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
+          <xs:attribute name="perTest" type="xs:boolean" use="optional" default="false"/>
+          <xs:attribute name="instrumentInPlace" type="xs:boolean" use="optional" default="true"/>
+          <xs:attribute name="keyFile" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Timeouts" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="runTimeout" type="xs:int" use="optional" default="0"/>
+          <xs:attribute name="testTimeout" type="xs:int" use="optional" default="1800000"/>
+          <xs:attribute name="agentNotRespondingTimeout" type="xs:int" use="optional" default="300000"/>
+          <xs:attribute name="deploymentTimeout" type="xs:int" use="optional" default="300000"/>
+          <xs:attribute name="scriptTimeout" type="xs:int" use="optional" default="300000"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Remote" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Agent" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="RequiredProperties" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Property" minOccurs="0" maxOccurs="unbounded" type="NameValuePropertyType"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="controllerName" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Deployment" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="DeploymentItemsType">
+              <xs:attribute name="deploySatelliteAssemblies" type="xs:boolean" use="optional" default="false"/>
+              <xs:attribute name="ignoredDependentAssemblies" type="xs:string" use="optional"/>
+              <xs:attribute name="userDeploymentRoot" type="xs:string" use="optional"/>
+              <xs:attribute name="runDeploymentRoot" type="xs:string" use="optional"/>
+              <xs:attribute name="useDefaultDeploymentRoot" type="xs:boolean" use="optional" default="true"/>
+              <xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
+              <xs:attribute name="uploadDeploymentItems" type="xs:boolean" use="optional" default="false"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="NamingScheme" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="baseName" type="xs:string" use="optional"/>
+          <xs:attribute name="appendTimeStamp" type="xs:boolean" use="optional" default="true"/>
+          <xs:attribute name="useDefault" type="xs:boolean" use="optional" default="true"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Scripts" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="cleanupScript" type="xs:string" use="optional"/>
+          <xs:attribute name="setupScript" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Buckets" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="size" type="xs:int" use="optional" default="200"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ExecutionThread" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="apartmentState" use="optional" default="0"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Hosts" minOccurs="0">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="AspNet" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:sequence minOccurs="0">
+                  <xs:element name="DevelopmentServer" type="DevelopmentServerType" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" use="optional"/>
+                <xs:attribute name="urlToTest" type="xs:string" use="required"/>
+                <xs:attribute name="executionType" type="xs:string" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="DeviceHostRunConfigData" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+              </xs:annotation>
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="optional"/>
+                <xs:attribute name="deviceId" type="xs:string" use="optional"/>
+                <xs:attribute name="deviceName" type="xs:string" use="optional"/>
+                <xs:attribute name="platformId" type="xs:string" use="optional"/>
+                <xs:attribute name="platformName" type="xs:string" use="optional"/>
+                <xs:attribute name="uiPlatformId" type="xs:string" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:choice>
+          <xs:attribute name="type" type="xs:string" use="optional"/>
+          <xs:attribute name="skipUnhostableTests" type="xs:boolean" use="optional" default="true">
+            <xs:annotation>
+              <xs:documentation>New in Orcas</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestTypeSpecific" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="WebTestRunConfiguration" type="WebTestRunConfigurationType" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:element name="WebTestRunConfig" type="WebTestRunConfigurationType" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+                <xs:documentation>Deprecated. Use WebTestRunConfiguration instead.</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+            <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Plugins" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Plugin" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Constraints" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Agent" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Execution" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="parallelTestCount" type="xs:int" use="optional" default="1" />
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="id" type="IDSimpleType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="isExecutedRemotely" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="abortRunOnError" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="autoSaveResults" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="mapIPAddresses" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="traceExecutionSequence" type="xs:boolean" use="optional" default="false"/>
+  </xs:complexType>
+  <xs:element name="DataCollectorConfiguration" type="DataCollectorConfigurationSection" />
+  <xs:element name="NetworkEmulationProfile" type="NetworkEmulationProfileType"/>
+  <xs:element name="TestExecution" type="AssemblyResolutionSettingsType"/>
+  <xs:element name="TestRun" type="TestRunType"/>
+  <xs:element name="TestResultDetail" type="TestResultDetailType"/>
+  <xs:complexType name="TestResultDetailType">
+    <xs:sequence>
+      <xs:element name="TestDefinitions" minOccurs="0" type="TestDefinitionType"/>
+      <xs:element name="Result" type="ResultsType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="runId" type="IDSimpleType" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="TestRunType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:choice minOccurs="0">
+        <xs:element name="TestRunConfiguration" type="TestRunConfiguration" minOccurs="0"/>
+        <xs:element name="TestSettings" type="TestSettingsType" minOccurs="0"/>
+      </xs:choice>
+      <xs:element name="ResultSummary" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element name="Counters" type="CountersType" minOccurs="0"/>
+              <xs:element name="Output" type="TestRunOutputType" minOccurs="0"/>
+              <xs:element name="RunInfos" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="RunInfo" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Text" minOccurs="0"/>
+                          <xs:element name="Exception" minOccurs="0"/>
+                        </xs:sequence>
+                        <xs:attribute name="computerName" type="xs:string" use="required"/>
+                        <xs:attribute name="outcome" type="TestOutcome" use="required"/>
+                        <xs:attribute name="timestamp" type="xs:string" use="required"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+            <xs:element name="ResultFiles" minOccurs="0" type="ResultFilesType"/>
+            <xs:element name="FileUris" minOccurs="0" maxOccurs="1" type="FileUrisType"/>
+            <xs:element name="CollectorDataEntries" minOccurs="0" maxOccurs="1" type="CollectorDataEntriesType"/>
+            <xs:element name="DataCollectorMessages" minOccurs="0" maxOccurs="1" type="DataCollectorMessagesType" />
+          </xs:sequence>
+          <xs:attribute name="outcome" type="xs:string" use="required"/>
+          <xs:attribute name="isPartialRun" type="xs:boolean" use="optional" default="false"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Times" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="creation" type="xs:string" use="required"/>
+          <xs:attribute name="queuing" type="xs:string" use="optional"/>
+          <xs:attribute name="start" type="xs:string" use="optional"/>
+          <xs:attribute name="finish" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestDefinitions" minOccurs="0" type="TestDefinitionType"/>
+      <xs:element name="TestLists" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="TestList" type="TestListType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TestEntries" type="TestEntriesType" minOccurs="0"/>
+      <xs:element name="Results" type="ResultsType" minOccurs="0"/>
+      <xs:element name="UserData" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:any namespace="##any" processContents="lax"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Build" minOccurs="0">
+        <xs:complexType>
+          <xs:attribute name="flavor" type="xs:string" use="optional"/>
+          <xs:attribute name="platform" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="id" type="IDSimpleType" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="runUser" type="xs:string" use="optional"/>
+    <xs:attribute name="tcmPassId" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="TestDefinitionType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="UnitTest" type="UnitTestType"/>
+      <xs:element name="UnitTestElement" type="UnitTestType">
+        <xs:annotation>
+          <xs:documentation>// Deprecated. Use UnitTest instead</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="ManualTest" type="PlainTextManualTestType"/>
+      <xs:element name="WebTest" type="DeclarativeWebTestElementType"/>
+      <xs:element name="CodedWebTest" type="CodedWebTestElementType"/>
+      <xs:element name="OrderedTest" type="OrderedTestType"/>
+      <xs:element name="LoadTest" type="LoadTestType"/>
+      <xs:element name="GenericTest" type="GenericTestType"/>
+      <xs:any namespace="##other" processContents="lax"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="UnitTestType">
+    <xs:complexContent>
+      <xs:extension base="BaseTestType">
+        <xs:sequence>
+          <xs:element name="TestMethod">
+            <xs:complexType>
+              <xs:attribute name="codeBase" type="xs:string" use="required"/>
+              <xs:attribute name="className" type="xs:string" use="required"/>
+              <xs:attribute name="name" type="xs:string" use="required"/>
+              <xs:attribute name="isValid" type="xs:boolean" use="optional" default="false"/>
+              <xs:attribute name="adapterTypeName" type="xs:string" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="DataSource" minOccurs="0">
+            <xs:complexType>
+              <xs:attribute name="settingName" type="xs:string" use="optional"/>
+              <xs:attribute name="accessMethod" type="xs:string" use="optional"/>
+              <xs:attribute name="connectionString" type="xs:string" use="optional"/>
+              <xs:attribute name="providerInvariantName" type="xs:string" use="optional"/>
+              <xs:attribute name="tableName" type="xs:string" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="AspNet" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="DevelopmentServer" type="DevelopmentServerType" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+              <xs:attribute name="webSiteUrl" type="xs:string" use="optional"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="AspNetDevelopmentServers" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="DevelopmentServer" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Extension" minOccurs="0">
+            <xs:complexType mixed="true">
+              <xs:sequence minOccurs="0">
+                <xs:any namespace="##other" processContents="lax"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="UnitTestResultType">
+    <xs:complexContent>
+      <xs:extension base="TestResultAggregationType">
+        <xs:sequence>
+          <xs:element name="ExtensionResult" minOccurs="0">
+            <xs:complexType mixed="true">
+              <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:any namespace="##other" processContents="lax"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="resultType" type="xs:string" use="optional"/>
+        <xs:attribute name="dataRowInfo" type="xs:string" use="optional"/>
+        <xs:attribute name="hasSufficientAccess" type="xs:boolean" use="optional" default="true"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="UnitTestResultTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NotDataDriven"/>
+      <xs:enumeration value="DataDrivenTest"/>
+      <xs:enumeration value="DataDrivenDataRow"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ViewType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Graph"/>
+      <xs:enumeration value="Summary"/>
+      <xs:enumeration value="Table"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="WebDataType">
+    <xs:sequence>
+      <xs:element name="Headers" minOccurs="0">
+        <xs:complexType/>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="url" type="xs:string" use="optional"/>
+    <xs:attribute name="command" type="xs:string" use="optional"/>
+    <xs:attribute name="contentType" type="xs:string" use="optional"/>
+    <xs:attribute name="encodingName" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="WebRequestResultType">
+    <xs:sequence>
+      <xs:element name="Request">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Headers" minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="url"/>
+          <xs:attribute name="command"/>
+          <xs:attribute name="contentType"/>
+          <xs:attribute name="encoding"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Response">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Headers" minOccurs="0"/>
+          </xs:sequence>
+          <xs:attribute name="url"/>
+          <xs:attribute name="contentType"/>
+          <xs:attribute name="statusLine"/>
+          <xs:attribute name="pageTime"/>
+          <xs:attribute name="time"/>
+          <xs:attribute name="statusCodeString" type="xs:string" use="optional"/>
+          <xs:attribute name="contentLength" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Context" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Entry" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="value" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Errors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Error" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="StackTrace" minOccurs="0"/>
+                  <xs:element name="ExceptionText" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="type" type="WebTestErrorType" use="optional"/>
+                <xs:attribute name="subType" type="xs:string" use="optional"/>
+                <xs:attribute name="text" type="xs:string" use="required"/>
+                <xs:attribute name="stackTrace" type="xs:string" use="optional"/>
+                <xs:attribute name="exceptionText" type="xs:string" use="optional"/>
+                <xs:attribute name="time" type="xs:string" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="DependantResults" type="WebRequestResultsType" minOccurs="0"/>
+      <xs:element name="ValidationRuleResults" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ValidationRuleResult" type="RuleResultType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ExtractionRuleResults" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ExtractionRuleResult" type="RuleResultType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="redirectUrl" type="xs:string" use="optional"/>
+    <xs:attribute name="exceptionMessage" type="xs:string" use="optional"/>
+    <xs:attribute name="run" type="xs:int" use="optional"/>
+    <xs:attribute name="submitted" type="xs:boolean" use="optional"/>
+    <xs:attribute name="cached" type="xs:boolean" use="optional"/>
+    <xs:attribute name="isRedirectFollow" type="xs:boolean" use="optional"/>
+    <xs:attribute name="requestBodyBytesHandle" type="xs:int" use="optional"/>
+    <xs:attribute name="responseBytesHandle" type="xs:int" use="optional"/>
+    <xs:attribute name="resultsUrl" type="xs:string"/>
+    <xs:attribute name="httpStatus" type="xs:int" default="200"/>
+    <xs:attribute name="recordResult" type="xs:boolean" default="false"/>
+    <xs:attribute name="scenarioName" type="xs:string"/>
+    <xs:attribute name="testCaseName" type="xs:string"/>
+    <xs:attribute name="failedValidationRuleCount" type="xs:int"/>
+    <xs:attribute name="successfulExtractionRuleCount" type="xs:int"/>
+    <xs:attribute name="failedExtractionRuleCount" type="xs:int"/>
+    <xs:attribute name="requestPassedByCode" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="WebRequestResultsType">
+    <xs:sequence>
+      <xs:element name="WebRequestResult" type="WebRequestResultType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="WebTestErrorTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TestError"/>
+      <xs:enumeration value="Exception"/>
+      <xs:enumeration value="HttpError"/>
+      <xs:enumeration value="ValidationRuleError"/>
+      <xs:enumeration value="ExtractionRuleError"/>
+      <xs:enumeration value="Timeout"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="WebTestErrorType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TestError"/>
+      <xs:enumeration value="Exception"/>
+      <xs:enumeration value="HttpError"/>
+      <xs:enumeration value="ValidationRuleError"/>
+      <xs:enumeration value="ExtractionRuleError"/>
+      <xs:enumeration value="ConditionalRuleError"/>
+      <xs:enumeration value="Timeout"/>
+      <xs:enumeration value="DataCollectionError"/>
+      <xs:enumeration value="DataCollectionWarning"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="WebTestItemsType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="Request" type="WebTestRequestType" maxOccurs="unbounded"/>
+        <xs:element name="TransactionTimer">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Items" type="WebTestItemsType"/>
+            </xs:sequence>
+            <xs:attribute name="Name" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WebTestRunConfigurationType">
+    <xs:sequence>
+      <xs:element name="Browser" type="BrowserType" minOccurs="0"/>
+      <xs:element name="Network" type="NetworkType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="simulateThinkTimes" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="UseNewCookieDefaultPath" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="AutomaticallyDecompressResponse" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="stepping" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="runUntilDataExhausted" type="xs:boolean" use="optional" default="false"/>
+    <xs:attribute name="iterationCount" type="xs:int" use="optional" default="1"/>
+    <xs:attribute name="testTypeId" type="IDSimpleType" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="WebTestRequestType">
+    <xs:sequence>
+      <xs:element name="StringHttpBody" minOccurs="0">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="contentType" type="xs:string" use="required"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="DependentRequests" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Request" type="WebTestRequestType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Headers" type="HeadersType" minOccurs="0"/>
+      <xs:element name="ExtractionRules" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ExtractionRule" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="className" type="xs:string" use="required"/>
+                <xs:attribute name="variableName" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryStringParameters" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="QueryStringParameter" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="value" type="xs:string" use="required"/>
+                <xs:attribute name="useToGroupResults" type="xs:boolean" use="optional" default="false"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="FormPostHttpBody" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="FormPostParameter" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="value" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="FileUploadParameter">
+              <xs:complexType>
+                <xs:attribute name="name" type="xs:string" use="required"/>
+                <xs:attribute name="fileName" type="xs:string" use="required"/>
+                <xs:attribute name="contentType" type="xs:string" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Guid" type="xs:string" use="optional"/>
+    <xs:attribute name="method" type="xs:string" use="required"/>
+    <xs:attribute name="version" type="xs:decimal" use="optional"/>
+    <xs:attribute name="url" type="xs:string" use="required"/>
+    <xs:attribute name="thinkTime" type="xs:unsignedByte" use="optional"/>
+    <xs:attribute name="timeout" type="xs:unsignedByte" use="optional"/>
+    <xs:attribute name="parseLinks" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="followRedirects" type="xs:boolean" use="optional" default="true"/>
+    <xs:attribute name="cache" type="xs:boolean" use="optional" default="true"/>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultType">
+    <xs:complexContent>
+      <xs:extension base="TestResultType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="ByteArrayCache" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Entry" minOccurs="0" maxOccurs="unbounded">
+                  <xs:complexType>
+                    <xs:attribute name="handle" type="xs:int" use="required"/>
+                    <xs:attribute name="bytes" use="required"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="nextHandle" type="xs:int" use="optional" default="0"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:choice>
+            <xs:element name="TestRunConfiguration" type="TestRunConfiguration"/>
+            <xs:element name="TestSettings" type="TestSettingsType"/>
+          </xs:choice>
+          <xs:element name="WebRequestResults" type="WebRequestResultsType" minOccurs="0"/>
+          <xs:element name="WebTestResultDetails" type="WebTestResultDetailsType" minOccurs="0"/>
+          <xs:element name="WebTestResultFilePath" type="xs:string" minOccurs="0"/>
+          <xs:element name="WebTestRecordedResultFilePath" type="xs:string" minOccurs="0"/>
+        </xs:choice>
+        <xs:attribute name="dataRowCount" type="xs:unsignedInt" use="optional" default="0"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultDetailsType">
+    <xs:sequence>
+      <xs:element name="WebTestResultIterations" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="WebTestResultIteration" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="WebTestResultGroup" type="WebTestResultGroupType" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="iterationNumber" type="xs:int" use="required"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultCommentType">
+    <xs:attribute name="comment" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultGroupType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="WebTestResultComment" type="WebTestResultCommentType"/>
+      <xs:element name="WebTestResultTransaction" type="WebTestResultTransactionType"/>
+      <xs:element name="WebTestResultPage" type="WebTestResultPageType"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultTransactionType">
+    <xs:sequence>
+      <xs:element name="WebTestResultGroup" type="WebTestResultGroupType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="isIncludedTest" type="xs:boolean"/>
+    <xs:attribute name="responseTime"/>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultPageType">
+    <xs:sequence>
+      <xs:element name="WebRequestResult" type="WebRequestResultType"/>
+      <xs:element name="RedirectedPages" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RedirectedPage" type="WebTestResultRedirectedPageType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WebTestResultRedirectedPageType">
+    <xs:sequence>
+      <xs:element name="WebRequestResult" type="WebRequestResultType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WorkItemIDsType">
+    <xs:sequence>
+      <xs:element name="WorkItem" type="IDElementType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="TestMixType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Sequential"/>
+      <xs:enumeration value="PercentageOfTestsStarted"/>
+      <xs:enumeration value="PercentageOfUsersRunning"/>
+      <xs:enumeration value="UserPacing"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LoadTestResultStoreType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Database"/>
+      <xs:enumeration value="XmlResultFile"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LoadTestValidationLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Low"/>
+      <xs:enumeration value="Medium"/>
+      <xs:enumeration value="High"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LoadTestAgentConfiguration">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Default"/>
+      <xs:enumeration value="Trusted IP"/>
+      <xs:enumeration value="Private Cloud"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="AgentDiagnosticsTraceLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Error"/>
+      <xs:enumeration value="Warning"/>
+      <xs:enumeration value="Information"/>
+      <xs:enumeration value="Verbose"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="WebTestConnectionModel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ConnectionPerUser"/>
+      <xs:enumeration value="ConnectionPool"/>
+      <xs:enumeration value="ConnectionPerTestIteration" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="TestOutcome">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Error"/>
+      <xs:enumeration value="Failed"/>
+      <xs:enumeration value="Timeout"/>
+      <xs:enumeration value="Aborted"/>
+      <xs:enumeration value="Inconclusive"/>
+      <xs:enumeration value="PassedButRunAborted"/>
+      <xs:enumeration value="NotRunnable"/>
+      <xs:enumeration value="NotExecuted"/>
+      <xs:enumeration value="Disconnected"/>
+      <xs:enumeration value="Warning"/>
+      <xs:enumeration value="Passed"/>
+      <xs:enumeration value="Completed"/>
+      <xs:enumeration value="InProgress"/>
+      <xs:enumeration value="Pending"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="NetworkEmulationProfileType">
+    <xs:all>
+      <xs:element minOccurs="0" maxOccurs="1" name="Emulation">
+        <xs:complexType>
+          <xs:sequence minOccurs="0">
+            <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+    <xs:attribute name="bandwidthInKbps" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="AgentRuleType">
+    <xs:all>
+      <xs:element minOccurs="0" name="SelectionCriteria">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="AgentProperty" type="NameValuePropertyType"/>
+          </xs:sequence>
+          <xs:attribute name="selectAllAgents" type="xs:boolean"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="DataCollectors">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="DataCollector">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element minOccurs="0" maxOccurs="1" name="Configuration">
+                    <xs:complexType>
+                      <xs:sequence minOccurs="0">
+                        <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="uri" type="xs:anyURI" use="required" />
+                <xs:attribute name="friendlyName" type="xs:string" use="optional" />
+                <xs:attribute name="assemblyQualifiedName" type="xs:string" use="required" />
+                <xs:attribute name="enabled" type="xs:boolean" default="true" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="AgentRuleCollectionType">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="AgentRules">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="AgentRule" type="AgentRuleType" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="enabled" type="xs:boolean" default="true" />
+  </xs:complexType>
+  <xs:element name="TestSettings" type="TestSettingsType"/>
+  <xs:complexType name="TestSettingsType">
+    <xs:all>
+      <xs:element minOccurs="0" name="Description" />
+      <xs:element minOccurs="0" name="Deployment">
+        <xs:complexType>
+          <xs:complexContent mixed="false">
+            <xs:extension base="DeploymentItemsType">
+              <xs:attribute default="false" name="deploySatelliteAssemblies" type="xs:boolean" use="optional" />
+              <xs:attribute name="ignoredDependentAssemblies" type="xs:string" use="optional" />
+              <xs:attribute name="userDeploymentRoot" type="xs:string" use="optional" />
+              <xs:attribute name="runDeploymentRoot" type="xs:string" use="optional" />
+              <xs:attribute default="true" name="useDefaultDeploymentRoot" type="xs:boolean" use="optional" />
+              <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+              <xs:attribute name="uploadDeploymentItems" type="xs:boolean" use="optional" default="false"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Properties" type="PropertiesType" />
+      <xs:element minOccurs="0" name="NamingScheme">
+        <xs:complexType>
+          <xs:attribute name="baseName" type="xs:string" use="optional" />
+          <xs:attribute default="true" name="appendTimeStamp" type="xs:boolean" use="optional" />
+          <xs:attribute default="true" name="useDefault" type="xs:boolean" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Scripts">
+        <xs:complexType>
+          <xs:attribute name="cleanupScript" type="xs:string" use="optional" />
+          <xs:attribute name="setupScript" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Constraints">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Agent" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="RemoteController">
+        <xs:complexType>
+          <xs:attribute name="name" type="xs:string" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Execution">
+        <xs:complexType>
+          <xs:all>
+            <xs:element minOccurs="0" name="Buckets">
+              <xs:complexType>
+                <xs:attribute default="1000" name="threshold" type="xs:int" use="optional" />
+                <xs:attribute default="200" name="size" type="xs:int" use="optional" />
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="ExecutionThread">
+              <xs:complexType>
+                <xs:attribute default="0" name="apartmentState" use="optional" />
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="Hosts">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element minOccurs="0" name="AspNet">
+                    <xs:annotation>
+                      <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                      <xs:sequence minOccurs="0">
+                        <xs:element minOccurs="0" name="DevelopmentServer" type="DevelopmentServerType" />
+                      </xs:sequence>
+                      <xs:attribute name="name" type="xs:string" use="optional" />
+                      <xs:attribute name="urlToTest" type="xs:string" use="required" />
+                      <xs:attribute name="executionType" type="xs:string" use="optional" />
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element minOccurs="0" name="DeviceHostRunConfigData">
+                    <xs:annotation>
+                      <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                      <xs:attribute name="name" type="xs:string" use="optional" />
+                      <xs:attribute name="deviceId" type="xs:string" use="optional" />
+                      <xs:attribute name="deviceName" type="xs:string" use="optional" />
+                      <xs:attribute name="platformId" type="xs:string" use="optional" />
+                      <xs:attribute name="platformName" type="xs:string" use="optional" />
+                      <xs:attribute name="uiPlatformId" type="xs:string" use="optional" />
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:any minOccurs="0" maxOccurs="unbounded" namespace="##other" processContents="lax" />
+                </xs:choice>
+                <xs:attribute name="type" type="xs:string" use="optional" />
+                <xs:attribute default="true" name="skipUnhostableTests" type="xs:boolean" use="optional">
+                  <xs:annotation>
+                    <xs:documentation>New in Orcas</xs:documentation>
+                  </xs:annotation>
+                </xs:attribute>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="TestTypeSpecific">
+              <xs:complexType>
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                  <xs:element name="WebTestRunConfiguration" type="WebTestRunConfigurationType">
+                    <xs:annotation>
+                      <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+                    </xs:annotation>
+                  </xs:element>
+                  <xs:element name="WebTestRunConfig" type="WebTestRunConfigurationType">
+                    <xs:annotation>
+                      <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+                      <xs:documentation>Deprecated. Use WebTestRunConfiguration instead.</xs:documentation>
+                    </xs:annotation>
+                  </xs:element>
+                  <xs:element name="UnitTestRunConfig" type="AssemblyResolutionSettingsType" minOccurs="0">
+                    <xs:annotation>
+                      <xs:documentation>Only one instance is allowed but no check is done due to xsd limitations.</xs:documentation>
+                    </xs:annotation>
+                  </xs:element>
+                  <xs:any namespace="##other" processContents="lax" />
+                </xs:choice>
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="Timeouts">
+              <xs:complexType>
+                <xs:attribute default="0" name="runTimeout" type="xs:int" use="optional" />
+                <xs:attribute default="1800000" name="testTimeout" type="xs:int" use="optional" />
+                <xs:attribute default="300000" name="agentNotRespondingTimeout" type="xs:int" use="optional" />
+                <xs:attribute default="300000" name="deploymentTimeout" type="xs:int" use="optional" />
+                <xs:attribute default="300000" name="scriptTimeout" type="xs:int" use="optional" />
+              </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="AgentRule" type="AgentRuleType"/>
+          </xs:all>
+          <xs:attribute name="location" default="Local">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="Local" />
+                <xs:enumeration value="Remote" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="hostProcessPlatform" default="X86" type="HostProcessPlatformTypeEnum" />
+          <xs:attribute name="parallelTestCount" type="xs:int" use="optional" default="1" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="CollectionOnlyAgents" type="AgentRuleCollectionType"/>
+    </xs:all>
+    <xs:attribute name="id" type="IDSimpleType" use="required" />
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute default="false" name="abortRunOnError" type="xs:boolean" use="optional" />
+    <xs:attribute default="true" name="autoSaveResults" type="xs:boolean" use="optional" />
+    <xs:attribute default="false" name="mapIPAddresses" type="xs:boolean" use="optional" />
+    <xs:attribute default="false" name="traceExecutionSequence" type="xs:boolean" use="optional" />
+    <xs:attribute name="enableDefaultDataCollectors" type="xs:boolean" use="optional" default="false" />
+  </xs:complexType>
+  <xs:complexType name="NameValuePropertyType">
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="value" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="PropertiesType">
+    <xs:sequence>
+      <xs:element name="Property" type="NameValuePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiscoveryCache" type="DiscoveryCacheType"/>
+  <xs:complexType name="DiscoveryCacheType">
+    <xs:sequence>
+      <xs:element name="RemoteAgents" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Controller" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Agent" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:all>
+                        <xs:element name="DataCollectorInformation" type="DataCollectorInformationType" minOccurs="0"/>
+                        <xs:element name="AgentProperties" minOccurs="0">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element name="Property" type="NameValuePropertyType" minOccurs="0" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:all>
+                      <xs:attribute name="name" type="xs:string" use="required" />
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="name" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DataCollectorInformationType">
+    <xs:all>
+      <xs:element name="DataCollectors" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="DataCollector" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="FriendlyName"/>
+                  <xs:element name="Description" minOccurs="0"/>
+                  <xs:element name="DefaultConfiguration" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence minOccurs="0">
+                        <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="ConfigurationEditor" minOccurs="0">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="Configuration" minOccurs="0">
+                          <xs:complexType>
+                            <xs:sequence minOccurs="0">
+                              <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute name="typeUri" type="xs:anyURI" use="optional"/>
+                      <xs:attribute name="helpUri" type="xs:anyURI" use="optional"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:all>
+                <xs:attribute name="typeUri" type="xs:anyURI" use="required" />
+                <xs:attribute name="requiresOutOfProcessCollection" type="xs:boolean" use="optional" />
+                <xs:attribute name="assemblyQualifiedName" type="xs:string" use="required" />
+                <xs:attribute name="isEnabledByDefault" type="xs:boolean" use="optional" default="false" />
+                <xs:attribute name="enabledOnCollectionOnlyAgents" type="xs:boolean" use="optional" default="true" />
+                <xs:attribute name="supportedTestClients" type="xs:string" use="optional" />
+                <xs:attribute name="supportedLocations" type="xs:string" use="optional" />
+                <xs:attribute name="supportedAgentRoleTypes" type="xs:string" use="optional" />
+                <xs:attribute name="isEnabledByDefaultForTailoredApplications" type="xs:boolean" use="optional" default="false" />
+                <xs:attribute name="supportsTailoredApplications" type="xs:boolean" use="optional" default="false" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ConfigurationEditors" minOccurs="0" >
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ConfigurationEditor" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:attribute name="typeUri" type="xs:anyURI" use="required" />
+                <xs:attribute name="assemblyQualifiedName" type="xs:string" use="required" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="DataCollectorConfigurationSection">
+    <xs:sequence>
+      <xs:element name="DataCollector" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="DefaultConfiguration" minOccurs="0" maxOccurs="1">
+              <xs:complexType>
+                <xs:sequence minOccurs="0">
+                  <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="typeUri" type="xs:anyURI" use="required" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AssemblyResolutionSettingsType">
+    <xs:sequence>
+      <xs:element name="AssemblyResolution" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name ="TestDirectory" minOccurs="0">
+              <xs:complexType>
+                <xs:attribute name="useLoadContext" type="xs:boolean" use="required"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="RuntimeResolution" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Directory" type="RuntimeResolutionDirectoryType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="DiscoveryResolution" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Directory" type="ResolutionDirectoryType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="applicationBaseDirectory" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="testTypeId" type="IDSimpleType" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="ResolutionDirectoryType">
+    <xs:attribute name="path" type="xs:string" use="required"/>
+    <xs:attribute name="includeSubDirectories" type="xs:boolean" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="RuntimeResolutionDirectoryType">
+    <xs:complexContent>
+      <xs:extension base="ResolutionDirectoryType">
+        <xs:attribute name="useLoadContext" type="xs:boolean" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="Emulation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="VirtualChannel" minOccurs="1" maxOccurs="1" />
+        <xs:element ref="Timestamp" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Timestamp">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="VirtualChannel" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="value" type="xs:unsignedInt" use="required" />
+      <xs:attribute name="operation" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="Add" />
+            <xs:enumeration value="Modify" />
+            <xs:enumeration value="Delete" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="VirtualChannel">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="FilterList" />
+        <xs:element ref="VirtualLink" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:ID" use="optional" />
+      <xs:attribute name="DispatchType" use="optional">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="packet" />
+            <xs:enumeration value="connection" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FilterList">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="Filter" minOccurs="0" maxOccurs="unbounded" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Filter">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="IpVersion" minOccurs="0" />
+        <xs:element ref="Protocol" minOccurs="0" />
+        <xs:element name="PhysicalAddress" type="MacAddr" minOccurs="0" />
+        <xs:element name="Local" type="AddressType" minOccurs="0" />
+        <xs:element name="Remote" type="AddressType" minOccurs="0" />
+        <!--    <xs:element name="CardIndex" type="xs:unsignedShort" minOccurs="0" /> -->
+      </xs:all>
+      <xs:attribute name="name" type="xs:ID" use="optional" />
+      <!-- if not is 1, block packets which meet the condition -->
+      <xs:attribute name="not" type="xs:boolean" default="0" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IpVersion">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="IPv4" />
+        <xs:enumeration value="IPv6" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Protocol">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="ICMP" />
+        <xs:enumeration value="TCP" />
+        <xs:enumeration value="UDP" />
+        <xs:enumeration value="ECP" />
+        <xs:enumeration value="ICMPv6" />
+        <xs:enumeration value="HTTP" />
+        <xs:enumeration value="FTP" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="VirtualLink">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="LinkRule" maxOccurs="2" />
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:ID" use="optional" />
+      <xs:attribute name="instances" type="xs:unsignedShort" use="optional" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LinkRule">
+    <xs:complexType>
+      <xs:all>
+        <xs:element ref="Latency" minOccurs="0" />
+        <xs:element ref="Error" minOccurs="0" />
+        <xs:element ref="Loss" minOccurs="0" />
+        <xs:element ref="Bandwidth" minOccurs="0" />
+        <xs:element ref="BackgroundTraffic" minOccurs="0" />
+        <xs:element ref="Reorder" minOccurs="0" />
+        <xs:element ref="Disconnection" minOccurs="0" />
+      </xs:all>
+      <xs:attribute name="dir" use="required">
+        <!-- upstream & downstream -->
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="upstream" />
+            <xs:enumeration value="downstream" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Latency">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Fixed" type="FixedLatencyType" />
+        <xs:element name="Uniform" type="UniformLatencyType" />
+        <xs:element name="Normal" type="NormalLatencyType" />
+        <xs:element name="Linear" type="LinearLatencyType" />
+        <xs:element name="Burst" type="BurstLatencyType" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Error">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Random" type="RandomErrorType" />
+        <xs:element name="Statistical" type="StatisticalErrorType" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Bandwidth">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="Speed" type="SpeedType" />
+        <xs:element name="QueueManagement" minOccurs="0">
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="RedQueue" type="RedQueueType" />
+              <xs:element name="NormalQueue" type="NormalQueueType" />
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BackgroundTraffic">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Constant" type="ConstantTrafficType" />
+        <xs:element name="Exponential" type="ExponentialTrafficType" />
+        <xs:element name="Pareto" type="ParetoTrafficType" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Loss">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Periodic" type="PeriodicLossType" />
+        <xs:element name="Random" type="RandomLossType" />
+        <xs:element name="Burst" type="BurstLossType" />
+        <xs:element name="Statistical" type="StatisticalType" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Reorder">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Normal" type="NormalReorderType" />
+        <xs:element name="Empirical1" type="Empirical1Type" />
+        <xs:element name="Empirical2" type="Empirical2Type" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Disconnection">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="Periodic" type="PeriodicDisconnectionType" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <!-- Global type define -->
+  <xs:complexType name="PeriodicDisconnectionType">
+    <xs:sequence>
+      <xs:element name="Rate" type="PercentType" />
+      <xs:element name="ConnectionTime" type="SecType" />
+      <xs:element name="DisconnectionTime" type="SecType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Empirical1Type">
+    <xs:sequence>
+      <xs:element name="Rate" type="PercentType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Empirical2Type">
+    <xs:sequence>
+      <xs:element name="Rate" type="PercentType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NormalReorderType">
+    <xs:sequence>
+      <xs:element name="Rate" type="PercentType" />
+      <xs:element name="Deviation" type="xs:double" />
+      <xs:element name="MaxPacketLag" type="xs:unsignedShort" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FixedLatencyType">
+    <xs:sequence>
+      <xs:element name="Time" type="MsecType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="UniformLatencyType">
+    <xs:sequence>
+      <xs:element name="Min" type="MsecType" />
+      <xs:element name="Max" type="MsecType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="NormalLatencyType">
+    <xs:all>
+      <xs:element name="Average" type="MsecType" />
+      <xs:element name="Deviation" type="MsecType" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="LinearLatencyType">
+    <xs:complexContent>
+      <xs:extension base="UniformLatencyType">
+        <xs:sequence>
+          <xs:element name="Period" type="SecType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="BurstLatencyType">
+    <xs:all>
+      <xs:element name="Time" type="MsecType" />
+      <xs:element name="PeriodMin" type="SecType" />
+      <xs:element name="PeriodMax" type="SecType" />
+      <xs:element name="Probability" type="PercentType" />
+    </xs:all>
+  </xs:complexType>
+  <!-- Error type defination -->
+  <xs:complexType name="RandomErrorType">
+    <xs:all>
+      <xs:element name="ErrorUnit" type="ErrorUnitType" minOccurs="1" />
+      <xs:element name="Rate" type="PercentType" />
+    </xs:all>
+  </xs:complexType>
+  <!-- Queue type defination -->
+  <xs:complexType name="NormalQueueType">
+    <xs:all>
+      <xs:element name="QueueMode" type="UnitType" />
+      <xs:element name="Size" type="xs:positiveInteger" />
+      <xs:element ref="DropType" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="RedQueueType">
+    <xs:all>
+      <xs:element ref="DropType" />
+      <xs:element name="QueueMode" type="UnitType" />
+      <xs:element name="MinPacket" type="xs:positiveInteger" />
+      <xs:element name="MaxPacket" type="xs:positiveInteger" />
+      <xs:element name="PacketSize" type="xs:positiveInteger" />
+    </xs:all>
+  </xs:complexType>
+  <xs:element name="DropType">
+    <xs:simpleType>
+      <xs:restriction base="xs:token">
+        <xs:enumeration value="DropTail" />
+        <xs:enumeration value="DropHead" />
+        <xs:enumeration value="DropRandom" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <!-- Background traffic type defination -->
+  <xs:complexType name="ConstantTrafficType">
+    <xs:sequence>
+      <xs:element name="Rate" type="SpeedType" />
+      <xs:element name="PacketSize" type="SizeType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ExponentialTrafficType">
+    <xs:complexContent>
+      <xs:extension base="ConstantTrafficType">
+        <xs:sequence>
+          <xs:element name="BurstTime" type="SecType" />
+          <xs:element name="IdleTime" type="SecType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ParetoTrafficType">
+    <xs:complexContent>
+      <xs:extension base="ExponentialTrafficType">
+        <xs:sequence>
+          <xs:element name="Shape" type="xs:double" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="PeriodicLossType">
+    <xs:all>
+      <xs:element name="PerPackets" type="xs:positiveInteger" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="RandomLossType">
+    <xs:all>
+      <xs:element name="Rate" type="PercentType" />
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="BurstLossType">
+    <xs:all>
+      <xs:element name="Rate" type="PercentType" />
+      <xs:element name="MinPacket" type="xs:positiveInteger" />
+      <xs:element name="MaxPacket" type="xs:positiveInteger" />
+    </xs:all>
+  </xs:complexType>
+  <!-- Global type defination -->
+  <xs:complexType name="AddressType">
+    <xs:all>
+      <xs:element name="IpAddress" type="IpAddressType" />
+      <xs:element name="IpMask" type="IpAddressType" />
+      <xs:element name="PortBegin" type="xs:unsignedShort" />
+      <xs:element name="PortEnd" type="xs:unsignedShort" />
+    </xs:all>
+  </xs:complexType>
+  <xs:simpleType name="IpAddressType">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="(([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])" />
+      <xs:pattern value="([0-9a-fA-F]{1,4}:){7}([0-9a-fA-F]{1,4})" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="MacAddr">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="([0-9a-fA-F]{1,2}-){7}([0-9a-fA-F]{1,2})" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="StatisticalType">
+    <xs:sequence>
+      <xs:element name="Good" type="PercentType" />
+      <xs:element name="GoodToBad" type="PercentType" />
+      <xs:element name="Bad" type="PercentType" />
+      <xs:element name="BadToGood" type="PercentType" />
+      <xs:element name="SwitchTime" type="SecType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatisticalErrorType">
+    <xs:complexContent>
+      <xs:extension base="StatisticalType">
+        <xs:sequence>
+          <xs:element name="ErrorUnit" type="ErrorUnitType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SpeedType">
+    <xs:simpleContent>
+      <xs:extension base="xs:double">
+        <xs:attribute name="unit" use="required">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="kbps" />
+              <xs:enumeration value="mbps" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="SizeType">
+    <xs:simpleContent>
+      <xs:extension base="xs:positiveInteger">
+        <xs:attribute name="unit" default="byte">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="byte" />
+              <xs:enumeration value="kb" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="ErrorUnitType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="packet" />
+      <xs:enumeration value="bit" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UnitType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="byte" />
+      <xs:enumeration value="kb" />
+      <xs:enumeration value="packet" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="SecType">
+    <xs:simpleContent>
+      <xs:extension base="xs:positiveInteger">
+        <xs:attribute name="unit">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="sec" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="MsecType">
+    <xs:simpleContent>
+      <xs:extension base="xs:positiveInteger">
+        <xs:attribute name="unit">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="msec" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="PercentType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

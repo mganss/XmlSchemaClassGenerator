@@ -75,6 +75,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string IataPattern = @"xsd\iata\*.xsd";
         const string TimePattern = @"xsd\time\time.xsd";
         const string TableauPattern = @"xsd\ts-api\*.xsd";
+        const string VSTstPattern = @"xsd\vstst\vstst.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -166,6 +167,18 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("Tableau", TableauPattern, new Generator());
             TestSamples("Tableau", TableauPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestVSTst()
+        {
+            Compiler.Generate("VSTst", VSTstPattern, new Generator
+            {
+                TextValuePropertyName = "TextValue",
+                GenerateComplexTypesForCollections = true
+            });
+            TestSamples("VSTst", VSTstPattern);
         }
 
         private void TestSamples(string name, string pattern)
