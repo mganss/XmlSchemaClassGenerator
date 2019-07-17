@@ -73,10 +73,23 @@ namespace XmlSchemaClassGenerator
         /// Use XElement instead of XmlElement for Any nodes?
         /// </summary>
         public bool UseXElementForAny { get; set; }
+
+        private NamingScheme namingScheme;
+
         /// <summary>
         /// How are the names of the created properties changed?
         /// </summary>
-        public NamingScheme NamingScheme { get; set; }
+        public NamingScheme NamingScheme
+        {
+            get => namingScheme;
+
+            set
+            {
+                namingScheme = value;
+                NamingProvider = new NamingProvider(namingScheme);
+            }
+        }
+
         /// <summary>
         /// Emit the "Order" attribute value for XmlElementAttribute to ensure the correct order
         /// of the serialized XML elements.
