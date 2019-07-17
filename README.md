@@ -46,9 +46,9 @@ For command line use, choose your preferred installation:
 - CI Builds are available at the NuGet feed https://ci.appveyor.com/nuget/xmlschemaclassgenerator-0f1t3r6ti475
 
 ```
-Usage: XmlSchemaClassGenerator.Console [OPTIONS]+ xsdFile...
+Usage: dotnet xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 2.0.183.0
+Version 2.0.252.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -83,7 +83,10 @@ Options:
                                groups (default is enabled)
   -a, --pascal               use Pascal case for class and property names (
                                default is enabled)
-  -u, --enableUpaCheck       should XmlSchemaSet check for Unique Particle 
+      --av, --assemblyVisible
+                             use the internal visibility modifier (default is
+                               false)
+  -u, --enableUpaCheck       should XmlSchemaSet check for Unique Particle
                                Attribution (UPA) (default is enabled)
       --ct, --collectionType=VALUE
                              collection type to use (default is System.
@@ -106,6 +109,9 @@ Options:
       --nu, --noUnderscore   do not generate underscore in private member name (
                                default is false)
       --da, --description    generate DescriptionAttribute (default is true)
+      --cc, --complexTypesForCollections
+                             generate complex types for collections (default is
+                               true)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
