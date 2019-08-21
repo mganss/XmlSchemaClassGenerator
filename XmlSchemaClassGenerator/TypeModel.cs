@@ -1284,9 +1284,6 @@ namespace XmlSchemaClassGenerator
             else if(type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
             {
                 int numberChars = defaultString.Length;
-                if(numberChars % 2 == 1)
-                    throw new NotSupportedException(string.Format("Default value {0} is not a valid hexBinary value.", defaultString));
-
                 var byteValues = new CodePrimitiveExpression[numberChars / 2];
                 for (int i = 0; i < numberChars; i += 2)
                     byteValues[i / 2] = new CodePrimitiveExpression(Convert.ToByte(defaultString.Substring(i, 2), 16));
