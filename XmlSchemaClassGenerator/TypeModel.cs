@@ -1281,6 +1281,19 @@ namespace XmlSchemaClassGenerator
                 else
                     return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
             }
+            else if(type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
+            {
+                int numberChars = defaultString.Length;
+                var byteValues = new CodePrimitiveExpression[numberChars / 2];
+                for (int i = 0; i < numberChars; i += 2)
+                    byteValues[i / 2] = new CodePrimitiveExpression(Convert.ToByte(defaultString.Substring(i, 2), 16));
+
+                // For whatever reason, CodeDom will not generate a semicolon for the assignment statement if CodeArrayCreateExpression
+                //  is used alone. Casting the value to the same type to work around this issue.
+                var rv = new CodeCastExpression(typeof(byte[]), new CodeArrayCreateExpression(typeof(byte), byteValues));
+                return rv;
+
+            }
 
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
         }
