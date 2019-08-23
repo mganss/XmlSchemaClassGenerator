@@ -67,9 +67,9 @@ namespace XmlSchemaClassGenerator
         public string Text { get; set; }
         public static bool DisableComments { get; set; }
 
-        public static IEnumerable<CodeCommentStatement> GetComments(IEnumerable<DocumentationModel> docs)
+        public static IEnumerable<CodeCommentStatement> GetComments(IList<DocumentationModel> docs)
         {
-            if (DisableComments)
+            if (DisableComments || docs.Count == 0)
                 yield break;
 
             yield return new CodeCommentStatement("<summary>", true);
