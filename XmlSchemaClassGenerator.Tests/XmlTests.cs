@@ -567,8 +567,6 @@ namespace Test
     using System.Xml.Serialization;
 
 
-    /// <summary>
-    /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute(""Tests"", ""1.0.0.1"")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(""group-name"", Namespace="""")]
@@ -583,8 +581,6 @@ namespace Test
         [System.Xml.Serialization.XmlTextAttribute()]
         public string Value { get; set; }
 
-        /// <summary>
-        /// </summary>
         [System.Xml.Serialization.XmlAttributeAttribute(""justify"", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
         public SimpleType Justify { get; set; }
 
@@ -596,16 +592,12 @@ namespace Test
         public bool JustifySpecified { get; set; }
     }
 
-    /// <summary>
-    /// </summary>
     [System.CodeDom.Compiler.GeneratedCodeAttribute(""Tests"", ""1.0.0.1"")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(""simpleType"", Namespace="""")]
     public enum SimpleType
     {
 
-        /// <summary>
-        /// </summary>
         [System.Xml.Serialization.XmlEnumAttribute(""foo"")]
         Foo,
     }
