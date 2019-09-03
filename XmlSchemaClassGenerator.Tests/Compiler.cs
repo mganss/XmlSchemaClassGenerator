@@ -102,7 +102,8 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = generatorPrototype.MemberVisitor,
                 GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute,
                 CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
-                TextValuePropertyName = generatorPrototype.TextValuePropertyName
+                TextValuePropertyName = generatorPrototype.TextValuePropertyName,
+                EmitOrder = generatorPrototype.EmitOrder
             };
 
             gen.Generate(files);

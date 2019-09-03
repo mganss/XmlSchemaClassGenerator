@@ -1048,8 +1048,11 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
-                attributes.Add(new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayAttribute), Configuration.CodeTypeReferenceOptions),
-                    new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name))));
+                var arrayAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayAttribute), Configuration.CodeTypeReferenceOptions),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                if (Order != null)
+                    arrayAttribute.Arguments.Add(new CodeAttributeArgument("Order", new CodePrimitiveExpression(Order.Value)));
+                attributes.Add(arrayAttribute);
             }
 
             foreach (var attribute in attributes)

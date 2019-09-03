@@ -71,6 +71,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string WadlPattern = @"xsd\wadl\*.xsd";
         const string ListPattern = @"xsd\list\list.xsd";
         const string SimplePattern = @"xsd\simple\simple.xsd";
+        const string ArrayOrderPattern = @"xsd\array-order\array-order.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
         const string IataPattern = @"xsd\iata\*.xsd";
         const string TimePattern = @"xsd\time\time.xsd";
@@ -129,6 +130,18 @@ namespace XmlSchemaClassGenerator.Tests
                 CodeTypeReferenceOptions = CodeTypeReferenceOptions.GlobalReference
             });
             TestSamples("Simple", SimplePattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestArrayOrder()
+        {
+            Compiler.Generate("ArrayOrder", ArrayOrderPattern, new Generator
+            {
+                NamespacePrefix = "ArrayOrder",
+                EmitOrder = true
+            });
+            TestSamples("ArrayOrder", ArrayOrderPattern);
         }
 
         [Fact, TestPriority(1)]
