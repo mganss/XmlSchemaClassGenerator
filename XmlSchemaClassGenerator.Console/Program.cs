@@ -150,7 +150,15 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
-            generator.Generate(files);
+            try
+            {
+                generator.Generate(files);
+            }
+            catch (Exception e)
+            {
+                System.Console.Error.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
         }
 
         static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
