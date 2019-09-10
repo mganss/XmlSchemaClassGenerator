@@ -90,7 +90,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
             };
 
-            var files = options.Parse(args);
+            var globsAndUris = options.Parse(args);
 
             if (showHelp)
             {
@@ -98,7 +98,24 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 return;
             }
 
-            files = files.SelectMany(f => Glob.ExpandNames(f)).Concat(files.Where(f => Uri.IsWellFormedUriString(f, UriKind.Absolute))).ToList();
+            var uris = new List<string>();
+            foreach (var globOrUri in globsAndUris)
+            {
+                if (Uri.IsWellFormedUriString(globOrUri, UriKind.Absolute))
+                {
+                    uris.Add(globOrUri);
+                    continue;
+                }
+
+                var expandedGlob = Glob.ExpandNames(globOrUri).ToList();
+                if (expandedGlob.Count == 0)
+                {
+                    System.Console.WriteLine($"No files found for '{globOrUri}'");
+                    Environment.Exit(1);
+                }
+
+                uris.AddRange(expandedGlob);
+            }
 
             var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
@@ -150,7 +167,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
 
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
-            generator.Generate(files);
+            generator.Generate(uris);
         }
 
         static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
