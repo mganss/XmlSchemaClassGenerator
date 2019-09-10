@@ -110,7 +110,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 var expandedGlob = Glob.ExpandNames(globOrUri).ToList();
                 if (expandedGlob.Count == 0)
                 {
-                    System.Console.WriteLine($"No matches for glob {globOrUri}");
+                    System.Console.WriteLine($"No files found for '{globOrUri}'");
                     Environment.Exit(1);
                 }
 
