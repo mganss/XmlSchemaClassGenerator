@@ -648,7 +648,6 @@ namespace XmlSchemaClassGenerator
             get
             {
                 return IsNillable
-                    && !IsNullableValueType
                     && !(IsCollection || IsArray)
                     && ((PropertyType is EnumModel) || (PropertyType is SimpleModel && ((SimpleModel)PropertyType).ValueType.IsValueType));
             }
