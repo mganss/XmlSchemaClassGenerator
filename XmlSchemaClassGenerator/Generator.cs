@@ -47,6 +47,11 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.OutputFolder; }
             set { _configuration.OutputFolder = value; }
         }
+        public string AdditionalNotes
+        {
+            get { return _configuration.AdditionalNotes; }
+            set { _configuration.AdditionalNotes = value; }
+        }
 
         public Action<string> Log
         {

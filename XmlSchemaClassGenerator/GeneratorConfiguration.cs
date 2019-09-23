@@ -62,6 +62,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public string OutputFolder { get; set; }
         /// <summary>
+        /// Additional notes
+        /// </summary>
+        public string AdditionalNotes { get; set; }
+        /// <summary>
         /// Provides a way to redirect the log output
         /// </summary>
         public Action<string> Log { get; set; }

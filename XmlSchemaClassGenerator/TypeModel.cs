@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -77,6 +78,7 @@ namespace XmlSchemaClassGenerator
             foreach (var doc in docs.OrderBy(d => d.Language))
             {
                 var text = doc.Text;
+                Console.WriteLine(text);
                 var comment = string.Format(@"<para{0}>{1}</para>",
                     string.IsNullOrEmpty(doc.Language) ? "" : string.Format(@" xml:lang=""{0}""", doc.Language), CodeUtilities.NormalizeNewlines(text).Trim());
                 yield return new CodeCommentStatement(comment, true);
@@ -121,17 +123,36 @@ namespace XmlSchemaClassGenerator
         public List<DocumentationModel> Documentation { get; private set; }
         public bool IsAnonymous { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
-
+        Dictionary<string, string> AdditionalNotesDc;
         protected TypeModel(GeneratorConfiguration configuration)
         {
             Configuration = configuration;
             Documentation = new List<DocumentationModel>();
+            if (!string.IsNullOrEmpty(configuration.AdditionalNotes))
+            {
+                AdditionalNotesDc = new Dictionary<string, string>();
+                var txt = File.ReadAllText(configuration.AdditionalNotes);
+                var line = txt.Split('\n');
+                foreach (var l in line)
+                {
+                    var kv = l.Split('=');
+                    AdditionalNotesDc.Add(kv[0], kv[1]);
+                }
+            }
         }
+
 
         public virtual CodeTypeDeclaration Generate()
         {
             var typeDeclaration = new CodeTypeDeclaration { Name = Name };
-
+            if (Documentation.Count == 0 )
+            {
+            
+            }
+            if (Documentation.Count == 0 && AdditionalNotesDc != null && AdditionalNotesDc.ContainsKey(Name))
+            {
+                Documentation.Add(new DocumentationModel() { Language = "ext", Text = AdditionalNotesDc[Name] });
+            }
             typeDeclaration.Comments.AddRange(DocumentationModel.GetComments(Documentation).ToArray());
 
             DocumentationModel.AddDescription(typeDeclaration.CustomAttributes, Documentation, Configuration);
@@ -1283,7 +1304,7 @@ namespace XmlSchemaClassGenerator
                 else
                     return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
             }
-            else if(type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
+            else if (type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
             {
                 int numberChars = defaultString.Length;
                 var byteValues = new CodePrimitiveExpression[numberChars / 2];

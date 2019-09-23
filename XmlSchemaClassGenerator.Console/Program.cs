@@ -41,7 +41,7 @@ namespace XmlSchemaClassGenerator.Console
             var generateDescriptionAttribute = true;
             var enableUpaCheck = true;
             var generateComplexTypesForCollections = true;
-
+            var Additionalnotes = (string)null;
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
                 { "n|namespace=", @"map an XML namespace to a C# namespace
@@ -88,6 +88,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "nu|noUnderscore", "do not generate underscore in private member name (default is false)", v => doNotUseUnderscoreInPrivateMemberNames = v != null },
                 { "da|description", "generate DescriptionAttribute (default is true)", v => generateDescriptionAttribute = v != null },
                 { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
+                  { "an|additionalnotes=", "添加额外的注释的路径", v => Additionalnotes = v },
             };
 
             var globsAndUris = options.Parse(args);
@@ -95,6 +96,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             if (showHelp)
             {
                 ShowHelp(options);
+                System.Console.WriteLine("Press any Key to continute");
+                System.Console.ReadLine();
                 return;
             }
 
@@ -130,7 +133,10 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             {
                 outputFolder = Path.GetFullPath(outputFolder);
             }
-
+            if (!string.IsNullOrEmpty(Additionalnotes))
+            {
+                Additionalnotes = Path.GetFullPath(Additionalnotes);
+            }
             var generator = new Generator
             {
                 NamespaceProvider = namespaceMap,
@@ -142,7 +148,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
-                AssemblyVisible=assembly,
+                AssemblyVisible = assembly,
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
                 CodeTypeReferenceOptions = codeTypeReferenceOptions,
@@ -152,7 +158,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 GenerateDescriptionAttribute = generateDescriptionAttribute,
                 PrivateMemberPrefix = doNotUseUnderscoreInPrivateMemberNames ? "" : "_",
                 EnableUpaCheck = enableUpaCheck,
-                GenerateComplexTypesForCollections = generateComplexTypesForCollections
+                GenerateComplexTypesForCollections = generateComplexTypesForCollections,
+                AdditionalNotes = Additionalnotes
             };
 
             if (pclCompatible)
