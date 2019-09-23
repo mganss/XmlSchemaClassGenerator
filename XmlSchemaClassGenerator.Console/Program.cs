@@ -88,7 +88,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "nu|noUnderscore", "do not generate underscore in private member name (default is false)", v => doNotUseUnderscoreInPrivateMemberNames = v != null },
                 { "da|description", "generate DescriptionAttribute (default is true)", v => generateDescriptionAttribute = v != null },
                 { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
-                  { "an|additionalnotes=", "添加额外的注释的路径", v => Additionalnotes = v },
+                  { "an|additionalnotes=", "Additional notes filename,you can add more summary in class,the file is ini format,like propertyname=value ", v => Additionalnotes = v },
             };
 
             var globsAndUris = options.Parse(args);
