@@ -136,7 +136,11 @@ namespace XmlSchemaClassGenerator
                 foreach (var l in line)
                 {
                     var kv = l.Split('=');
-                    AdditionalNotesDc.Add(kv[0], kv[1]);
+                    if (kv.Length == 2)
+                    {
+                        AdditionalNotesDc.Add(kv[0], kv[1]);
+                    }
+
                 }
             }
         }
@@ -145,9 +149,9 @@ namespace XmlSchemaClassGenerator
         public virtual CodeTypeDeclaration Generate()
         {
             var typeDeclaration = new CodeTypeDeclaration { Name = Name };
-            if (Documentation.Count == 0 )
+            if (Documentation.Count == 0)
             {
-            
+
             }
             if (Documentation.Count == 0 && AdditionalNotesDc != null && AdditionalNotesDc.ContainsKey(Name))
             {
