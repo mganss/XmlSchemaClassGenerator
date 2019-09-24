@@ -301,4 +301,8 @@ If an explicit integer type mapping is specified via `--integer=TYPE`, that type
 Contributing
 ------------
 
-Pull requests are welcome :)
+Contrbutions are welcome. Here are some guidelines:
+
+- If it's not a trivial fix, please submit an issue first
+- Try and blend new code with the existing code's style
+- Add unit tests
