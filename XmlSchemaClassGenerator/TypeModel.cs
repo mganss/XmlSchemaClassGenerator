@@ -1025,7 +1025,8 @@ namespace XmlSchemaClassGenerator
                         {
                             var derivedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
                                 new CodeAttributeArgument(new CodePrimitiveExpression((derivedType.SubstitutionName ?? derivedType.XmlSchemaName).Name)),
-                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace))));
+                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace))),
+                                new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(derivedType.XmlSchemaName.Namespace)));
                             if (Order != null)
                             {
                                 derivedAttribute.Arguments.Add(new CodeAttributeArgument("Order",
@@ -1056,19 +1057,23 @@ namespace XmlSchemaClassGenerator
 
             foreach (var attribute in attributes)
             {
-                if (XmlNamespace != null)
+                bool namespacePrecalculated = attribute.Arguments.OfType<CodeAttributeArgument>().Any(a => a.Name == "Namespace");
+                if (!namespacePrecalculated)
                 {
-                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
-                }
-                else if (Form == XmlSchemaForm.Qualified)
-                {
-                    attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
-                }
-                else if (!IsAny)
-                {
-                    attribute.Arguments.Add(new CodeAttributeArgument("Form",
-                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm), Configuration.CodeTypeReferenceOptions)),
-                            "Unqualified")));
+                    if (XmlNamespace != null)
+                    {
+                        attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
+                    }
+                    else if (Form == XmlSchemaForm.Qualified)
+                    {
+                        attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
+                    }
+                    else if (!IsAny)
+                    {
+                        attribute.Arguments.Add(new CodeAttributeArgument("Form",
+                            new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm), Configuration.CodeTypeReferenceOptions)),
+                                "Unqualified")));
+                    }
                 }
 
                 if (IsNillable)

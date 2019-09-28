@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using System.Xml.XPath;
 using Ganss.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.Xml.XMLGen;
@@ -77,6 +78,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string TimePattern = @"xsd\time\time.xsd";
         const string TableauPattern = @"xsd\ts-api\*.xsd";
         const string VSTstPattern = @"xsd\vstst\vstst.xsd";
+        const string BpmnPattern = @"xsd\bpmn\*.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -366,6 +368,62 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestBpmn()
+        {
+            var assembly = Compiler.Generate("Bpmn", BpmnPattern, new Generator
+            {
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateNullables = true,
+                MemberVisitor = (member, model) => { }
+            });
+            Assert.NotNull(assembly);
+
+            var type = assembly.GetTypes().SingleOrDefault(t => t.Name == "TDefinitions");
+            Assert.NotNull(type);
+
+            var serializer = new XmlSerializer(type);
+            serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
+            var unknownNodeError = false;
+            var unknownAttrError = false;
+
+            void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
+            {
+                unknownNodeError = true;
+            }
+
+            void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
+            {
+                unknownAttrError = true;
+            }
+
+            var xml = ReadXml("bpmnSimple");
+            var reader = XmlReader.Create(new StringReader(xml));
+
+            var isDeserializable = serializer.CanDeserialize(reader);
+            Assert.True(isDeserializable);
+
+            var deserializedObject = serializer.Deserialize(reader);
+            Assert.False(unknownNodeError);
+            Assert.False(unknownAttrError);
+
+            var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xml));
+            File.WriteAllText("file.xml", serializedXml);
+
+            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+            AssertEx.Equal(deserializedObject, deserializedXml);
+        }
+
+        private IDictionary<string, string> GetNamespacesFromSource(string source)
+        {
+            XPathDocument doc = new XPathDocument(new StringReader(source));
+            XPathNavigator namespaceNavigator = doc.CreateNavigator();
+            namespaceNavigator.MoveToFollowing(XPathNodeType.Element);
+            return namespaceNavigator.GetNamespacesInScope(XmlNamespaceScope.All);
+        }
+
         [Fact, TestPriority(3)]
         public void CanSerializeAndDeserializeAllExampleXmlFiles()
         {
@@ -397,11 +455,21 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        string Serialize(XmlSerializer serializer, object o)
+        string Serialize(XmlSerializer serializer, object o, IDictionary<string, string> prefixToNsMap = null)
         {
             var sw = new StringWriter();
             var ns = new XmlSerializerNamespaces();
-            ns.Add("", null);
+            if (prefixToNsMap == null)
+            {
+                ns.Add("", null);
+            }
+            else
+            {
+                foreach (var ptns in prefixToNsMap)
+                {
+                    ns.Add(ptns.Key, ptns.Value);
+                }
+            }
             serializer.Serialize(sw, o, ns);
             var serializedXml = sw.ToString();
             return serializedXml;
