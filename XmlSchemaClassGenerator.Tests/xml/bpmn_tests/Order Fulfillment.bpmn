@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<semantic:definitions xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:trisobpmn="http://www.trisotech.com/2014/triso/bpmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:trisofeed="http://trisotech.com/feed" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:rss="http://purl.org/rss/2.0/" xmlns="http://www.trisotech.com/definitions/_1363713347778" id="_1363713347778"         exporter="BPMN Modeler" exporterVersion="5.0.22" trisobpmn:logoChoice="Default" name="Order Fulfillment" targetNamespace="http://www.trisotech.com/definitions/_1363713347778" expressionLanguage="http://www.w3.org/1999/XPath" typeLanguage="http://www.w3.org/2001/XMLSchema">
+    <semantic:process isExecutable="false" id="WFP-6-" name="Order Fulfillment" triso:defaultName="true">
+        <semantic:laneSet>
+            <semantic:lane id="LaneOrderProcess" name="Order Process">
+                <semantic:childLaneSet>
+                    <semantic:lane id="LaneWarehouse" name="Warehouse">
+                        <semantic:flowNodeRef>GatewayOutofStock</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>EndEventOrderFailed</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>EndEventOrderCancelled</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>TaskShipOrder</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>SPPackageOrder</semantic:flowNodeRef>
+                    </semantic:lane>
+                    <semantic:lane id="LaneFinance" name="Finance">
+                        <semantic:flowNodeRef>SPCheckCredit</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>TaskSendInvoice</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>EndEventOrderRejectedBadCredit</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>EndEventOrderCompleted</semantic:flowNodeRef>
+                    </semantic:lane>
+                    <semantic:lane id="LaneSales" name="Sales">
+                        <semantic:flowNodeRef>SPTakerOrder</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>EndEventUpdateOrder</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>TaskUpdateAccountInformation</semantic:flowNodeRef>
+                        <semantic:flowNodeRef>StartEvent</semantic:flowNodeRef>
+                    </semantic:lane>
+                </semantic:childLaneSet>
+            </semantic:lane>
+        </semantic:laneSet>
+        <semantic:exclusiveGateway id="GatewayOutofStock" name="Out of Stock?" gatewayDirection="Unspecified">
+            <semantic:incoming>_BBE1FFCD-3AB5-4B8B-92B7-8398A3283619</semantic:incoming>
+            <semantic:outgoing>_C8517C23-699D-4F73-83EB-CC60A7441211</semantic:outgoing>
+            <semantic:outgoing>_625F3B99-9EB1-41C8-8AB9-5BF59A6834D0</semantic:outgoing>
+        </semantic:exclusiveGateway>
+        <semantic:sequenceFlow id="_BBE1FFCD-3AB5-4B8B-92B7-8398A3283619" triso:userConstraints="false" sourceRef="SPPackageOrder" targetRef="GatewayOutofStock"/>
+        <semantic:sequenceFlow id="_625F3B99-9EB1-41C8-8AB9-5BF59A6834D0" name="Yes" sourceRef="GatewayOutofStock" targetRef="EndEventOrderFailed"/>
+        <semantic:sequenceFlow id="_C8517C23-699D-4F73-83EB-CC60A7441211" name="No" triso:userConstraints="true" sourceRef="GatewayOutofStock" targetRef="TaskShipOrder"/>
+        <semantic:endEvent id="EndEventOrderFailed" name="Order Failed">
+            <semantic:incoming>_625F3B99-9EB1-41C8-8AB9-5BF59A6834D0</semantic:incoming>
+        </semantic:endEvent>
+        <semantic:endEvent id="EndEventOrderCancelled" name="Order Cancelled">
+            <semantic:incoming>_27E1698F-EE0D-4842-8B52-FAED109B775E</semantic:incoming>
+            <semantic:messageEventDefinition/>
+        </semantic:endEvent>
+        <semantic:sequenceFlow id="_27E1698F-EE0D-4842-8B52-FAED109B775E" sourceRef="ErrorAttachedToPackageOrder" targetRef="EndEventOrderCancelled"/>
+        <semantic:userTask id="TaskShipOrder" name="Ship Order" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+            <semantic:incoming>_C8517C23-699D-4F73-83EB-CC60A7441211</semantic:incoming>
+            <semantic:outgoing>_2E679974-8C50-452E-9384-04C1CF17C3F2</semantic:outgoing>
+        </semantic:userTask>
+        <semantic:sequenceFlow id="_2E679974-8C50-452E-9384-04C1CF17C3F2" sourceRef="TaskShipOrder" targetRef="TaskSendInvoice"/>
+        <semantic:subProcess id="SPPackageOrder" name="Package Order" startQuantity="1" completionQuantity="1" isForCompensation="false" triggeredByEvent="false">
+            <semantic:incoming>_B49625F6-8E8D-4627-B1A0-C1C68E8D9AA9</semantic:incoming>
+            <semantic:outgoing>_BBE1FFCD-3AB5-4B8B-92B7-8398A3283619</semantic:outgoing>
+            <semantic:startEvent id="StartEventPackageOrder">
+                <semantic:outgoing>_B69111B7-6300-4D47-A51E-82ABB6A18E66</semantic:outgoing>
+            </semantic:startEvent>
+            <semantic:userTask id="TaskCheckStock" name="Check Stock" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                <semantic:incoming>_B69111B7-6300-4D47-A51E-82ABB6A18E66</semantic:incoming>
+                <semantic:outgoing>_90F26CDC-1B0A-4B5F-8CD1-9E72EF50C101</semantic:outgoing>
+            </semantic:userTask>
+            <semantic:exclusiveGateway id="GatewayInStock" name="In Stock ?" gatewayDirection="Unspecified">
+                <semantic:incoming>_90F26CDC-1B0A-4B5F-8CD1-9E72EF50C101</semantic:incoming>
+                <semantic:outgoing>_0ED5D5F4-29F2-4117-A438-4E0BDB64EB6C</semantic:outgoing>
+                <semantic:outgoing>_9E07F2B9-888E-4DBB-9D82-61BB482DCDE5</semantic:outgoing>
+            </semantic:exclusiveGateway>
+            <semantic:userTask id="TaskPickStock" name="Pick Stock" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                <semantic:incoming>_0ED5D5F4-29F2-4117-A438-4E0BDB64EB6C</semantic:incoming>
+                <semantic:outgoing>_2CEF8F2E-4BAA-409D-AE1D-696BE5E5BF5B</semantic:outgoing>
+            </semantic:userTask>
+            <semantic:endEvent id="EndEventPackageOrder">
+                <semantic:incoming>_9E07F2B9-888E-4DBB-9D82-61BB482DCDE5</semantic:incoming>
+                <semantic:incoming>_2CEF8F2E-4BAA-409D-AE1D-696BE5E5BF5B</semantic:incoming>
+            </semantic:endEvent>
+            <semantic:subProcess id="_6F994960-5012-4020-8481-D838426A7856" startQuantity="1" completionQuantity="1" isForCompensation="false" triggeredByEvent="true">
+                <semantic:startEvent id="StartEventUpdateOrder" name="Update Order" isInterrupting="false">
+                    <semantic:outgoing>_5EAF3266-58A5-4017-8B7F-EFA11F3CE8F6</semantic:outgoing>
+                    <semantic:messageEventDefinition/>
+                </semantic:startEvent>
+                <semantic:userTask id="TaskEvaluateChange" name="Evaluate Change" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                    <semantic:incoming>_5EAF3266-58A5-4017-8B7F-EFA11F3CE8F6</semantic:incoming>
+                    <semantic:outgoing>_55093CF6-D10C-46C3-9F7B-DC67ADA7FD49</semantic:outgoing>
+                </semantic:userTask>
+                <semantic:exclusiveGateway id="_FE9B5977-F69F-4397-BE8F-8472106416D5" name="OK?" gatewayDirection="Unspecified">
+                    <semantic:incoming>_55093CF6-D10C-46C3-9F7B-DC67ADA7FD49</semantic:incoming>
+                    <semantic:outgoing>_A5B1D7E5-E8CF-40A6-B697-F47BD736B303</semantic:outgoing>
+                    <semantic:outgoing>_23C923D4-043E-4CA4-8F2A-8A4AB0D0D040</semantic:outgoing>
+                </semantic:exclusiveGateway>
+                <semantic:userTask id="TaskExecuteChange" name="Execute Change" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                    <semantic:incoming>_A5B1D7E5-E8CF-40A6-B697-F47BD736B303</semantic:incoming>
+                    <semantic:outgoing>_1D33E806-67DC-46F7-AE3E-9AD79C90CA26</semantic:outgoing>
+                </semantic:userTask>
+                <semantic:endEvent id="EndEventEventSP">
+                    <semantic:incoming>_1D33E806-67DC-46F7-AE3E-9AD79C90CA26</semantic:incoming>
+                </semantic:endEvent>
+                <semantic:endEvent id="EndEventEventSPError">
+                    <semantic:incoming>_23C923D4-043E-4CA4-8F2A-8A4AB0D0D040</semantic:incoming>
+                    <semantic:errorEventDefinition/>
+                </semantic:endEvent>
+            </semantic:subProcess>
+            <semantic:sequenceFlow id="_B69111B7-6300-4D47-A51E-82ABB6A18E66" sourceRef="StartEventPackageOrder" targetRef="TaskCheckStock"/>
+            <semantic:sequenceFlow id="_0ED5D5F4-29F2-4117-A438-4E0BDB64EB6C" name="Yes" sourceRef="GatewayInStock" targetRef="TaskPickStock"/>
+            <semantic:sequenceFlow id="_55093CF6-D10C-46C3-9F7B-DC67ADA7FD49" sourceRef="TaskEvaluateChange" targetRef="_FE9B5977-F69F-4397-BE8F-8472106416D5"/>
+            <semantic:sequenceFlow id="_9E07F2B9-888E-4DBB-9D82-61BB482DCDE5" name="No" triso:userConstraints="true" sourceRef="GatewayInStock" targetRef="EndEventPackageOrder"/>
+            <semantic:sequenceFlow id="_2CEF8F2E-4BAA-409D-AE1D-696BE5E5BF5B" sourceRef="TaskPickStock" targetRef="EndEventPackageOrder"/>
+            <semantic:sequenceFlow id="_90F26CDC-1B0A-4B5F-8CD1-9E72EF50C101" sourceRef="TaskCheckStock" targetRef="GatewayInStock"/>
+            <semantic:sequenceFlow id="_23C923D4-043E-4CA4-8F2A-8A4AB0D0D040" name="No" triso:userConstraints="true" sourceRef="_FE9B5977-F69F-4397-BE8F-8472106416D5" targetRef="EndEventEventSPError"/>
+            <semantic:sequenceFlow id="_1D33E806-67DC-46F7-AE3E-9AD79C90CA26" sourceRef="TaskExecuteChange" targetRef="EndEventEventSP"/>
+            <semantic:sequenceFlow id="_A5B1D7E5-E8CF-40A6-B697-F47BD736B303" name="Yes" sourceRef="_FE9B5977-F69F-4397-BE8F-8472106416D5" targetRef="TaskExecuteChange"/>
+            <semantic:sequenceFlow id="_5EAF3266-58A5-4017-8B7F-EFA11F3CE8F6" sourceRef="StartEventUpdateOrder" targetRef="TaskEvaluateChange"/>
+        </semantic:subProcess>
+        <semantic:sequenceFlow id="_B49625F6-8E8D-4627-B1A0-C1C68E8D9AA9" sourceRef="SPCheckCredit" targetRef="SPPackageOrder"/>
+        <semantic:boundaryEvent id="ErrorAttachedToPackageOrder" attachedToRef="SPPackageOrder">
+            <semantic:outgoing>_27E1698F-EE0D-4842-8B52-FAED109B775E</semantic:outgoing>
+            <semantic:errorEventDefinition/>
+        </semantic:boundaryEvent>
+        <semantic:subProcess id="SPCheckCredit" name="Check Credit" startQuantity="1" completionQuantity="1" isForCompensation="false" triggeredByEvent="false">
+            <semantic:incoming>_93C0E056-3E6E-40EE-A90A-9803B9B454A2</semantic:incoming>
+            <semantic:outgoing>_B49625F6-8E8D-4627-B1A0-C1C68E8D9AA9</semantic:outgoing>
+            <semantic:startEvent id="StartEventCheckCredit">
+                <semantic:outgoing>_0911E1A2-3C51-4051-B8C7-55D7AA786B96</semantic:outgoing>
+            </semantic:startEvent>
+            <semantic:userTask id="TaskGetCreditScore" name="Get Credit Score" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                <semantic:incoming>_0911E1A2-3C51-4051-B8C7-55D7AA786B96</semantic:incoming>
+                <semantic:outgoing>_2BDD5532-A099-4369-8E4A-B745239D478B</semantic:outgoing>
+            </semantic:userTask>
+            <semantic:exclusiveGateway id="Gateway1" gatewayDirection="Unspecified">
+                <semantic:incoming>_2BDD5532-A099-4369-8E4A-B745239D478B</semantic:incoming>
+                <semantic:outgoing>_AC5BA344-F3AB-4DF1-92AD-BD7CC33DAC24</semantic:outgoing>
+                <semantic:outgoing>_3E9F21C1-F1F9-4B13-B679-25949AAF7EE0</semantic:outgoing>
+                <semantic:outgoing>_5AE6A635-6FD6-412B-A4B4-2DA1FFD490A3</semantic:outgoing>
+            </semantic:exclusiveGateway>
+            <semantic:userTask id="TaskReviewCreditFile" name="Review Credit File" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                <semantic:incoming>_AC5BA344-F3AB-4DF1-92AD-BD7CC33DAC24</semantic:incoming>
+                <semantic:outgoing>_B1586B1B-549F-4CAB-A1CA-B6863A4B8579</semantic:outgoing>
+            </semantic:userTask>
+            <semantic:exclusiveGateway id="GatewayApproved" name="Approved?" gatewayDirection="Unspecified">
+                <semantic:incoming>_B1586B1B-549F-4CAB-A1CA-B6863A4B8579</semantic:incoming>
+                <semantic:outgoing>_B2818876-2B34-46CB-A3BC-F0670B2C74C1</semantic:outgoing>
+                <semantic:outgoing>_D3EC4728-8300-44EA-873E-8BDE6DB505BF</semantic:outgoing>
+            </semantic:exclusiveGateway>
+            <semantic:endEvent id="EndEventYes">
+                <semantic:incoming>_5AE6A635-6FD6-412B-A4B4-2DA1FFD490A3</semantic:incoming>
+                <semantic:incoming>_B2818876-2B34-46CB-A3BC-F0670B2C74C1</semantic:incoming>
+            </semantic:endEvent>
+            <semantic:endEvent id="EndEvent2">
+                <semantic:incoming>_D3EC4728-8300-44EA-873E-8BDE6DB505BF</semantic:incoming>
+                <semantic:incoming>_3E9F21C1-F1F9-4B13-B679-25949AAF7EE0</semantic:incoming>
+            </semantic:endEvent>
+            <semantic:sequenceFlow id="_AC5BA344-F3AB-4DF1-92AD-BD7CC33DAC24" name="Medium" sourceRef="Gateway1" targetRef="TaskReviewCreditFile"/>
+            <semantic:sequenceFlow id="_5AE6A635-6FD6-412B-A4B4-2DA1FFD490A3" name="High" triso:userConstraints="true" sourceRef="Gateway1" targetRef="EndEventYes"/>
+            <semantic:sequenceFlow id="_B1586B1B-549F-4CAB-A1CA-B6863A4B8579" sourceRef="TaskReviewCreditFile" targetRef="GatewayApproved"/>
+            <semantic:sequenceFlow id="_B2818876-2B34-46CB-A3BC-F0670B2C74C1" name="Yes" sourceRef="GatewayApproved" targetRef="EndEventYes"/>
+            <semantic:sequenceFlow id="_0911E1A2-3C51-4051-B8C7-55D7AA786B96" sourceRef="StartEventCheckCredit" targetRef="TaskGetCreditScore"/>
+            <semantic:sequenceFlow id="_D3EC4728-8300-44EA-873E-8BDE6DB505BF" name="No" sourceRef="GatewayApproved" targetRef="EndEvent2"/>
+            <semantic:sequenceFlow id="_2BDD5532-A099-4369-8E4A-B745239D478B" sourceRef="TaskGetCreditScore" targetRef="Gateway1"/>
+            <semantic:sequenceFlow id="_3E9F21C1-F1F9-4B13-B679-25949AAF7EE0" name="Low" triso:userConstraints="true" sourceRef="Gateway1" targetRef="EndEvent2"/>
+        </semantic:subProcess>
+        <semantic:sequenceFlow id="_93C0E056-3E6E-40EE-A90A-9803B9B454A2" sourceRef="SPTakerOrder" targetRef="SPCheckCredit"/>
+        <semantic:boundaryEvent id="ErrorAttachedToCheckCredit" attachedToRef="SPCheckCredit">
+            <semantic:outgoing>_D682431B-25C4-4DA3-A63D-08E5677B18AC</semantic:outgoing>
+            <semantic:errorEventDefinition/>
+        </semantic:boundaryEvent>
+        <semantic:sequenceFlow id="_D682431B-25C4-4DA3-A63D-08E5677B18AC" sourceRef="ErrorAttachedToCheckCredit" targetRef="EndEventOrderRejectedBadCredit"/>
+        <semantic:userTask id="TaskSendInvoice" name="Send Invoice" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+            <semantic:incoming>_2E679974-8C50-452E-9384-04C1CF17C3F2</semantic:incoming>
+            <semantic:outgoing>_893DC160-DAE1-469F-A068-16C5E90F836A</semantic:outgoing>
+        </semantic:userTask>
+        <semantic:sequenceFlow id="_893DC160-DAE1-469F-A068-16C5E90F836A" sourceRef="TaskSendInvoice" targetRef="EndEventOrderCompleted"/>
+        <semantic:endEvent id="EndEventOrderRejectedBadCredit" name="Order Rejected – Bad Credit">
+            <semantic:incoming>_D682431B-25C4-4DA3-A63D-08E5677B18AC</semantic:incoming>
+            <semantic:messageEventDefinition/>
+        </semantic:endEvent>
+        <semantic:endEvent id="EndEventOrderCompleted" name="Order Completed">
+            <semantic:incoming>_893DC160-DAE1-469F-A068-16C5E90F836A</semantic:incoming>
+        </semantic:endEvent>
+        <semantic:subProcess id="SPTakerOrder" name="Taker Order" startQuantity="1" completionQuantity="1" isForCompensation="false" triggeredByEvent="false">
+            <semantic:incoming>_5DB1CB2F-B1ED-49A3-92E4-B65B063B0740</semantic:incoming>
+            <semantic:outgoing>_93C0E056-3E6E-40EE-A90A-9803B9B454A2</semantic:outgoing>
+            <semantic:startEvent id="StartEventTakeOrder">
+                <semantic:outgoing>_DEFBB966-B8EB-47F4-8C90-7F1AB376680A</semantic:outgoing>
+            </semantic:startEvent>
+            <semantic:userTask id="TaskEnterItemDetails" name="Enter Item Details" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                <semantic:incoming>_DEFBB966-B8EB-47F4-8C90-7F1AB376680A</semantic:incoming>
+                <semantic:outgoing>_70D529F6-B6BC-4264-A1DB-0373EDE85DBB</semantic:outgoing>
+            </semantic:userTask>
+            <semantic:userTask id="TaskEnterBillingDetails" name="Enter Billing Details" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+                <semantic:incoming>_70D529F6-B6BC-4264-A1DB-0373EDE85DBB</semantic:incoming>
+                <semantic:outgoing>_02CF55E4-E055-410B-B1FF-138775C1357B</semantic:outgoing>
+            </semantic:userTask>
+            <semantic:exclusiveGateway id="GatewayCustomerServiceIssues" name="Customer Service Issues" gatewayDirection="Unspecified">
+                <semantic:incoming>_02CF55E4-E055-410B-B1FF-138775C1357B</semantic:incoming>
+                <semantic:outgoing>_EB7A025B-A42A-4F69-BB16-B4272321366A</semantic:outgoing>
+                <semantic:outgoing>_C17B24FC-06D3-4471-A459-BE03C109580E</semantic:outgoing>
+            </semantic:exclusiveGateway>
+            <semantic:endEvent id="EndEventTakeOrder">
+                <semantic:incoming>_C17B24FC-06D3-4471-A459-BE03C109580E</semantic:incoming>
+            </semantic:endEvent>
+            <semantic:endEvent id="EndEventTakeOrderEscalation">
+                <semantic:incoming>_EB7A025B-A42A-4F69-BB16-B4272321366A</semantic:incoming>
+                <semantic:escalationEventDefinition/>
+            </semantic:endEvent>
+            <semantic:sequenceFlow id="_C17B24FC-06D3-4471-A459-BE03C109580E" name="No" triso:userConstraints="true" sourceRef="GatewayCustomerServiceIssues" targetRef="EndEventTakeOrder"/>
+            <semantic:sequenceFlow id="_70D529F6-B6BC-4264-A1DB-0373EDE85DBB" sourceRef="TaskEnterItemDetails" targetRef="TaskEnterBillingDetails"/>
+            <semantic:sequenceFlow id="_02CF55E4-E055-410B-B1FF-138775C1357B" sourceRef="TaskEnterBillingDetails" targetRef="GatewayCustomerServiceIssues"/>
+            <semantic:sequenceFlow id="_EB7A025B-A42A-4F69-BB16-B4272321366A" name="Yes" sourceRef="GatewayCustomerServiceIssues" targetRef="EndEventTakeOrderEscalation"/>
+            <semantic:sequenceFlow id="_DEFBB966-B8EB-47F4-8C90-7F1AB376680A" sourceRef="StartEventTakeOrder" targetRef="TaskEnterItemDetails"/>
+        </semantic:subProcess>
+        <semantic:sequenceFlow id="_5DB1CB2F-B1ED-49A3-92E4-B65B063B0740" sourceRef="StartEvent" targetRef="SPTakerOrder"/>
+        <semantic:boundaryEvent id="_edd83543-340b-4e10-9467-f304d9a7729e" attachedToRef="SPTakerOrder" cancelActivity="true">
+            <semantic:outgoing>_c2eec32f-9593-40c5-bcf9-abc7f2729917</semantic:outgoing>
+            <semantic:escalationEventDefinition/>
+        </semantic:boundaryEvent>
+        <semantic:sequenceFlow id="_c2eec32f-9593-40c5-bcf9-abc7f2729917" sourceRef="_edd83543-340b-4e10-9467-f304d9a7729e" targetRef="TaskUpdateAccountInformation"/>
+        <semantic:endEvent id="EndEventUpdateOrder">
+            <semantic:incoming>_5E8E0717-F5E7-421B-8A60-142ED2354301</semantic:incoming>
+        </semantic:endEvent>
+        <semantic:sequenceFlow id="_5E8E0717-F5E7-421B-8A60-142ED2354301" sourceRef="TaskUpdateAccountInformation" targetRef="EndEventUpdateOrder"/>
+        <semantic:userTask id="TaskUpdateAccountInformation" name="Update Account Information" startQuantity="1" completionQuantity="1" isForCompensation="false" implementation="##WebService">
+            <semantic:incoming>_c2eec32f-9593-40c5-bcf9-abc7f2729917</semantic:incoming>
+            <semantic:outgoing>_5E8E0717-F5E7-421B-8A60-142ED2354301</semantic:outgoing>
+        </semantic:userTask>
+        <semantic:startEvent id="StartEvent">
+            <semantic:outgoing>_5DB1CB2F-B1ED-49A3-92E4-B65B063B0740</semantic:outgoing>
+        </semantic:startEvent>
+    </semantic:process>
+    <bpmndi:BPMNDiagram id="_6" name="Order Fulfillment" documentation="">
+        <bpmndi:BPMNPlane bpmnElement="WFP-6-" id="_6_plane" trisobpmn:diagramWidth="1152" trisobpmn:diagramHeight="945">
+            <di:extension/>
+            <bpmndi:BPMNShape id="S1401821447992_LaneOrderProcess" bpmnElement="LaneOrderProcess" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="50" y="126.15151454944805" width="1052" height="784"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="1052" width="12" x="55" y="-7.848485450551948"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821447993_LaneWarehouse" bpmnElement="LaneWarehouse" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="80" y="687.151514549448" width="1022" height="223"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="1022" width="12" x="85" y="287.65151454944805"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448033_GatewayOutofStock" bpmnElement="GatewayOutofStock" isMarkerVisible="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="707" y="780.151514549448" width="42" height="42"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="64" x="696.2153901886061" y="829.2605110221127"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448041__BBE1FFCD-3AB5-4B8B-92B7-8398A3283619" bpmnElement="_BBE1FFCD-3AB5-4B8B-92B7-8398A3283619" color:border-color="#000000">
+                <di:waypoint x="646.9004201898077" y="801.651514549448"/>
+                <di:waypoint x="719.2839069032841" y="800.369769225235"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448045__625F3B99-9EB1-41C8-8AB9-5BF59A6834D0" bpmnElement="_625F3B99-9EB1-41C8-8AB9-5BF59A6834D0" color:border-color="#000000">
+                <di:waypoint x="750" y="802.151514549448"/>
+                <di:waypoint x="905" y="801.151514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="17.015625" x="818.9921875" y="806.651514549448"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448048__C8517C23-699D-4F73-83EB-CC60A7441211" bpmnElement="_C8517C23-699D-4F73-83EB-CC60A7441211" color:border-color="#000000" triso:userconstraints="true">
+                <di:waypoint x="729" y="781.151514549448"/>
+                <di:waypoint x="728.9587481652279" y="741.151514549448"/>
+                <di:waypoint x="780" y="742.151514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6">
+                    <dc:Bounds height="12" width="14" x="720" y="731.151514549448"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448034_EndEventOrderFailed" bpmnElement="EndEventOrderFailed" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="905" y="785.151514549448" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="60" x="891" y="826.040403438337"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448035_EndEventOrderCancelled" bpmnElement="EndEventOrderCancelled" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="941" y="845.151514549448" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="78" x="918" y="886.040403438337"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448043__27E1698F-EE0D-4842-8B52-FAED109B775E" bpmnElement="_27E1698F-EE0D-4842-8B52-FAED109B775E" color:border-color="#000000">
+                <di:waypoint x="637.5846189865465" y="849.4628225307778"/>
+                <di:waypoint x="637.5846189865465" y="861.151514549448"/>
+                <di:waypoint x="941" y="861.151514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448036_TaskShipOrder" bpmnElement="TaskShipOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="779" y="707.151514549448" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="779" y="735.151514549448"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448047__2E679974-8C50-452E-9384-04C1CF17C3F2" bpmnElement="_2E679974-8C50-452E-9384-04C1CF17C3F2" color:border-color="#000000">
+                <di:waypoint x="822" y="708.151514549448"/>
+                <di:waypoint x="822" y="536.151514549448"/>
+                <di:waypoint x="876" y="536.151514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448019_SPPackageOrder" bpmnElement="SPPackageOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="571" y="764.651514549448" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="571" y="792.651514549448"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448040__B49625F6-8E8D-4627-B1A0-C1C68E8D9AA9" bpmnElement="_B49625F6-8E8D-4627-B1A0-C1C68E8D9AA9" color:border-color="#000000">
+                <di:waypoint x="521" y="476.15151454944805"/>
+                <di:waypoint x="613" y="476.15151454944805"/>
+                <di:waypoint x="613" y="765.651514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448032_ErrorAttachedToPackageOrder" bpmnElement="ErrorAttachedToPackageOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="621.5846189865465" y="817.4628225307778" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821447994_LaneFinance" bpmnElement="LaneFinance" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="80" y="429.15151454944805" width="1022" height="258"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="1022" width="12" x="85" y="47.15151454944805"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821447996_SPCheckCredit" bpmnElement="SPCheckCredit" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="437" y="441.15151454944805" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="437" y="469.15151454944805"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448049__93C0E056-3E6E-40EE-A90A-9803B9B454A2" bpmnElement="_93C0E056-3E6E-40EE-A90A-9803B9B454A2" color:border-color="#000000">
+                <di:waypoint x="273" y="259.15151454944805"/>
+                <di:waypoint x="480" y="259.15151454944805"/>
+                <di:waypoint x="480" y="442.15151454944805"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448004_ErrorAttachedToCheckCredit" bpmnElement="ErrorAttachedToCheckCredit" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="488.6" y="493.95151454944806" width="32" height="32.00000000000006"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448044__D682431B-25C4-4DA3-A63D-08E5677B18AC" bpmnElement="_D682431B-25C4-4DA3-A63D-08E5677B18AC" color:border-color="#000000">
+                <di:waypoint x="504.6" y="525.9515145494481"/>
+                <di:waypoint x="504" y="541.151514549448"/>
+                <di:waypoint x="555" y="541.151514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448005_TaskSendInvoice" bpmnElement="TaskSendInvoice" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="875" y="501.15151454944805" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="875" y="529.151514549448"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448042__893DC160-DAE1-469F-A068-16C5E90F836A" bpmnElement="_893DC160-DAE1-469F-A068-16C5E90F836A" color:border-color="#000000">
+                <di:waypoint x="959" y="536.151514549448"/>
+                <di:waypoint x="976" y="535.151514549448"/>
+                <di:waypoint x="995" y="535.151514549448"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448006_EndEventOrderRejectedBadCredit" bpmnElement="EndEventOrderRejectedBadCredit" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="555" y="525.151514549448" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="104" x="519" y="566.040403438337"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448007_EndEventOrderCompleted" bpmnElement="EndEventOrderCompleted" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="995" y="519.151514549448" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="969.5" y="560.040403438337"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821447995_LaneSales" bpmnElement="LaneSales" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="80" y="126.15151454944805" width="1022" height="303"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="1022" width="12" x="85" y="-233.34848545055195"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448008_SPTakerOrder" bpmnElement="SPTakerOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="189" y="224.15151454944805" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="189" y="252.15151454944805"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448038__5DB1CB2F-B1ED-49A3-92E4-B65B063B0740" bpmnElement="_5DB1CB2F-B1ED-49A3-92E4-B65B063B0740" color:border-color="#000000">
+                <di:waypoint x="134" y="258.15151454944805"/>
+                <di:waypoint x="153" y="258.15151454944805"/>
+                <di:waypoint x="190" y="259.15151454944805"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448015__edd83543-340b-4e10-9467-f304d9a7729e" bpmnElement="_edd83543-340b-4e10-9467-f304d9a7729e" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="239.58461898654645" y="276.9628225307778" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448039__c2eec32f-9593-40c5-bcf9-abc7f2729917" bpmnElement="_c2eec32f-9593-40c5-bcf9-abc7f2729917" color:border-color="#000000">
+                <di:waypoint x="256.58461898654645" y="308.9628225307778"/>
+                <di:waypoint x="256" y="359.15151454944805"/>
+                <di:waypoint x="292" y="360.15151454944805"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448016_EndEventUpdateOrder" bpmnElement="EndEventUpdateOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="414" y="343.15151454944805" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448046__5E8E0717-F5E7-421B-8A60-142ED2354301" bpmnElement="_5E8E0717-F5E7-421B-8A60-142ED2354301" color:border-color="#000000">
+                <di:waypoint x="375" y="359.15151454944805"/>
+                <di:waypoint x="393" y="359.15151454944805"/>
+                <di:waypoint x="414" y="359.15151454944805"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821448017_TaskUpdateAccountInformation" bpmnElement="TaskUpdateAccountInformation" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="291" y="325.15151454944805" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="83" x="291" y="346.15151454944805"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448018_StartEvent" bpmnElement="StartEvent" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="104" y="243.15151454944805" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+        </bpmndi:BPMNPlane>
+        <bpmndi:BPMNLabelStyle id="LS_6">
+            <dc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="8"/>
+        </bpmndi:BPMNLabelStyle>
+    </bpmndi:BPMNDiagram>
+    <bpmndi:BPMNDiagram id="_9" name="Taker Order" documentation="">
+        <bpmndi:BPMNPlane bpmnElement="SPTakerOrder">
+            <di:extension/>
+            <bpmndi:BPMNShape id="S1401821448009_StartEventTakeOrder" bpmnElement="StartEventTakeOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="50" y="282" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448010_TaskEnterItemDetails" bpmnElement="TaskEnterItemDetails" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="129" y="263" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="83" x="129" y="284"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448011_TaskEnterBillingDetails" bpmnElement="TaskEnterBillingDetails" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="269" y="263" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="83" x="269" y="284"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448012_GatewayCustomerServiceIssues" bpmnElement="GatewayCustomerServiceIssues" isMarkerVisible="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="407" y="276" width="42" height="42"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="85" x="385.71539018860614" y="325.10899647266467"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448013_EndEventTakeOrder" bpmnElement="EndEventTakeOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="539" y="208" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448014_EndEventTakeOrderEscalation" bpmnElement="EndEventTakeOrderEscalation" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="539" y="281" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448050__C17B24FC-06D3-4471-A459-BE03C109580E" bpmnElement="_C17B24FC-06D3-4471-A459-BE03C109580E" color:border-color="#000000" triso:userconstraints="true">
+                <di:waypoint x="429" y="277"/>
+                <di:waypoint x="428" y="224"/>
+                <di:waypoint x="539" y="224"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9">
+                    <dc:Bounds height="12" width="14" x="487" y="210"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448051__70D529F6-B6BC-4264-A1DB-0373EDE85DBB" bpmnElement="_70D529F6-B6BC-4264-A1DB-0373EDE85DBB" color:border-color="#000000">
+                <di:waypoint x="213" y="298"/>
+                <di:waypoint x="270" y="298"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448052__02CF55E4-E055-410B-B1FF-138775C1357B" bpmnElement="_02CF55E4-E055-410B-B1FF-138775C1357B" color:border-color="#000000">
+                <di:waypoint x="353" y="297"/>
+                <di:waypoint x="371" y="297"/>
+                <di:waypoint x="408" y="298"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448053__EB7A025B-A42A-4F69-BB16-B4272321366A" bpmnElement="_EB7A025B-A42A-4F69-BB16-B4272321366A" color:border-color="#000000">
+                <di:waypoint x="450" y="298"/>
+                <di:waypoint x="539" y="297"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="17.015625" x="485.9921875" y="302.5"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448054__DEFBB966-B8EB-47F4-8C90-7F1AB376680A" bpmnElement="_DEFBB966-B8EB-47F4-8C90-7F1AB376680A" color:border-color="#000000">
+                <di:waypoint x="80" y="297"/>
+                <di:waypoint x="99" y="297"/>
+                <di:waypoint x="130" y="298"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_9"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+        <bpmndi:BPMNLabelStyle id="LS_9">
+            <dc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="8"/>
+        </bpmndi:BPMNLabelStyle>
+    </bpmndi:BPMNDiagram>
+    <bpmndi:BPMNDiagram id="_0" name="Check Credit" documentation="">
+        <bpmndi:BPMNPlane bpmnElement="SPCheckCredit">
+            <di:extension/>
+            <bpmndi:BPMNShape id="S1401821447997_StartEventCheckCredit" bpmnElement="StartEventCheckCredit" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="50" y="333" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821447998_TaskGetCreditScore" bpmnElement="TaskGetCreditScore" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="146" y="314" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="146" y="342"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821447999_Gateway1" bpmnElement="Gateway1" isMarkerVisible="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="290" y="327" width="42" height="42"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448000_TaskReviewCreditFile" bpmnElement="TaskReviewCreditFile" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="429" y="314" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="83" x="429" y="335"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448001_GatewayApproved" bpmnElement="GatewayApproved" isMarkerVisible="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="590" y="327" width="42" height="42"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0">
+                    <dc:Bounds height="12" width="52" x="638.2153901886061" y="341.10899647266467"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448002_EndEventYes" bpmnElement="EndEventYes" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="688" y="244" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448003_EndEvent2" bpmnElement="EndEvent2" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="688" y="396" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448055__AC5BA344-F3AB-4DF1-92AD-BD7CC33DAC24" bpmnElement="_AC5BA344-F3AB-4DF1-92AD-BD7CC33DAC24" color:border-color="#000000">
+                <di:waypoint x="333" y="349"/>
+                <di:waypoint x="350" y="348"/>
+                <di:waypoint x="430" y="349"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="38" x="331" y="353"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448056__5AE6A635-6FD6-412B-A4B4-2DA1FFD490A3" bpmnElement="_5AE6A635-6FD6-412B-A4B4-2DA1FFD490A3" color:border-color="#000000" triso:userconstraints="true">
+                <di:waypoint x="312" y="328"/>
+                <di:waypoint x="311" y="260"/>
+                <di:waypoint x="688" y="260"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0">
+                    <dc:Bounds height="12" width="22" x="311" y="247"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448057__B1586B1B-549F-4CAB-A1CA-B6863A4B8579" bpmnElement="_B1586B1B-549F-4CAB-A1CA-B6863A4B8579" color:border-color="#000000">
+                <di:waypoint x="513" y="349"/>
+                <di:waypoint x="530" y="348"/>
+                <di:waypoint x="591" y="349"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448058__B2818876-2B34-46CB-A3BC-F0670B2C74C1" bpmnElement="_B2818876-2B34-46CB-A3BC-F0670B2C74C1" color:border-color="#000000">
+                <di:waypoint x="612" y="328"/>
+                <di:waypoint x="611" y="309"/>
+                <di:waypoint x="704" y="309"/>
+                <di:waypoint x="704" y="276"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="17.015625" x="648.9921875" y="314"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448059__0911E1A2-3C51-4051-B8C7-55D7AA786B96" bpmnElement="_0911E1A2-3C51-4051-B8C7-55D7AA786B96" color:border-color="#000000">
+                <di:waypoint x="80" y="348"/>
+                <di:waypoint x="98" y="348"/>
+                <di:waypoint x="147" y="349"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448060__D3EC4728-8300-44EA-873E-8BDE6DB505BF" bpmnElement="_D3EC4728-8300-44EA-873E-8BDE6DB505BF" color:border-color="#000000">
+                <di:waypoint x="612" y="370"/>
+                <di:waypoint x="611" y="378"/>
+                <di:waypoint x="704" y="378"/>
+                <di:waypoint x="704" y="396"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="14" x="650.5" y="383"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448061__2BDD5532-A099-4369-8E4A-B745239D478B" bpmnElement="_2BDD5532-A099-4369-8E4A-B745239D478B" color:border-color="#000000">
+                <di:waypoint x="230" y="348"/>
+                <di:waypoint x="248" y="348"/>
+                <di:waypoint x="291" y="349"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448062__3E9F21C1-F1F9-4B13-B679-25949AAF7EE0" bpmnElement="_3E9F21C1-F1F9-4B13-B679-25949AAF7EE0" color:border-color="#000000" triso:userconstraints="true">
+                <di:waypoint x="312" y="370"/>
+                <di:waypoint x="311" y="424"/>
+                <di:waypoint x="692" y="423"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_0">
+                    <dc:Bounds height="12" width="20" x="312" y="429"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+        <bpmndi:BPMNLabelStyle id="LS_0">
+            <dc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="8"/>
+        </bpmndi:BPMNLabelStyle>
+    </bpmndi:BPMNDiagram>
+    <bpmndi:BPMNDiagram id="_1" name="Package Order" documentation="">
+        <bpmndi:BPMNPlane bpmnElement="SPPackageOrder">
+            <di:extension/>
+            <bpmndi:BPMNShape id="S1401821448020_StartEventPackageOrder" bpmnElement="StartEventPackageOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="83" y="240" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448021_TaskCheckStock" bpmnElement="TaskCheckStock" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="200" y="221" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="200" y="249"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448022_GatewayInStock" bpmnElement="GatewayInStock" isMarkerVisible="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="356" y="234" width="42" height="42"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1">
+                    <dc:Bounds height="12" width="47" x="384.71539018860614" y="228.10899647266467"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448023_TaskPickStock" bpmnElement="TaskPickStock" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="458" y="221" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="458" y="249"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448024_EndEventPackageOrder" bpmnElement="EndEventPackageOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="622" y="239" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448025__6F994960-5012-4020-8481-D838426A7856" bpmnElement="_6F994960-5012-4020-8481-D838426A7856" isExpanded="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="50" y="372" width="630" height="180"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448026_StartEventUpdateOrder" bpmnElement="StartEventUpdateOrder" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="83" y="417" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="66" x="65" y="456.375"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448027_TaskEvaluateChange" bpmnElement="TaskEvaluateChange" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="200" y="398" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="200" y="426"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448028__FE9B5977-F69F-4397-BE8F-8472106416D5" bpmnElement="_FE9B5977-F69F-4397-BE8F-8472106416D5" isMarkerVisible="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="356" y="411" width="42" height="42"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1">
+                    <dc:Bounds height="12" width="21" x="366.71539018860614" y="395.10899647266467"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448029_TaskExecuteChange" bpmnElement="TaskExecuteChange" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="458" y="398" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="458" y="426"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448030_EndEventEventSP" bpmnElement="EndEventEventSP" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="622" y="416" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821448031_EndEventEventSPError" bpmnElement="EndEventEventSPError" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="622" y="504" width="32" height="32"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821448063__B69111B7-6300-4D47-A51E-82ABB6A18E66" bpmnElement="_B69111B7-6300-4D47-A51E-82ABB6A18E66" color:border-color="#000000">
+                <di:waypoint x="113" y="255"/>
+                <di:waypoint x="131" y="255"/>
+                <di:waypoint x="201" y="256"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448064__0ED5D5F4-29F2-4117-A438-4E0BDB64EB6C" bpmnElement="_0ED5D5F4-29F2-4117-A438-4E0BDB64EB6C" color:border-color="#000000">
+                <di:waypoint x="399" y="256"/>
+                <di:waypoint x="416" y="255"/>
+                <di:waypoint x="459" y="256"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="17.015625" x="407.4921875" y="260"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448065__55093CF6-D10C-46C3-9F7B-DC67ADA7FD49" bpmnElement="_55093CF6-D10C-46C3-9F7B-DC67ADA7FD49" color:border-color="#000000">
+                <di:waypoint x="284" y="432"/>
+                <di:waypoint x="302" y="432"/>
+                <di:waypoint x="357" y="433"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448066__9E07F2B9-888E-4DBB-9D82-61BB482DCDE5" bpmnElement="_9E07F2B9-888E-4DBB-9D82-61BB482DCDE5" color:border-color="#000000" triso:userconstraints="true">
+                <di:waypoint x="378" y="235"/>
+                <di:waypoint x="377" y="208"/>
+                <di:waypoint x="638" y="208"/>
+                <di:waypoint x="638" y="239"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1">
+                    <dc:Bounds height="12" width="14" x="558.5" y="195"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448067__2CEF8F2E-4BAA-409D-AE1D-696BE5E5BF5B" bpmnElement="_2CEF8F2E-4BAA-409D-AE1D-696BE5E5BF5B" color:border-color="#000000">
+                <di:waypoint x="542" y="256"/>
+                <di:waypoint x="559" y="255"/>
+                <di:waypoint x="622" y="255"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448068__90F26CDC-1B0A-4B5F-8CD1-9E72EF50C101" bpmnElement="_90F26CDC-1B0A-4B5F-8CD1-9E72EF50C101" color:border-color="#000000">
+                <di:waypoint x="284" y="255"/>
+                <di:waypoint x="302" y="255"/>
+                <di:waypoint x="357" y="256"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448069__23C923D4-043E-4CA4-8F2A-8A4AB0D0D040" bpmnElement="_23C923D4-043E-4CA4-8F2A-8A4AB0D0D040" color:border-color="#000000" triso:userconstraints="true">
+                <di:waypoint x="378" y="454"/>
+                <di:waypoint x="377" y="520"/>
+                <di:waypoint x="622" y="520"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1">
+                    <dc:Bounds height="12" width="14" x="383" y="526"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448070__1D33E806-67DC-46F7-AE3E-9AD79C90CA26" bpmnElement="_1D33E806-67DC-46F7-AE3E-9AD79C90CA26" color:border-color="#000000">
+                <di:waypoint x="542" y="433"/>
+                <di:waypoint x="559" y="432"/>
+                <di:waypoint x="622" y="432"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448071__A5B1D7E5-E8CF-40A6-B697-F47BD736B303" bpmnElement="_A5B1D7E5-E8CF-40A6-B697-F47BD736B303" color:border-color="#000000">
+                <di:waypoint x="399" y="433"/>
+                <di:waypoint x="416" y="432"/>
+                <di:waypoint x="459" y="433"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="17.015625" x="407.4921875" y="437"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821448072__5EAF3266-58A5-4017-8B7F-EFA11F3CE8F6" bpmnElement="_5EAF3266-58A5-4017-8B7F-EFA11F3CE8F6" color:border-color="#000000">
+                <di:waypoint x="113" y="432"/>
+                <di:waypoint x="131" y="432"/>
+                <di:waypoint x="201" y="433"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_1"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+        <bpmndi:BPMNLabelStyle id="LS_1">
+            <dc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="8"/>
+        </bpmndi:BPMNLabelStyle>
+    </bpmndi:BPMNDiagram>
+    <semantic:relationship type="ActivityStream">
+        <semantic:extensionElements>
+            <rss xmlns="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" version="2.0">
+                <channel/>
+            </rss>
+        </semantic:extensionElements>
+        <semantic:source>_1363713347778</semantic:source>
+        <semantic:target>_1363713347778</semantic:target>
+    </semantic:relationship>
+    <semantic:relationship type="trisoExtension">
+        <semantic:extensionElements>
+            <ProjectCharter xmlns="http://www.trisotech.com/2015/triso/modeling">
+                <projectDescription>&lt;p&gt;In &amp;ldquo;BPMN Method &amp;amp; Style&amp;rdquo;, Bruce Silver uses segments of this diagram to illustrate proper BPMN modeling. We have assemble some of these segments to present an end to end Fulfillment process, form Order taking to product shipment.&lt;/p&gt;</projectDescription>
+                <projectGoals/>
+                <projectChallenges/>
+                <projectStakeholders/>
+            </ProjectCharter>
+        </semantic:extensionElements>
+        <semantic:source>_1363713347778</semantic:source>
+        <semantic:target>_1363713347778</semantic:target>
+    </semantic:relationship>
+</semantic:definitions>
