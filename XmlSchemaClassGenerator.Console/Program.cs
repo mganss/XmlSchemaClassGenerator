@@ -117,7 +117,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 uris.AddRange(expandedGlob);
             }
 
-            var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
+            var namespaceMap = namespaces.Select(n => Utility.ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
                 var xn = key.XmlSchemaNamespace;
                 var name = string.Join(".", xn.Split('/').Where(p => p != "schema" && GeneratorConfiguration.IdentifierRegex.IsMatch(p))
@@ -170,7 +170,21 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             generator.Generate(uris);
         }
 
-        static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
+        static void ShowHelp(OptionSet p)
+        {
+            System.Console.WriteLine("Usage: dotnet xscgen [OPTIONS]+ xsdFile...");
+            System.Console.WriteLine("Generate C# classes from XML Schema files.");
+            System.Console.WriteLine("Version " + typeof(Generator).Assembly.GetName().Version);
+            System.Console.WriteLine(@"xsdFiles may contain globs, e.g. ""content\{schema,xsd}\**\*.xsd"", and URLs.");
+            System.Console.WriteLine(@"Append - to option to disable it, e.g. --interface-.");
+            System.Console.WriteLine();
+            System.Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(System.Console.Out);
+        }
+    }
+    public static class Utility
+    {
+        public static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
         {
             var parts = nsArg.Split(new[] { '=' }, 2);
             var xmlNs = parts[0];
@@ -183,18 +197,6 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 netNs = namespacePrefix + "." + netNs;
             }
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
-        }
-
-        static void ShowHelp(OptionSet p)
-        {
-            System.Console.WriteLine("Usage: dotnet xscgen [OPTIONS]+ xsdFile...");
-            System.Console.WriteLine("Generate C# classes from XML Schema files.");
-            System.Console.WriteLine("Version " + typeof(Generator).Assembly.GetName().Version);
-            System.Console.WriteLine(@"xsdFiles may contain globs, e.g. ""content\{schema,xsd}\**\*.xsd"", and URLs.");
-            System.Console.WriteLine(@"Append - to option to disable it, e.g. --interface-.");
-            System.Console.WriteLine();
-            System.Console.WriteLine("Options:");
-            p.WriteOptionDescriptions(System.Console.Out);
         }
     }
 }

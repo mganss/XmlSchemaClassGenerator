@@ -14,6 +14,7 @@ using System.Xml.XPath;
 using Ganss.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.Xml.XMLGen;
+using XmlSchemaClassGenerator.Console;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -370,14 +371,75 @@ namespace XmlSchemaClassGenerator.Tests
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
-        public void TestBpmn()
+        public void TestCustomNamespaces()
         {
+            string customNsPattern = "|{0}={1}";
+            string bpmnXsd = "BPMN20.xsd";
+            string semantXsd = "Semantic.xsd";
+            string bpmndiXsd = "BPMNDI.xsd";
+            string dcXsd = "DC.xsd";
+            string diXsd = "DI.xsd";
+
+            Dictionary<string, string> xsdToCsharpNsMap = new Dictionary<string, string>
+            {
+                { bpmnXsd, "Namespace1" },
+                { semantXsd, "Namespace1" },
+                { bpmndiXsd, "Namespace2" },
+                { dcXsd, "Namespace3" },
+                { diXsd, "Namespace4" }
+            };
+
+            Dictionary<string, string> xsdToCsharpTypeMap = new Dictionary<string, string>
+            {
+                { bpmnXsd, "TDefinitions" },
+                { semantXsd, "TActivity" },
+                { bpmndiXsd, "BPMNDiagram" },
+                { dcXsd, "Font" },
+                { diXsd, "DiagramElement" }
+            };
+
+            List<string> customNamespaceConfig = new List<string>();
+
+            foreach (var ns in xsdToCsharpNsMap)
+                customNamespaceConfig.Add(string.Format(customNsPattern, ns.Key, ns.Value));
+
             var assembly = Compiler.Generate("Bpmn", BpmnPattern, new Generator
             {
                 DataAnnotationMode = DataAnnotationMode.All,
                 GenerateNullables = true,
-                MemberVisitor = (member, model) => { }
+                MemberVisitor = (member, model) => { },
+                NamespaceProvider = customNamespaceConfig.Select(n => Utility.ParseNamespace(n, null)).ToNamespaceProvider()
             });
+            Assert.NotNull(assembly);
+
+            Type type = null;
+
+            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[bpmnXsd]);
+            Assert.NotNull(type);
+            Assert.Equal(xsdToCsharpNsMap[bpmnXsd], type.Namespace);
+
+            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[semantXsd]);
+            Assert.NotNull(type);
+            Assert.Equal(xsdToCsharpNsMap[semantXsd], type.Namespace);
+
+            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[bpmndiXsd]);
+            Assert.NotNull(type);
+            Assert.Equal(xsdToCsharpNsMap[bpmndiXsd], type.Namespace);
+
+            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[dcXsd]);
+            Assert.NotNull(type);
+            Assert.Equal(xsdToCsharpNsMap[dcXsd], type.Namespace);
+
+            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[diXsd]);
+            Assert.NotNull(type);
+            Assert.Equal(xsdToCsharpNsMap[diXsd], type.Namespace);
+        }
+
+        [Fact, TestPriority(2)]
+        [UseCulture("en-US")]
+        public void TestBpmn()
+        {
+            var assembly = Compiler.Generate("Bpmn", BpmnPattern);
             Assert.NotNull(assembly);
 
             var type = assembly.GetTypes().SingleOrDefault(t => t.Name == "TDefinitions");
