@@ -44,14 +44,51 @@ namespace XmlSchemaClassGenerator
                 .DistinctBy(g => g.QualifiedName.ToString())
                 .ToDictionary(g => g.QualifiedName);
 
-            foreach (var globalType in set.GlobalTypes.Values.Cast<XmlSchemaType>())
+            List<XmlSchema> dependencyOrder = new List<XmlSchema>();
+            foreach (var schema in set.Schemas().Cast<XmlSchema>())
+            {
+                ResolveDependencies(schema, dependencyOrder);
+            }
+
+            foreach (var schema in dependencyOrder)
+            {
+                var types = set.GlobalTypes.Values.Cast<XmlSchemaType>().Where(s => s.GetSchema() == schema);
+                CreateTypes(types);
+                var elements = set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(s => s.GetSchema() == schema);
+                CreateElements(elements);
+            }
+        }
+
+        private void ResolveDependencies(XmlSchema schema, List<XmlSchema> dependencyOrder)
+        {
+            if (dependencyOrder.Contains(schema))
+                return;
+
+            var imports = schema.Includes.OfType<XmlSchemaImport>();
+            if (imports.Any())
+            {
+                foreach (var import in imports)
+                {
+                    ResolveDependencies(import.Schema, dependencyOrder);
+                }                
+            }
+            dependencyOrder.Add(schema);
+        }
+
+
+        private void CreateTypes(IEnumerable<XmlSchemaType> types)
+        {
+            foreach (var globalType in types)
             {
                 var schema = globalType.GetSchema();
                 var source = CodeUtilities.CreateUri(schema?.SourceUri);
                 CreateTypeModel(source, globalType, globalType.QualifiedName);
             }
+        }
 
-            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>())
+        private void CreateElements(IEnumerable<XmlSchemaElement> elements)
+        {
+            foreach (var rootElement in elements)
             {
                 var rootSchema = rootElement.GetSchema();
                 var source = CodeUtilities.CreateUri(rootSchema.SourceUri);
