@@ -69,8 +69,9 @@ namespace XmlSchemaClassGenerator
             {
                 foreach (var import in imports)
                 {
-                    ResolveDependencies(import.Schema, dependencyOrder);
-                }                
+                    if (import.Schema != null)
+                        ResolveDependencies(import.Schema, dependencyOrder);
+                }
             }
             dependencyOrder.Add(schema);
         }
