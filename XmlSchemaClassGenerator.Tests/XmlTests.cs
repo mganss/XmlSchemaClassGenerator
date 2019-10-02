@@ -399,21 +399,28 @@ namespace XmlSchemaClassGenerator.Tests
                 unknownAttrError = true;
             }
 
-            var xml = ReadXml("bpmnSimple");
-            var reader = XmlReader.Create(new StringReader(xml));
+            var currDir = Directory.GetCurrentDirectory();
+            var testDir = "bpmn_tests";
+            var fileExt = "bpmn";
+            var testFiles = Glob.ExpandNames(string.Format("{0}\\xml\\{1}\\*.{2}", currDir, testDir, fileExt));
 
-            var isDeserializable = serializer.CanDeserialize(reader);
-            Assert.True(isDeserializable);
+            foreach (var testFile in testFiles)
+            {
+                var xmlString = File.ReadAllText(testFile);
+                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
 
-            var deserializedObject = serializer.Deserialize(reader);
-            Assert.False(unknownNodeError);
-            Assert.False(unknownAttrError);
+                var isDeserializable = serializer.CanDeserialize(reader);
+                Assert.True(isDeserializable);
 
-            var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xml));
-            File.WriteAllText("file.xml", serializedXml);
+                var deserializedObject = serializer.Deserialize(reader);
+                Assert.False(unknownNodeError);
+                Assert.False(unknownAttrError);
 
-            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
-            AssertEx.Equal(deserializedObject, deserializedXml);
+                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+
+                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+                AssertEx.Equal(deserializedObject, deserializedXml);
+            }
         }
 
         private IDictionary<string, string> GetNamespacesFromSource(string source)
