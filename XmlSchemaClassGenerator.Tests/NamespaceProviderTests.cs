@@ -63,5 +63,43 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.False(new NamespaceKey("http://test") <= null);
             Assert.True(new NamespaceKey("http://test") != null);
         }
+
+        [Theory]
+        [InlineData("http://www.w3.org/2001/XMLSchema", "test.xsd", "MyNamespace", "Test")]
+        [InlineData("http://www.w3.org/2001/XMLSchema", "test.xsd", "MyNamespace", null)]
+        [InlineData("http://www.w3.org/2001/XMLSchema", "test.xsd", "MyNamespace", "")]
+        [InlineData("", "test.xsd", "MyNamespace", "Test")]
+        [InlineData("", "test.xsd", "MyNamespace", null)]
+        [InlineData("", "test.xsd", "MyNamespace", "")]
+        [InlineData(null, "test.xsd", "MyNamespace", "Test")]
+        [InlineData(null, "test.xsd", "MyNamespace", null)]
+        [InlineData(null, "test.xsd", "MyNamespace", "")]
+        public void TestParseNamespaceUtilityMethod1(string xmlNs, string xmlSchema, string netNs, string netPrefix)
+        {
+            string customNsPattern = "{0}|{1}={2}";
+
+            var uri = new Uri(xmlSchema, UriKind.RelativeOrAbsolute);
+            var fullNetNs = (string.IsNullOrEmpty(netPrefix)) ? netNs : string.Join('.', netPrefix, netNs);
+
+            var expected = new KeyValuePair<NamespaceKey, string>(new NamespaceKey(uri, xmlNs), fullNetNs);
+            var actual = CodeUtilities.ParseNamespace(string.Format(customNsPattern, xmlNs, xmlSchema, netNs), netPrefix);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Theory]
+        [InlineData("test.xsd", "MyNamespace", "Test")]
+        [InlineData("test.xsd", "MyNamespace", null)]
+        [InlineData("test.xsd", "MyNamespace", "")]
+        public void TestParseNamespaceUtilityMethod2(string xmlSchema, string netNs, string netPrefix)
+        {
+            string customNsPattern = "{0}={1}";
+
+            var fullNetNs = (string.IsNullOrEmpty(netPrefix)) ? netNs : string.Join('.', netPrefix, netNs);
+            var expected = new KeyValuePair<NamespaceKey, string>(new NamespaceKey(null, xmlSchema), fullNetNs);
+            var actual = CodeUtilities.ParseNamespace(string.Format(customNsPattern, xmlSchema, netNs), netPrefix);
+
+            Assert.Equal(expected, actual);
+        }
     }
 }
