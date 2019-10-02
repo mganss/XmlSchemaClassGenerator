@@ -117,7 +117,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 uris.AddRange(expandedGlob);
             }
 
-            var namespaceMap = namespaces.Select(n => ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
+            var namespaceMap = namespaces.Select(n => CodeUtilities.ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
                 var xn = key.XmlSchemaNamespace;
                 var name = string.Join(".", xn.Split('/').Where(p => p != "schema" && GeneratorConfiguration.IdentifierRegex.IsMatch(p))
@@ -168,21 +168,6 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
             generator.Generate(uris);
-        }
-
-        static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
-        {
-            var parts = nsArg.Split(new[] { '=' }, 2);
-            var xmlNs = parts[0];
-            var netNs = parts[1];
-            var parts2 = xmlNs.Split(new[] { '|' }, 2);
-            var source = parts2.Length == 2 ? new Uri(parts2[1], UriKind.RelativeOrAbsolute) : null;
-            xmlNs = parts2[0];
-            if (!string.IsNullOrEmpty(namespacePrefix))
-            {
-                netNs = namespacePrefix + "." + netNs;
-            }
-            return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
         static void ShowHelp(OptionSet p)

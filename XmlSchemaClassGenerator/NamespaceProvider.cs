@@ -158,6 +158,9 @@ namespace XmlSchemaClassGenerator
                 var path = key.Source.IsAbsoluteUri ? key.Source.LocalPath : key.Source.OriginalString;
                 keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative)));
 
+                // Search for both file name and XmlSchemaNamespace pair
+                keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative), key.XmlSchemaNamespace));
+
                 // Search for XmlSchemaNamespace only
                 keyValues.Add(new NamespaceKey(key.XmlSchemaNamespace));
 
