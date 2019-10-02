@@ -14,7 +14,6 @@ using System.Xml.XPath;
 using Ganss.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.Xml.XMLGen;
-using XmlSchemaClassGenerator.Console;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -408,7 +407,7 @@ namespace XmlSchemaClassGenerator.Tests
                 DataAnnotationMode = DataAnnotationMode.All,
                 GenerateNullables = true,
                 MemberVisitor = (member, model) => { },
-                NamespaceProvider = customNamespaceConfig.Select(n => Utility.ParseNamespace(n, null)).ToNamespaceProvider()
+                NamespaceProvider = customNamespaceConfig.Select(n => CodeUtilities.ParseNamespace(n, null)).ToNamespaceProvider()
             });
             Assert.NotNull(assembly);
 
