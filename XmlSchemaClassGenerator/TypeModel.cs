@@ -768,13 +768,37 @@ namespace XmlSchemaClassGenerator
 
             if (DefaultValue == null)
             {
-                var propertyName = isNullableValueType && Configuration.GenerateNullables ? Name + "Value" : Name;
+                var propertyName = Name;
+
+                if (isNullableValueType && Configuration.GenerateNullables && !(Configuration.UseShouldSerializePattern && !IsAttribute))
+                {
+                    propertyName = propertyName + "Value";
+                }
 
                 if (IsNillableValueType)
                 {
                     var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions);
                     nullableType.TypeArguments.Add(typeReference);
                     member = new CodeMemberField(nullableType, propertyName);
+                }
+                else if (isNullableValueType && !IsAttribute && Configuration.UseShouldSerializePattern)
+                {
+                    var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions)
+                    {
+                        TypeArguments = { typeReference }
+                    };
+                    member = new CodeMemberField(nullableType, propertyName);
+
+                    typeDeclaration.Members.Add(new CodeMemberMethod
+                    {
+                        Attributes = MemberAttributes.Public,
+                        Name = "ShouldSerialize" + propertyName,
+                        ReturnType = new CodeTypeReference(typeof(bool)),
+                        Statements =
+                        {
+                            new CodeSnippetExpression($"return {propertyName}.HasValue")
+                        }
+                    });
                 }
                 else
                     member = new CodeMemberField(typeReference, propertyName);
@@ -828,24 +852,37 @@ namespace XmlSchemaClassGenerator
 
             if (isNullableValueType)
             {
-                var specifiedName = Configuration.GenerateNullables ? Name + "Value" : Name;
-                var specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
-                specifiedMember.CustomAttributes.Add(ignoreAttribute);
-                if (Configuration.EntityFramework && Configuration.GenerateNullables) { specifiedMember.CustomAttributes.Add(notMappedAttribute); }
-                specifiedMember.Attributes = MemberAttributes.Public;
-                var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets or sets a value indicating whether the {0} property is specified.", Name) },
-                    new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
-                specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
-                typeDeclaration.Members.Add(specifiedMember);
+                bool generateNullablesProperty = Configuration.GenerateNullables;
+                bool generateSpecifiedProperty = true;
 
-                var specifiedMemberPropertyModel = new PropertyModel(Configuration)
+                if (generateNullablesProperty && Configuration.UseShouldSerializePattern && !IsAttribute)
                 {
-                    Name = specifiedName + "Specified"
-                };
+                    generateNullablesProperty = false;
+                    generateSpecifiedProperty = false;
+                }
 
-                Configuration.MemberVisitor(specifiedMember, specifiedMemberPropertyModel);
+                var specifiedName = generateNullablesProperty ? Name + "Value" : Name;
+                CodeMemberField specifiedMember = null;
+                if (generateSpecifiedProperty)
+                {
+                    specifiedMember = new CodeMemberField(typeof(bool), specifiedName + "Specified { get; set; }");
+                    specifiedMember.CustomAttributes.Add(ignoreAttribute);
+                    if (Configuration.EntityFramework && generateNullablesProperty) { specifiedMember.CustomAttributes.Add(notMappedAttribute); }
+                    specifiedMember.Attributes = MemberAttributes.Public;
+                    var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets or sets a value indicating whether the {0} property is specified.", Name) },
+                    new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
+                    specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
+                    typeDeclaration.Members.Add(specifiedMember);
 
-                if (Configuration.GenerateNullables)
+                    var specifiedMemberPropertyModel = new PropertyModel(Configuration)
+                    {
+                        Name = specifiedName + "Specified"
+                    };
+
+                    Configuration.MemberVisitor(specifiedMember, specifiedMemberPropertyModel);
+                }
+
+                if (generateNullablesProperty)
                 {
                     var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions);
                     nullableType.TypeArguments.Add(typeReference);
@@ -900,7 +937,7 @@ namespace XmlSchemaClassGenerator
 
                     var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute), Configuration.CodeTypeReferenceOptions));
                     editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(EditorBrowsableState), Configuration.CodeTypeReferenceOptions)), "Never")));
-                    specifiedMember.CustomAttributes.Add(editorBrowsableAttribute);
+                    specifiedMember?.CustomAttributes.Add(editorBrowsableAttribute);
                     member.CustomAttributes.Add(editorBrowsableAttribute);
                     if (Configuration.EntityFramework) { member.CustomAttributes.Add(notMappedAttribute); }
                 }
@@ -1288,7 +1325,7 @@ namespace XmlSchemaClassGenerator
                 else
                     return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
             }
-            else if(type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
+            else if (type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
             {
                 int numberChars = defaultString.Length;
                 var byteValues = new CodePrimitiveExpression[numberChars / 2];

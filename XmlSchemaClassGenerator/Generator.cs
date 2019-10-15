@@ -112,6 +112,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.GenerateNullables = value; }
         }
 
+        public bool UseShouldSerializePattern
+        {
+            get { return _configuration.UseShouldSerializePattern; }
+            set { _configuration.UseShouldSerializePattern = value; }
+        }
+
         public bool GenerateSerializableAttribute
         {
             get { return _configuration.GenerateSerializableAttribute; }

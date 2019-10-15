@@ -93,6 +93,7 @@ namespace XmlSchemaClassGenerator.Tests
                 OutputWriter = output,
                 NamespaceProvider = generatorPrototype.NamespaceProvider,
                 GenerateNullables = generatorPrototype.GenerateNullables,
+                UseShouldSerializePattern = generatorPrototype.UseShouldSerializePattern,
                 IntegerDataType = generatorPrototype.IntegerDataType,
                 DataAnnotationMode = generatorPrototype.DataAnnotationMode,
                 GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,

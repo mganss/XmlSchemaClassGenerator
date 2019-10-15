@@ -104,6 +104,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public bool GenerateNullables { get; set; }
         /// <summary>
+        /// Use ShouldSerialize pattern in where possible to support nullables?
+        /// </summary>
+        public bool UseShouldSerializePattern { get; set; }
+        /// <summary>
         /// Generate the Serializable attribute?
         /// </summary>
         public bool GenerateSerializableAttribute { get; set; }
