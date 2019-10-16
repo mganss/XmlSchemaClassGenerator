@@ -156,6 +156,21 @@ namespace XmlSchemaClassGenerator.Tests
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
+        public void TestIS24RestApiShouldSerialize()
+        {
+            Compiler.Generate("IS24RestApiShouldSerialize", IS24Pattern, new Generator
+            {
+                GenerateNullables = true,
+                GenerateInterfaces = true,
+                NamespacePrefix = "IS24RestApi",
+                GenerateDescriptionAttribute = true,
+                UseShouldSerializePattern = true
+            });
+            TestSamples("IS24RestApiShouldSerialize", IS24Pattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
         public void TestWadl()
         {
             Compiler.Generate("Wadl", WadlPattern, new Generator
