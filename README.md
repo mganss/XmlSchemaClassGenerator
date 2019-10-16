@@ -112,6 +112,8 @@ Options:
       --cc, --complexTypesForCollections
                              generate complex types for collections (default is
                                true)
+  -s, --useShouldSerialize   use ShouldSerialize pattern instead of Specified
+                               pattern (default is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
