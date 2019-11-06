@@ -280,10 +280,10 @@ namespace XmlSchemaClassGenerator
             classDeclaration.IsClass = true;
             classDeclaration.IsPartial = true;
             if (Configuration.AssemblyVisible)
-            {
                 classDeclaration.TypeAttributes = (classDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
-            }
 
+            if (IsAbstract)
+                classDeclaration.TypeAttributes |= System.Reflection.TypeAttributes.Abstract;
 
             if (Configuration.EnableDataBinding)
             {
