@@ -44,10 +44,11 @@ namespace XmlSchemaClassGenerator
                 .DistinctBy(g => g.QualifiedName.ToString())
                 .ToDictionary(g => g.QualifiedName);
 
-            List<XmlSchema> dependencyOrder = new List<XmlSchema>();
+            var dependencyOrder = new List<XmlSchema>();
+            var seenSchemas = new HashSet<XmlSchema>();
             foreach (var schema in set.Schemas().Cast<XmlSchema>())
             {
-                ResolveDependencies(schema, dependencyOrder);
+                ResolveDependencies(schema, dependencyOrder, seenSchemas);
             }
 
             foreach (var schema in dependencyOrder)
@@ -59,20 +60,24 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        private void ResolveDependencies(XmlSchema schema, List<XmlSchema> dependencyOrder)
+        private void ResolveDependencies(XmlSchema schema, List<XmlSchema> dependencyOrder, HashSet<XmlSchema> seenSchemas)
         {
-            if (dependencyOrder.Contains(schema))
+            if (seenSchemas.Contains(schema))
                 return;
 
-            var imports = schema.Includes.OfType<XmlSchemaImport>();
+            seenSchemas.Add(schema);
+
+            var imports = schema.Includes.OfType<XmlSchemaExternal>();
+
             if (imports.Any())
             {
                 foreach (var import in imports)
                 {
                     if (import.Schema != null)
-                        ResolveDependencies(import.Schema, dependencyOrder);
+                        ResolveDependencies(import.Schema, dependencyOrder, seenSchemas);
                 }
             }
+
             dependencyOrder.Add(schema);
         }
 
