@@ -914,10 +914,18 @@ namespace XmlSchemaClassGenerator
                     {
                         var ifNotEquals = new CodeConditionStatement(
                             new CodeBinaryOperatorExpression(
-                                new CodeMethodInvokeExpression(valueExpression, "Equals", getValueOrDefaultExpression),
-                                CodeBinaryOperatorType.ValueEquality,
-                                new CodePrimitiveExpression(false)
-                                ),
+                                new CodeBinaryOperatorExpression(
+                                    new CodeMethodInvokeExpression(valueExpression, "Equals", getValueOrDefaultExpression),
+                                    CodeBinaryOperatorType.ValueEquality,
+                                    new CodePrimitiveExpression(false)
+                                    ),
+                                CodeBinaryOperatorType.BooleanOr,
+                                new CodeBinaryOperatorExpression(
+                                    new CodeMethodInvokeExpression(specifiedExpression, "Equals", hasValueExpression),
+                                    CodeBinaryOperatorType.ValueEquality,
+                                    new CodePrimitiveExpression(false)
+                                    )
+                            ),
                             setValueStatement,
                             setSpecifiedStatement,
                             new CodeExpressionStatement(new CodeMethodInvokeExpression(null, "OnPropertyChanged",
