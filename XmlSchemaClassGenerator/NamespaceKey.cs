@@ -43,6 +43,11 @@ namespace XmlSchemaClassGenerator
             return CompareTo(other) == 0;
         }
 
+        public override bool Equals(object obj)
+        {
+            return Equals((NamespaceKey)obj);
+        }
+
         public int CompareTo(NamespaceKey other)
         {
             if (other == null) return 1;
@@ -65,11 +70,6 @@ namespace XmlSchemaClassGenerator
                 }
             }
             return string.Compare(XmlSchemaNamespace, other.XmlSchemaNamespace, StringComparison.Ordinal);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals((NamespaceKey)obj);
         }
 
         public override int GetHashCode()

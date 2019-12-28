@@ -363,7 +363,7 @@ namespace XmlSchemaClassGenerator
                 classDeclaration.BaseTypes.Add(new CodeTypeReference(typeof(INotifyPropertyChanged), Configuration.CodeTypeReferenceOptions));
             }
 
-            if (Configuration.EntityFramework && (BaseClass == null || !(BaseClass is ClassModel)))
+            if (Configuration.EntityFramework && !(BaseClass is ClassModel))
             {
                 // generate key
                 var keyProperty = Properties.FirstOrDefault(p => p.Name.ToLowerInvariant() == "id")
