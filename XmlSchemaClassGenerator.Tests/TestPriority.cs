@@ -45,7 +45,7 @@ namespace XmlSchemaClassGenerator.Tests
     }
 
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class TestPriorityAttribute : Attribute
+    public sealed class TestPriorityAttribute : Attribute
     {
         public TestPriorityAttribute(int priority)
         {

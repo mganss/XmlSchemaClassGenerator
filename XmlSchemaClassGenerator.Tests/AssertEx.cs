@@ -20,10 +20,12 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 await func();
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception e)
             {
                 actual = e.GetType();
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             Assert.Equal(expected, actual);
         }
 

@@ -252,7 +252,7 @@ namespace XmlSchemaClassGenerator
                 XmlSchemaName = qualifiedName,
                 XmlSchemaType = complexType,
                 IsAbstract = complexType.IsAbstract,
-                IsAnonymous = complexType.QualifiedName.Name == "",
+                IsAnonymous = string.IsNullOrEmpty(complexType.QualifiedName.Name),
                 IsMixed = complexType.IsMixed,
                 IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty
             };
@@ -456,7 +456,7 @@ namespace XmlSchemaClassGenerator
                             {
                                 attributeQualifiedName = attribute.QualifiedName;
 
-                                if (attributeQualifiedName.IsEmpty || attributeQualifiedName.Namespace == "")
+                                if (attributeQualifiedName.IsEmpty || string.IsNullOrEmpty(attributeQualifiedName.Namespace))
                                 {
                                     // inner type, have to generate a type name
                                     var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(typeModel.Name, attribute.QualifiedName.Name);
@@ -488,7 +488,7 @@ namespace XmlSchemaClassGenerator
                             DefaultValue = attribute.DefaultValue ?? (attribute.Use != XmlSchemaUse.Optional ? attribute.FixedValue : null),
                             FixedValue = attribute.FixedValue,
                             Form = attribute.Form == XmlSchemaForm.None ? attribute.GetSchema().AttributeFormDefault : attribute.Form,
-                            XmlNamespace = attribute.QualifiedName.Namespace != "" && attribute.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? attribute.QualifiedName.Namespace : null,
+                            XmlNamespace = !string.IsNullOrEmpty(attribute.QualifiedName.Namespace) && attribute.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? attribute.QualifiedName.Namespace : null,
                         };
 
                         var attributeDocs = GetDocumentation(attribute);
@@ -565,7 +565,7 @@ namespace XmlSchemaClassGenerator
                         DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !(item.XmlParent is XmlSchemaChoice)) ? element.FixedValue : null),
                         FixedValue = element.FixedValue,
                         Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
-                        XmlNamespace = element.QualifiedName.Namespace != "" && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
+                        XmlNamespace = !string.IsNullOrEmpty(element.QualifiedName.Namespace) && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
                         XmlParticle = item.XmlParticle,
                         XmlParent = item.XmlParent,
                     };
@@ -733,7 +733,7 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        public List<DocumentationModel> GetDocumentation(XmlSchemaAnnotated annotated)
+        public static List<DocumentationModel> GetDocumentation(XmlSchemaAnnotated annotated)
         {
             if (annotated.Annotation == null) { return new List<DocumentationModel>(); }
 

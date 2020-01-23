@@ -25,10 +25,8 @@ namespace XmlSchemaClassGenerator
 
         protected void Write(TextWriter writer, CodeCompileUnit cu)
         {
-            using (var sw = new SemicolonRemovalTextWriter(writer))
-            {
-                Provider.GenerateCodeFromCompileUnit(cu, sw, Options);
-            }
+            using var sw = new SemicolonRemovalTextWriter(writer);
+            Provider.GenerateCodeFromCompileUnit(cu, sw, Options);
         }
 
         /// <summary>
@@ -56,6 +54,16 @@ namespace XmlSchemaClassGenerator
                 }
 
                 _previousWasClosingBrace = value == '}';
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+
+                if (_other != null)
+                {
+                    _other.Dispose();
+                }
             }
         }
     }

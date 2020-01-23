@@ -343,7 +343,7 @@ namespace XmlSchemaClassGenerator
                     member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
                     var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute), Configuration.CodeTypeReferenceOptions));
-                    if (BaseClass is SimpleModel simpleModel && (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed(Configuration) ?? simpleModel.UseDataTypeAttribute))
+                    if (BaseClass is SimpleModel simpleModel && (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute))
                     {
                         var name = BaseClass.GetQualifiedName();
                         if (name.Namespace == XmlSchema.Namespace)
@@ -772,7 +772,7 @@ namespace XmlSchemaClassGenerator
 
                 if (isNullableValueType && Configuration.GenerateNullables && !(Configuration.UseShouldSerializePattern && !IsAttribute))
                 {
-                    propertyName = propertyName + "Value";
+                    propertyName += "Value";
                 }
 
                 if (IsNillableValueType)
@@ -1279,7 +1279,7 @@ namespace XmlSchemaClassGenerator
                 // XmlSerializer is inconsistent: maps xs:decimal to decimal but xs:integer to string,
                 // even though xs:integer is a restriction of xs:decimal
                 type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, attribute);
-                UseDataTypeAttribute = XmlSchemaType.Datatype.IsDataTypeAttributeAllowed(Configuration) ?? UseDataTypeAttribute;
+                UseDataTypeAttribute = XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? UseDataTypeAttribute;
             }
 
             if (collection)

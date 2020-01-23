@@ -23,19 +23,17 @@ namespace XmlSchemaClassGenerator.Tests
     {
         public static CompilationResult GenerateAssembly(Compilation compilation)
         {
-            using (var stream = new MemoryStream())
-            {
-                var emitResult = compilation.Emit(stream);
+            using var stream = new MemoryStream();
+            var emitResult = compilation.Emit(stream);
 
-                return new CompilationResult
-                {
-                    Assembly = emitResult.Success ? Assembly.Load(stream.ToArray()) : null,
-                    Result = emitResult
-                };
-            }
+            return new CompilationResult
+            {
+                Assembly = emitResult.Success ? Assembly.Load(stream.ToArray()) : null,
+                Result = emitResult
+            };
         }
 
-        private static ConcurrentDictionary<string, Assembly> Assemblies = new ConcurrentDictionary<string, Assembly>();
+        private static readonly ConcurrentDictionary<string, Assembly> Assemblies = new ConcurrentDictionary<string, Assembly>();
 
         private static readonly string[] DependencyAssemblies = new[]
         {
@@ -72,7 +70,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
 
-            generatorPrototype = generatorPrototype ?? new Generator
+            generatorPrototype ??= new Generator
             {
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),

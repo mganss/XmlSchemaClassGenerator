@@ -20,7 +20,7 @@ namespace XmlSchemaClassGenerator
         {
             if (!(model is SimpleModel simpleType))
             {
-                if (!(model is EnumModel enumModel))
+                if (!(model is EnumModel))
                 {
                     return PropertyValueTypeCode.Other;
                 }

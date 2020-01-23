@@ -31,6 +31,11 @@ namespace XmlSchemaClassGenerator.Tests
 
         private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
         {
+            if (name is null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
             var writer = new MemoryOutputWriter();
 
             var gen = new Generator
@@ -254,72 +259,71 @@ namespace XmlSchemaClassGenerator.Tests
                 var serializer = new XmlSerializer(type);
                 var generator = new XmlSampleGenerator(set, rootElement.QualifiedName);
                 var sb = new StringBuilder();
-                using (var xw = XmlWriter.Create(sb, new XmlWriterSettings { Indent = true }))
+                using var xw = XmlWriter.Create(sb, new XmlWriterSettings { Indent = true });
+
+                // generate sample xml
+                generator.WriteXml(xw);
+                var xml = sb.ToString();
+
+                File.WriteAllText("xml.xml", xml);
+
+                // validate serialized xml
+                var settings = new XmlReaderSettings
                 {
-                    // generate sample xml
-                    generator.WriteXml(xw);
-                    var xml = sb.ToString();
+                    ValidationType = ValidationType.Schema,
+                    Schemas = set
+                };
 
-                    File.WriteAllText("xml.xml", xml);
+                var invalid = false;
 
-                    // validate serialized xml
-                    var settings = new XmlReaderSettings
-                    {
-                        ValidationType = ValidationType.Schema,
-                        Schemas = set
-                    };
-
-                    var invalid = false;
-
-                    void validate(object s, ValidationEventArgs e)
-                    {
-                        if (HandleValidationError(xml, e)) invalid = true;
-                    }
-
-                    settings.ValidationEventHandler += validate;
-
-                    var reader = XmlReader.Create(new StringReader(xml), settings);
-                    while (reader.Read()) ;
-
-                    settings.ValidationEventHandler -= validate;
-
-                    // generated xml is not schema valid -> skip
-                    if (invalid) continue;
-                    anyValidXml = true;
-
-                    // deserialize from sample
-                    var sr = new StringReader(xml);
-                    var o = serializer.Deserialize(sr);
-
-                    // serialize back to xml
-                    var xml2 = Serialize(serializer, o);
-
-                    File.WriteAllText("xml2.xml", xml2);
-
-                    void validate2(object s, ValidationEventArgs e)
-                    {
-                        if (HandleValidationError(xml2, e)) throw e.Exception;
-                    };
-
-                    settings.ValidationEventHandler += validate2;
-
-                    reader = XmlReader.Create(new StringReader(xml2), settings);
-                    while (reader.Read()) ;
-
-                    settings.ValidationEventHandler -= validate2;
-
-                    // deserialize again
-                    sr = new StringReader(xml2);
-                    var o2 = serializer.Deserialize(sr);
-
-                    AssertEx.Equal(o, o2);
+                void validate(object s, ValidationEventArgs e)
+                {
+                    if (HandleValidationError(xml, e)) invalid = true;
                 }
+
+                settings.ValidationEventHandler += validate;
+
+                var reader = XmlReader.Create(new StringReader(xml), settings);
+                while (reader.Read()) ;
+
+                settings.ValidationEventHandler -= validate;
+
+                // generated xml is not schema valid -> skip
+                if (invalid) continue;
+                anyValidXml = true;
+
+                // deserialize from sample
+                var sr = new StringReader(xml);
+                var o = serializer.Deserialize(sr);
+
+                // serialize back to xml
+                var xml2 = Serialize(serializer, o);
+
+                File.WriteAllText("xml2.xml", xml2);
+
+                void validate2(object s, ValidationEventArgs e)
+                {
+                    if (HandleValidationError(xml2, e)) throw e.Exception;
+                };
+
+                settings.ValidationEventHandler += validate2;
+
+                reader = XmlReader.Create(new StringReader(xml2), settings);
+                while (reader.Read()) ;
+
+                settings.ValidationEventHandler -= validate2;
+
+                // deserialize again
+                sr = new StringReader(xml2);
+                var o2 = serializer.Deserialize(sr);
+
+                AssertEx.Equal(o, o2);
             }
 
             Assert.True(anyValidXml, "No valid generated XML for this test");
         }
 
-        private Type FindType(Assembly assembly, XmlQualifiedName xmlQualifiedName)
+        private static Type FindType(Assembly assembly, XmlQualifiedName xmlQualifiedName)
         {
             return assembly.GetTypes()
                 .Single(t => t.CustomAttributes.Any(a => a.AttributeType == typeof(XmlRootAttribute)
@@ -538,7 +542,7 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        string Serialize(XmlSerializer serializer, object o, IDictionary<string, string> prefixToNsMap = null)
+        static string Serialize(XmlSerializer serializer, object o, IDictionary<string, string> prefixToNsMap = null)
         {
             var sw = new StringWriter();
             var ns = new XmlSerializerNamespaces();
@@ -558,7 +562,7 @@ namespace XmlSchemaClassGenerator.Tests
             return serializedXml;
         }
 
-        string ReadXml(string name)
+        static string ReadXml(string name)
         {
             var folder = Directory.GetCurrentDirectory();
             var xml = File.ReadAllText(string.Format(@"{0}\xml\{1}.xml", folder, name));
@@ -1073,7 +1077,7 @@ namespace Test
 
         private static void CompareOutput(string expected, string actual)
         {
-            string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
+            static string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
             Assert.Equal(Normalize(expected), Normalize(actual));
         }
 

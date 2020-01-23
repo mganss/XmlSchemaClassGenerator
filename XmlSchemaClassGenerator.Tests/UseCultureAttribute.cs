@@ -16,7 +16,7 @@ namespace XmlSchemaClassGenerator.Tests
     /// <see cref="CultureInfo.CurrentUICulture" /> with another culture.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class UseCultureAttribute : BeforeAfterTestAttribute
+    public sealed class UseCultureAttribute : BeforeAfterTestAttribute
     {
         readonly Lazy<CultureInfo> culture;
         readonly Lazy<CultureInfo> uiCulture;

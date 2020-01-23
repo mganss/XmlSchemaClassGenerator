@@ -10,7 +10,7 @@ namespace XmlSchemaClassGenerator
     public static class CodeUtilities
     {
         // Match non-letter followed by letter
-        static Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
+        static readonly Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
 
         // Uppercases first letter and all letters following non-letters.
         // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
@@ -32,7 +32,7 @@ namespace XmlSchemaClassGenerator
             return string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
         }
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration)
+        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type)
         {
             bool? result;
             switch (type.TypeCode)

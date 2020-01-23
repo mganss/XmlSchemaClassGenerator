@@ -48,13 +48,11 @@ namespace XmlSchemaClassGenerator.Tests
                                 return "Elster.Basis";
                             case "datenabholung_5.xsd":
                             case "elster0810_datenabholung_5.xsd":
-                                switch (key.XmlSchemaNamespace)
+                                return key.XmlSchemaNamespace switch
                                 {
-                                    case "http://www.elster.de/2002/XMLSchema":
-                                        return "Elster.Datenabholung5";
-                                    default:
-                                        throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
-                                }
+                                    "http://www.elster.de/2002/XMLSchema" => "Elster.Datenabholung5",
+                                    _ => throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source)),
+                                };
                             default:
                                 throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
                         }

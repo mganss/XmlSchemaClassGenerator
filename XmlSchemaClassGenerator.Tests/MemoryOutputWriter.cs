@@ -15,11 +15,9 @@ namespace XmlSchemaClassGenerator.Tests
             var cu = new CodeCompileUnit();
             cu.Namespaces.Add(cn);
 
-            using (var writer = new StringWriter())
-            {
-                Write(writer, cu);
-                _contents.Add(writer.ToString());
-            }
+            using var writer = new StringWriter();
+            Write(writer, cu);
+            _contents.Add(writer.ToString());
         }
     }
 }
