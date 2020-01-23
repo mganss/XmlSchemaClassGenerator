@@ -152,10 +152,6 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        // see http://msdn.microsoft.com/en-us/library/z2w0sxhf.aspx
-        private static readonly HashSet<string> EnumTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            { "string", "normalizedString", "token", "Name", "NCName", "ID", "ENTITY", "NMTOKEN" };
-
         private TypeModel CreateTypeModel(Uri source, XmlSchemaAnnotated type, XmlQualifiedName qualifiedName)
         {
             if (!qualifiedName.IsEmpty && Types.TryGetValue(qualifiedName, out TypeModel typeModel))
@@ -359,8 +355,7 @@ namespace XmlSchemaClassGenerator
             if (simpleType.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
             {
                 var enumFacets = typeRestriction.Facets.OfType<XmlSchemaEnumerationFacet>().ToList();
-                var isEnum = (enumFacets.Count == typeRestriction.Facets.Count && enumFacets.Count != 0)
-                                || (EnumTypes.Contains(typeRestriction.BaseTypeName.Name) && enumFacets.Any());
+                var isEnum = (enumFacets.Count == typeRestriction.Facets.Count && enumFacets.Count != 0);
                 if (isEnum)
                 {
                     // we got an enum
