@@ -89,7 +89,7 @@ namespace XmlSchemaClassGenerator
             name = name.Trim().Replace(' ', '_').Replace('\t', '_');
             if (string.IsNullOrEmpty(name))
             {
-                return "Item";
+                return "Empty";
             }
             if (!char.IsLetter(name[0]))
             {
