@@ -355,7 +355,8 @@ namespace XmlSchemaClassGenerator
             if (simpleType.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
             {
                 var enumFacets = typeRestriction.Facets.OfType<XmlSchemaEnumerationFacet>().ToList();
-                var isEnum = (enumFacets.Count == typeRestriction.Facets.Count && enumFacets.Count != 0);
+                // If there's a pattern restriction mixed into the enumeration values, we'll generate a string to play it safe.
+                var isEnum = enumFacets.Count > 0 && !typeRestriction.Facets.OfType<XmlSchemaPatternFacet>().Any();
                 if (isEnum)
                 {
                     // we got an enum
