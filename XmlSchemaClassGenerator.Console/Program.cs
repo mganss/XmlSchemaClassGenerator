@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -177,7 +178,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
         {
             System.Console.WriteLine("Usage: dotnet xscgen [OPTIONS]+ xsdFile...");
             System.Console.WriteLine("Generate C# classes from XML Schema files.");
-            System.Console.WriteLine("Version " + typeof(Generator).Assembly.GetName().Version);
+            System.Console.WriteLine("Version " + typeof(Generator).Assembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version);
             System.Console.WriteLine(@"xsdFiles may contain globs, e.g. ""content\{schema,xsd}\**\*.xsd"", and URLs.");
             System.Console.WriteLine(@"Append - to option to disable it, e.g. --interface-.");
             System.Console.WriteLine();

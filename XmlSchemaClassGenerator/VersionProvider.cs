@@ -20,7 +20,7 @@ namespace XmlSchemaClassGenerator
         {
             var executingAssembly = Assembly.GetExecutingAssembly();
             var title = executingAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
-            var version = executingAssembly.GetName().Version.ToString();
+            var version = executingAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
 
             return new VersionProvider(title, version);
         }
