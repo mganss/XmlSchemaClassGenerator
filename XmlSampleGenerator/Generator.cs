@@ -466,7 +466,7 @@ namespace Microsoft.Xml.XMLGen {
                 decimal result = 0;
                 if(AllowedValues != null) {
                     try {
-                        result = (decimal)AllowedValues[occurNum++ % AllowedValues.Count];
+                        result = (decimal)Convert.ChangeType(AllowedValues[occurNum++ % AllowedValues.Count], typeof(decimal));
                     }
                     catch(OverflowException) {
                         occurNum = 0;

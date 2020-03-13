@@ -1109,11 +1109,19 @@ namespace XmlSchemaClassGenerator
                     {
                         attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlNamespace)));
                     }
-                    else if (Form == XmlSchemaForm.Qualified)
+
+                    if (Form == XmlSchemaForm.Qualified && IsAttribute)
                     {
-                        attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
+                        if (XmlNamespace == null)
+                        {
+                            attribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(OwningType.XmlSchemaName.Namespace)));
+                        }
+
+                        attribute.Arguments.Add(new CodeAttributeArgument("Form",
+                            new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm), Configuration.CodeTypeReferenceOptions)),
+                                "Qualified")));
                     }
-                    else if (!IsAny)
+                    else if (Form == XmlSchemaForm.Unqualified && !IsAttribute && !IsAny && XmlNamespace == null)
                     {
                         attribute.Arguments.Add(new CodeAttributeArgument("Form",
                             new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(XmlSchemaForm), Configuration.CodeTypeReferenceOptions)),

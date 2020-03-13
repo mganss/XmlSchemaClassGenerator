@@ -84,6 +84,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string TableauPattern = @"xsd\ts-api\*.xsd";
         const string VSTstPattern = @"xsd\vstst\vstst.xsd";
         const string BpmnPattern = @"xsd\bpmn\*.xsd";
+        const string DtsxPattern = @"xsd\dtsx\dtsx2.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -202,6 +203,14 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("Tableau", TableauPattern, new Generator());
             TestSamples("Tableau", TableauPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestDtsx()
+        {
+            Compiler.Generate("Dtsx", DtsxPattern, new Generator());
+            TestSamples("Dtsx", DtsxPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -748,7 +757,7 @@ namespace Test
         [System.Xml.Serialization.XmlTextAttribute()]
         public string Value { get; set; }
 
-        [System.Xml.Serialization.XmlAttributeAttribute(""justify"", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        [System.Xml.Serialization.XmlAttributeAttribute(""justify"")]
         public SimpleType Justify { get; set; }
 
         /// <summary>

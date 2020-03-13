@@ -1,0 +1,3667 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           attributeFormDefault="qualified"
+           targetNamespace="www.microsoft.com/SqlServer/Dts"
+           xmlns:WSTask="www.microsoft.com/sqlserver/dts/tasks/webservicetask"
+           xmlns:MessageQueueTask="www.microsoft.com/sqlserver/dts/tasks/messagequeuetask"
+           xmlns:SendMailTask="www.microsoft.com/sqlserver/dts/tasks/sendmailtask"
+           xmlns:ActiveXScriptTask=
+            "www.microsoft.com/sqlserver/dts/tasks/activexscripttask"
+           xmlns:Exec80PackageTask=
+            "www.microsoft.com/sqlserver/dts/tasks/exec80packagetask"
+           xmlns:BulkInsertTask=
+            "www.microsoft.com/sqlserver/dts/tasks/bulkinserttask"
+           xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask"
+            >
+
+  <!--Imports-->
+
+  <!--<xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/webservicetask"
+          schemaLocation="./ns_webservicetask.xsd"  />
+  <xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/messagequeuetask"
+          schemaLocation="./ns_messagequeuetask.xsd"   />
+  <xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/sendmailtask"
+            schemaLocation="./ns_sendmailtask.xsd" />
+  <xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/activexscripttask"
+           schemaLocation="./ns_activexscripttask.xsd"  />
+  <xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/exec80packagetask"
+            schemaLocation="./ns_exec80packagetask.xsd" />
+  <xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/bulkinserttask"
+                         schemaLocation="./ns_bulkinserttask.xsd" />
+  <xs:import namespace=
+        "www.microsoft.com/sqlserver/dts/tasks/sqltask"
+            schemaLocation="./ns_sqltask.xsd" />-->
+
+
+  <!--Root Element and Root Executables-->
+
+  <xs:element name="Executable" type="DTS:ExecutableTypePackage"/>
+
+  <xs:complexType name="ExecutableTypePackage">
+    <xs:sequence>
+      <xs:element name="Property" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="DTS:PropertyElementBaseType">
+              <xs:attribute name="Name"
+                  type="DTS:ExecutableTypePackagePropertyNameEnum"
+                  use="required"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ConnectionManagers" type="DTS:ConnectionManagersType"
+                  minOccurs="0"/>
+      <xs:element name="Configurations" type="DTS:ConfigurationsType"
+                  minOccurs="0"/>
+      <xs:element name="LogProviders" type="DTS:LogProvidersType"
+                  minOccurs="0"/>
+      <xs:element name="Variables" type="DTS:VariablesType"
+                  minOccurs="0"/>
+      <xs:element name="LoggingOptions" type="DTS:LoggingOptionsType" minOccurs="0"/>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Executables" type="DTS:ExecutablesType"
+                  minOccurs="0"/>
+      <xs:element name="PrecedenceConstraints" minOccurs="0"
+                  type="DTS:PrecedenceConstraintsType"/>
+      <xs:element name="EventHandlers" type="DTS:EventHandlersType"
+                  minOccurs="0"/>
+      <xs:element name="PackageParameters" type="DTS:PackageParametersType"
+                  minOccurs="0" />
+      <xs:element name="PackageVariables" type="DTS:PackageVariablesType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DesignTimeProperties" type="xs:string"
+                  minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="ExecutableType" use="required"
+              fixed="SSIS.Package.3" />
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attributeGroup ref="DTS:AllExecutableAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:BaseExecutablePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:ExecutableTypePackageAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="ExecutablesType">
+    <xs:sequence>
+      <xs:element name="Executable" type="DTS:AnyNonPackageExecutableType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="AnyNonPackageExecutableType">
+    <xs:sequence>
+      <xs:element name="ForEachEnumerator"
+                  type="DTS:ForEachEnumeratorType" minOccurs="0"/>
+      <xs:element name="Variables" type="DTS:VariablesType"
+                  minOccurs="0"/>
+      <xs:element name="LoggingOptions" type="DTS:LoggingOptionsType"
+                  minOccurs="0"/>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Executables" type="DTS:ExecutablesType"
+                  minOccurs="0"/>
+      <xs:element name="PrecedenceConstraints"
+                  type="DTS:PrecedenceConstraintsType"
+                  minOccurs="0"/>
+      <xs:element name="ForEachVariableMappings"
+                  type="DTS:ForEachVariableMappingType" minOccurs="0"/>
+      <xs:element name="EventHandlers" type="DTS:EventHandlersType"
+                  minOccurs="0"/>
+      <xs:element name="ObjectData" type="DTS:ExecutableObjectDataType"
+                  minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="ExecutableType" use="required" type="xs:string"/>
+    <xs:attribute name="ThreadHint" use="optional" type="xs:int"/>
+    <xs:attributeGroup ref="DTS:AllExecutableAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:BaseExecutablePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:AnyNonPackageExecutableAttributeGroup"/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="qualified"/>
+  </xs:complexType>
+
+  <!--Package Exe contained types-->
+
+  <xs:complexType name="PackageParametersType">
+    <xs:sequence>
+      <xs:element name="PackageParameter" type="DTS:PackageParameterType" minOccurs="0"
+                  maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PackageParameterType">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" name="Property"
+                  type="DTS:PackageParameterPropertyType" />
+    </xs:sequence>
+    <xs:attribute name="CreationName" use="required" type="xs:string" />
+    <xs:attribute name="DataType" type="xs:unsignedByte" use="required" />
+    <xs:attribute name="Description" type="xs:string" use="optional" />
+    <xs:attribute name="DTSID" type="DTS:uuid" use="required" />
+    <xs:attribute name="ObjectName" type="xs:string" use="required" />
+    <xs:attribute name="Required" type="xs:string" use="optional" />
+    <xs:attribute name="Sensitive" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType mixed="true" name="PackageParameterPropertyType">
+    <xs:sequence minOccurs="0">
+      <xs:element name="Property"
+                  type="DTS:PackageParameterPropertyEncryptedValuePropertyType" />
+    </xs:sequence>
+    <xs:attribute name="DataType" type="xs:unsignedByte" use="optional" />
+    <xs:attribute name="Name" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="PackageParameterPropertyEncryptedValuePropertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="DataType" type="xs:unsignedByte" use="required" />
+        <xs:attribute name="Name" type="xs:string" use="required" />
+        <xs:attribute name="Encrypted" type="xs:unsignedByte" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="PackageVariablesType">
+    <xs:sequence>
+      <xs:element name="PackageVariable" type="DTS:PackageVariableType"
+                  minOccurs="0" maxOccurs="unbounded" form="qualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PackageVariableType">
+    <xs:sequence>
+      <xs:element name="Property"
+                  maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="DTS:PropertyElementBaseType">
+              <xs:attribute name="Name"
+                  type="DTS:PackageVariablePropertyNameEnum"
+                  use="required"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ConfigurationsType">
+    <xs:sequence>
+      <xs:element name="Configuration" type="DTS:ConfigurationType"
+                  minOccurs="0" maxOccurs="unbounded" form="qualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ConfigurationType">
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:ConfigurationAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="LogProvidersType">
+    <xs:sequence>
+      <xs:element name="LogProvider" type="DTS:LogProviderType"
+                  minOccurs="0" maxOccurs="unbounded"  form="qualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="LogProviderType" >
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ObjectData" type="DTS:LogProviderObjectDataType"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:LogProviderAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="ConnectionManagersType">
+    <xs:sequence>
+      <xs:element name="ConnectionManager" type="DTS:ConnectionManagerType"
+                  minOccurs="0" maxOccurs="unbounded" form="qualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ConnectionManagerType">
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ObjectData"
+                  type="DTS:ConnectionManagerObjectDataType"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:ConnectionManagerAttributeGroup"/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="qualified"/>
+  </xs:complexType>
+
+  <!--AnyNonPackageExecutable Contained Complex Types-->
+
+  <xs:complexType name="PrecedenceConstraintsType">
+    <xs:sequence>
+      <xs:element name="PrecedenceConstraint"
+                type="DTS:PrecedenceConstraintType"
+                minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PrecedenceConstraintType">
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:PrecedenceConstraintAttributeGroup"/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="qualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="LoggingOptionsType">
+    <xs:sequence>
+      <xs:element name="Property"
+                  type="DTS:LoggingOptionsPropertyElementType"
+                  minOccurs="0" maxOccurs="unbounded">
+      </xs:element>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="SelectedLogProviders" minOccurs="0"
+                  type="DTS:SelectedLogProvidersType"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:LoggingOptionsAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="LoggingOptionsPropertyElementType" mixed="true">
+    <xs:sequence>
+      <xs:element name="Property" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:anySimpleType">
+              <xs:attribute name="Name"
+                            type="DTS:ColumnEventFilterPropertyNameEnum"
+                            use="required"/>
+              <xs:attribute name="DataType" type="DTS:DtsDataTypeEnum"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Name"
+        type="DTS:LoggingOptionsPropertyNameEnum"
+        use="required"/>
+    <xs:attribute name="DataType" type="DTS:DtsDataTypeEnum"/>
+    <xs:attribute name="EventName" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="SelectedLogProviderTypeX">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attribute name="InstanceID" type="DTS:uuid"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="SelectedLogProvidersType">
+    <xs:sequence>
+      <xs:element name="SelectedLogProvider"
+                  type="DTS:SelectedLogProviderType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SelectedLogProviderType">
+    <xs:sequence/>
+    <xs:attribute name="InstanceID" type="DTS:uuid"/>
+  </xs:complexType>
+
+  <xs:complexType name="VariablesType">
+    <xs:sequence>
+      <xs:element name="Variable" type="DTS:VariableType"
+                 minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VariableType">
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="VariableValue">
+        <xs:complexType mixed="true">
+          <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded"
+                    processContents="skip"/>
+          </xs:sequence>
+          <xs:attribute name="DataType" type="DTS:DtsDataTypeEnum"/>
+          <xs:attribute name="DataSubType">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:enumeration value="ManagedSerizlizable"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:VariableAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="EventHandlersType">
+    <xs:sequence>
+      <xs:element name="EventHandler" type="DTS:EventHandlerType"
+                  minOccurs="0" maxOccurs="unbounded" form="qualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="EventHandlerType">
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Variables" type="DTS:VariablesType" minOccurs="0"/>
+      <xs:element name="LoggingOptions" type="DTS:LoggingOptionsType"/>
+      <xs:element name="Executables" type="DTS:ExecutablesType" minOccurs="0"/>
+      <xs:element name="PrecedenceConstraints"
+                  type="DTS:PrecedenceConstraintsType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:BaseExecutablePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:EventHandlerAttributeGroup"/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="qualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="ForEachEnumeratorType">
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ObjectData"
+                  type="DTS:ForEachEnumeratorObjectDataType"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="ForEachVariableMappingsType">
+    <xs:sequence>
+      <xs:element name="ForEachVariableMapping"
+                  type="DTS:ForEachVariableMappingType"
+                  minOccurs="0" maxOccurs="unbounded" form="qualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ForEachVariableMappingType" >
+    <xs:sequence>
+      <xs:element name="PropertyExpression"
+                  type="DTS:PropertyExpressionElementType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:ForEachVariableMappingAttributeGroup"/>
+  </xs:complexType>
+
+  <!--ObjectData Executable Types-->
+
+  <xs:complexType name="ExecutableObjectDataType">
+    <xs:choice minOccurs="0">
+      <xs:element name="pipeline" type="DTS:pipelineObjectDataType"
+                  form="unqualified"/>
+      <!--<xs:element ref="ActiveXScriptTask:ActiveXScriptTaskData" />-->
+      <xs:element name="ASDdlData" type="DTS:ASDdlDataObjectDataType"
+                  form="unqualified"/>
+      <xs:element name="ASProcessingData" form="unqualified"
+                  type="DTS:ASProcessingDataObjectDataType"/>
+      <!--<xs:element ref="BulkInsertTask:BulkInsertTaskData"/>-->
+      <xs:element name="DMQuertTaskData"  form="unqualified"
+                  type="DTS:DMQueryTaskDataObjectDataType"/>
+      <xs:element name="DataProfilingTaskData"  form="unqualified"
+                  type="DTS:DataProfilingTaskDataObjectDataType"/>
+      <!--<xs:element ref="Exec80PackageTask:Exec80PackageTaskData"/>-->
+      <xs:element name="ExecutePackageTask"  form="unqualified"
+                  type="DTS:ExecutePackageTaskObjectDataType"/>
+      <xs:element name="ExecuteProcessData" form="unqualified"
+                  type="DTS:ExecuteProcessDataObjectDataType"/>
+      <!--<xs:element ref="SQLTask:SqlTaskData"/>-->
+      <xs:element name="FileSystemData" form="unqualified"
+                  type="DTS:FileSystemDataObjectDataType"/>
+      <xs:element name="FtpData" type="DTS:FtpDataObjectDataType"
+                  form="unqualified"/>
+      <!--<xs:element ref="MessageQueueTask:MessageQueueTaskData"/>-->
+      <xs:element name="ScriptProject" type="DTS:ScriptProjectObjectDataType"
+                  form="unqualified"/>
+      <!--<xs:element ref="SendMailTask:SendMailTaskData"/>-->
+      <xs:element name="TransferDatabasesTaskData" form="unqualified"
+                  type="DTS:TransferDatabasesTaskDataObjectDataType"/>
+      <xs:element name="TransferErrorMessagesTaskData" form="unqualified"
+                  type="DTS:TransferErrorMessagesTaskDataObjectDataType"/>
+      <xs:element name="TransferJobsTaskData" form="unqualified"
+                  type="DTS:TransferJobsTaskDataObjectDataType"/>
+      <xs:element name="TransferLoginsTaskData" form="unqualified"
+                  type="DTS:TransferLoginsTaskDataObjectDataType"/>
+      <xs:element name="TransferStoredProceduresTaskData" form="unqualified"
+                  type="DTS:TransferStoredProceduresTaskDataObjectDataType"/>
+      <xs:element name="TransferSqlServerObjectsTaskData" form="unqualified"
+                  type="DTS:TransferSqlServerObjectsTaskDataObjectDataType"/>
+      <!--<xs:element ref="WSTask:WebServiceTaskData"/>-->
+      <xs:element name="WMIDRTaskData" type="DTS:WMIDRTaskDataObjectDataType"
+                  form="unqualified"/>
+      <xs:element name="WMIEWTaskData" type="DTS:WMIEWTaskDataObjectDataType"
+                  form="unqualified"/>
+      <xs:element name="XMLTaskData" type="DTS:XMLTaskDataObjectDataType"
+                  form="unqualified"/>
+      <xs:element name="InnerObject" type="DTS:InnerObjectObjectDataType"
+                  form="unqualified"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="ASDdlDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="ConnectionName" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="SourceType" form="unqualified"
+                  type="DTS:SourceTypeEnum"/>
+    <xs:attribute name="Source" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="ASProcessingDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="ConnectionName" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="ProcessingCommands" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="DMQueryTaskDataObjectDataType">
+    <xs:sequence>
+      <xs:element name="QueryString" form="unqualified"
+                  type="DTS:DMQueryTaskQueryStringContainerType"/>
+      <xs:element name="QueryBuilderQueryString" form="unqualified"
+                  type="DTS:DMQueryTaskQueryStringContainerType"/>
+      <xs:element name="QueryBuilderSpecification" form="unqualified"
+                  type="DTS:DMQueryBuilderSpecificationType"/>
+    </xs:sequence>
+    <xs:attribute name="InputConnection" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="OutputConnection" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="ModelStructureName" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="ModelName" type="xs:string" form="unqualified"/>
+    <xs:attribute name="OverwriteOutputTable" form="unqualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="OutputTableName" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="DMQueryTaskQueryStringContainerType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Sensitive" type="xs:boolean"
+                      form="unqualified"/>
+        <xs:attribute name="Encrypted" type="xs:boolean"
+                      form="unqualified"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="DMQueryBuilderSpecificationType">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded"
+              namespace="##any" processContents="lax"/>
+    </xs:sequence>
+    <xs:attribute name="Sensitive" type="xs:boolean"
+                      form="unqualified"/>
+    <xs:attribute name="Encrypted" type="xs:boolean"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="DataProfilingTaskDataObjectDataType">
+    <xs:sequence>
+      <xs:element name="ProfileInput" type="xs:string"
+                  form="unqualified"/>
+    </xs:sequence>
+    <xs:attribute name="DestinationType" form="unqualified"
+                  type="DTS:DestinationTypeEnum"
+                  use="optional" default="FileConnection"/>
+    <xs:attribute name="Destination" type="xs:string"
+                  form="unqualified" use="optional" default=""/>
+    <xs:attribute name="OverwriteDestination" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="DestinationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="FileConnection"/>
+      <xs:enumeration value="Variable"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="ExecutePackageTaskObjectDataType">
+    <xs:sequence>
+      <xs:element name="ExecuteOutOfProcess" form="unqualified">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="True"/>
+            <xs:enumeration value="False"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="PackageName" type="xs:string"
+                  form="unqualified"/>
+      <xs:element name="UseProjectReference" type="DTS:BooleanStringCap"
+                  minOccurs="0" form="unqualified"/>
+      <xs:element name="PackagePassword" type="DTS:PasswordElementType"
+                  form="unqualified"/>
+      <xs:element name="PackageID" type="DTS:uuid" form="unqualified"/>
+      <xs:element name="VersionID" type="DTS:uuid" form="unqualified"/>
+      <xs:element name="Connection" type="xs:string" form="unqualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ExecuteProcessDataObjectDataType">
+    <xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="Executable" type="xs:string" form="unqualified"
+                  use="optional" default=""/>
+    <xs:attribute name="RequireFullFileName" form="unqualified"
+                  use="optional" type="DTS:BooleanStringCap"
+                  default="True"/>
+    <xs:attribute name="Arguments" type="xs:string" form="unqualified"
+                  use="optional" default=""/>
+    <xs:attribute name="WorkingDirectory" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="TimeOut" type="xs:string" form="unqualified"
+                  use="optional" default="0"/>
+    <xs:attribute name="FailTaskIfReturnCodeIsNotSuccessValue"
+                  use="optional" default="True" form="unqualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="SuccessValue" type="xs:string" form="unqualified"
+                  use="optional" default="0"/>
+    <xs:attribute name="TerminateAfterTimeout" form="unqualified"
+                  use="optional" default="True">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="StandardInputVariable" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="StandardOutputVariable" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="StandardErrorVariable" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="WindowStyle" form="unqualified"
+                  type="DTS:WindowStyleEnum"
+                  use="optional" default="Normal"/>
+  </xs:complexType>
+
+  <xs:simpleType name="WindowStyleEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Hidden"/>
+      <xs:enumeration value="Maximized"/>
+      <xs:enumeration value="Minimized"/>
+      <xs:enumeration value="Normal"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="FileSystemDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="TaskOperationType" form="unqualified"
+                  type="DTS:FileSystemTaskOperationTypeEnum"
+                  use="optional" default="CopyFile"/>
+    <xs:attribute name="OperationName" form="unqualified"
+                  type="xs:string" use="optional" default=""/>
+    <xs:attribute name="TaskOverwriteDestFile" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskSourcePath" form="unqualified"
+                  type="xs:string" use="optional" default=""/>
+    <xs:attribute name="TaskIsSourceVariable" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskDestinationPath" form="unqualified"
+                  type="xs:string" use="optional" default=""/>
+    <xs:attribute name="TaskIsDestinationVariable" form="unqualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskFileAttributes" form="unqualified"
+                  type="DTS:FileSystemTaskFileAttributesEnum"
+                  use="optional" default="Normal"/>
+  </xs:complexType>
+
+  <xs:complexType name="FtpDataObjectDataType">
+    <xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="ConnectionName" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="StopOnFailure" form="unqualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskOperationType"
+                  type="DTS:FtpDataTaskOperationTypeEnum"
+                  use="optional" default="Send" form="unqualified"/>
+    <xs:attribute name="TaskOperationName" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="TaskIsLocalPathVar" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskLocalPath" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="TaskIsRemotePathVar" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskRemotePath" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="TaskOverwriteDest" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="TaskTransferAscii" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="False"/>
+          <xs:enumeration value="True"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="FtpDataTaskOperationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DeleteLocal"/>
+      <xs:enumeration value="DeleteRemote"/>
+      <xs:enumeration value="MakeDirLocal"/>
+      <xs:enumeration value="MakeDirRemote"/>
+      <xs:enumeration value="Receive"/>
+      <xs:enumeration value="RemoveDirLocal"/>
+      <xs:enumeration value="RemoveDirRemote"/>
+      <xs:enumeration value="Send"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="ScriptProjectObjectDataType">
+    <xs:sequence>
+      <xs:element name="ProjectItem"
+                  type="DTS:ScriptProjectProjectItemType"
+                  minOccurs="0" maxOccurs="unbounded"
+                  form="unqualified"/>
+      <xs:element name="BinaryItem"
+                  type="DTS:ScriptProjectBinaryItemType"
+                  minOccurs="0" form="unqualified"/>
+      <xs:element name="Breakpoint"
+                  type="DTS:ScriptProjectBreakpointType"
+                  minOccurs="0" maxOccurs="unbounded"
+                  form="unqualified"/>
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" form="unqualified"/>
+    <xs:attribute name="VSTAMajorVersion" type="xs:int"
+                  form="unqualified"/>
+    <xs:attribute name="VSTAMinorVersion" type="xs:int"
+                  form="unqualified"/>
+    <xs:attribute name="Language" type="DTS:ScriptProjectLanguageEnum"
+                  form="unqualified"/>
+    <xs:attribute name="EntryPoint" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="ReadOnlyVariables" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="ReadWriteVariables" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="ScriptProjectProjectItemType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Name" type="xs:string"
+                      form="unqualified"/>
+        <xs:attribute name="Encoding" type="xs:string"
+                      form="unqualified"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="ScriptProjectBinaryItemType">
+    <xs:simpleContent>
+      <xs:extension base="xs:base64Binary">
+        <xs:attribute name="Name" type="xs:string"
+                      form="unqualified"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="ScriptProjectBreakpointType">
+    <xs:sequence/>
+    <xs:attribute name="Name" type="xs:string" form="unqualified"/>
+    <xs:attribute name="Enabled" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="Function" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="File" type="xs:string" form="unqualified"/>
+    <xs:attribute name="Line" type="xs:int" form="unqualified"/>
+    <xs:attribute name="Column" type="xs:int" form="unqualified"/>
+    <xs:attribute name="Condition" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="ConditionType"
+                  type="DTS:ScriptProjectConditionTypeEnum"
+                  form="unqualified"/>
+    <xs:attribute name="Language" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="HitCount" type="xs:int" form="unqualified"/>
+    <xs:attribute name="HitCountType" form="unqualified"
+                  type="DTS:ScriptProjectHitCountTypeEnum"/>
+  </xs:complexType>
+
+  <xs:simpleType name="ScriptProjectLanguageEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CSharp"/>
+      <xs:enumeration value="VisualBasic"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ScriptProjectHitCountTypeEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ScriptProjectConditionTypeEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TransferDatabasesTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="SrcConn" type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="DestConn" type="xs:string" use="optional"
+                  default="" form="unqualified"/>
+    <xs:attribute name="Action" type="DTS:TransferDatabaseTaskActionEnum"
+                  use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="Method" type="DTS:TransferDatabaseTaskMethodEnum"
+                  use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="SrcDBName" type="xs:string" use="optional"
+                  default="" form="unqualified"/>
+    <xs:attribute name="ReattachSrcDB" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="SrcDBFiles" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestDBName" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestDBFiles" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestOverwrite" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="TransferDatabaseTaskActionEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransferDatabaseTaskMethodEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TransferErrorMessagesTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="TransferAllErrorMessages" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="ErrorMessagesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="ErrorMessageLanguagesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="IfObjectExists"
+                  type="DTS:IfObjectExistsEnum"
+                  use="optional" default="FailTask" form="unqualified"/>
+    <xs:attribute name="SourceConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestinationConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="IfObjectExistsEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="FailTask"/>
+      <xs:enumeration value="Overwrite"/>
+      <xs:enumeration value="Skip"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TransferJobsTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="TransferAllJobs" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="JobsList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="IfObjectExists" type="DTS:IfObjectExistsEnum"
+                  use="optional" default="FailTask" form="unqualified"/>
+    <xs:attribute name="EnableJobsAtDestination" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="SourceConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestinationConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="TransferLoginsTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="LoginsToTransfer"
+                  type="DTS:TransferLoginsTaskLoginsToTransferEnum"
+                  use="optional" default="SelectedLogins"
+                  form="unqualified"/>
+    <xs:attribute name="CopySids" type="xs:boolean" form="unqualified"
+                  use="optional" default="false"/>
+    <xs:attribute name="LoginList" type="xs:string" form="unqualified"
+                  use="optional" default=""/>
+    <xs:attribute name="IfObjectExists" type="DTS:IfObjectExistsEnum"
+                  use="optional" default="FailTask" form="unqualified"/>
+    <xs:attribute name="SourceConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestinationConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DatabasesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="TransferLoginsTaskLoginsToTransferEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SelectedLogins"/>
+      <xs:enumeration value="AllLoginsFromSelectedDatabases"/>
+      <xs:enumeration value="AllLogins"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="TransferStoredProceduresTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="TransferAllStoredProcedures"
+                  type="xs:boolean" use="optional" default="false"
+                  form="unqualified"/>
+    <xs:attribute name="StoredProceduresList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="IfObjectExists" type="DTS:IfObjectExistsEnum"
+                  use="optional" default="FailTask" form="unqualified"/>
+    <xs:attribute name="SourceConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="m_DestinationConnectionID"
+                  use="optional" default="" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="TransferSqlServerObjectsTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="SourceConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestinationConnection" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="SourceDatabase" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestinationDatabase" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="CopyAllObjects" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllRules" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllTables" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllViews" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllStoredProcedures"
+                  type="xs:boolean" use="optional" default="false"
+                  form="unqualified"/>
+    <xs:attribute name="CopyAllUserDefinedFunctions"
+                  type="xs:boolean" use="optional" default="false"
+                  form="unqualified"/>
+    <xs:attribute name="CopyAllDefaults" type="xs:string"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllUserDefinedDataTypes"
+                  use="optional" default="false" type="xs:boolean"
+                  form="unqualified"/>
+    <xs:attribute name="CopyAllPartitionFunctions" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllPartitionSchemes" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllSchemas" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllSqlAssemblies" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllUserDefinedAggregates"
+                  use="optional" default="false" type="xs:boolean"
+                  form="unqualified"/>
+    <xs:attribute name="CopyAllUserDefinedTypes" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllXmlSchemaCollections" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="LoginsList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="UsersList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="RulesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="TablesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="ViewsList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="StoredProceduresList"
+                  type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="UserDefinedFunctionsList"
+                  type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="DefaultsList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="UserDefinedDataTypesList"
+                  type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="PartitionFunctionsList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="PartitionSchemesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="SchemasList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="SqlAssembliesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="UserDefinedAggregatesList"
+                  type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="UserDefinedTypesList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="XmlSchemaCollectionsList" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DropObjectsFirst" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="IncludeDependentObjects"
+                  type="xs:boolean" use="optional" default="false"
+                  form="unqualified"/>
+    <xs:attribute name="IncludeExtendedProperties" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyData" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="ExistingData"
+        type="DTS:TransferSqlServerObjectsTaskExistingDataEnum"
+                  use="optional" default="Replace" form="unqualified"/>
+    <xs:attribute name="CopySchema" type="xs:boolean"
+                  use="optional" default="true" form="unqualified"/>
+    <xs:attribute name="UseCollation" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyDatabaseUsers" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyDatabaseRoles" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopySqlServerLogins" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyObjectLevelPermissions" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyIndexes" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyTriggers" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyFullTextIndexes" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyPrimaryKeys" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyForeignKeys" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="GenerateScriptsInUnicode" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="SourceTranslateChar" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="DestinationTranslateChar" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="CopyAllDRIObjects" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="ListStringType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+,?([0-9]+,.+,){0,}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransferSqlServerObjectsTaskExistingDataEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Replace"/>
+      <xs:enumeration value="Append"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="WMIDRTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="WQLQuerySourceType" type="DTS:SourceTypeEnum"
+                  use="optional" default="DirectInput" form="unqualified"/>
+    <xs:attribute name="WQLQuerySource" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="DestinationType"
+                  type="DTS:DestinationTypeEnum" form="unqualified"
+                  use="optional" default="FileConnection"/>
+    <xs:attribute name="Destination" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="OverwriteDestination"
+                  type="DTS:WMITaskDataOverwriteDestinationEnum"
+                  use="optional" default="KeepOriginal" form="unqualified"/>
+    <xs:attribute name="OutputType"
+                  type="DTS:WMITaskDataOutputTypeEnum"
+                  use="optional" default="DataTable" form="unqualified"/>
+    <xs:attribute name="WMIConnectionName" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="WMITaskDataOverwriteDestinationEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="KeepOriginal"/>
+      <xs:enumeration value="AppendToDestination"/>
+      <xs:enumeration value="OverwriteDestination"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="WMITaskDataOutputTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DataTable"/>
+      <xs:enumeration value="PropertyNameAndValue"/>
+      <xs:enumeration value="PropertyValue"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <xs:complexType name="WMIEWTaskDataObjectDataType">
+    <xs:sequence/>
+    <xs:attribute name="WMIConnectionName" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="WQLQuerySourceType" type="DTS:SourceTypeEnum"
+                  use="optional" default="DirectInput" form="unqualified"/>
+    <xs:attribute name="WQLQuerySource" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="ActionAtEvent"
+                  type="DTS:WMIEWTaskDataActionAtEventEnum"
+                  use="optional" default="LogTheEventAndFireDTSEvent"
+                  form="unqualified"/>
+    <xs:attribute name="AfterEvent"
+                  type="DTS:WMIEWTaskDataAfterEventEnum"
+                  use="optional" default="ReturnWithSuccess"
+                  form="unqualified"/>
+    <xs:attribute name="ActionAtTimeout"
+                  type="DTS:WMIEWTaskDataActionAtTimeoutEnum"
+                  use="optional" default="LogTimeoutAndFireDTSEvent"
+                  form="unqualified"/>
+    <xs:attribute name="AfterTimeout"
+                  type="DTS:WMIEWTaskDataAfterEventEnum"
+                  use="optional" default="ReturnWithFailure"
+                  form="unqualified"/>
+    <xs:attribute name="NumberOfEvents" type="xs:int"
+                  use="optional" default="1" form="unqualified"/>
+    <xs:attribute name="Timeout" type="xs:int" form="unqualified"
+                  use="optional" default="0"/>
+  </xs:complexType>
+
+  <xs:simpleType name="WMIEWTaskDataActionAtEventEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LogTheEventAndFireDTSEvent"/>
+      <xs:enumeration value="LogTheEvent"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="WMIEWTaskDataAfterEventEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="WatchfortheEventAgain"/>
+      <xs:enumeration value="ReturnWithSuccess"/>
+      <xs:enumeration value="ReturnWithFailure"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="WMIEWTaskDataActionAtTimeoutEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LogTimeoutAndFireDTSEvent"/>
+      <xs:enumeration value="LogTimeout"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="XMLTaskDataObjectDataType">
+    <xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="OperationType" form="unqualified"
+                  type="DTS:XMLTaskOperationTypeEnum"
+                  use="optional" default="Diff"/>
+    <xs:attribute name="SourceType" type="DTS:SourceTypeEnum"
+                  use="optional" default="FileConnection"
+                  form="unqualified"/>
+    <xs:attribute name="Source" type="xs:string" form="unqualified"
+                  use="optional" default="" />
+    <xs:attribute name="SecondOperandType" type="DTS:SourceTypeEnum"
+                  use="optional" default="DirectInput" form="unqualified"/>
+    <xs:attribute name="SecondOperand" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="SaveOperationResult" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="DestinationType"
+                  type="DTS:DestinationTypeEnum" form="unqualified"
+                  use="optional" default="FileConnection" />
+    <xs:attribute name="Destination" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="OverwriteDestination" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="FailOpOnValidationFail" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="FailOpOnDifference" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="SaveDiffGram" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="DiffGramDestinationType" form="unqualified"
+                  type="DTS:DestinationTypeEnum" use="optional"
+                  default="FileConnection"/>
+    <xs:attribute name="DiffGramDestination" form="unqualified"
+                  type="xs:string" use="optional" default=""/>
+    <xs:attribute name="DiffOptions" type="DTS:XMLTaskDiffOptionsType"
+                  use="optional" default="20" form="unqualified"/>
+    <xs:attribute name="DiffAlgorithm" form="unqualified"
+                  type="DTS:XMLTaskDiffAlgorithmEnum"
+                  use="optional" default="Fast"/>
+    <xs:attribute name="XPathStringSourceType"
+                  type="DTS:SourceTypeEnum" form="unqualified"
+                  use="optional" default="DirectInput"/>
+    <xs:attribute name="XPathStringSource" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="XPathOperation" form="unqualified"
+                  type="DTS:XMLTaskXPathOperationEnum"
+                  use="optional" default="Evaluation" />
+    <xs:attribute name="PutResultInOneNode" form="unqualified"
+                  use="optional" default="False">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="ValidationType"
+                  type="DTS:XMLTaskValidationTypeEnum"
+                  use="optional" default="XSD" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="XMLTaskOperationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Diff"/>
+      <xs:enumeration value="Validate"/>
+      <xs:enumeration value="Merge"/>
+      <xs:enumeration value="XSLT"/>
+      <xs:enumeration value="XPATH"/>
+      <xs:enumeration value="Patch"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="XMLTaskDiffOptionsType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="XMLTaskDiffAlgorithmEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Auto"/>
+      <xs:enumeration value="Fast"/>
+      <xs:enumeration value="Precise"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="XMLTaskXPathOperationEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Evaluation"/>
+      <xs:enumeration value="NodeList"/>
+      <xs:enumeration value="Values"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="XMLTaskValidationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DTD"/>
+      <xs:enumeration value="XSD"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="InnerObjectObjectDataType">
+    <xs:sequence>
+      <xs:any minOccurs="0" maxOccurs="unbounded"
+              namespace="##any" processContents="skip"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--Support Types Contained by ObjectData for Executables-->
+
+  <!--pipelineObjectDataType-->
+
+  <xs:complexType name="pipelineObjectDataType">
+    <xs:sequence>
+      <xs:sequence>
+        <xs:element name="components" type="DTS:PipelineComponentsType"
+                    form="unqualified"/>
+        <xs:element name="paths" type="DTS:PipelinePathsType"
+                    minOccurs="0" form="unqualified"/>
+      </xs:sequence>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:int" form="unqualified"
+                  use="required"/>
+    <xs:attribute name="name" type="xs:string" form="unqualified"
+                  use="optional" default=""/>
+    <xs:attribute name="version" type="xs:int" form="unqualified"
+                  use="optional" fixed="1"/>
+    <xs:attribute name="description" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="defaultBufferMaxRows" type="xs:int"
+                  use="optional" default="10000" form="unqualified"/>
+    <xs:attribute name="engineThreads" type="xs:int"
+                  use="optional" default="10" form="unqualified"/>
+    <xs:attribute name="defaultBufferSize" type="xs:int"
+                  use="optional" default="10485760" form="unqualified"/>
+    <xs:attribute name="BLOBTempStoragePath" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="bufferTempStoragePath" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="runInOptimizedMode" type="xs:boolean"
+                  use="optional" default="true" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentsType">
+    <xs:sequence>
+      <xs:element name="component" type="DTS:PipelineComponentType"
+                  form="unqualified" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelinePathsType">
+    <xs:sequence>
+      <xs:element name="path" type="DTS:PipelinePathType"
+          form="unqualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentType">
+    <xs:sequence>
+      <xs:element name="properties" form="unqualified"
+                  type="DTS:PipelineComponentPropertiesType"
+                  minOccurs="0"/>
+      <xs:element name="connections" form="unqualified"
+                  type="DTS:PipelineComponentConnectionsType"
+                  minOccurs="0"/>
+      <xs:element name="inputs" form="unqualified"
+                  type="DTS:PipelineComponentInputsType"
+                  minOccurs="0"/>
+      <xs:element name="outputs" form="unqualified"
+                  type="DTS:PipelineComponentOutputsType"
+                  minOccurs="0"/>
+    </xs:sequence>
+    <!--   <xs:attribute name="id" type="xs:int" form="unqualified"/>-->
+    <xs:attribute name="name" type="xs:string" form="unqualified"
+                  use="optional" default=""/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="unqualified"/>
+    <xs:attribute name="componentClassID" use="required"
+                  type="DTS:PipelineComponentComponentClassIDEnum"
+                  form="unqualified"/>
+    <xs:attribute name="description" type="xs:string"
+                  form="unqualified" use="optional" default=""/>
+    <xs:attribute name="localeId" type="xs:int" use="optional"
+                  default="-1" form="unqualified"/>
+    <xs:attribute name="usesDispositions" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="validateExternalMetadata" form="unqualified"
+                  use="optional" default="True">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="version" type="xs:int" use="optional"
+                  default="0" form="unqualified"/>
+    <xs:attribute name="pipelineVersion" type="xs:int"
+                  use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="contactInfo" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentPropertiesType">
+    <xs:sequence>
+      <xs:element name="property" form="unqualified"
+                  type="DTS:PipelineComponentPropertyType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentOutputPropertiesType">
+    <xs:sequence>
+      <xs:element name="property" form="unqualified"
+                  type="DTS:PipelineComponentOutputPropertyType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputPropertiesType">
+    <xs:sequence>
+      <xs:element name="property" form="unqualified"
+                  type="DTS:PipelineComponentInputPropertyType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentConnectionsType">
+    <xs:sequence>
+      <xs:element name="connection" form="unqualified"
+                  type="DTS:PipelineComponentConnectionType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputsType">
+    <xs:sequence>
+      <xs:element name="input" form="unqualified"
+                  type="DTS:PipelineComponentInputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentOutputsType">
+    <xs:sequence>
+      <xs:element name="output" form="unqualified"
+                  type="DTS:PipelineComponentOutputType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Test">
+    <xs:complexContent>
+      <xs:restriction base="xs:anyType">
+        <xs:sequence>
+          <xs:element name="arrayElements" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+              <xs:anyAttribute namespace="##any" processContents="lax"/>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:anyAttribute namespace="##any" processContents="lax"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentPropertyType" mixed="true">
+    <xs:sequence>
+      <xs:element name="arrayElements"
+                  type="DTS:PipelineComponentArrayElementsType"
+                  form="unqualified" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="name" use="required"
+                  type="DTS:PipelineComponentPropertyNameEnum"
+                  form="unqualified"/>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentPropertyAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:attributeGroup
+    name="PipelineComponentPropertyAttributeGroup">
+    <!--    <xs:attribute name="id" type="xs:int" form="unqualified"/>-->
+    <xs:attribute name="dataType"
+                  type="DTS:PipelineComponentDataTypeEnum"
+                  form="unqualified"/>
+    <xs:attribute name="state"
+                  type="DTS:PipelineComponentStateEnum"
+                  form="unqualified" use="optional" default="default" />
+    <xs:attribute name="isArray" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="description" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="typeConverter" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="UITypeEditor" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="containsID" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="expressionType"
+                  type="DTS:PipelineComponentExpressionTypeEnum"
+                  use="optional" default="None" form="unqualified"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="PipelineComponentOutputPropertyType"
+                  mixed="true">
+    <xs:sequence>
+      <xs:element name="arrayElements"
+                  type="DTS:PipelineComponentArrayElementsType"
+                  form="unqualified" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentPropertyAttributeGroup"/>
+    <xs:attribute name="name" use="required"
+                  type="DTS:PipelineComponentOutputPropertyNameEnum"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputPropertyType"
+                  mixed="true">
+    <xs:sequence>
+      <xs:element name="arrayElements"
+                  type="DTS:PipelineComponentArrayElementsType"
+                  form="unqualified" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentPropertyAttributeGroup"/>
+    <xs:attribute name="name" use="required"
+                  type="DTS:PipelineComponentInputPropertyNameEnum"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentArrayElementsType">
+    <xs:sequence>
+      <xs:element name="arrayElement"
+                  type="DTS:PipelineComponentArrayElementType"
+                  form="unqualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="arrayElementCount" type="xs:int"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentArrayElementType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attribute name="dataType"
+                      type="DTS:PipelineComponentDataTypeEnum"
+                      form="unqualified"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="PipelineComponentComponentClassIDEnum">
+    <xs:restriction base="DTS:uuid">
+      <!--Transforms-->
+      <!--Aggregate-->
+      <xs:enumeration value="{5B201335-B360-485C-BB93-75C34E09B3D3}"/>
+      <!--Audit-->
+      <xs:enumeration value="{4FCE8297-9C65-40A9-9D60-00C5CC6BC283}"/>
+      <!--Cache Transform-->
+      <xs:enumeration value="{BF818E79-2C1C-410D-ADEA-B2D1A04FED01}"/>
+      <!--Character Map-->
+      <xs:enumeration value="{C86C867A-7D40-486A-8734-F0B6943A9DD4}"/>
+      <!--Conditional Split-->
+      <xs:enumeration value="{7F88F654-4E20-4D14-84F4-AF9C925D3087}"/>
+      <!--Copy Column-->
+      <xs:enumeration value="{D231ABC4-4754-481B-8F7A-CD4BD8D09832}"/>
+      <!--Data Conversion-->
+      <xs:enumeration value="{62B1106C-7DB8-4EC8-ADD6-4C664DFFC54A}"/>
+      <!--Data Mining Query-->
+      <xs:enumeration value="{CBDFF0CC-3758-4424-A431-3C2E103069AA}"/>
+      <!--Derived Column-->
+      <xs:enumeration value="{49928E82-9C4E-49F0-AABE-3812B82707EC}"/>
+      <!--Export Column-->
+      <xs:enumeration value="{A9823821-0085-4483-952F-36277F63FFC5}"/>
+      <!--Fuzzy Grouping-->
+      <xs:enumeration value="{836E0D0B-0358-45B4-B888-4ADCE9356D4E}"/>
+      <!--Fuzzy Lookup-->
+      <xs:enumeration value="{E4A5F949-EC93-45AB-8B36-B52936257EC2}"/>
+      <!--Import Column-->
+      <xs:enumeration value="{9053CAE0-140B-48E4-AEEC-4E6A26E9E436}"/>
+      <!--Lookup-->
+      <xs:enumeration value="{671046B0-AA63-4C9F-90E4-C06E0B710CE3}"/>
+      <!--Merge-->
+      <xs:enumeration value="{36E0E750-2510-4776-AA6E-17EAE84FD63E}"/>
+      <!--MergeJoin-->
+      <xs:enumeration value="{14D43A4F-D7BD-489D-829E-6DE35750CFE4}"/>
+      <!--Multicast-->
+      <xs:enumeration value="{EC139FBC-694E-490B-8EA7-35690FB0F445}"/>
+      <!--OLE DB Command-->
+      <xs:enumeration value="{93FFEC66-CBC8-4C7F-9C6A-CB1C17A7567D}"/>
+      <!--Percentage Sampling-->
+      <xs:enumeration value="{05322586-D434-4593-8BE4-8CFC766D9C8B}"/>
+      <!--Pivot-->
+      <xs:enumeration value="{AEB2AFAE-2201-48B1-B290-42BB8C9149DD}"/>
+      <!--RowCount-->
+      <xs:enumeration value="{E2697D8C-70DA-42B2-8208-A19CE3A9FE41}"/>
+      <!--Row Sampling-->
+      <xs:enumeration value="{284A868A-7C3D-498C-ABBF-028CEF6AB288}"/>
+      <!--Script Component, ADO.Net source, XML Source,ADO.Net
+       Destination, DataReader Destination, SQL Server Compact Destination-->
+      <xs:enumeration value="{874F7595-FB5F-40FF-96AF-FBFF8250E3EF}"/>
+      <!--Slowly Changing Dimension-->
+      <xs:enumeration value="{25BBB0C5-369B-4303-B3DF-D0DC741DEE58}"/>
+      <!--Sort-->
+      <xs:enumeration value="{5B1A3FF5-D366-4D75-AD1F-F19A36FCBEDB}"/>
+      <!--Term Extraction-->
+      <xs:enumeration value="{056F53D1-8081-4D07-8134-1D4DAC244BB2}"/>
+      <!--Term Lookup-->
+      <xs:enumeration value="{ACCC729A-823D-49A7-B16D-F1999AEB1D4C}"/>
+      <!--Union All-->
+      <xs:enumeration value="{B594E9A8-4351-4939-891C-CFE1AB93E925}"/>
+      <!--Unpivot-->
+      <xs:enumeration value="{B8B094A9-8809-4E06-8874-5C55606A9FDF}"/>
+
+      <!--Destinations-->
+      <!--Excel Destination-->
+      <xs:enumeration value="{1F5D5712-2FBA-4CB9-A95A-86C1F336E1DA}"/>
+      <!--Flat File Destination-->
+      <xs:enumeration value="{8DA75FED-1B7C-407D-B2AD-2B24209CCCA4}"/>
+      <!--OLE DB Destination-->
+      <xs:enumeration value="{4ADA7EAA-136C-4215-8098-D7A7C27FC0D1}"/>
+      <!--Data Mining Model Training-->
+      <xs:enumeration value="{3D9FFAE9-B89B-43D9-80C8-B97D2740C746}"/>
+      <!--Dimension Processing-->
+      <xs:enumeration value="{2C2F0891-3AAA-4865-A676-D7476FE4CE90}"/>
+      <!--Partition Processing-->
+      <xs:enumeration value="{DA510FB7-E3A8-4D96-9F59-55E15E67FE3D}"/>
+      <!--Raw File Destination-->
+      <xs:enumeration value="{04762BB6-892F-4EE6-AD46-9CEB0A7EC7A2}"/>
+      <!--RecordSet Destination-->
+      <xs:enumeration value="{C457FD7E-CE98-4C4B-AEFE-F3AE0044F181}"/>
+      <!--SQL Server Destination-->
+      <xs:enumeration value="{F452EAF3-5EF0-43F1-8067-09DDF0BC6316}"/>
+
+      <!--Sources-->
+      <!--Excel Source-->
+      <xs:enumeration value="{8C084929-27D1-479F-9641-ABB7CDADF1AC}"/>
+      <!--Flat File Source-->
+      <xs:enumeration value="{D23FD76B-F51D-420F-BBCB-19CBF6AC1AB4}"/>
+      <!--OLE DB Source-->
+      <xs:enumeration value="{165A526D-D5DE-47FF-96A6-F8274C19826B}"/>
+      <!--Raw File Source-->
+      <xs:enumeration value="{480C7D5A-CE63-405C-B338-3C7F26560EE3}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <!--Transforms-->
+      <!--Aggregate Task-->
+      <xs:enumeration value="KeyScale"/>
+      <xs:enumeration value="Keys"/>
+      <xs:enumeration value="CountDistinctScale"/>
+      <xs:enumeration value="CountDistinctKeys"/>
+      <xs:enumeration value="AutoExtendFactor"/>
+      <!--Audit (none)-->
+      <!--Cache Transform (none)-->
+      <!--Character Map (none)-->
+      <!--Conditional Split (none)-->
+      <!--Copy Column (none)-->
+      <!--Data Conversion (none)-->
+      <!--Data Mining Query-->
+      <xs:enumeration value="ObjectRef"/>
+      <xs:enumeration value="QueryText"/>
+      <xs:enumeration value="CatalogName"/>
+      <!--Derived Column Query (none)-->
+      <!--Export Column Query (none)-->
+      <!--Fuzzy Grouping-->
+      <xs:enumeration value="MinSimilarity"/>
+      <xs:enumeration value="Delimiters"/>
+      <xs:enumeration value="MaxMemoryUsage"/>
+      <xs:enumeration value="Exhaustive"/>
+      <!--Fuzzy Lookup-->
+      <xs:enumeration value="MatchIndexOptions"/>
+      <xs:enumeration value="MaxMemoryUsage"/>
+      <xs:enumeration value="MatchIndexName"/>
+      <xs:enumeration value="ReferenceTableName"/>
+      <xs:enumeration value="DropExistingMatchIndex"/>
+      <xs:enumeration value="CopyReferenceTable"/>
+      <xs:enumeration value="MaxOutputMatchesPerInput"/>
+      <xs:enumeration value="MinSimilarity"/>
+      <xs:enumeration value="Delimiters"/>
+      <xs:enumeration value="ReferenceMetadataXml"/>
+      <xs:enumeration value="Exhaustive"/>
+      <xs:enumeration value="WarmCaches"/>
+      <!--Import Column (none)-->
+      <!--Lookup-->
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="SqlCommandParam"/>
+      <xs:enumeration value="ConnectionType"/>
+      <xs:enumeration value="CacheType"/>
+      <xs:enumeration value="NoMatchBehavior"/>
+      <xs:enumeration value="NoMatchCachePercentage"/>
+      <xs:enumeration value="MaxMemoryUsage"/>
+      <xs:enumeration value="MaxMemoryUsage64"/>
+      <xs:enumeration value="ReferenceMetadataXml"/>
+      <xs:enumeration value="ParameterMap"/>
+      <xs:enumeration value="DefaultCodePage"/>
+      <!--Merge (none)-->
+      <!--MergeJoin (none)-->
+      <xs:enumeration value="JoinType"/>
+      <xs:enumeration value="NumKeyColumns"/>
+      <xs:enumeration value="TreatNullsAsEqual"/>
+      <xs:enumeration value="MaxBuffersPerInput"/>
+      <!--Multicast (none)-->
+      <!--OLE DB Command-->
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="DefaultCodePage"/>
+      <!--Percentage Sampling-->
+      <xs:enumeration value="SamplingValue"/>
+      <xs:enumeration value="SamplingSeed"/>
+      <!--Pivot (none)-->
+      <!--RowCount-->
+      <xs:enumeration value="VariableName"/>
+      <!--Row Sampling-->
+      <xs:enumeration value="SamplingValue"/>
+      <xs:enumeration value="SamplingSeed"/>
+      <!--Script Component-->
+      <xs:enumeration value="SourceCode"/>
+      <xs:enumeration value="BinaryCode"/>
+      <xs:enumeration value="VSTAProjectName"/>
+      <xs:enumeration value="ScriptLanguage"/>
+      <xs:enumeration value="ReadOnlyVariables"/>
+      <xs:enumeration value="ReadWriteVariables"/>
+      <xs:enumeration value="BreakpointCollection"/>
+      <xs:enumeration value="UserComponentTypeName"/>
+      <!--Slowly Changing Dimension-->
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="CurrentRowWhere"/>
+      <xs:enumeration value="UpdateChangingAttributeHistory"/>
+      <xs:enumeration value="FailOnFixedAttributeChange"/>
+      <xs:enumeration value="InferredMemberIndicator"/>
+      <xs:enumeration value="EnableInferredMember"/>
+      <xs:enumeration value="FailOnLookupFailure"/>
+      <xs:enumeration value="IncomingRowChangeType"/>
+      <xs:enumeration value="DefaultCodePage"/>
+      <!--Sort-->
+      <xs:enumeration value="EliminateDuplicates"/>
+      <xs:enumeration value="MaximumThreads"/>
+      <!--Term Extraction-->
+      <xs:enumeration value="NeedReferenceData"/>
+      <xs:enumeration value="OutTermTable"/>
+      <xs:enumeration value="OutTermColumn"/>
+      <xs:enumeration value="WordOrPhrase"/>
+      <xs:enumeration value="ScoreType"/>
+      <xs:enumeration value="FrequencyThreshold"/>
+      <xs:enumeration value="MaxLengthOfTerm"/>
+      <xs:enumeration value="IsCaseSensitive"/>
+      <!--Term Lookup-->
+      <xs:enumeration value="RefTermTable"/>
+      <xs:enumeration value="RefTermColumn"/>
+      <xs:enumeration value="IsCaseSensitive"/>
+      <!--UnionAll (none)-->
+      <!--Unpivot (none)-->
+
+      <!--Data Destinations-->
+      <!--ADO.Net Destination-->
+      <xs:enumeration value="TableOrViewName"/>
+      <xs:enumeration value="BatchSize"/>
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="UserComponentTypeName"/>
+      <!--Excel Destination-->
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="OpenRowset"/>
+      <xs:enumeration value="OpenRowsetVariable"/>
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="FastLoadKeepIdentity"/>
+      <xs:enumeration value="FastLoadKeepNulls"/>
+      <xs:enumeration value="FastLoadOptions"/>
+      <xs:enumeration value="FastLoadMaxInsertCommitSize"/>
+      <!--Flat File Destination-->
+      <xs:enumeration value="Overwrite"/>
+      <xs:enumeration value="Header"/>
+      <!--OLE DB Destination-->
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="OpenRowset"/>
+      <xs:enumeration value="OpenRowsetVariable"/>
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="DefaultCodePage"/>
+      <xs:enumeration value="AlwaysUseDefaultCodePage"/>
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="FastLoadKeepIdentity"/>
+      <xs:enumeration value="FastLoadKeepNulls"/>
+      <xs:enumeration value="FastLoadOptions"/>
+      <xs:enumeration value="FastLoadMaxInsertCommitSize"/>
+      <!--Raw File Destination-->
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="FileName"/>
+      <xs:enumeration value="FileNameVariable"/>
+      <xs:enumeration value="WriteOption"/>
+      <!--DataReader Destination-->
+      <xs:enumeration value="ReadTimeout"/>
+      <xs:enumeration value="DataReader"/>
+      <xs:enumeration value="FailOnTimeout"/>
+      <xs:enumeration value="UserComponentTypeName"/>
+      <!--Data Mining Model Training-->
+      <xs:enumeration value="ObjectRef"/>
+      <!--Dimension Processing-->
+      <xs:enumeration value="ObjectRef"/>
+      <xs:enumeration value="UseDefaultConfiguration"/>
+      <xs:enumeration value="KeyErrorLimit"/>
+      <xs:enumeration value="KeyErrorLogFile"/>
+      <xs:enumeration value="KeyErrorAction"/>
+      <xs:enumeration value="KeyErrorLimitAction"/>
+      <xs:enumeration value="KeyNotFound"/>
+      <xs:enumeration value="KeyDuplicate"/>
+      <xs:enumeration value="NullKeyConvertedToUnknown"/>
+      <xs:enumeration value="NullKeyNotAllowed"/>
+      <xs:enumeration value="ProcessType"/>
+      <!--Partition Processing-->
+      <xs:enumeration value="ObjectRef"/>
+      <xs:enumeration value="UseDefaultConfiguration"/>
+      <xs:enumeration value="KeyErrorLimit"/>
+      <xs:enumeration value="KeyErrorLogFile"/>
+      <xs:enumeration value="KeyErrorAction"/>
+      <xs:enumeration value="KeyErrorLimitAction"/>
+      <xs:enumeration value="KeyNotFound"/>
+      <xs:enumeration value="KeyDuplicate"/>
+      <xs:enumeration value="NullKeyConvertedToUnknown"/>
+      <xs:enumeration value="NullKeyNotAllowed"/>
+      <xs:enumeration value="ProcessType"/>
+      <!--RecordSet Destination-->
+      <xs:enumeration value="VariableName"/>
+      <!--SQL Server Compact Destination-->
+      <xs:enumeration value="Table Name"/>
+      <xs:enumeration value="UserComponentTypeName"/>
+      <!--SQL Server Destination-->
+      <xs:enumeration value="DefaultCodePage"/>
+      <xs:enumeration value="AlwaysUseDefaultCodePage"/>
+      <xs:enumeration value="BulkInsertTableName"/>
+      <xs:enumeration value="BulkInsertCheckConstraints"/>
+      <xs:enumeration value="BulkInsertFirstRow"/>
+      <xs:enumeration value="BulkInsertFireTriggers"/>
+      <xs:enumeration value="BulkInsertKeepIdentity"/>
+      <xs:enumeration value="BulkInsertKeepNulls"/>
+      <xs:enumeration value="BulkInsertLastRow"/>
+      <xs:enumeration value="BulkInsertMaxErrors"/>
+      <xs:enumeration value="BulkInsertOrder"/>
+      <xs:enumeration value="BulkInsertTablock"/>
+      <xs:enumeration value="Timeout"/>
+      <xs:enumeration value="MaxInsertCommitSize"/>
+
+      <!--Data Sources-->
+      <!--ADO.Net Source-->
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="AllowImplicitStringConversion"/>
+      <xs:enumeration value="TableOrViewName"/>
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="UserComponentTypeName"/>
+      <!--Excel Source-->
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="OpenRowset"/>
+      <xs:enumeration value="OpenRowsetVariable"/>
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="SqlCommandVariable"/>
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="ParameterMapping"/>
+      <!--Flat File Source-->
+      <xs:enumeration value="RetainNulls"/>
+      <xs:enumeration value="FileNameColumnName"/>
+      <!--OLEDB Source Task-->
+      <xs:enumeration value="CommandTimeout"/>
+      <xs:enumeration value="OpenRowset"/>
+      <xs:enumeration value="OpenRowsetVariable"/>
+      <xs:enumeration value="SqlCommand"/>
+      <xs:enumeration value="SqlCommandVariable"/>
+      <xs:enumeration value="DefaultCodePage"/>
+      <xs:enumeration value="AlwaysUseDefaultCodePage"/>
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="ParameterMapping"/>
+      <!--Raw File Source-->
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="FileName"/>
+      <xs:enumeration value="FileNameVariable"/>
+      <!--XML Source-->
+      <xs:enumeration value="UserComponentTypeName"/>
+      <xs:enumeration value="XMLData"/>
+      <xs:enumeration value="XMLDataVariable"/>
+      <xs:enumeration value="AccessMode"/>
+      <xs:enumeration value="XMLSchemaDefinition"/>
+      <xs:enumeration value="UseInlineSchema"/>
+
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentOutputPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <!--Transforms-->
+      <!--Aggregate Task-->
+      <xs:enumeration value="KeyScale"/>
+      <xs:enumeration value="Keys"/>
+      <!--Audit (none)-->
+      <!--Cache Transform (none)-->
+      <!--Character Map (none)-->
+      <!--Conditional Split-->
+      <xs:enumeration value="Expression"/>
+      <xs:enumeration value="FriendlyExpression"/>
+      <xs:enumeration value="EvaluationOrder"/>
+      <xs:enumeration value="IsDefaultOut"/>
+      <!--Copy Column (none)-->
+      <!--Data Conversion (none)-->
+      <!--Data Mining Query(none)-->
+      <!--Derived Column Query (none)-->
+      <!--Export Column Query (none)-->
+      <!--Fuzzy Grouping(none)-->
+      <!--Fuzzy Lookup(none)-->
+      <!--Import Column (none)-->
+      <!--Lookup(none)-->
+      <!--Merge (none)-->
+      <!--MergeJoin (none)-->
+      <!--Multicast (none)-->
+      <!--OLE DB Command(none)-->
+      <!--Percentage Sampling-->
+      <xs:enumeration value="Selected"/>
+      <!--Pivot (none)-->
+      <!--RowCount (none)-->
+      <!--Row Sampling-->
+      <xs:enumeration value="Selected"/>
+      <!--Script Component(none)-->
+      <!--Slowly Changing Dimension(none)-->
+      <!--Sort(none)-->
+      <!--Term Extraction(none)-->
+      <!--Term Lookup(none)-->
+      <!--UnionAll (none)-->
+      <!--Unpivot (none)-->
+
+      <!--Data Sources(none)-->
+      <!--ADO.Net Source(none)-->
+      <!--Excel Source(none)-->
+      <!--Flat File Source(none)-->
+      <!--OLEDB Source Task(none)-->
+      <!--Raw File Source(none)-->
+      <!--XML Source-->
+      <xs:enumeration value="RowsetID"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentInputPropertyNameEnum">
+    <xs:restriction base="xs:string">
+    </xs:restriction>
+    <!--None of the components have defined properties for 
+     the Input element-->
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentOutputColumnPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <!--Transforms-->
+      <!--Aggregate Task-->
+      <xs:enumeration value="AggregationColumnId"/>
+      <xs:enumeration value="AggregationType"/>
+      <xs:enumeration value="IsBig"/>
+      <xs:enumeration value="AggregationComparisonFlags"/>
+      <xs:enumeration value="CountDistinctKey"/>
+      <xs:enumeration value="CountDistinctScale"/>
+      <!--Audit-->
+      <xs:enumeration value="LineageItemSelected"/>
+      <!--Cache Transform (none)-->
+      <!--Character Map (none)-->
+      <!--Conditional Split (none)-->
+      <!--Copy Column (none)-->
+      <xs:enumeration value="copyColumnId"/>
+      <!--Data Conversion (none)-->
+      <xs:enumeration value="SourceInputColumnLineageID"/>
+      <xs:enumeration value="FastParse"/>
+      <!--Data Mining Query-->
+      <!--Derived Column Query (none)-->
+      <xs:enumeration value="Expression"/>
+      <xs:enumeration value="FriendlyExpression"/>
+      <!--Export Column Query (none)-->
+      <!--Fuzzy Grouping-->
+      <xs:enumeration value="ColumnType"/>
+      <xs:enumeration value="InputId"/>
+      <!--Fuzzy Lookup-->
+      <xs:enumeration value="CopyFromReferenceColumn"/>
+      <xs:enumeration value="SourceInputColumnLineageID"/>
+      <xs:enumeration value="ColumnType"/>
+      <!--Import Column (none)-->
+      <!--Lookup-->
+      <xs:enumeration value="CopyFromReferenceColumn"/>
+      <!--Merge (none)-->
+      <!--MergeJoin-->
+      <xs:enumeration value="InputColumnID"/>
+      <!--Multicast (none)-->
+      <!--OLE DB Command (none)-->
+      <!--Percentage Sampling (none)-->
+      <!--Pivot-->
+      <xs:enumeration value="SourceColumn"/>
+      <xs:enumeration value="PivotKeyValue"/>
+      <!--RowCount (none)-->
+      <!--Row Sampling-->
+      <xs:enumeration value="InputColumnLineageID"/>
+      <!--Script Component (none)-->
+      <!--Slowly Changing Dimension (none)-->
+      <!--Sort-->
+      <xs:enumeration value="SortColumnId"/>
+      <!--Term Extraction(none)-->
+      <!--Term Lookup-->
+      <xs:enumeration value="CustomLineageID"/>
+      <!--UnionAll (none)-->
+      <!--Unpivot (none)-->
+      <xs:enumeration value="PivotKey"/>
+
+      <!--Data Sources-->
+      <!--ADO.Net Source(none)-->
+      <!--Excel Source(none)-->
+      <!--Flat File Source-->
+      <xs:enumeration value="FastParse"/>
+      <xs:enumeration value="UseBinaryFormat"/>
+      <!--OLEDB Source Task(none)-->
+      <!--Raw File Source(none)-->
+      <!--XML Source(none)-->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentInputColumnPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <!--Transforms-->
+      <!--Aggregate Task-->
+      <!--Audit (none)-->
+      <!--Cache Transform-->
+      <xs:enumeration value="CacheColumnName"/>
+      <!--Character Map-->
+      <xs:enumeration value="MapFlags"/>
+      <!--Conditional Split (none)-->
+      <!--Copy Column (none)-->
+      <!--Data Conversion (none)-->
+      <!--Data Mining Query(none)-->
+      <!--Derived Column Query-->
+      <xs:enumeration value="Expression"/>
+      <xs:enumeration value="FriendlyExpression"/>
+      <!--Export Column-->
+      <xs:enumeration value="FileDataColumnID"/>
+      <xs:enumeration value="WriteBOM"/>
+      <xs:enumeration value="ForceTruncate"/>
+      <xs:enumeration value="AllowAppend"/>
+      <!--Fuzzy Grouping-->
+      <xs:enumeration value="ToBeCleaned"/>
+      <xs:enumeration value="ExactFuzzy"/>
+      <xs:enumeration value="LeadingTrailingNumeralsSignificant"/>
+      <xs:enumeration value="MinSimilarity"/>
+      <xs:enumeration value="FuzzyComparisonFlags"/>
+      <!--Fuzzy Lookup-->
+      <xs:enumeration value="JoinType"/>
+      <xs:enumeration value="ExactFuzzy"/>
+      <xs:enumeration value="JoinToReferenceColumn"/>
+      <xs:enumeration value="FuzzyComparisonFlags"/>
+      <xs:enumeration value="FuzzyComparisonFlagsEx"/>
+      <!--Import Column-->
+      <xs:enumeration value="FileDataColumnID"/>
+      <xs:enumeration value="ExpectBOM"/>
+      <!--Lookup-->
+      <xs:enumeration value="JoinToReferenceColumn"/>
+      <xs:enumeration value="CopyFromReferenceColumn"/>
+      <!--Merge-->
+      <xs:enumeration value="OutputColumnLineageID"/>
+      <!--MergeJoin (none)-->
+      <!--Multicast (none)-->
+      <!--OLE DB Command (none)-->
+      <!--Percentage Sampling (none)-->
+      <!--Pivot-->
+      <xs:enumeration value="PivotUsage"/>
+      <!--RowCount(none)-->
+      <!--Row Sampling(none)-->
+      <!--Script Component(none)-->
+      <!--Slowly Changing Dimension-->
+      <xs:enumeration value="ColumnType"/>
+      <!--Sort-->
+      <xs:enumeration value="NewComparisonFlags"/>
+      <xs:enumeration value="NewSortKeyPosition"/>
+      <!--Term Extraction(none)-->
+      <!--Term Lookup-->
+      <xs:enumeration value="InputColumnType"/>
+      <!--UnionAll-->
+      <xs:enumeration value="OutputColumnLineageID"/>
+      <!--Unpivot-->
+      <xs:enumeration value="DestinationColumn"/>
+      <xs:enumeration value="PivotKeyValue"/>
+
+      <!--Data Destinations-->
+      <!--ADO.Net Destination(none)-->
+      <!--Excel Destination(none)-->
+      <!--Flat File Destination(none)-->
+      <!--OLE DB Destination(none)-->
+      <!--Raw File Destination(none)-->
+      <!--DataReader Destination(none)-->
+      <!--Data Mining Model Training(none)-->
+      <!--Dimension Processing(none)-->
+      <!--Partition Processing(none)-->
+      <!--RecordSet Destination(none)-->
+      <!--SQL Server Compact Destination(none)-->
+      <!--SQL Server Destination(none)-->
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentDataTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="System.Boolean"/>
+      <xs:enumeration value="System.Byte"/>
+      <xs:enumeration value="System.SByte"/>
+      <xs:enumeration value="System.Decimal"/>
+      <xs:enumeration value="System.Double"/>
+      <xs:enumeration value="System.Single"/>
+      <xs:enumeration value="System.Int32"/>
+      <xs:enumeration value="System.UInt32"/>
+      <xs:enumeration value="System.Int64"/>
+      <xs:enumeration value="System.UInt64"/>
+      <xs:enumeration value="System.Int16"/>
+      <xs:enumeration value="System.UInt16"/>
+      <xs:enumeration value="System.String"/>
+      <xs:enumeration value="System.Null"/>
+      <xs:enumeration value="System.DateTime"/>
+      <xs:enumeration value="System.Object"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentStateEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cdata"/>
+      <xs:enumeration value="escaped"/>
+      <xs:enumeration value="default"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentExpressionTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Notify"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="PipelineComponentConnectionType">
+    <xs:sequence/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                form="unqualified"/>
+    <xs:attribute name="name" type="xs:string" use="optional"
+                  default="" form="unqualified"/>
+    <xs:attribute name="description" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="connectionManagerID" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputType">
+    <xs:sequence>
+      <xs:element name="properties"
+                 type="DTS:PipelineComponentInputPropertiesType"
+                 minOccurs="0" form="unqualified"/>
+      <xs:element name="inputColumns"
+                  type="DTS:PipelineComponentInputColumnsType"
+                  minOccurs="0" form="unqualified"/>
+      <xs:element name="externalMetadataColumns"
+                  type="DTS:PipelineComponentMetadataColumnsType"
+                  minOccurs="0" form="unqualified"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentInputOutputElementAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputColumnsType">
+    <xs:sequence>
+      <xs:element name="inputColumn"
+                  type="DTS:PipelineComponentInputColumnType"
+                  minOccurs="0" maxOccurs="unbounded" form="unqualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputColumnType">
+    <xs:sequence>
+      <xs:element name="properties"
+                  type="DTS:PipelineComponentInputColumnPropertiesType"
+                  form="unqualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentAllColumnBaseAttributeGroup"/>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentIOColumnBaseAttributeGroup"/>
+    <xs:attribute name="usageType"  form="unqualified"
+                  use="optional" default="readOnly"
+                  type="DTS:PipelineComponentUsageTypeEnum"/>
+    <xs:attribute name="cachedName" type="xs:string"
+              use="optional" default="" form="unqualified"/>
+    <xs:attribute name="cachedSortKeyPosition" type="xs:int"
+              use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="cachedPrecision" type="xs:int" use="optional"
+                  default="0" form="unqualified"/>
+    <xs:attribute name="cachedScale" type="xs:int" use="optional"
+                  default="0" form="unqualified"/>
+    <xs:attribute name="cachedLength" type="xs:int" use="optional"
+                  default="0" form="unqualified"/>
+    <xs:attribute name="cachedDataType"
+                  type="DTS:PipelineComponentColumnDataTypeEnum"
+                  use="optional" default="empty" form="unqualified"/>
+    <xs:attribute name="cachedCodepage" type="xs:int" use="optional"
+                  default="0" form="unqualified"/>
+    <xs:attribute name="cachedComparisonFlags" type="xs:int"
+                  form="unqualified" use="optional" default="0" />
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputColumnPropertiesType">
+    <xs:sequence>
+      <xs:element name="property" form="unqualified"
+                  type="DTS:PipelineComponentInputColumnPropertyType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentInputColumnPropertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attributeGroup
+          ref="DTS:PipelineComponentPropertyAttributeGroup"/>
+        <xs:attribute name="name" form="unqualified" use="required"
+            type="DTS:PipelineComponentInputColumnPropertyNameEnum"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentOutputColumnPropertiesType">
+    <xs:sequence>
+      <xs:element name="property" form="unqualified"
+                  type="DTS:PipelineComponentOutputColumnPropertyType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentOutputColumnPropertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attributeGroup
+          ref="DTS:PipelineComponentPropertyAttributeGroup"/>
+        <xs:attribute name="name" form="unqualified" use="required"
+            type="DTS:PipelineComponentOutputColumnPropertyNameEnum"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="PipelineComponentUsageTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="readOnly"/>
+      <xs:enumeration value="readWrite"/>
+      <xs:enumeration value="Ignored"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="PipelineComponentOutputType">
+    <xs:sequence>
+      <xs:element name="properties"
+                  type="DTS:PipelineComponentOutputPropertiesType"
+                  minOccurs="0" form="unqualified"/>
+      <xs:element name="outputColumns"
+                  type="DTS:PipelineComponentOutputColumnsType"
+                  minOccurs="0" form="unqualified"/>
+      <xs:element name="externalMetadataColumns"
+                  type="DTS:PipelineComponentMetadataColumnsType"
+                  minOccurs="0" form="unqualified"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentInputOutputElementAttributeGroup"/>
+    <xs:attribute name="exclusionGroup" type="xs:int"
+                  use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="synchronousInputId" type="xs:string"
+                  use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="deleteOutputOnPathDetached" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="isErrorOut" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="isSorted" type="xs:boolean" use="optional"
+                  default="false" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentMetadataColumnsType">
+    <xs:sequence>
+      <xs:element name="externalMetadataColumn"
+          type="DTS:PipelineComponentMetadataColumnType"
+          minOccurs="0" maxOccurs="unbounded" form="unqualified"/>
+    </xs:sequence>
+    <xs:attribute name="isUsed" form="unqualified">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="True"/>
+          <xs:enumeration value="False"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentMetadataColumnType">
+    <xs:sequence>
+      <xs:element name="properties"
+          type="DTS:PipelineComponentMetadataColumnPropertiesType"
+                  minOccurs="0" form="unqualified"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentAllColumnBaseAttributeGroup"/>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentColumnExtendedAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentMetadataColumnPropertiesType">
+    <xs:sequence>
+      <xs:element name="property"
+          type="DTS:PipelineComponentMetadataColumnPropertyType"
+          minOccurs="0" maxOccurs="unbounded" form="unqualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentMetadataColumnPropertyType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attributeGroup
+          ref="DTS:PipelineComponentPropertyAttributeGroup"/>
+        <xs:attribute name="name" form="unqualified" use="required"
+            type="DTS:PipelineComponentMetadataColumnPropertyNameEnum"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="PipelineComponentMetadataColumnPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <!--OLE DB Command-->
+      <xs:enumeration value="DBParamInfoFlags"/>
+      <!--XML Source-->
+      <xs:enumeration value="CLRType"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup
+    name="PipelineComponentInputOutputElementAttributeGroup">
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="unqualified"/>
+    <xs:attribute name="name" type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="description" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="hasSideEffects" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="dangling" type="xs:boolean"
+                  use="optional" default="false" form="unqualified"/>
+    <xs:attribute name="errorOrTruncationOperation" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="errorRowDisposition" form="unqualified"
+                  type="DTS:PipelineComponentRowDispositionEnum"
+                  use="optional" default="NotUsed"/>
+    <xs:attribute name="truncationRowDisposition" form="unqualified"
+                  type="DTS:PipelineComponentRowDispositionEnum"
+                  use="optional" default="NotUsed"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="PipelineComponentAllColumnBaseAttributeGroup">
+    <!--    <xs:attribute name="id" type="xs:int" form="unqualified"/>-->
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="unqualified"/>
+    <xs:attribute name="name" type="xs:string" use="optional" default=""
+                  form="unqualified"/>
+    <xs:attribute name="description" type="xs:string" use="optional"
+                  default="" form="unqualified"/>
+    <xs:attribute name="mappedColumnId" type="xs:int" use="optional"
+                  default="0" form="unqualified"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="PipelineComponentIOColumnBaseAttributeGroup">
+    <xs:attribute name="errorOrTruncationOperation" type="xs:string"
+                  use="optional" default="" form="unqualified"/>
+    <xs:attribute name="errorRowDisposition"
+                  type="DTS:PipelineComponentRowDispositionEnum"
+                  form="unqualified" use="optional" default="NotUsed"/>
+    <xs:attribute name="truncationRowDisposition"
+                  type="DTS:PipelineComponentRowDispositionEnum"
+                  form="unqualified" use="optional" default="NotUsed"/>
+    <xs:attribute name="externalMetadataColumnId" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="lineageId" type="xs:string" use="required"
+                  form="unqualified"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="PipelineComponentColumnExtendedAttributeGroup">
+    <xs:attribute name="precision" type="xs:int" use="optional" default="0"
+                  form="unqualified"/>
+    <xs:attribute name="scale" type="xs:int" use="optional" default="0"
+                  form="unqualified"/>
+    <xs:attribute name="length" type="xs:int" use="optional" default="0"
+                  form="unqualified"/>
+    <xs:attribute name="dataType"
+                  type="DTS:PipelineComponentColumnDataTypeEnum"
+                  use="optional" default="empty" form="unqualified"/>
+    <xs:attribute name="codePage" type="xs:int" use="optional" default="0"
+                  form="unqualified"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="PipelineComponentOutputColumnsType">
+    <xs:sequence>
+      <xs:element name="outputColumn"
+                  type="DTS:PipelineComponentOutputColumnType"
+           minOccurs="0" maxOccurs="unbounded" form="unqualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PipelineComponentOutputColumnType">
+    <xs:sequence>
+      <xs:element name="properties"
+                  type="DTS:PipelineComponentOutputColumnPropertiesType"
+                  form="unqualified" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentAllColumnBaseAttributeGroup"/>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentIOColumnBaseAttributeGroup"/>
+    <xs:attributeGroup
+      ref="DTS:PipelineComponentColumnExtendedAttributeGroup"/>
+    <xs:attribute name="sortKeyPosition" type="xs:int"
+                  use="optional" default="0" form="unqualified"/>
+    <xs:attribute name="comparisonFlags" type="xs:int"
+                  form="unqualified" use="optional" default="0" />
+    <xs:attribute name="specialFlags" form="unqualified"
+                  use="optional" default="0">
+      <xs:simpleType>
+        <xs:restriction base="xs:int">
+          <xs:minInclusive value="0"/>
+          <xs:maxInclusive value="2"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:simpleType name="PipelineComponentColumnDataTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="empty"/>
+      <xs:enumeration value="i1"/>
+      <xs:enumeration value="ui1"/>
+      <xs:enumeration value="i2"/>
+      <xs:enumeration value="i4"/>
+      <xs:enumeration value="r4"/>
+      <xs:enumeration value="r8"/>
+      <xs:enumeration value="cy"/>
+      <xs:enumeration value="date"/>
+      <xs:enumeration value="bool"/>
+      <xs:enumeration value="variant"/>
+      <xs:enumeration value="decimal"/>
+      <xs:enumeration value="ui2"/>
+      <xs:enumeration value="ui4"/>
+      <xs:enumeration value="i8"/>
+      <xs:enumeration value="ui8"/>
+      <xs:enumeration value="guid"/>
+      <xs:enumeration value="bytes"/>
+      <xs:enumeration value="str"/>
+      <xs:enumeration value="wstr"/>
+      <xs:enumeration value="numeric"/>
+      <xs:enumeration value="dbDate"/>
+      <xs:enumeration value="dateTime"/>
+      <xs:enumeration value="dbTime"/>
+      <xs:enumeration value="dbTimeStamp"/>
+      <xs:enumeration value="image"/>
+      <xs:enumeration value="text"/>
+      <xs:enumeration value="nText"/>
+      <xs:enumeration value="dbTime2"/>
+      <xs:enumeration value="dbTimeStamp2"/>
+      <xs:enumeration value="dbTimeStampOffset"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PipelineComponentRowDispositionEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NotUsed"/>
+      <xs:enumeration value="IgnoreFailure"/>
+      <xs:enumeration value="FailComponent"/>
+      <xs:enumeration value="RedirectRow"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="PipelinePathType">
+    <xs:sequence/>
+    <xs:attribute name="refId" type="xs:string" use="required"
+                  form="unqualified"/>
+    <xs:attribute name="id" type="xs:int" form="unqualified"/>
+    <xs:attribute name="name" type="xs:string" form="unqualified"/>
+    <xs:attribute name="description" type="xs:string"
+                  form="unqualified"/>
+    <xs:attribute name="startId" type="xs:string" form="unqualified"/>
+    <xs:attribute name="endId" type="xs:string" form="unqualified"/>
+  </xs:complexType>
+
+  <!--ObjectData for non-Executables-->
+
+  <xs:complexType name="LogProviderObjectDataType">
+    <xs:sequence>
+      <xs:element name="InnerObject" form="unqualified"
+                  type="DTS:InnerObjectObjectDataType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ForEachEnumeratorObjectDataType">
+    <xs:choice>
+      <xs:element name="FEIEItems" type="DTS:FEIEItemsType"
+                  form="unqualified"/>
+      <xs:element name="ForEachFileEnumeratorProperties"
+                  type="DTS:ForEachFileEnumeratorPropertiesType"
+                  form="unqualified"/>
+      <xs:element name="FEEADO" type="DTS:FEEADOType"
+                  form="unqualified"/>
+      <xs:element name="FEESchemaRowset" type="DTS:FEESchemaRowsetType"
+                  form="unqualified"/>
+      <xs:element name="FEEFVE" type="DTS:FEEFVEType" form="unqualified"/>
+      <xs:element name="FEENODELIST" type="DTS:FEENODELISTType"
+                  form="unqualified"/>
+      <xs:element name="FEESMO" type="DTS:FEESMOType" form="unqualified"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="FEIEItemsType">
+    <xs:sequence>
+      <xs:element name="FEIEItem" type="DTS:FEIEItemType"
+                  maxOccurs="unbounded" form="unqualified"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FEIEItemType">
+    <xs:sequence>
+      <xs:element name="FEIEItemValue" maxOccurs="unbounded"
+                  form="unqualified" type="DTS:FEIEItemValueType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FEIEItemValueType">
+    <xs:sequence/>
+    <xs:attribute name="Type" type="DTS:DtsDataTypeEnum"
+                  use="required" form="unqualified"/>
+    <xs:attribute name="Value" type="xs:string"
+                  use="required" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="ForEachFileEnumeratorPropertiesType">
+    <xs:sequence>
+      <xs:element name="FEFEProperty" maxOccurs="unbounded" form="unqualified">
+        <xs:complexType>
+          <xs:sequence/>
+          <xs:attribute name="Folder" form="unqualified"/>
+          <xs:attribute name="FileSpec" form="unqualified"/>
+          <xs:attribute name="FileNameRetrievalType" form="unqualified">
+            <xs:simpleType>
+              <xs:restriction base="xs:int">
+                <xs:minInclusive value="0"/>
+                <xs:maxInclusive value="2"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="Recurse" form="unqualified">
+            <xs:simpleType>
+              <xs:restriction base="xs:int">
+                <xs:minInclusive value="-1"/>
+                <xs:maxInclusive value="0"/>
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FEEADOType">
+    <xs:sequence/>
+    <xs:attribute name="EnumType" use="required" form="unqualified"
+                  type="DTS:FEEADOEnumType"/>
+    <xs:attribute name="VarName" type="xs:string"
+                  use="required" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="FEEADOEnumType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="EnumerateRowsInFirstTable"/>
+      <xs:enumeration value="EnumerateAllRows"/>
+      <xs:enumeration value="EnumerateTables"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="FEESchemaRowsetType">
+    <xs:sequence>
+      <xs:element name="Restriction" maxOccurs="unbounded"
+                  form="unqualified" type="DTS:RestrictionElementType"/>
+    </xs:sequence>
+    <xs:attribute name="Connection" type="xs:string"
+                  use="required" form="unqualified"/>
+    <xs:attribute name="Schema" type="DTS:uuid"
+                  use="required" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="RestrictionElementType">
+    <xs:sequence/>
+    <xs:attribute name="Index" type="xs:int" use="required"
+                  form="unqualified"/>
+    <xs:attribute name="Value" type="xs:string" use="required"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType name="FEEFVEType">
+    <xs:sequence/>
+    <xs:attribute name="VariableName" type="xs:string" form="unqualified" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="FEENODELISTType">
+    <xs:sequence/>
+    <xs:attribute name="EnumerationType"
+                  type="DTS:NodelistEnumerationTypeEnum"
+                  form="unqualified" use="required"/>
+    <xs:attribute name="OuterXPathSourceType" form="unqualified"
+                  use="required" type="DTS:SourceTypeEnum"/>
+    <xs:attribute name="OuterXPathString" type="xs:string"
+                  form="unqualified" use="required"/>
+    <xs:attribute name="InnerElementType"
+                  type="DTS:NodelistInnerElementEnumerationTypeEnum"
+                  use="required" form="unqualified"/>
+    <xs:attribute name="InnerXPathSourceType" form="unqualified"
+                  use="required" type="DTS:SourceTypeEnum"/>
+    <xs:attribute name="InnerXPathString" type="xs:string"
+                  form="unqualified" use="required"/>
+    <xs:attribute name="SourceType" form="unqualified"
+                  use="required" type="DTS:SourceTypeEnum"/>
+    <xs:attribute name="SourceDocument" type="xs:string"
+                  use="required" form="unqualified"/>
+  </xs:complexType>
+
+  <xs:simpleType name="NodelistInnerElementEnumerationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Navigator"/>
+      <xs:enumeration value="Node"/>
+      <xs:enumeration value="NodeText"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NodelistEnumerationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Navigator"/>
+      <xs:enumeration value="Node"/>
+      <xs:enumeration value="NodeText"/>
+      <xs:enumeration value="ElementCollection"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="FEESMOType">
+    <xs:sequence/>
+    <xs:attribute name="EnumURN" type="xs:string" form="unqualified" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="ConnectionManagerObjectDataType">
+    <xs:choice>
+      <xs:element name="ConnectionManager" type=
+          "DTS:ConnectionManagerObjectDataConnectionManagerType"/>
+      <xs:element name="MsmqConnectionManager" type=
+          "DTS:ConnectionManagerObjectDataMsmqConnectionManagerType"
+                  form="unqualified"/>
+      <xs:element name="SMOServerConnectionManager" type=
+          "DTS:ConnectionManagerObjectDataSMOServerConnectionManagerType"
+                  form="unqualified"/>
+      <xs:element name="SmtpConnectionManager" type=
+          "DTS:ConnectionManagerObjectDataSmtpConnectionManagerType"
+                  form="unqualified"/>
+      <xs:element name="WmiConnectionManager" type=
+          "DTS:ConnectionManagerObjectDataWmiConnectionManagerType"
+                  form="unqualified"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType
+    name="ConnectionManagerObjectDataConnectionManagerType">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element name="FlatFileColumns" type="DTS:FlatFileColumnsType"/>
+        <xs:element name="CacheColumns" type="DTS:CacheColumnsType"
+                    maxOccurs="unbounded"/>
+        <xs:element name="FtpConnection" type="DTS:FtpConnectionType"/>
+        <xs:element name="HttpConnection" type="DTS:HttpConnectionType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attributeGroup
+      ref="DTS:ConnectionManagerConnectionManagerAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="FlatFileColumnsType">
+    <xs:sequence>
+      <xs:element name="FlatFileColumn" type="DTS:FlatFileColumnType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FlatFileColumnType">
+    <xs:sequence/>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:FlatFileColumnAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="CacheColumnsType">
+    <xs:sequence>
+      <xs:element name="CacheColumn" type="DTS:CacheColumnType"
+                    minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CacheColumnType">
+    <xs:sequence/>
+    <xs:attributeGroup ref="DTS:BasePropertyAttributeGroup"/>
+    <xs:attributeGroup ref="DTS:CacheColumnAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="FtpConnectionType">
+    <xs:sequence>
+      <xs:element name="Property"
+                  minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="DTS:PropertyElementBaseType">
+              <xs:attribute name="Name"
+                  type="DTS:FtpConnectionPropertyNameEnum"
+                  use="required"/>
+              <xs:attribute name="Sensitive" form="unqualified">
+                <xs:simpleType>
+                  <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="1"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="Encrypted" form="unqualified">
+                <xs:simpleType>
+                  <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="1"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:FtpConnectionAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType name="HttpConnectionType">
+    <xs:sequence>
+      <xs:element name="Property"
+                  minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="DTS:PropertyElementBaseType">
+              <xs:attribute name="Name"
+                  type="DTS:HttpConnectionPropertyNameEnum"
+                  use="required"/>
+              <xs:attribute name="Sensitive" form="unqualified">
+                <xs:simpleType>
+                  <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="1"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+              <xs:attribute name="Encrypted" form="unqualified">
+                <xs:simpleType>
+                  <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="1"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:attribute>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="DTS:HttpConnectionAttributeGroup"/>
+  </xs:complexType>
+
+  <xs:complexType
+    name="ConnectionManagerObjectDataMsmqConnectionManagerType">
+    <xs:sequence/>
+    <xs:attribute name="ConnectionString" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType
+    name="ConnectionManagerObjectDataSMOServerConnectionManagerType">
+    <xs:sequence>
+      <xs:element name="PassWord" type=
+                   "DTS:PasswordElementType"
+                  form="unqualified"/>
+    </xs:sequence>
+    <xs:attribute name="ConnectionString" type="xs:string"
+                  form="unqualified" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="PasswordElementType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Sensitive" form="unqualified">
+          <xs:simpleType>
+            <xs:restriction base="xs:int">
+              <xs:minInclusive value="0"/>
+              <xs:maxInclusive value="1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="Encrypted" form="unqualified">
+          <xs:simpleType>
+            <xs:restriction base="xs:int">
+              <xs:minInclusive value="0"/>
+              <xs:maxInclusive value="1"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType
+    name="ConnectionManagerObjectDataSmtpConnectionManagerType">
+    <xs:sequence/>
+    <xs:attribute name="ConnectionString" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <xs:complexType
+    name="ConnectionManagerObjectDataWmiConnectionManagerType">
+    <xs:sequence>
+      <xs:element name="PassWord" minOccurs="0"
+                  type="DTS:PasswordElementType"
+                  form="unqualified"/>
+    </xs:sequence>
+    <xs:attribute name="ConnectionString" type="xs:string"
+                  form="unqualified"/>
+  </xs:complexType>
+
+  <!--Property Element Types-->
+
+  <xs:complexType name="PropertyElementBaseType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attribute name="DataType" type="DTS:DtsDataTypeEnum"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="PropertyExpressionElementType">
+    <xs:simpleContent>
+      <xs:extension base="xs:anySimpleType">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!--Enumeration Types-->
+
+  <xs:simpleType name="BasePropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Description"/>
+      <xs:enumeration value="DTSID"/>
+      <xs:enumeration value="CreationName"/>
+      <xs:enumeration value="ObjectName"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="BasePropertyAttributeGroup">
+    <xs:attribute name="Description" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="DTSID" type="DTS:uuid" use="required"
+                  form="qualified"/>
+    <xs:attribute name="CreationName" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attribute name="ObjectName" type="xs:string" use="optional"
+                  form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="DtsDataTypeEnum">
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="5"/>
+      <xs:enumeration value="6"/>
+      <xs:enumeration value="7"/>
+      <xs:enumeration value="8"/>
+      <xs:enumeration value="11"/>
+      <xs:enumeration value="13"/>
+      <xs:enumeration value="14"/>
+      <xs:enumeration value="16"/>
+      <xs:enumeration value="17"/>
+      <xs:enumeration value="18"/>
+      <xs:enumeration value="19"/>
+      <xs:enumeration value="20"/>
+      <xs:enumeration value="21"/>
+      <xs:enumeration value="22"/>
+      <xs:enumeration value="23"/>
+      <xs:enumeration value="64"/>
+      <xs:enumeration value="72"/>
+      <xs:enumeration value="129"/>
+      <xs:enumeration value="130"/>
+      <xs:enumeration value="131"/>
+      <xs:enumeration value="133"/>
+      <xs:enumeration value="134"/>
+      <xs:enumeration value="135"/>
+      <xs:enumeration value="139"/>
+      <xs:enumeration value="145"/>
+      <xs:enumeration value="146"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AllExecutablePropertyNameEnum">
+    <xs:union memberTypes="DTS:BaseExecutablePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="DisableEventHandlers"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="AllExecutableAttributeGroup">
+    <xs:attribute name="DisableEventHandlers" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="BaseExecutablePropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ForceExecValue"/>
+          <xs:enumeration value="ExecValue"/>
+          <xs:enumeration value="ForceExecutionResult"/>
+          <xs:enumeration value="Disabled"/>
+          <xs:enumeration value="FailPackageOnFailure"/>
+          <xs:enumeration value="FailParentOnFailure"/>
+          <xs:enumeration value="MaxErrorCount"/>
+          <xs:enumeration value="ISOLevel"/>
+          <xs:enumeration value="LocaleID"/>
+          <xs:enumeration value="TransactionOption"/>
+          <xs:enumeration value="DelayValidation"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="BaseExecutablePropertyAttributeGroup">
+    <xs:attribute name="ForceExecValue" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="ExecValue" type="xs:anySimpleType" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ForceExecutionResult" default="-1" use="optional"
+                  type="DTS:ForceExecutionResultEnum" form="qualified"/>
+    <xs:attribute name="Disabled" type="DTS:BooleanStringCap" default="False"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="FailPackageOnFailure" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="FailParentOnFailure" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="MaxErrorCount" type="xs:int" default="1"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ISOLevel" type="DTS:ISOLevelEnum"
+                  default="1048576" use="optional" form="qualified"/>
+    <xs:attribute name="LocaleID" type="xs:int" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="TransactionOption" type="DTS:TransactionOptionEnum"
+                  default="1" use="optional" form="qualified"/>
+    <xs:attribute name="DelayValidation" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="ExecValueType" type="DTS:DtsDataTypeEnum"
+                  use="required" form="qualified"/>
+  </xs:attributeGroup>
+  <!--3 ENUM follow-->
+  <xs:simpleType name="ForceExecutionResultEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="-1"/>
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ISOLevelEnum">
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="-1"/>
+      <xs:enumeration value="16"/>
+      <xs:enumeration value="1033"/>
+      <xs:enumeration value="4096"/>
+      <xs:enumeration value="65536"/>
+      <xs:enumeration value="1048576"/>
+      <xs:enumeration value="16777216"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransactionOptionEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ExecutableTypePackagePropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PackageFormatVersion"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="ExecutableTypePackageAttributeGroup">
+    <xs:attribute name="VersionComments" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="CreatorName" type="xs:string" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="CreatorComputerName" type="xs:string"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="CreationDate" type="xs:dateTime" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="PackageType" type="DTS:PackageTypeEnum" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ProtectionLevel" type="DTS:ProtectionLevelEnum"
+                  default="1" use="optional" form="qualified"/>
+    <xs:attribute name="MaxConcurrentExecutables" type="xs:int"
+                  default="-1" use="optional" form="qualified"/>
+    <xs:attribute name="PackagePriorityClass" default="0" use="optional"
+                  type="DTS:PackagePriorityClassEnum" form="qualified"/>
+    <xs:attribute name="VersionMajor" type="xs:int" default="1"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="VersionMinor" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="VersionBuild" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="VersionGUID" type="DTS:uuid" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="EnableConfig" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="CheckpointFileName" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="SaveCheckpoints" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="CheckpointUsage" type="DTS:CheckpointUsageEnum"
+                  default="0" use="optional" form="qualified"/>
+    <xs:attribute name="SuppressConfigurationWarnings" default="False"
+                  type="DTS:BooleanStringCap" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="LastModifiedProductVersion" type="xs:string"
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--4 ENUM follow-->
+  <xs:simpleType name="PackageTypeEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="6"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ProtectionLevelEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="5"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PackagePriorityClassEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CheckpointUsageEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AnyNonPackageExecutablePropertyNameEnum">
+    <xs:union memberTypes="DTS:AllExecutablePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ExecutionLocation"/>
+          <xs:enumeration value="ExecutionAddress"/>
+          <xs:enumeration value="TaskContact"/>
+          <!--<xs:enumeration value="SqlStatementSource"/>-->
+          <!--ForLoop uses these values-->
+          <xs:enumeration value="InitExpression"/>
+          <xs:enumeration value="EvalExpression"/>
+          <xs:enumeration value="AssignExpression"/>
+          <!--ForLoop and ForEachLoop use this value-->
+          <xs:enumeration value="MaxConcurrent"/>
+          <!--Sequence uses this value-->
+          <xs:enumeration value="LockName"/>
+          <!--Web Service Task uses this value-->
+          <!--<xs:enumeration value="WsdlFile"/>-->
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="AnyNonPackageExecutableAttributeGroup">
+    <!--Pipeline & Tasks use these attributes-->
+    <xs:attribute name="ExecutionLocation" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ExecutionAddress" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="TaskContact" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <!--ForLoop uses these attributes-->
+    <xs:attribute name="InitExpression" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="EvalExpression" type="xs:string" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="AssignExpression" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <!--ForLoop and ForEachLoop use this attribute-->
+    <xs:attribute name="MaxConcurrent" type="xs:int" default="1"
+                  use="optional" form="qualified"/>
+    <!--Sequence uses this attribute-->
+    <xs:attribute name="LockName" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="LogProviderAttributeGroup">
+    <xs:attribute name="DelayValidation" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="ConfigString" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="PackageVariablePropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="PackageVariableValue"/>
+          <xs:enumeration value="PackageVariable"/>
+          <xs:enumeration value="Namespace"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:simpleType name="ConfigurationPropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ConfigurationType"/>
+          <xs:enumeration value="ConfigurationString"/>
+          <xs:enumeration value="ConfigurationVariable"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="ConfigurationAttributeGroup">
+    <xs:attribute name="ConfigurationType" type="DTS:ConfigurationTypeEnum"
+                  default="0" use="optional" form="qualified"/>
+    <xs:attribute name="ConfigurationString" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ConfigurationVariable" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--1 ENUM follows-->
+  <xs:simpleType name="ConfigurationTypeEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PrecedenceConstraintPropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Value"/>
+          <xs:enumeration value="EvalOp"/>
+          <xs:enumeration value="LogicalAnd"/>
+          <xs:enumeration value="Expression"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="PrecedenceConstraintAttributeGroup">
+    <xs:attribute name="Value" type="DTS:PrecedenceConstraintValueEnum"
+                  use="optional" default="0" form="qualified"/>
+    <xs:attribute name="EvalOp" type="DTS:PrecedenceConstraintEvalOpEnum"
+                  use="optional" default="1" form="qualified"/>
+    <xs:attribute name="LogicalAnd" type="DTS:BooleanStringCap"
+                  use="optional" default="False" form="qualified"/>
+    <xs:attribute name="Expression" type="xs:string" use="optional"
+                  default="" form="qualified"/>
+    <xs:attribute name="From" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attribute name="To" type="xs:string" use="required"
+                  form="qualified"/>
+  </xs:attributeGroup>
+  <!--2 ENUM follow-->
+  <xs:simpleType name="PrecedenceConstraintValueEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PrecedenceConstraintEvalOpEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LoggingOptionsPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="EventFilter"/>
+      <xs:enumeration value="ColumnFilter"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="LoggingOptionsAttributeGroup">
+    <xs:attribute name="LoggingMode" type="DTS:LoggingModeEnum" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="FilterKind" type="DTS:FilterKindEnum" default="1"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="EventFilter" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--2 ENUM follow-->
+  <xs:simpleType name="LoggingModeEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FilterKindEnum">
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ColumnEventFilterPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Computer"/>
+      <xs:enumeration value="Operator"/>
+      <xs:enumeration value="SourceName"/>
+      <xs:enumeration value="SourceID"/>
+      <xs:enumeration value="ExecutionID"/>
+      <xs:enumeration value="MessageText"/>
+      <xs:enumeration value="DataBytes"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ForEachVariableMappingPropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="VariableName"/>
+          <xs:enumeration value="ValueIndex"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="ForEachVariableMappingAttributeGroup">
+    <xs:attribute name="VariableName" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attribute name="ValueIndex" type="xs:int" use="required"
+                  form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="VariablePropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="Namespace"/>
+          <xs:enumeration value="Expression"/>
+          <xs:enumeration value="EvaluateAsExpression"/>
+          <xs:enumeration value="ReadOnly"/>
+          <xs:enumeration value="RaiseChangedEvent"/>
+          <xs:enumeration value="IncludeInDebugDump"/>
+          <xs:enumeration value="Expression"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="VariableAttributeGroup">
+    <xs:attribute name="Namespace" type="xs:string" use="optional"
+                  default="" form="qualified"/>
+    <xs:attribute name="Expression" type="xs:string" use="optional"
+                  default="" form="qualified"/>
+    <xs:attribute name="EvaluateAsExpression" type="DTS:BooleanStringCap"
+                  use="optional" default="False" form="qualified"/>
+    <xs:attribute name="ReadOnly" type="DTS:BooleanStringCap" use="optional"
+                  default="False" form="qualified"/>
+    <xs:attribute name="RaiseChangedEvent" type="DTS:BooleanStringCap"
+                  use="optional" default="False" form="qualified"/>
+    <xs:attribute name="IncludeInDebugDump" type="xs:int" use="optional"
+                  default="0" form="qualified"/>
+  </xs:attributeGroup>
+  <!--1 ENUM follows-->
+  <xs:simpleType name="IncludeInDebugDumpEnum">
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="2345"/>
+      <xs:enumeration value="6789"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BooleanStringCap">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="True"/>
+      <xs:enumeration value="False"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ConnectionManagerPropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="DelayValidation"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="ConnectionManagerAttributeGroup">
+    <xs:attribute name="DelayValidation" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="ConnectionManagerObjectDataPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Retain"/>
+      <xs:enumeration value="ConnectionString"/>
+      <xs:enumeration value="FileUsageType"/>
+      <xs:enumeration value="Format"/>
+      <xs:enumeration value="LocaleID"/>
+      <xs:enumeration value="Unicode"/>
+      <xs:enumeration value="HeaderRowsToSkip"/>
+      <xs:enumeration value="HeaderRowDelimiter"/>
+      <xs:enumeration value="ColumnNamesInFirstDataRow"/>
+      <xs:enumeration value="RowDelimiter"/>
+      <xs:enumeration value="DataRowsToSkip"/>
+      <xs:enumeration value="TextQualifier"/>
+      <xs:enumeration value="CodePage"/>
+      <xs:enumeration value="ServerName"/>
+      <xs:enumeration value="UseFile"/>
+      <xs:enumeration value="UseEncryption"/>
+      <xs:enumeration value="RetainData"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="ConnectionManagerConnectionManagerAttributeGroup">
+    <xs:attribute name="Retain" type="DTS:BooleanStringCap" default="False"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ConnectionString" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attribute name="FileUsageType" type="DTS:FileUsageTypeEnum"
+                  default="0" use="optional" form="qualified"/>
+    <xs:attribute name="Format" type="DTS:FormatEnum" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="LocaleID" type="xs:int" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="Unicode" type="DTS:BooleanStringCap" default="False"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="HeaderRowsToSkip" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="HeaderRowDelimiter" type="xs:string" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="ColumnNamesInFirstDataRow" default="False"
+                  type="DTS:BooleanStringCap" use="optional" form="qualified"/>
+    <xs:attribute name="RowDelimiter" type="xs:string" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="DataRowsToSkip" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="TextQualifier" type="xs:string" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="CodePage" type="xs:int" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="ServerName" type="xs:string" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="UseFile" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="UseEncryption" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="RetainData" type="DTS:BooleanStringCap"
+                  default="True" use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--2 ENUM follow-->
+  <xs:simpleType name="FileUsageTypeEnum">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FormatEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Delimited"/>
+      <xs:enumeration value="FixedWidth"/>
+      <xs:enumeration value="RaggedRight"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FlatFileColumnPropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="ColumnType"/>
+          <xs:enumeration value="ColumnDelimiter"/>
+          <xs:enumeration value="ColumnWidth"/>
+          <xs:enumeration value="MaximumWidth"/>
+          <xs:enumeration value="DataType"/>
+          <xs:enumeration value="DataPrecision"/>
+          <xs:enumeration value="DataScale"/>
+          <xs:enumeration value="TextQualified"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="FlatFileColumnAttributeGroup">
+    <xs:attribute name="ColumnType" type="DTS:ColumnTypeEnum"
+                  default="FixedWidth" use="optional" form="qualified"/>
+    <xs:attribute name="ColumnDelimiter" type="xs:string"
+                  use="required" form="qualified"/>
+    <xs:attribute name="ColumnWidth" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="MaximumWidth" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="DataType" type="DTS:DtsDataTypeEnum" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="DataPrecision" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="DataScale" type="xs:int" default="0" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="TextQualified" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--1 ENUM follows-->
+  <xs:simpleType name="ColumnTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Delimited"/>
+      <xs:enumeration value="FixedWidth"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CacheColumnPropertyNameEnum">
+    <xs:union memberTypes="DTS:BasePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="DataType"/>
+          <xs:enumeration value="Length"/>
+          <xs:enumeration value="Precision"/>
+          <xs:enumeration value="Scale"/>
+          <xs:enumeration value="CodePage"/>
+          <xs:enumeration value="IndexPosition"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="CacheColumnAttributeGroup">
+    <xs:attribute name="DataType" type="DTS:DtsDataTypeEnum" default="0"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="Length" type="xs:int" default="0" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="Precision" type="xs:int" default="0" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="Scale" type="xs:int" default="0" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="CodePage" type="xs:int" default="0" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="IndexPosition" type="xs:int" default="0"
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--0 ENUM-->
+
+  <xs:simpleType name="FtpConnectionPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ServerPassword"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="FtpConnectionAttributeGroup">
+    <xs:attribute name="ServerName" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attribute name="ServerPort" type="xs:int" default="21"
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ServerUserName" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ChunkSize" type="xs:int" default="1" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="TimeOut" type="xs:int" default="60" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="Retries" type="xs:int" default="5" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="UsePassiveMode" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+  </xs:attributeGroup>
+  <!--0 ENUM-->
+
+  <xs:simpleType name="HttpConnectionPropertyNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ProxyPassword"/>
+      <xs:enumeration value="ServerPassword"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="HttpConnectionAttributeGroup">
+    <xs:attribute name="ServerURL" type="xs:string" use="required"
+                  form="qualified"/>
+    <xs:attribute name="UseServerCredentials" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="ServerUserName" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ServerDomain" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="UseSecureConnection" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="CertificateIdentifier" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="Certificate" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="TimeOut" type="xs:int" default="60" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="ChunkSize" type="xs:int" default="1" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="UseProxy" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="ProxyURL" type="xs:string" default="" use="optional"
+                  form="qualified"/>
+    <xs:attribute name="BypassProxyOnLocal" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="UseProxyCredentials" type="DTS:BooleanStringCap"
+                  default="False" use="optional" form="qualified"/>
+    <xs:attribute name="ProxyUserName" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="ProxyDomain" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+    <xs:attribute name="BypassList" type="xs:string" default=""
+                  use="optional" form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="EventHandlerPropertyNameEnum">
+    <xs:union memberTypes="DTS:BaseExecutablePropertyNameEnum">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="EventID"/>
+          <xs:enumeration value="EventName"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+
+  <xs:attributeGroup name="EventHandlerAttributeGroup">
+    <xs:attribute name="EventID" type="xs:int" use="optional"
+                  default="0" form="qualified"/>
+    <xs:attribute name="EventName" type="DTS:EventNameEnum"
+                  use="required" form="qualified"/>
+  </xs:attributeGroup>
+
+  <xs:simpleType name="EventNameEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="OnError"/>
+      <xs:enumeration value="OnExecStatusChanged"/>
+      <xs:enumeration value="OnInformation"/>
+      <xs:enumeration value="OnPostExecute"/>
+      <xs:enumeration value="OnPreExecute"/>
+      <xs:enumeration value="OnPreValidate"/>
+      <xs:enumeration value="OnProgress"/>
+      <xs:enumeration value="OnQueryCancel"/>
+      <xs:enumeration value="OnTaskFailed"/>
+      <xs:enumeration value="OnVariableValueChanged"/>
+      <xs:enumeration value="OnWarning"/>
+      <xs:enumeration value="OnCustomEvent"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FileSystemTaskOperationTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CopyFile" />
+      <xs:enumeration value="CreateDirectory" />
+      <xs:enumeration value="DeleteDirectory" />
+      <xs:enumeration value="DeleteFile" />
+      <xs:enumeration value="MoveDirectory" />
+      <xs:enumeration value="MoveFile" />
+      <xs:enumeration value="RenameFile" />
+      <xs:enumeration value="SetAttributes" />
+      <xs:enumeration value="DeleteDirectoryContent" />
+      <xs:enumeration value="CopyDirectory" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FileSystemTaskFileAttributesEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Archive" />
+      <xs:enumeration value="Hidden" />
+      <xs:enumeration value="Normal" />
+      <xs:enumeration value="ReadOnly" />
+      <xs:enumeration value="System" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SourceTypeEnum">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DirectInput"/>
+      <xs:enumeration value="FileConnection"/>
+      <xs:enumeration value="Variable"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!--Other Misc Types-->
+
+  <xs:simpleType name="uuid">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\{[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}\}" />
+      <xs:pattern value=""/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+</xs:schema>
