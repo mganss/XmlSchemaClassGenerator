@@ -44,6 +44,12 @@ namespace XmlSchemaClassGenerator
         public OutputWriter OutputWriter { get; set; }
 
         /// <summary>
+        /// Whether to split the namespace and use the last segment after the "."
+        /// to be the outpur Filename (without the file extension)
+        /// </summary>
+        public bool SplitNamespaceAndFileName { get; set; }
+
+        /// <summary>
         /// A provider to obtain the name and version of the tool
         /// </summary>
         public VersionProvider Version { get; set; }

@@ -21,6 +21,7 @@ namespace XmlSchemaClassGenerator.Console
             var showHelp = args.Length == 0;
             var namespaces = new List<string>();
             var outputFolder = (string)null;
+            var splitNamespaceAndFileName = false;
             var integerType = typeof(string);
             var namespacePrefix = "";
             var verbose = false;
@@ -52,6 +53,9 @@ One option must be given for each namespace to be mapped.
 A file name may be given by appending a pipe sign (|) followed by a file name (like schema.xsd) to the XML namespace.
 If no mapping is found for an XML namespace, a name is generated automatically (may fail).", v => namespaces.Add(v) },
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
+                { "sn|splitNamespaceAndFileName", @"Whether the last segment after the '.' in the namespace will be used for output file name.
+For example, if the calculated namespace shall be: 'a.b.c', the output file will be 'c.[extension]'
+and the namespace written inside the generated file will be 'a.b'", v => splitNamespaceAndFileName = v != null },
                 { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of automatic approximation
 {TYPE} can be i[nt], l[ong], or d[ecimal].", v => {
                                          switch (v)
@@ -138,6 +142,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
             {
                 NamespaceProvider = namespaceMap,
                 OutputFolder = outputFolder,
+                SplitNamespaceAndFileName = splitNamespaceAndFileName,
                 GenerateNullables = nullables,
                 EnableDataBinding = enableDataBinding,
                 EmitOrder = emitOrder,

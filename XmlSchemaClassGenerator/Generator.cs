@@ -48,6 +48,13 @@ namespace XmlSchemaClassGenerator
             set { _configuration.OutputFolder = value; }
         }
 
+        public bool SplitNamespaceAndFileName
+        {
+            get { return _configuration.SplitNamespaceAndFileName; }
+            set { _configuration.SplitNamespaceAndFileName = value; }
+        }
+
+
         public Action<string> Log
         {
             get { return _configuration.Log; }
@@ -247,7 +254,14 @@ namespace XmlSchemaClassGenerator
 
             var m = new ModelBuilder(_configuration, set);
             var namespaces = m.GenerateCode();
-            var writer = _configuration.OutputWriter ?? new FileOutputWriter(OutputFolder ?? ".") { Configuration = _configuration };
+            var writer = _configuration.OutputWriter ??
+                         new FileOutputWriter(
+                             OutputFolder ?? ".", 
+                             true, 
+                             _configuration.SplitNamespaceAndFileName)
+                         {
+                             Configuration = _configuration
+                         };
 
             foreach (var ns in namespaces)
             {
