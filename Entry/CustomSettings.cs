@@ -91,21 +91,21 @@ namespace Entry
                     generator.SeparateClasses = true;
 
                     //Generator options
-                    generator.AssemblyVisible = false;
-                    generator.DisableComments = true;
-                    generator.EmitOrder = false;
+                    generator.AssemblyVisible = true;
+                    generator.DisableComments = false;
+                    generator.EmitOrder = true;
                     generator.EnableDataBinding = false;
-                    generator.EnableUpaCheck = false;
+                    generator.EnableUpaCheck = true;
                     generator.EntityFramework = true;
                     generator.GenerateNullables = true;
                     generator.GenerateComplexTypesForCollections = true;
                     generator.GenerateDebuggerStepThroughAttribute = true;
-                    generator.GenerateDesignerCategoryAttribute = false;
-                    generator.GenerateInterfaces = false;
+                    generator.GenerateDesignerCategoryAttribute = true;
+                    generator.GenerateInterfaces = true;
                     generator.GenerateNullables = true;
                     generator.GenerateSerializableAttribute = true;
                     generator.UseShouldSerializePattern = true;
-                    generator.UseXElementForAny = false;
+                    generator.UseXElementForAny = true;
 
                     foreach (FileInfo f in inputFiles)
                     {
