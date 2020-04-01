@@ -83,16 +83,34 @@ namespace XmlSchemaClassGenerator
                 }
 
 
+                var ccu = new CodeCompileUnit();
+                var cns = new CodeNamespace(ValidateName(cn.Name));
+
+                cns.Imports.AddRange(cn.Imports.Cast<CodeNamespaceImport>().ToArray());
+                cns.Comments.AddRange(cn.Comments);
+                ccu.Namespaces.Add(cns);
+
                 foreach (CodeTypeDeclaration ctd in cn.Types)
                 {
                     string path = Path.Combine(dirPath, ctd.Name + ".cs");
-                    if (ctd.IsEnum) WriteEnum(ctd, cu, path);
-                    else if (ctd.IsClass) WriteClass(ctd, cu, path);
-                    else if (ctd.IsInterface) WriteInterface(ctd, cu, path);
-                    else if (ctd.IsStruct) WriteStruct(ctd, cu, path);
-                    else
-                    { }
+                    cns.Types.Clear();
+                    cns.Types.Add(ctd);
+                    //path = Path.Combine(OutputDirectory, $"{cn.Name}.{ctd.Name}.cs");
+                    Configuration?.WriteLog(path);
+                    WriteFile(path, ccu);
                 }
+
+                //Bespokee CodeDom locally created
+                //foreach (CodeTypeDeclaration ctd in cn.Types)
+                //{
+                //    string path = Path.Combine(dirPath, ctd.Name + ".cs");
+                //    if (ctd.IsEnum) WriteEnum(ctd, cu, path);
+                //    else if (ctd.IsClass) WriteClass(ctd, cu, path);
+                //    else if (ctd.IsInterface) WriteInterface(ctd, cu, path);
+                //    else if (ctd.IsStruct) WriteStruct(ctd, cu, path);
+                //    else
+                //    { }
+                //}
             }
             catch (System.Exception ae)
             {
@@ -244,6 +262,7 @@ namespace XmlSchemaClassGenerator
                 string s = ae.ToString();
             }
         }
+
         private void WriteInterface(CodeTypeDeclaration ctd, CodeCompileUnit cu, string path)
         {
             try
@@ -274,6 +293,7 @@ namespace XmlSchemaClassGenerator
                 string s = ae.ToString();
             }
         }
+
         private void WriteStruct(CodeTypeDeclaration ctd, CodeCompileUnit cu, string path)
         {
             try
