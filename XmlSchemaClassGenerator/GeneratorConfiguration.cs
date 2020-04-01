@@ -244,5 +244,10 @@ namespace XmlSchemaClassGenerator
         /// </code>
         /// </summary>
         public bool GenerateComplexTypesForCollections { get; set; } = true;
+
+        /// <summary>
+        /// Separates each classes into an individual C# file
+        /// </summary>
+        public bool SeparateClasses { get; set; } = false;
     }
 }
