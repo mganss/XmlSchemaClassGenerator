@@ -35,7 +35,7 @@ namespace XmlSchemaClassGenerator
 
             if (Configuration.SeparateClasses == true)
             {
-                WriteSeparateFiles(cn, cu);
+                WriteSeparateFiles(cn);
             }
             else
             {
@@ -66,7 +66,7 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        private void WriteSeparateFiles(CodeNamespace cn, CodeCompileUnit cu)
+        private void WriteSeparateFiles(CodeNamespace cn)
         {
             try
             {
