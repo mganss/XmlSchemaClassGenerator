@@ -43,6 +43,7 @@ namespace XmlSchemaClassGenerator.Console
             var enableUpaCheck = true;
             var generateComplexTypesForCollections = true;
             var useShouldSerialize = false;
+            var separateClasses = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -91,6 +92,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "da|description", "generate DescriptionAttribute (default is true)", v => generateDescriptionAttribute = v != null },
                 { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
                 { "s|useShouldSerialize", "use ShouldSerialize pattern instead of Specified pattern (default is false)", v => useShouldSerialize = v != null },
+                { "sf|separateFiles", "generate a separate file for each class (default is false)", v => separateClasses = v != null },
             };
 
             var globsAndUris = options.Parse(args);
@@ -156,7 +158,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 PrivateMemberPrefix = doNotUseUnderscoreInPrivateMemberNames ? "" : "_",
                 EnableUpaCheck = enableUpaCheck,
                 GenerateComplexTypesForCollections = generateComplexTypesForCollections,
-                UseShouldSerializePattern = useShouldSerialize
+                UseShouldSerializePattern = useShouldSerialize,
+                SeparateClasses = separateClasses
             };
 
             if (pclCompatible)

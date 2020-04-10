@@ -33,7 +33,7 @@ namespace XmlSchemaClassGenerator
             var cu = new CodeCompileUnit();
             cu.Namespaces.Add(cn);
 
-            if (Configuration.SeparateClasses == true)
+            if (Configuration?.SeparateClasses == true)
             {
                 WriteSeparateFiles(cn);
             }
@@ -68,49 +68,28 @@ namespace XmlSchemaClassGenerator
 
         private void WriteSeparateFiles(CodeNamespace cn)
         {
-            try
+            var dirPath = Path.Combine(OutputDirectory, ValidateName(cn.Name));
+            var ccu = new CodeCompileUnit();
+            var cns = new CodeNamespace(ValidateName(cn.Name));
+
+            Directory.CreateDirectory(dirPath);
+
+            cns.Imports.AddRange(cn.Imports.Cast<CodeNamespaceImport>().ToArray());
+            cns.Comments.AddRange(cn.Comments);
+            ccu.Namespaces.Add(cns);
+
+            foreach (CodeTypeDeclaration ctd in cn.Types)
             {
-                string dirPath = Path.Combine(OutputDirectory, ValidateName(cn.Name));
-                DirectoryInfo di = null;
-                //Create directory to hold the output files
-                if (Directory.Exists(dirPath))
-                {
-                    di = Directory.GetParent(dirPath);
-                }
-                else
-                {
-                    di = Directory.CreateDirectory(dirPath);
-                }
-
-
-                var ccu = new CodeCompileUnit();
-                var cns = new CodeNamespace(ValidateName(cn.Name));
-
-                cns.Imports.AddRange(cn.Imports.Cast<CodeNamespaceImport>().ToArray());
-                cns.Comments.AddRange(cn.Comments);
-                ccu.Namespaces.Add(cns);
-
-                foreach (CodeTypeDeclaration ctd in cn.Types)
-                {
-                    string path = Path.Combine(dirPath, ctd.Name + ".cs");
-                    cns.Types.Clear();
-                    cns.Types.Add(ctd);
-                    Configuration?.WriteLog(path);
-                    WriteFile(path, ccu);
-                }
-            }
-            catch (System.Exception ae)
-            {
-                string s = ae.ToString();
-                if (ae.InnerException != null) s = ae.InnerException.Message;
+                var path = Path.Combine(dirPath, ctd.Name + ".cs");
+                cns.Types.Clear();
+                cns.Types.Add(ctd);
+                Configuration?.WriteLog(path);
+                WriteFile(path, ccu);
             }
         }
 
-        private string ValidateName(string name)
-        {
-            string regexSearch = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
-            string validName = Regex.Replace(name, regexSearch, "_");
-            return validName.Replace(".", "_");
-        }
+        static readonly Regex InvalidCharacters = new Regex($"[{string.Join("", Path.GetInvalidFileNameChars())}]", RegexOptions.Compiled);
+
+        private string ValidateName(string name) => InvalidCharacters.Replace(name, "_");
     }
 }

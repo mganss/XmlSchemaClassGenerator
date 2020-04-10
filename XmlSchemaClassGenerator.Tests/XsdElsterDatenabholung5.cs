@@ -36,6 +36,7 @@ namespace XmlSchemaClassGenerator.Tests
                 DataAnnotationMode = DataAnnotationMode.None,
                 EmitOrder = true,
                 GenerateDescriptionAttribute = true,
+                SeparateClasses = true,
                 NamespaceProvider = new NamespaceProvider
                 {
                     GenerateNamespace = key =>
@@ -76,7 +77,7 @@ namespace XmlSchemaClassGenerator.Tests
         public void CanCompileClasses()
         {
             var inputPath = GetOutputPath("CanGenerateClasses");
-            var fileNames = new DirectoryInfo(inputPath).GetFiles("*.cs").Select(x => x.FullName).ToArray();
+            var fileNames = new DirectoryInfo(inputPath).GetFiles("*.cs", SearchOption.AllDirectories).Select(x => x.FullName).ToArray();
             var assembly = Compiler.CompileFiles("Elster.Test", fileNames);
 
             assembly.GetType("Elster.Datenabholung5.Elster", true);

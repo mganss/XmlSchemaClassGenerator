@@ -207,6 +207,21 @@ namespace XmlSchemaClassGenerator.Tests
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
+        public void TestSeparateClasses()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Separate"));
+            Compiler.Generate("Tableau.Separate", TableauPattern, 
+                new Generator 
+                { 
+                    OutputWriter = output, 
+                    SeparateClasses = true,
+                    EnableDataBinding = true
+                });
+            TestSamples("Tableau.Separate", TableauPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
         public void TestDtsx()
         {
             Compiler.Generate("Dtsx", DtsxPattern, new Generator());
