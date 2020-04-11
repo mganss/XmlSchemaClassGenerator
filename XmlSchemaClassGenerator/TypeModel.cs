@@ -285,7 +285,7 @@ namespace XmlSchemaClassGenerator
             if (IsAbstract)
                 classDeclaration.TypeAttributes |= System.Reflection.TypeAttributes.Abstract;
 
-            if (Configuration.EnableDataBinding)
+            if (Configuration.EnableDataBinding && !(BaseClass is ClassModel))
             {
                 var propertyChangedEvent = new CodeMemberEvent()
                 {
