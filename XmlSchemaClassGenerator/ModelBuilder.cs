@@ -15,7 +15,7 @@ namespace XmlSchemaClassGenerator
         private readonly Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private readonly Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
         private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
-        private readonly Dictionary<XmlQualifiedName, TypeModel> Types = new Dictionary<XmlQualifiedName, TypeModel>();
+        private readonly Dictionary<string, TypeModel> Types = new Dictionary<string, TypeModel>();
 
         private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
 
@@ -35,7 +35,8 @@ namespace XmlSchemaClassGenerator
                 UseDataTypeAttribute = false
             };
 
-            Types[AnyType] = objectModel;
+            var key = typeof(XmlSchemaComplexType) + "#" + AnyType;
+            Types[key] = objectModel;
 
             AttributeGroups = set.Schemas().Cast<XmlSchema>().SelectMany(s => s.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>())
                 .DistinctBy(g => g.QualifiedName.ToString())
@@ -123,7 +124,8 @@ namespace XmlSchemaClassGenerator
                             derivedClassModel.Namespace.Types[derivedClassModel.Name] = derivedClassModel;
                         }
 
-                        Types[rootElement.QualifiedName] = derivedClassModel;
+                        var key = rootElement.GetType() + "#" + rootElement.QualifiedName;
+                        Types[key] = derivedClassModel;
 
                         derivedClassModel.BaseClass = classModel;
                         ((ClassModel)derivedClassModel.BaseClass).DerivedTypes.Add(derivedClassModel);
@@ -132,7 +134,8 @@ namespace XmlSchemaClassGenerator
                     }
                     else
                     {
-                        Types[rootElement.QualifiedName] = type;
+                        var key = rootElement.GetType() + "#" + rootElement.QualifiedName;
+                        Types[key] = type;
                     }
                 }
                 else
@@ -154,7 +157,8 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaAnnotated type, XmlQualifiedName qualifiedName)
         {
-            if (!qualifiedName.IsEmpty && Types.TryGetValue(qualifiedName, out TypeModel typeModel))
+            var key = type.GetType() + "#" + qualifiedName;
+            if (!qualifiedName.IsEmpty && Types.TryGetValue(key, out TypeModel typeModel))
             {
                 return typeModel;
             }
@@ -197,7 +201,12 @@ namespace XmlSchemaClassGenerator
             interfaceModel.Documentation.AddRange(docs);
 
             if (namespaceModel != null) { namespaceModel.Types[name] = interfaceModel; }
-            if (!qualifiedName.IsEmpty) { Types[qualifiedName] = interfaceModel; }
+
+            if (!qualifiedName.IsEmpty) 
+            {
+                var key = group.GetType() + "#" + qualifiedName;
+                Types[key] = interfaceModel;
+            }
 
             var particle = group.Particle;
             var items = GetElements(particle);
@@ -225,7 +234,12 @@ namespace XmlSchemaClassGenerator
             interfaceModel.Documentation.AddRange(docs);
 
             if (namespaceModel != null) { namespaceModel.Types[name] = interfaceModel; }
-            if (!qualifiedName.IsEmpty) { Types[qualifiedName] = interfaceModel; }
+
+            if (!qualifiedName.IsEmpty)
+            {
+                var key = attributeGroup.GetType() + "#" + qualifiedName;
+                Types[key] = interfaceModel;
+            }
 
             var items = attributeGroup.Attributes;
             var properties = CreatePropertiesForAttributes(source, interfaceModel, items.OfType<XmlSchemaAttribute>());
@@ -264,7 +278,11 @@ namespace XmlSchemaClassGenerator
                 namespaceModel.Types[classModel.Name] = classModel;
             }
 
-            if (!qualifiedName.IsEmpty) { Types[qualifiedName] = classModel; }
+            if (!qualifiedName.IsEmpty)
+            {
+                var key = complexType.GetType() + "#" + qualifiedName;
+                Types[key] = classModel;
+            }
 
             if (complexType.BaseXmlSchemaType != null && complexType.BaseXmlSchemaType.QualifiedName != AnyType)
             {
@@ -398,7 +416,8 @@ namespace XmlSchemaClassGenerator
 
                     if (!qualifiedName.IsEmpty)
                     {
-                        Types[qualifiedName] = enumModel;
+                        var key = simpleType.GetType() + "#" + qualifiedName;
+                        Types[key] = enumModel;
                     }
 
                     return enumModel;
@@ -427,7 +446,11 @@ namespace XmlSchemaClassGenerator
                 namespaceModel.Types[simpleModel.Name] = simpleModel;
             }
 
-            if (!qualifiedName.IsEmpty) { Types[qualifiedName] = simpleModel; }
+            if (!qualifiedName.IsEmpty)
+            {
+                var key = simpleType.GetType() + "#" + qualifiedName;
+                Types[key] = simpleModel;
+            }
 
             return simpleModel;
         }
@@ -445,7 +468,7 @@ namespace XmlSchemaClassGenerator
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
                         var attributeName = _configuration.NamingProvider.AttributeNameFromQualifiedName(attribute.QualifiedName);
 
-                        if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup && attributeGroup.QualifiedName != typeModel.XmlSchemaName && Types.TryGetValue(attributeGroup.QualifiedName, out var typeModelValue) && typeModelValue is InterfaceModel interfaceTypeModel)
+                        if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup && attributeGroup.QualifiedName != typeModel.XmlSchemaName && Types.TryGetValue(attributeGroup.GetType() + "#" + attributeGroup.QualifiedName, out var typeModelValue) && typeModelValue is InterfaceModel interfaceTypeModel)
                         {
                             var interfaceProperty = interfaceTypeModel.Properties.Single(p => p.XmlSchemaName == attribute.QualifiedName);
                             attributeQualifiedName = interfaceProperty.Type.XmlSchemaName;
