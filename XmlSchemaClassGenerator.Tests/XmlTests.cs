@@ -690,6 +690,41 @@ namespace XmlSchemaClassGenerator.Tests
         }
 
         [Fact]
+        public void CollidingElementAndComplexTypeNamesCanBeResolved()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding = ""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"">
+  <xs:complexType name=""MyType"">
+    <xs:sequence>
+      <xs:element maxOccurs=""1"" minOccurs=""0"" name=""output"" type=""xs:string""/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name=""MyType"">
+    <xs:simpleType>
+      <xs:restriction base=""xs:string"">
+        <xs:enumeration value=""Choice1""/>
+        <xs:enumeration value=""Choice2""/>
+        <xs:enumeration value=""Choice3""/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+</xs:schema>
+";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+
+            var generatedType = ConvertXml(nameof(CollidingElementAndComplexTypeNamesCanBeResolved), xsd, generator).First();
+
+            Assert.Contains(@"public partial class MyType", generatedType);
+            Assert.Contains(@"public enum MyType", generatedType);
+        }
+
+        [Fact]
         public void ComplexTypeWithAttributeGroupExtension()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
