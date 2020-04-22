@@ -387,6 +387,7 @@ namespace XmlSchemaClassGenerator
                         Namespace = namespaceModel,
                         XmlSchemaName = qualifiedName,
                         XmlSchemaType = simpleType,
+                        IsAnonymous = string.IsNullOrEmpty(simpleType.QualifiedName.Name),
                     };
 
                     enumModel.Documentation.AddRange(docs);
