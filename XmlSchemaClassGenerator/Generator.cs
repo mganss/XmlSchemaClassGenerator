@@ -12,6 +12,8 @@ namespace XmlSchemaClassGenerator
     {
         private readonly GeneratorConfiguration _configuration = new GeneratorConfiguration();
 
+        public GeneratorConfiguration Configuration => _configuration;
+
         public NamespaceProvider NamespaceProvider
         {
             get { return _configuration.NamespaceProvider; }
@@ -215,6 +217,12 @@ namespace XmlSchemaClassGenerator
         {
             get { return _configuration.EnableUpaCheck; }
             set { _configuration.EnableUpaCheck = value; }
+        }
+
+        public bool SeparateClasses
+        {
+            get { return _configuration.SeparateClasses; }
+            set { _configuration.SeparateClasses = value; }
         }
 
         public void Generate(IEnumerable<string> files)

@@ -84,7 +84,7 @@ namespace XmlSchemaClassGenerator.Tests
                 TextValuePropertyName = "Value"
             };
 
-            var output = new FileWatcherOutputWriter(Path.Combine("output", name));
+            var output = generatorPrototype.OutputWriter as FileWatcherOutputWriter ?? new FileWatcherOutputWriter(Path.Combine("output", name));
 
             var gen = new Generator
             {
@@ -102,8 +102,11 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute,
                 CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
                 TextValuePropertyName = generatorPrototype.TextValuePropertyName,
-                EmitOrder = generatorPrototype.EmitOrder
+                EmitOrder = generatorPrototype.EmitOrder,
+                SeparateClasses = generatorPrototype.SeparateClasses
             };
+
+            output.Configuration = gen.Configuration;
 
             gen.Generate(files);
 
