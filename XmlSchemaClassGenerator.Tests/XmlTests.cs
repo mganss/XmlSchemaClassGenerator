@@ -721,7 +721,7 @@ namespace XmlSchemaClassGenerator.Tests
             var generatedType = ConvertXml(nameof(CollidingElementAndComplexTypeNamesCanBeResolved), xsd, generator).First();
 
             Assert.Contains(@"public partial class MyType", generatedType);
-            Assert.Contains(@"public enum MyType", generatedType);
+            Assert.Contains(@"public enum MyType2", generatedType);
         }
 
         [Fact]
