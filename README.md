@@ -28,6 +28,7 @@ from schema restrictions
 * Optional support for [`INotifyPropertyChanged`](http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged)
 * Optional support for Entity Framework Code First (automatically generate key properties)
 * Optionally generate interfaces for groups and attribute groups
+* Optionally generate one file per class
 
 Unsupported:
 
@@ -114,6 +115,8 @@ Options:
                                true)
   -s, --useShouldSerialize   use ShouldSerialize pattern instead of Specified
                                pattern (default is false)
+      --sf, --separateFiles  generate a separate file for each class (default
+                               is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
