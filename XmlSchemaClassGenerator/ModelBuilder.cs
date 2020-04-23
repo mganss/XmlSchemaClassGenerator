@@ -699,6 +699,20 @@ namespace XmlSchemaClassGenerator
 
             foreach (var facet in facets)
             {
+                if (facet is XmlSchemaLengthFacet)
+                {
+                    var value = int.Parse(facet.Value);
+                    if (_configuration.DataAnnotationMode == DataAnnotationMode.All)
+                    {
+                        yield return new MinLengthRestrictionModel(_configuration) { Value = value };
+                        yield return new MaxLengthRestrictionModel(_configuration) { Value = value };
+                    }
+                    else
+                    {
+                        yield return new MinMaxLengthRestrictionModel(_configuration) { Min = value, Max = value };  
+                    }
+                }
+
                 if (facet is XmlSchemaTotalDigitsFacet)
                 {
                     yield return new TotalDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) };
