@@ -57,7 +57,7 @@ namespace XmlSchemaClassGenerator
 
         private static Type GetIntegerDerivedType(XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions)
         {
-            if (configuration.IntegerDataType != null) return configuration.IntegerDataType;
+            if (configuration.IntegerDataType != null && !configuration.UseIntegerDataTypeAsFallback) return configuration.IntegerDataType;
 
             var xmlTypeCode = type.TypeCode;
 
@@ -70,6 +70,8 @@ namespace XmlSchemaClassGenerator
                      || xmlTypeCode == XmlTypeCode.NegativeInteger
                      || xmlTypeCode == XmlTypeCode.NonPositiveInteger) && totalDigits.Value >= 29))
             {
+                if (configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null)
+                  return configuration.IntegerDataType;
                 return typeof(string);
             }
 

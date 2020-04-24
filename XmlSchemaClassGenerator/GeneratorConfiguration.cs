@@ -135,6 +135,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public Type IntegerDataType { get; set; }
         /// <summary>
+        /// Use <see cref="IntegerDataType"/> only if no better type can be inferred
+        /// </summary>
+        public bool UseIntegerDataTypeAsFallback { get; set; }
+        /// <summary>
         /// Generate Entity Framework Code First compatible classes
         /// </summary>
         public bool EntityFramework { get; set; }
