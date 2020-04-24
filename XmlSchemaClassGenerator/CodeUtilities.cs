@@ -63,6 +63,61 @@ namespace XmlSchemaClassGenerator
 
             Type result = null;
 
+            var maxInclusive = restrictions.OfType<MaxInclusiveRestrictionModel>().SingleOrDefault();
+            var minInclusive = restrictions.OfType<MinInclusiveRestrictionModel>().SingleOrDefault();
+
+            decimal? maxInclusiveValue = null;
+            if (maxInclusive is null && xmlTypeCode == XmlTypeCode.NegativeInteger)
+            {
+                maxInclusiveValue = -1;
+            }
+            else if (maxInclusive is null && xmlTypeCode == XmlTypeCode.NonPositiveInteger)
+            {
+                maxInclusiveValue = 0;
+            }
+            else if (maxInclusive != null && decimal.TryParse(maxInclusive.Value, out decimal value))
+            {
+                maxInclusiveValue = value;
+            }
+
+            decimal? minInclusiveValue = null;
+            if (minInclusive is null && xmlTypeCode == XmlTypeCode.PositiveInteger)
+            {
+                minInclusiveValue = 1;
+            }
+            else if (minInclusive is null && xmlTypeCode == XmlTypeCode.NonNegativeInteger)
+            {
+                minInclusiveValue = 0;
+            }
+            else if (minInclusive != null && decimal.TryParse(minInclusive.Value, out decimal value))
+            {
+                minInclusiveValue = value;
+            }
+
+            // If either value is null, then that value is either unbounded or too large to fit in any numeric type.
+            if (minInclusiveValue != null && maxInclusiveValue != null) {
+                if (minInclusiveValue >= byte.MinValue && maxInclusiveValue <= byte.MaxValue)
+                    result = typeof(byte);
+                else if (minInclusiveValue >= sbyte.MinValue && maxInclusiveValue <= sbyte.MaxValue)
+                    result = typeof(sbyte);
+                else if (minInclusiveValue >= ushort.MinValue && maxInclusiveValue <= ushort.MaxValue)
+                    result = typeof(ushort);
+                else if (minInclusiveValue >= short.MinValue && maxInclusiveValue <= short.MaxValue)
+                    result = typeof(short);
+                else if (minInclusiveValue >= uint.MinValue && maxInclusiveValue <= uint.MaxValue)
+                    result = typeof(uint);
+                else if (minInclusiveValue >= int.MinValue && maxInclusiveValue <= int.MaxValue)
+                    result = typeof(int);
+                else if (minInclusiveValue >= ulong.MinValue && maxInclusiveValue <= ulong.MaxValue)
+                    result = typeof(ulong);
+                else if (minInclusiveValue >= long.MinValue && maxInclusiveValue <= long.MaxValue)
+                    result = typeof(long);
+                else // If it didn't fit in a decimal, we could not have gotten here.
+                    result = typeof(decimal);
+
+                return result;
+            }
+
             if (!(restrictions.SingleOrDefault(r => r is TotalDigitsRestrictionModel) is TotalDigitsRestrictionModel totalDigits)
                 || ((xmlTypeCode == XmlTypeCode.PositiveInteger
                      || xmlTypeCode == XmlTypeCode.NonNegativeInteger) && totalDigits.Value >= 30)
