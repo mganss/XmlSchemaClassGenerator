@@ -295,6 +295,15 @@ namespace XmlSchemaClassGenerator
                 };
                 classDeclaration.Members.Add(propertyChangedEvent);
 
+                var propertyChangedModel = new PropertyModel(Configuration)
+                {
+                    Name = propertyChangedEvent.Name,
+                    OwningType = this,
+                    Type = new SimpleModel(Configuration) { ValueType = typeof(PropertyChangedEventHandler) }
+                };
+
+                Configuration.MemberVisitor(propertyChangedEvent, propertyChangedModel);
+
                 var onPropChangedMethod = new CodeMemberMethod
                 {
                     Name = "OnPropertyChanged",
@@ -355,6 +364,15 @@ namespace XmlSchemaClassGenerator
 
                     member.CustomAttributes.Add(attribute);
                     classDeclaration.Members.Add(member);
+
+                    var valuePropertyModel = new PropertyModel(Configuration)
+                    {
+                        Name = Configuration.TextValuePropertyName,
+                        OwningType = this,
+                        Type = BaseClass
+                    };
+
+                    Configuration.MemberVisitor(member, valuePropertyModel);
                 }
             }
 
@@ -415,6 +433,15 @@ namespace XmlSchemaClassGenerator
                 var xmlTextAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute), Configuration.CodeTypeReferenceOptions));
                 text.CustomAttributes.Add(xmlTextAttribute);
                 classDeclaration.Members.Add(text);
+
+                var textPropertyModel = new PropertyModel(Configuration)
+                {
+                    Name = propName,
+                    OwningType = this,
+                    Type = new SimpleModel(Configuration) { ValueType = typeof(string) }
+                };
+
+                Configuration.MemberVisitor(text, textPropertyModel);
             }
 
             if (Configuration.GenerateDebuggerStepThroughAttribute)
@@ -948,6 +975,8 @@ namespace XmlSchemaClassGenerator
                     specifiedMember?.CustomAttributes.Add(editorBrowsableAttribute);
                     member.CustomAttributes.Add(editorBrowsableAttribute);
                     if (Configuration.EntityFramework) { member.CustomAttributes.Add(notMappedAttribute); }
+
+                    Configuration.MemberVisitor(nullableMember, this);
                 }
             }
             else if ((IsCollection || isArray || (IsList && IsAttribute)) && IsNullable)
