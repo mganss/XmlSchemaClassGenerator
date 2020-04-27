@@ -33,6 +33,7 @@ namespace XmlSchemaClassGenerator
             GenerateSerializableAttribute = GenerateDesignerCategoryAttribute = true;
             CollectionType = typeof(Collection<>);
             MemberVisitor = (member, model) => { };
+            TypeVisitor = (type, model) => { };
             NamingProvider = new NamingProvider(NamingScheme);
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
@@ -184,6 +185,11 @@ namespace XmlSchemaClassGenerator
         /// Optional delegate that is called for each generated type member
         /// </summary>
         public Action<CodeTypeMember, PropertyModel> MemberVisitor { get; set; }
+
+        /// <summary>
+        /// Optional delegate that is called for each generated type (class, interface, enum)
+        /// </summary>
+        public Action<CodeTypeDeclaration, TypeModel> TypeVisitor { get; set; }
 
         /// <summary>
         /// Provides options to customize Elementnamens with own logik

@@ -222,6 +222,7 @@ namespace XmlSchemaClassGenerator
 
             interfaceDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace)).ToArray());
 
+            Configuration.TypeVisitor(interfaceDeclaration, this);
             return interfaceDeclaration;
         }
     }
@@ -473,6 +474,7 @@ namespace XmlSchemaClassGenerator
 
             classDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace)).ToArray());
 
+            Configuration.TypeVisitor(classDeclaration, this);
             return classDeclaration;
         }
 
@@ -1249,6 +1251,7 @@ namespace XmlSchemaClassGenerator
                 enumDeclaration.Members.Add(member);
             }
 
+            Configuration.TypeVisitor(enumDeclaration, this);
             return enumDeclaration;
         }
 
