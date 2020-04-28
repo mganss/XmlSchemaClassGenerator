@@ -1,7 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -118,6 +118,101 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("List", ListPattern);
             TestSamples("List", ListPattern);
+        }
+
+        [Fact]
+        public void TestListWithPrivatePropertySetters()
+        {
+            var assembly = Compiler.Generate("List", ListPattern, new Generator() {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "List",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CollectionSettersMode = CollectionSettersMode.Private
+            });
+            Assert.NotNull(assembly);
+            var myClassType = assembly.GetType("List.MyClass");
+            Assert.NotNull(myClassType);
+            var iListType = typeof(Collection<>);
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPrivate).OrderBy(p=>p.Name).ToList();
+            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+
+            var myClassInstance = Activator.CreateInstance(myClassType);
+            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+            {
+                Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
+            }
+        }
+
+        [Fact]
+        public void TestListWithPublicPropertySetters()
+        {
+            var assembly = Compiler.Generate("List", ListPattern, new Generator {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "List",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CollectionSettersMode = CollectionSettersMode.Public
+            });
+            Assert.NotNull(assembly);
+            var myClassType = assembly.GetType("List.MyClass");
+            Assert.NotNull(myClassType);
+            var iListType = typeof(Collection<>);
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).ToList();
+            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+
+            var myClassInstance = Activator.CreateInstance(myClassType);
+            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+            {
+                Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
+            }
+        }
+
+        [Fact]
+        public void TestListWithPublicPropertySettersWithoutConstructors()
+        {
+            var assembly = Compiler.Generate("List", ListPattern, new Generator {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "List",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CollectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization
+            });
+            Assert.NotNull(assembly);
+            var myClassType = assembly.GetType("List.MyClass");
+            Assert.NotNull(myClassType);
+            var iListType = typeof(Collection<>);
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).ToList();
+            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+            var myClassInstance = Activator.CreateInstance(myClassType);
+            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+            {
+                Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
+            }
         }
 
         [Fact, TestPriority(1)]

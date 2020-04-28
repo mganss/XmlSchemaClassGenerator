@@ -180,6 +180,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CodeTypeReferenceOptions = value; }
         }
 
+        public CollectionSettersMode CollectionSettersMode
+        {
+            get { return _configuration.CollectionSettersMode; }
+            set { _configuration.CollectionSettersMode = value; }
+        }
+
         public string TextValuePropertyName
         {
             get { return _configuration.TextValuePropertyName; }

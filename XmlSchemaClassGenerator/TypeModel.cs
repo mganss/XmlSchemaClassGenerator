@@ -830,7 +830,7 @@ namespace XmlSchemaClassGenerator
                 else
                     member = new CodeMemberField(typeReference, propertyName);
 
-                var isPrivateSetter = IsCollection || isArray || (IsList && IsAttribute);
+                var isPrivateSetter = (IsCollection || isArray || (IsList && IsAttribute)) && Configuration.CollectionSettersMode == CollectionSettersMode.Private;
 
                 if (requiresBackingField)
                 {
@@ -1011,7 +1011,7 @@ namespace XmlSchemaClassGenerator
             member.CustomAttributes.AddRange(attributes);
 
             // initialize List<>
-            if (IsCollection || isArray || (IsList && IsAttribute))
+            if ((IsCollection || isArray || (IsList && IsAttribute)) && Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
             {
                 var constructor = typeDeclaration.Members.OfType<CodeConstructor>().FirstOrDefault();
                 if (constructor == null)
