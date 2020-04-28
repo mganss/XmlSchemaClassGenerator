@@ -155,7 +155,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact]
         public void TestListWithPublicPropertySetters()
         {
-            var assembly = Compiler.Generate("List", ListPattern, new Generator {
+            var assembly = Compiler.Generate("ListPublic", ListPattern, new Generator {
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),
                 DataAnnotationMode = DataAnnotationMode.All,
@@ -187,7 +187,7 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact]
         public void TestListWithPublicPropertySettersWithoutConstructors()
         {
-            var assembly = Compiler.Generate("List", ListPattern, new Generator {
+            var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator {
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),
                 DataAnnotationMode = DataAnnotationMode.All,
