@@ -22,6 +22,7 @@ namespace XmlSchemaClassGenerator.Console
             var namespaces = new List<string>();
             var outputFolder = (string)null;
             var integerType = typeof(string);
+            var useIntegerTypeAsFallback = false;
             var namespacePrefix = "";
             var verbose = false;
             var nullables = false;
@@ -71,6 +72,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                                                  break;
                                          }
                                      } },
+                { "fb|fallback|use-integer-type-as-fallback", v => useIntegerTypeAsFallback = v != null },
                 { "e|edb|enable-data-binding", "enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
                 { "r|order", "emit order for all class members stored as XML element", v => emitOrder = v != null },
                 { "c|pcl", "PCL compatible output", v => pclCompatible = v != null },
@@ -144,6 +146,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EnableDataBinding = enableDataBinding,
                 EmitOrder = emitOrder,
                 IntegerDataType = integerType,
+                UseIntegerDataTypeAsFallback = useIntegerTypeAsFallback,
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
