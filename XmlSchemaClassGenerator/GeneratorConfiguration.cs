@@ -154,6 +154,10 @@ namespace XmlSchemaClassGenerator
         /// Generator Code reference options
         /// </summary>
         public CodeTypeReferenceOptions CodeTypeReferenceOptions { get; set; }
+        /// <summary>
+        /// Determines the kind of collection accessor modifiers to emit and controls baking collection fields initialization
+        /// </summary>
+        public CollectionSettersMode CollectionSettersMode { get; set; }
 
         /// <summary>
         /// The name of the property that will contain the text value of an XML element

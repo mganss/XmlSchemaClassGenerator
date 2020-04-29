@@ -101,6 +101,7 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = generatorPrototype.MemberVisitor,
                 GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute,
                 CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
+                CollectionSettersMode = generatorPrototype.CollectionSettersMode,
                 TextValuePropertyName = generatorPrototype.TextValuePropertyName,
                 EmitOrder = generatorPrototype.EmitOrder,
                 SeparateClasses = generatorPrototype.SeparateClasses

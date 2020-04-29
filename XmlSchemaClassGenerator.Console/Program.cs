@@ -44,6 +44,7 @@ namespace XmlSchemaClassGenerator.Console
             var generateComplexTypesForCollections = true;
             var useShouldSerialize = false;
             var separateClasses = false;
+            var collectionSettersMode = CollectionSettersMode.Private;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -84,6 +85,30 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "u|enableUpaCheck", "should XmlSchemaSet check for Unique Particle Attribution (UPA) (default is enabled)", v => enableUpaCheck = v != null },
                 { "ct|collectionType=", "collection type to use (default is " + typeof(Collection<>).FullName + ")", v => collectionType = v == null ? typeof(Collection<>) : Type.GetType(v, true) },
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
+                { "csm|collectionSettersMode=", @"generate a private, public or public setters 
+without backing field initialization for collections
+(default is Private; can be: {Private, Public, PublicWithoutConstructorInitialization})",
+                                        v =>
+                                        {
+                                            switch (v)
+                                            {
+                                                case "pr":
+                                                case "Private":
+                                                    collectionSettersMode = CollectionSettersMode.Private;
+                                                    break;
+                                                case "pu":
+                                                case "Public":
+                                                    collectionSettersMode = CollectionSettersMode.Public;
+                                                    break;
+                                                case "puwci":
+                                                case "PublicWithoutConstructorInitialization":
+                                                    collectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization;
+                                                    break;
+                                                default: 
+                                                    collectionSettersMode = CollectionSettersMode.Private;
+                                                    break;
+                                            }
+                                        }},
                 { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) },
                 { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v },
                 { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null },
@@ -159,7 +184,8 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 EnableUpaCheck = enableUpaCheck,
                 GenerateComplexTypesForCollections = generateComplexTypesForCollections,
                 UseShouldSerializePattern = useShouldSerialize,
-                SeparateClasses = separateClasses
+                SeparateClasses = separateClasses,
+                CollectionSettersMode = collectionSettersMode
             };
 
             if (pclCompatible)
