@@ -156,6 +156,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.IntegerDataType = value; }
         }
 
+        public bool UseIntegerDataTypeAsFallback
+        {
+            get { return _configuration.UseIntegerDataTypeAsFallback; }
+            set { _configuration.UseIntegerDataTypeAsFallback = value; }
+        }
+
         public bool EntityFramework
         {
             get { return _configuration.EntityFramework; }
