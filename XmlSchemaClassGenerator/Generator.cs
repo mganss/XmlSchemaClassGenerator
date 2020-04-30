@@ -207,6 +207,15 @@ namespace XmlSchemaClassGenerator
             set { _configuration.MemberVisitor = value; }
         }
 
+        /// <summary>
+        /// Optional delegate that is called for each generated type (class, interface, enum)
+        /// </summary>
+        public Action<CodeTypeDeclaration, TypeModel> TypeVisitor
+        {
+            get { return _configuration.TypeVisitor; }
+            set { _configuration.TypeVisitor = value; }
+        }
+
         public VersionProvider Version
         {
             get { return _configuration.Version; }
