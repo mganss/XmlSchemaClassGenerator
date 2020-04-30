@@ -68,6 +68,9 @@ Options:
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of automatic approximation
                                TYPE can be i[nt], l[ong], or d[ecimal].
+      --fb, --fallback, --use-integer-type-as-fallback
+                             use integer type specified via -i only if no type
+                               can be deduced
   -e, --edb, --enable-data-binding
                              enable INotifyPropertyChanged data binding
   -r, --order                emit order for all class members stored as XML
@@ -286,7 +289,7 @@ the [`Type.GetType()`](https://docs.microsoft.com/en-us/dotnet/api/system.type.g
 Integer and derived types
 ---------------------
 Not all numeric types defined by XML Schema can be safely and accurately mapped to .NET numeric data types, however, it's possible to approximate the mapping based on the integer bounds and restrictions such as `totalDigits`.  
-If an explicit integer type mapping is specified via `--integer=TYPE`, that type will be used, otherwise an approximation will be made based on the following table:
+If an explicit integer type mapping is specified via `--integer=TYPE`, that type will be used, otherwise an approximation will be made based on the table below. If you additionally specify `--fallback`, the type specified via `--integer=TYPE` will be used only if no type can be deduced by applying the rules below.
 
 <table>
   <tr>
