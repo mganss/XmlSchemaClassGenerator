@@ -413,6 +413,7 @@ namespace XmlSchemaClassGenerator
                         enumModel.Values.Add(value);
                     }
 
+                    enumModel.Values = EnsureEnumValuesUnique(enumModel.Values);
                     if (namespaceModel != null)
                     {
                         namespaceModel.Types[enumModel.Name] = enumModel;
@@ -457,6 +458,23 @@ namespace XmlSchemaClassGenerator
             }
 
             return simpleModel;
+        }
+
+        private static List<EnumValueModel> EnsureEnumValuesUnique(List<EnumValueModel> enumModelValues)
+        {
+            var enumValueGroups = from enumValue in enumModelValues
+                group enumValue by enumValue.Name;
+ 
+            foreach (var g in enumValueGroups)
+            {
+                var i = 1;
+                foreach (var t in g.Skip(1))
+                {
+                    t.Name = $"{t.Name}{i++}";
+                }
+            }
+
+            return enumModelValues;
         }
 
         private IEnumerable<PropertyModel> CreatePropertiesForAttributes(Uri source, TypeModel typeModel, IEnumerable<XmlSchemaObject> items)

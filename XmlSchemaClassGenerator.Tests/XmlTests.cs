@@ -1382,5 +1382,46 @@ namespace Test
                 Assert.Contains($"public {expectedTypeName} RestrictedInteger{i}", generatedType);
             }
         }
+
+        [Fact]
+        public void EnumWithNonUniqueEntriesTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+				<xs:simpleType name=""TestEnum"">
+					<xs:restriction base=""xs:string"">
+					    <xs:enumeration value=""test_case""/>
+					    <xs:enumeration value=""test_Case""/>
+					    <xs:enumeration value=""Test_case""/>
+					    <xs:enumeration value=""Test_Case""/>
+					</xs:restriction>
+				</xs:simpleType>
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(EnumWithNonUniqueEntriesTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(EnumWithNonUniqueEntriesTest), content);
+            var durationEnumType = assembly.GetType("Test.TestEnum");
+            Assert.NotNull(durationEnumType);
+
+            var expectedEnumValues = new[] {"Test_Case", "Test_Case1", "Test_Case2", "Test_Case3"};
+            var enumValues = durationEnumType.GetEnumNames().OrderBy(n => n).ToList();
+            Assert.Equal(expectedEnumValues, enumValues);
+
+            var mEnumValue = durationEnumType.GetMembers().First(mi => mi.Name == "Test_Case1");
+            var xmlEnumAttribute = mEnumValue.GetCustomAttributes<XmlEnumAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlEnumAttribute);
+            Assert.Equal("test_Case", xmlEnumAttribute.Name);
+        }
     }
 }
