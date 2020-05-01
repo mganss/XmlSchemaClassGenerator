@@ -291,6 +291,27 @@ Integer and derived types
 Not all numeric types defined by XML Schema can be safely and accurately mapped to .NET numeric data types, however, it's possible to approximate the mapping based on the integer bounds and restrictions such as `totalDigits`.  
 If an explicit integer type mapping is specified via `--integer=TYPE`, that type will be used, otherwise an approximation will be made based on the table below. If you additionally specify `--fallback`, the type specified via `--integer=TYPE` will be used only if no type can be deduced by applying the rules below.
 
+If the restrictions `minInclusive` and `maxInclusive` are present on the integer element, then the smallest CLR type that fully encompasses the specified range will be used. Unsigned types are given precedence over signed types. The following table shows the possible ranges and their corresponding CLR type, in the order they will be applied.
+
+<table>
+  <tr>
+    <th>Minimum (Inclusive)</th>
+	<th>Maximum (Inclusive)</th>
+	<th>C# type</th>
+	<tr><td>sbyte.MinValue</td><td>sbyte.MaxValue</td><td>sbyte</td></tr>
+	<tr><td>byte.MinValue</td><td>byte.MaxValue</td><td>byte</td></tr>
+	<tr><td>ushort.MinValue</td><td>ushort.MaxValue</td><td>ushort</td></tr>
+	<tr><td>short.MinValue</td><td>short.MaxValue</td><td>short</td></tr>
+	<tr><td>uint.MinValue</td><td>uint.MaxValue</td><td>uint</td></tr>
+	<tr><td>int.MinValue</td><td>int.MaxValue</td><td>int</td></tr>
+	<tr><td>ulong.MinValue</td><td>ulong.MaxValue</td><td>ulong</td></tr>
+	<tr><td>long.MinValue</td><td>long.MaxValue</td><td>long</td></tr>
+	<tr><td>decimal.MinValue</td><td>decimal.MaxValue</td><td>decimal</td></tr>
+  </tr>
+</table>
+
+If the range specified by `minInclusive` and `maxInclusive` does not fit in any CLR type, or if those restrictions are not present, then the `totalDigits` restriction will be used, as shown in the following table.
+
 <table>
   <tr>
     <th>XML Schema type</th>
