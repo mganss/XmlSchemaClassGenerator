@@ -342,9 +342,9 @@ namespace XmlSchemaClassGenerator.Tests
             DeserializeSampleXml(pattern, assembly);
         }
 
-        private bool HandleValidationError(string xml, ValidationEventArgs e)
+        private bool HandleValidationError(string[] xmlLines, ValidationEventArgs e)
         {
-            var line = xml.Split('\n')[e.Exception.LineNumber - 1].Substring(e.Exception.LinePosition - 1);
+            var line = xmlLines[e.Exception.LineNumber - 1].Substring(e.Exception.LinePosition - 1);
             var severity = e.Severity == XmlSeverityType.Error ? "Error" : "Warning";
             Output.WriteLine($"{severity} at line {e.Exception.LineNumber}, column {e.Exception.LinePosition}: {e.Message}");
             Output.WriteLine(line);
@@ -371,19 +371,19 @@ namespace XmlSchemaClassGenerator.Tests
             set.Compile();
 
             var anyValidXml = false;
-
+            var sb = new StringBuilder();
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract && !(e.ElementSchemaType is XmlSchemaSimpleType)))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);
                 var generator = new XmlSampleGenerator(set, rootElement.QualifiedName);
-                var sb = new StringBuilder();
+                
                 using var xw = XmlWriter.Create(sb, new XmlWriterSettings { Indent = true });
 
                 // generate sample xml
                 generator.WriteXml(xw);
                 var xml = sb.ToString();
-
+                sb.Clear();
                 File.WriteAllText("xml.xml", xml);
 
                 // validate serialized xml
@@ -394,10 +394,10 @@ namespace XmlSchemaClassGenerator.Tests
                 };
 
                 var invalid = false;
-
+                var xmlLines = xml.Split('\n');
                 void validate(object s, ValidationEventArgs e)
                 {
-                    if (HandleValidationError(xml, e)) invalid = true;
+                    if (HandleValidationError(xmlLines, e)) invalid = true;
                 }
 
                 settings.ValidationEventHandler += validate;
@@ -419,10 +419,10 @@ namespace XmlSchemaClassGenerator.Tests
                 var xml2 = Serialize(serializer, o);
 
                 File.WriteAllText("xml2.xml", xml2);
-
+                xmlLines = xml2.Split('\n');
                 void validate2(object s, ValidationEventArgs e)
                 {
-                    if (HandleValidationError(xml2, e)) throw e.Exception;
+                    if (HandleValidationError(xmlLines, e)) throw e.Exception;
                 };
 
                 settings.ValidationEventHandler += validate2;
