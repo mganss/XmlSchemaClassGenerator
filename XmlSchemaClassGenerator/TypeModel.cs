@@ -312,7 +312,7 @@ namespace XmlSchemaClassGenerator
                 };
                 var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName");
                 onPropChangedMethod.Parameters.Add(param);
-                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new PropertyChangedEventArgs({param.Name}))");
+                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs({param.Name}))");
 
                 onPropChangedMethod.Statements.Add(threadSafeDelegateInvokeExpression);
                 classDeclaration.Members.Add(onPropChangedMethod);
