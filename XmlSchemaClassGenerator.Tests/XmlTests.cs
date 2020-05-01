@@ -1423,5 +1423,84 @@ namespace Test
             Assert.NotNull(xmlEnumAttribute);
             Assert.Equal("test_Case", xmlEnumAttribute.Name);
         }
+
+        [Fact]
+        public void RenameInterfacePropertyInDerivedClassTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+                <xs:complexType name=""ClassItemBase"">
+			        <xs:sequence>
+                        <xs:group ref=""Level1""/>
+                    </xs:sequence>	
+		        </xs:complexType>
+
+	            <xs:element name=""ClassItem"">
+		            <xs:complexType>
+			            <xs:complexContent>
+                            <xs:extension base=""ClassItemBase""/>
+		                </xs:complexContent>
+		            </xs:complexType>
+                </xs:element>	  
+
+                <xs:element name=""SomeType1"">
+		            <xs:complexType>
+			            <xs:group ref=""Level1""/>
+		            </xs:complexType>
+                </xs:element>
+
+	            <xs:group name=""Level1"">
+		            <xs:choice>
+                        <xs:group ref=""Level2""/>
+		            </xs:choice>
+	            </xs:group>	  
+
+	            <xs:group name=""Level2"">
+		            <xs:choice>
+			            <xs:group ref=""Level3""/>
+		            </xs:choice>
+	            </xs:group>	  
+                
+	            <xs:group name=""Level3"">
+		            <xs:choice>
+			            <xs:element name=""ClassItemBase"" type=""xs:string""/>
+		            </xs:choice>
+	            </xs:group>	 
+
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(RenameInterfacePropertyInDerivedClassTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(RenameInterfacePropertyInDerivedClassTest), content);
+            var classType = assembly.GetType("Test.ClassItem");
+            Assert.NotNull(classType);
+            Assert.Single(classType.GetProperties());
+            Assert.Equal("ClassItemBaseProperty", classType.GetProperties().First().Name);
+
+            var level1Interface = assembly.GetType("Test.ILevel1");
+            Assert.NotNull(level1Interface);
+            Assert.Empty(level1Interface.GetProperties());
+
+            var level2Interface = assembly.GetType("Test.ILevel1");
+            Assert.NotNull(level2Interface);
+            Assert.Empty(level2Interface.GetProperties());
+
+            var level3Interface = assembly.GetType("Test.ILevel3");
+            Assert.NotNull(level3Interface);
+            Assert.Single(level3Interface.GetProperties());
+            Assert.Equal("ClassItemBaseProperty", level3Interface.GetProperties().First().Name);
+        }
     }
 }
