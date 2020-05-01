@@ -1582,5 +1582,52 @@ namespace Test
             Assert.NotNull(level3InterfacePropertyInfo);
 
         }
+
+        [Fact]
+        public void NillableWithDefaultValueTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+                <xs:complexType name=""TestType"">
+                    <xs:sequence>
+                        <xs:element name=""IntProperty"" type=""xs:int"" nillable=""true"" default=""9000"" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(NillableWithDefaultValueTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(NillableWithDefaultValueTest), content);
+            
+            var testType = assembly.GetType("Test.TestType");
+            Assert.NotNull(testType);
+            
+            var propertyInfo = testType.GetProperties().FirstOrDefault(p => p.Name == "IntProperty");
+            Assert.NotNull(propertyInfo);
+            var testTypeInstance = Activator.CreateInstance(testType);
+            var propertyDefaultValue = propertyInfo.GetValue(testTypeInstance);
+            Assert.IsType<int>(propertyDefaultValue);
+            Assert.Equal(9000, propertyDefaultValue);
+
+            propertyInfo.SetValue(testTypeInstance, null);
+            var serializer = new XmlSerializer(testType);
+
+            var serializedXml = Serialize(serializer, testTypeInstance);
+            Assert.Contains(
+                @":nil=""true""",
+                serializedXml);
+        }
+
     }
 }

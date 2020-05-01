@@ -829,10 +829,22 @@ namespace XmlSchemaClassGenerator
             var typeReference = TypeReference;
 
             var requiresBackingField = withDataBinding || DefaultValue != null || IsCollection || isArray;
-            var backingField = new CodeMemberField(typeReference, OwningType.GetUniqueFieldName(this))
+            CodeMemberField backingField;
+
+            if (IsNillableValueType)
             {
-                Attributes = MemberAttributes.Private
-            };
+                var nullableType = new CodeTypeReference(typeof(Nullable<>), Configuration.CodeTypeReferenceOptions);
+                nullableType.TypeArguments.Add(typeReference);
+                backingField = new CodeMemberField(nullableType, OwningType.GetUniqueFieldName(this));
+            }
+            else
+            {
+                backingField = new CodeMemberField(typeReference, OwningType.GetUniqueFieldName(this))
+                {
+                    Attributes = MemberAttributes.Private
+                };
+            }
+
             var ignoreAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlIgnoreAttribute), Configuration.CodeTypeReferenceOptions));
             var notMappedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(NotMappedAttribute), Configuration.CodeTypeReferenceOptions));
             backingField.CustomAttributes.Add(ignoreAttribute);
