@@ -1502,5 +1502,85 @@ namespace Test
             Assert.Single(level3Interface.GetProperties());
             Assert.Equal("ClassItemBaseProperty", level3Interface.GetProperties().First().Name);
         }
+
+        [Fact]
+        public void DoNotGenerateSamePropertiesInDerivedInterfacesClassTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+	            <xs:element name=""ParentClass"">
+		            <xs:complexType>
+			            <xs:group ref=""Level1""/>
+		            </xs:complexType>
+                </xs:element>	   
+
+	            <xs:group name=""Level1"">
+		            <xs:choice>
+                    <xs:sequence>
+                        <xs:element name=""InterfaceProperty"" type=""xs:string""/>
+                        <xs:group ref=""Level2""/>
+                    </xs:sequence>			            
+		            </xs:choice>
+	            </xs:group>	  
+
+	            <xs:group name=""Level2"">
+                    <xs:sequence>
+                        <xs:element name=""InterfaceProperty"" type=""xs:string""/>
+                        <xs:group ref=""Level3""/>
+                    </xs:sequence>	
+	            </xs:group>	  
+
+	            <xs:group name=""Level22"">
+                    <xs:sequence>
+                        <xs:element name=""InterfaceProperty"" type=""xs:string""/>
+                        <xs:element name=""Level22OwnProperty"" type=""xs:string""/>
+                        <xs:group ref=""Level3""/>
+                    </xs:sequence>	
+	            </xs:group>	  
+                
+	            <xs:group name=""Level3"">
+		            <xs:choice>
+			            <xs:element name=""InterfaceProperty"" type=""xs:string""/>
+		            </xs:choice>
+	            </xs:group>	 
+
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), content);
+            
+            var listType = assembly.GetType("Test.ParentClass");
+            Assert.NotNull(listType);
+            
+            var listTypePropertyInfo = listType.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
+            Assert.NotNull(listTypePropertyInfo);
+            
+            var level1Interface = assembly.GetType("Test.ILevel1");
+            Assert.NotNull(level1Interface);
+            Assert.Empty(level1Interface.GetProperties());
+
+            var level2Interface = assembly.GetType("Test.ILevel2");
+            Assert.NotNull(level2Interface);
+            Assert.Empty(level2Interface.GetProperties());
+
+            var level3Interface = assembly.GetType("Test.ILevel3");
+            Assert.NotNull(level3Interface);
+            var level3InterfacePropertyInfo = level3Interface.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
+            Assert.NotNull(level3InterfacePropertyInfo);
+
+        }
     }
 }

@@ -66,6 +66,26 @@ namespace XmlSchemaClassGenerator
             if (configuration.GenerateInterfaces)
             {
                 RenameInterfacePropertiesIfRenamedInDerivedClasses();
+                RemoveDuplicateInterfaceProperties();
+            }
+        }
+
+        private void RemoveDuplicateInterfaceProperties()
+        {
+            foreach (var interfaceModel in Types.Values.OfType<InterfaceModel>())
+            {
+                var parentProperties = interfaceModel.Properties.ToList();
+                foreach (var baseInterfaceType in interfaceModel.AllDerivedReferenceTypes().OfType<InterfaceModel>())
+                {
+                    foreach (var parentProperty in parentProperties)
+                    {
+                        var baseProperties = baseInterfaceType.Properties.ToList();
+                        foreach (var baseProperty in baseProperties.Where(baseProperty => parentProperty.Name == baseProperty.Name && parentProperty.Type.Name == baseProperty.Type.Name))
+                        {
+                            baseInterfaceType.Properties.Remove(baseProperty);
+                        }
+                    }
+                }
             }
         }
 
