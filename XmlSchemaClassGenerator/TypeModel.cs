@@ -1373,7 +1373,7 @@ namespace XmlSchemaClassGenerator
                 else
                     return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
             }
-            else if (type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
+            else if (type == typeof(byte[]) && defaultString != null)
             {
                 int numberChars = defaultString.Length;
                 var byteValues = new CodePrimitiveExpression[numberChars / 2];
