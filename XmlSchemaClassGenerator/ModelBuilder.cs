@@ -62,6 +62,66 @@ namespace XmlSchemaClassGenerator
                 var elements = set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(s => s.GetSchema() == schema);
                 CreateElements(elements);
             }
+
+            if (configuration.GenerateInterfaces)
+            {
+                RenameInterfacePropertiesIfRenamedInDerivedClasses();
+                RemoveDuplicateInterfaceProperties();
+            }
+        }
+
+        private void RemoveDuplicateInterfaceProperties()
+        {
+            foreach (var interfaceModel in Types.Values.OfType<InterfaceModel>())
+            {
+                var parentProperties = interfaceModel.Properties.ToList();
+                foreach (var baseInterfaceType in interfaceModel.AllDerivedReferenceTypes().OfType<InterfaceModel>())
+                {
+                    foreach (var parentProperty in parentProperties)
+                    {
+                        var baseProperties = baseInterfaceType.Properties.ToList();
+                        foreach (var baseProperty in baseProperties.Where(baseProperty => parentProperty.Name == baseProperty.Name && parentProperty.Type.Name == baseProperty.Type.Name))
+                        {
+                            baseInterfaceType.Properties.Remove(baseProperty);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void RenameInterfacePropertiesIfRenamedInDerivedClasses()
+        {
+            foreach (var interfaceModel in Types.Values.OfType<InterfaceModel>())
+            {
+                foreach (var interfaceProperty in interfaceModel.Properties)
+                {
+                    foreach (var implementationClass in interfaceModel.AllDerivedReferenceTypes())
+                    foreach (var implementationClassProperty in implementationClass.Properties)
+                    {
+                        if (implementationClassProperty.Name != implementationClassProperty.OriginalPropertyName
+                            && implementationClassProperty.OriginalPropertyName == interfaceProperty.Name
+                        )
+                        {
+                            RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
+                            interfaceProperty.Name = implementationClassProperty.Name;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void RenameInterfacePropertyInBaseClasses(InterfaceModel interfaceModel, ReferenceTypeModel implementationClass,
+            PropertyModel interfaceProperty, string newName)
+        {
+            foreach (var interfaceModelImplementationClass in interfaceModel.AllDerivedReferenceTypes().Where(c =>
+                c != implementationClass))
+            {
+                foreach (var propertyModel in interfaceModelImplementationClass.Properties.Where(p =>
+                    p.Name == interfaceProperty.Name))
+                {
+                    propertyModel.Name = newName;
+                }
+            }
         }
 
         private void ResolveDependencies(XmlSchema schema, List<XmlSchema> dependencyOrder, HashSet<XmlSchema> seenSchemas)
@@ -217,7 +277,7 @@ namespace XmlSchemaClassGenerator
             interfaceModel.Properties.AddRange(properties);
             var interfaces = items.Select(i => i.XmlParticle).OfType<XmlSchemaGroupRef>()
                 .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), Groups[i.RefName], i.RefName));
-            interfaceModel.Interfaces.AddRange(interfaces);
+            interfaceModel.AddInterfaces(interfaces);
 
             return interfaceModel;
         }
@@ -249,7 +309,7 @@ namespace XmlSchemaClassGenerator
             interfaceModel.Properties.AddRange(properties);
             var interfaces = items.OfType<XmlSchemaAttributeGroupRef>()
                 .Select(a => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(a.SourceUri), AttributeGroups[a.RefName], a.RefName));
-            interfaceModel.Interfaces.AddRange(interfaces);
+            interfaceModel.AddInterfaces(interfaces);
 
             return interfaceModel;
         }
@@ -307,16 +367,18 @@ namespace XmlSchemaClassGenerator
             }
             else particle = complexType.Particle ?? complexType.ContentTypeParticle;
 
-            var items = GetElements(particle, complexType);
-            var properties = CreatePropertiesForElements(source, classModel, particle, items);
-            classModel.Properties.AddRange(properties);
+            var items = GetElements(particle, complexType).ToList();
 
             if (_configuration.GenerateInterfaces)
             {
                 var interfaces = items.Select(i => i.XmlParticle).OfType<XmlSchemaGroupRef>()
-                    .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), Groups[i.RefName], i.RefName));
-                classModel.Interfaces.AddRange(interfaces);
+                    .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), Groups[i.RefName], i.RefName)).ToList();
+
+                classModel.AddInterfaces(interfaces);
             }
+
+            var properties = CreatePropertiesForElements(source, classModel, particle, items);
+            classModel.Properties.AddRange(properties);
 
             XmlSchemaObjectCollection attributes = null;
             if (classModel.BaseClass != null)
@@ -344,7 +406,7 @@ namespace XmlSchemaClassGenerator
                 {
                     var attributeInterfaces = attributes.OfType<XmlSchemaAttributeGroupRef>()
                         .Select(i => (InterfaceModel)CreateTypeModel(CodeUtilities.CreateUri(i.SourceUri), AttributeGroups[i.RefName], i.RefName));
-                    classModel.Interfaces.AddRange(attributeInterfaces);
+                    classModel.AddInterfaces(attributeInterfaces);
                 }
             }
 
@@ -413,6 +475,7 @@ namespace XmlSchemaClassGenerator
                         enumModel.Values.Add(value);
                     }
 
+                    enumModel.Values = EnsureEnumValuesUnique(enumModel.Values);
                     if (namespaceModel != null)
                     {
                         namespaceModel.Types[enumModel.Name] = enumModel;
@@ -457,6 +520,23 @@ namespace XmlSchemaClassGenerator
             }
 
             return simpleModel;
+        }
+
+        private static List<EnumValueModel> EnsureEnumValuesUnique(List<EnumValueModel> enumModelValues)
+        {
+            var enumValueGroups = from enumValue in enumModelValues
+                group enumValue by enumValue.Name;
+ 
+            foreach (var g in enumValueGroups)
+            {
+                var i = 1;
+                foreach (var t in g.Skip(1))
+                {
+                    t.Name = $"{t.Name}{i++}";
+                }
+            }
+
+            return enumModelValues;
         }
 
         private IEnumerable<PropertyModel> CreatePropertiesForAttributes(Uri source, TypeModel typeModel, IEnumerable<XmlSchemaObject> items)
@@ -579,6 +659,7 @@ namespace XmlSchemaClassGenerator
                     }
 
                     var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(element.QualifiedName);
+                    var originalPropertyName = propertyName;
                     if (propertyName == typeModel.Name)
                     {
                         propertyName += "Property"; // member names cannot be the same as their enclosing type
@@ -589,6 +670,7 @@ namespace XmlSchemaClassGenerator
                         OwningType = typeModel,
                         XmlSchemaName = element.QualifiedName,
                         Name = propertyName,
+                        OriginalPropertyName = originalPropertyName,
                         Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
                         IsNillable = element.IsNillable,
                         IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),

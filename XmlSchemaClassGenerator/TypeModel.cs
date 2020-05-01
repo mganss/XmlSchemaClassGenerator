@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -193,17 +194,16 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class InterfaceModel : TypeModel
+    public class InterfaceModel : ReferenceTypeModel
     {
         public InterfaceModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
             Properties = new List<PropertyModel>();
-            Interfaces = new List<InterfaceModel>();
+            DerivedTypes = new List<ReferenceTypeModel>();
         }
 
-        public List<PropertyModel> Properties { get; set; }
-        public List<InterfaceModel> Interfaces { get; set; }
+        public List<ReferenceTypeModel> DerivedTypes { get; set; }
 
         public override CodeTypeDeclaration Generate()
         {
@@ -225,23 +225,48 @@ namespace XmlSchemaClassGenerator
             Configuration.TypeVisitor(interfaceDeclaration, this);
             return interfaceDeclaration;
         }
+
+        public IEnumerable<ReferenceTypeModel> AllDerivedReferenceTypes()
+        {
+            foreach (var interfaceModelDerivedType in DerivedTypes)
+            {
+                yield return interfaceModelDerivedType;
+                switch (interfaceModelDerivedType)
+                {
+                    case InterfaceModel derivedInterfaceModel:
+                    {
+                        foreach (var referenceTypeModel in derivedInterfaceModel.AllDerivedReferenceTypes())
+                        {
+                            yield return referenceTypeModel;
+                        }
+
+                        break;
+                    }
+                    case ClassModel derivedClassModel:
+                    {
+                        foreach (var baseClass in derivedClassModel.GetAllDerivedTypes())
+                        {
+                            yield return baseClass;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
     }
 
-    public class ClassModel : TypeModel
+    public class ClassModel : ReferenceTypeModel
     {
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
         public XmlQualifiedName SubstitutionName { get; set; }
         public TypeModel BaseClass { get; set; }
-        public List<PropertyModel> Properties { get; set; }
-        public List<InterfaceModel> Interfaces { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
         public ClassModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
-            Properties = new List<PropertyModel>();
-            Interfaces = new List<InterfaceModel>();
             DerivedTypes = new List<ClassModel>();
         }
 
@@ -516,11 +541,35 @@ namespace XmlSchemaClassGenerator
         }
     }
 
+    public class ReferenceTypeModel : TypeModel
+    {
+        public ReferenceTypeModel(GeneratorConfiguration configuration)
+            : base(configuration)
+        {
+            Properties = new List<PropertyModel>();
+            Interfaces = new List<InterfaceModel>();
+        }
+
+        public List<PropertyModel> Properties { get; set; }
+        public List<InterfaceModel> Interfaces { get; }
+        
+        public void AddInterfaces(IEnumerable<InterfaceModel> interfaces)
+        {
+            foreach (var interfaceModel in interfaces)
+            {
+                Interfaces.Add(interfaceModel);
+                interfaceModel.DerivedTypes.Add(this);
+            }
+            
+        }
+    }
+
     [DebuggerDisplay("{Name}")]
     public class PropertyModel
     {
         public TypeModel OwningType { get; set; }
         public string Name { get; set; }
+        public string OriginalPropertyName { get; set; }
         public bool IsAttribute { get; set; }
         public TypeModel Type { get; set; }
         public bool IsNullable { get; set; }
