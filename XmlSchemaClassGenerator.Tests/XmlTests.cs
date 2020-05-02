@@ -1665,5 +1665,63 @@ namespace Test
             Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
             Assert.Equal("http://test.namespace", xmlRootAttribute.Namespace);
         }
+
+        [Fact]
+        public void AmbiguousTypesTest()
+        {
+            const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+		        <xs:element name=""EnumTestType"">
+		            <xs:simpleType>			
+					    <xs:restriction base=""xs:string"">
+						    <xs:enumeration value=""EnumValue""/>
+					    </xs:restriction>
+				    </xs:simpleType>			
+	            </xs:element>
+
+            </xs:schema>";
+            const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS2""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+		        <xs:element name=""EnumTestType"">
+		            <xs:simpleType>			
+					    <xs:restriction base=""xs:string"">
+						    <xs:enumeration value=""EnumValue""/>
+					    </xs:restriction>
+				    </xs:simpleType>			
+	            </xs:element>
+
+            </xs:schema>";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key =>key.XmlSchemaNamespace
+                }
+            };
+            var contents1 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd1, generator);
+            var contents2 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd2, generator);
+            var content1 = Assert.Single(contents1);
+            var content2 = Assert.Single(contents2);
+
+            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content1, content2);
+            
+            var testType = assembly.GetType("Test_NS1.EnumTestType");
+            Assert.NotNull(testType);
+            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+
+            testType = assembly.GetType("Test_NS2.EnumTestType");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+        }
     }
 }

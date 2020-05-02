@@ -68,6 +68,25 @@ namespace XmlSchemaClassGenerator
                 RenameInterfacePropertiesIfRenamedInDerivedClasses();
                 RemoveDuplicateInterfaceProperties();
             }
+
+            AddXmlRootAttributeToAmbiguousTypes();
+        }
+
+        private void AddXmlRootAttributeToAmbiguousTypes()
+        {
+            var ambiguousTypes = Types.Values.Where(t=>t.RootElementName == null && !(t is InterfaceModel)).GroupBy(t => t.Name);
+            foreach (var ambiguousTypeGroup in ambiguousTypes)
+            {
+                var types = ambiguousTypeGroup.ToList();
+                if (types.Count == 1)
+                {
+                    continue;
+                }
+                foreach (var typeModel in types)
+                {
+                    typeModel.RootElementName = typeModel.GetQualifiedName();
+                }
+            }
         }
 
         private void RemoveDuplicateInterfaceProperties()
