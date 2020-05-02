@@ -1310,6 +1310,13 @@ namespace XmlSchemaClassGenerator
                 enumDeclaration.Members.Add(member);
             }
 
+            if (RootElementName != null)
+            {
+                var rootAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlRootAttribute), Configuration.CodeTypeReferenceOptions),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(RootElementName.Name)),
+                    new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(RootElementName.Namespace)));
+                enumDeclaration.CustomAttributes.Add(rootAttribute);
+            }
             return enumDeclaration;
         }
 

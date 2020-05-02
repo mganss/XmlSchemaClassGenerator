@@ -1629,5 +1629,41 @@ namespace Test
                 serializedXml);
         }
 
+        [Fact]
+        public void GenerateXmlRootAttributeForEnumTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://test.namespace""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+		        <xs:element name=""EnumTestType"">
+		            <xs:simpleType>			
+					    <xs:restriction base=""xs:string"">
+						    <xs:enumeration value=""EnumValue""/>
+					    </xs:restriction>
+				    </xs:simpleType>			
+	            </xs:element>
+
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content);
+            
+            var testType = assembly.GetType("Test.EnumTestType");
+            Assert.NotNull(testType);
+            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("http://test.namespace", xmlRootAttribute.Namespace);
+        }
     }
 }
