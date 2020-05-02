@@ -222,6 +222,7 @@ namespace XmlSchemaClassGenerator
 
             interfaceDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace)).ToArray());
 
+            Configuration.TypeVisitor(interfaceDeclaration, this);
             return interfaceDeclaration;
         }
 
@@ -336,7 +337,7 @@ namespace XmlSchemaClassGenerator
                 };
                 var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName");
                 onPropChangedMethod.Parameters.Add(param);
-                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new PropertyChangedEventArgs({param.Name}))");
+                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs({param.Name}))");
 
                 onPropChangedMethod.Statements.Add(threadSafeDelegateInvokeExpression);
                 classDeclaration.Members.Add(onPropChangedMethod);
@@ -498,6 +499,7 @@ namespace XmlSchemaClassGenerator
 
             classDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace)).ToArray());
 
+            Configuration.TypeVisitor(classDeclaration, this);
             return classDeclaration;
         }
 
@@ -1317,6 +1319,7 @@ namespace XmlSchemaClassGenerator
                     new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(RootElementName.Namespace)));
                 enumDeclaration.CustomAttributes.Add(rootAttribute);
             }
+            Configuration.TypeVisitor(enumDeclaration, this);
             return enumDeclaration;
         }
 
@@ -1438,7 +1441,7 @@ namespace XmlSchemaClassGenerator
                 else
                     return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType));
             }
-            else if (type == typeof(byte[]) && !string.IsNullOrWhiteSpace(defaultString))
+            else if (type == typeof(byte[]) && defaultString != null)
             {
                 int numberChars = defaultString.Length;
                 var byteValues = new CodePrimitiveExpression[numberChars / 2];

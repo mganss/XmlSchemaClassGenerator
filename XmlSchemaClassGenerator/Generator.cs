@@ -156,6 +156,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.IntegerDataType = value; }
         }
 
+        public bool UseIntegerDataTypeAsFallback
+        {
+            get { return _configuration.UseIntegerDataTypeAsFallback; }
+            set { _configuration.UseIntegerDataTypeAsFallback = value; }
+        }
+
         public bool EntityFramework
         {
             get { return _configuration.EntityFramework; }
@@ -199,6 +205,15 @@ namespace XmlSchemaClassGenerator
         {
             get { return _configuration.MemberVisitor; }
             set { _configuration.MemberVisitor = value; }
+        }
+
+        /// <summary>
+        /// Optional delegate that is called for each generated type (class, interface, enum)
+        /// </summary>
+        public Action<CodeTypeDeclaration, TypeModel> TypeVisitor
+        {
+            get { return _configuration.TypeVisitor; }
+            set { _configuration.TypeVisitor = value; }
         }
 
         public VersionProvider Version

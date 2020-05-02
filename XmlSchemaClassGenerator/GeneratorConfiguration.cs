@@ -33,6 +33,7 @@ namespace XmlSchemaClassGenerator
             GenerateSerializableAttribute = GenerateDesignerCategoryAttribute = true;
             CollectionType = typeof(Collection<>);
             MemberVisitor = (member, model) => { };
+            TypeVisitor = (type, model) => { };
             NamingProvider = new NamingProvider(NamingScheme);
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
@@ -135,6 +136,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public Type IntegerDataType { get; set; }
         /// <summary>
+        /// Use <see cref="IntegerDataType"/> only if no better type can be inferred
+        /// </summary>
+        public bool UseIntegerDataTypeAsFallback { get; set; }
+        /// <summary>
         /// Generate Entity Framework Code First compatible classes
         /// </summary>
         public bool EntityFramework { get; set; }
@@ -188,6 +193,11 @@ namespace XmlSchemaClassGenerator
         /// Optional delegate that is called for each generated type member
         /// </summary>
         public Action<CodeTypeMember, PropertyModel> MemberVisitor { get; set; }
+
+        /// <summary>
+        /// Optional delegate that is called for each generated type (class, interface, enum)
+        /// </summary>
+        public Action<CodeTypeDeclaration, TypeModel> TypeVisitor { get; set; }
 
         /// <summary>
         /// Provides options to customize Elementnamens with own logik
