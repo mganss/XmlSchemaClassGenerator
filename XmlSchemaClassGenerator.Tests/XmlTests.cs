@@ -342,9 +342,9 @@ namespace XmlSchemaClassGenerator.Tests
             DeserializeSampleXml(pattern, assembly);
         }
 
-        private bool HandleValidationError(string xml, ValidationEventArgs e)
+        private bool HandleValidationError(string[] xmlLines, ValidationEventArgs e)
         {
-            var line = xml.Split('\n')[e.Exception.LineNumber - 1].Substring(e.Exception.LinePosition - 1);
+            var line = xmlLines[e.Exception.LineNumber - 1].Substring(e.Exception.LinePosition - 1);
             var severity = e.Severity == XmlSeverityType.Error ? "Error" : "Warning";
             Output.WriteLine($"{severity} at line {e.Exception.LineNumber}, column {e.Exception.LinePosition}: {e.Message}");
             Output.WriteLine(line);
@@ -371,19 +371,19 @@ namespace XmlSchemaClassGenerator.Tests
             set.Compile();
 
             var anyValidXml = false;
-
+            var sb = new StringBuilder();
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract && !(e.ElementSchemaType is XmlSchemaSimpleType)))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);
                 var generator = new XmlSampleGenerator(set, rootElement.QualifiedName);
-                var sb = new StringBuilder();
+                
                 using var xw = XmlWriter.Create(sb, new XmlWriterSettings { Indent = true });
 
                 // generate sample xml
                 generator.WriteXml(xw);
                 var xml = sb.ToString();
-
+                sb.Clear();
                 File.WriteAllText("xml.xml", xml);
 
                 // validate serialized xml
@@ -394,10 +394,10 @@ namespace XmlSchemaClassGenerator.Tests
                 };
 
                 var invalid = false;
-
+                var xmlLines = xml.Split('\n');
                 void validate(object s, ValidationEventArgs e)
                 {
-                    if (HandleValidationError(xml, e)) invalid = true;
+                    if (HandleValidationError(xmlLines, e)) invalid = true;
                 }
 
                 settings.ValidationEventHandler += validate;
@@ -419,10 +419,10 @@ namespace XmlSchemaClassGenerator.Tests
                 var xml2 = Serialize(serializer, o);
 
                 File.WriteAllText("xml2.xml", xml2);
-
+                xmlLines = xml2.Split('\n');
                 void validate2(object s, ValidationEventArgs e)
                 {
-                    if (HandleValidationError(xml2, e)) throw e.Exception;
+                    if (HandleValidationError(xmlLines, e)) throw e.Exception;
                 };
 
                 settings.ValidationEventHandler += validate2;
@@ -1581,6 +1581,147 @@ namespace Test
             var level3InterfacePropertyInfo = level3Interface.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
             Assert.NotNull(level3InterfacePropertyInfo);
 
+        }
+
+        [Fact]
+        public void NillableWithDefaultValueTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+                <xs:complexType name=""TestType"">
+                    <xs:sequence>
+                        <xs:element name=""IntProperty"" type=""xs:int"" nillable=""true"" default=""9000"" />
+                    </xs:sequence>
+                </xs:complexType>
+
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(NillableWithDefaultValueTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(NillableWithDefaultValueTest), content);
+            
+            var testType = assembly.GetType("Test.TestType");
+            Assert.NotNull(testType);
+            
+            var propertyInfo = testType.GetProperties().FirstOrDefault(p => p.Name == "IntProperty");
+            Assert.NotNull(propertyInfo);
+            var testTypeInstance = Activator.CreateInstance(testType);
+            var propertyDefaultValue = propertyInfo.GetValue(testTypeInstance);
+            Assert.IsType<int>(propertyDefaultValue);
+            Assert.Equal(9000, propertyDefaultValue);
+
+            propertyInfo.SetValue(testTypeInstance, null);
+            var serializer = new XmlSerializer(testType);
+
+            var serializedXml = Serialize(serializer, testTypeInstance);
+            Assert.Contains(
+                @":nil=""true""",
+                serializedXml);
+        }
+
+        [Fact]
+        public void GenerateXmlRootAttributeForEnumTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://test.namespace""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+		        <xs:element name=""EnumTestType"">
+		            <xs:simpleType>			
+					    <xs:restriction base=""xs:string"">
+						    <xs:enumeration value=""EnumValue""/>
+					    </xs:restriction>
+				    </xs:simpleType>			
+	            </xs:element>
+
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content);
+            
+            var testType = assembly.GetType("Test.EnumTestType");
+            Assert.NotNull(testType);
+            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("http://test.namespace", xmlRootAttribute.Namespace);
+        }
+
+        [Fact]
+        public void AmbiguousTypesTest()
+        {
+            const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+		        <xs:element name=""EnumTestType"">
+		            <xs:simpleType>			
+					    <xs:restriction base=""xs:string"">
+						    <xs:enumeration value=""EnumValue""/>
+					    </xs:restriction>
+				    </xs:simpleType>			
+	            </xs:element>
+
+            </xs:schema>";
+            const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS2""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+		        <xs:element name=""EnumTestType"">
+		            <xs:simpleType>			
+					    <xs:restriction base=""xs:string"">
+						    <xs:enumeration value=""EnumValue""/>
+					    </xs:restriction>
+				    </xs:simpleType>			
+	            </xs:element>
+
+            </xs:schema>";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key =>key.XmlSchemaNamespace
+                }
+            };
+            var contents1 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd1, generator);
+            var contents2 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd2, generator);
+            var content1 = Assert.Single(contents1);
+            var content2 = Assert.Single(contents2);
+
+            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content1, content2);
+            
+            var testType = assembly.GetType("Test_NS1.EnumTestType");
+            Assert.NotNull(testType);
+            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+
+            testType = assembly.GetType("Test_NS2.EnumTestType");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
         }
     }
 }
