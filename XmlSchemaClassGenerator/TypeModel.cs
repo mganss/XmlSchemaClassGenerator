@@ -973,7 +973,7 @@ namespace XmlSchemaClassGenerator
                     typeDeclaration.Members.Add(nullableMember);
 
                     var editorBrowsableAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(EditorBrowsableAttribute), Configuration.CodeTypeReferenceOptions));
-                    editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(EditorBrowsableState), Configuration.CodeTypeReferenceOptions)), "Never")));
+                    editorBrowsableAttribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(EditorBrowsableState), CodeTypeReferenceOptions.GlobalReference)), "Never")));
                     specifiedMember?.CustomAttributes.Add(editorBrowsableAttribute);
                     member.CustomAttributes.Add(editorBrowsableAttribute);
                     if (Configuration.EntityFramework) { member.CustomAttributes.Add(notMappedAttribute); }
