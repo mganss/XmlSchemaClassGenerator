@@ -115,14 +115,16 @@ namespace XmlSchemaClassGenerator
                 foreach (var interfaceProperty in interfaceModel.Properties)
                 {
                     foreach (var implementationClass in interfaceModel.AllDerivedReferenceTypes())
-                    foreach (var implementationClassProperty in implementationClass.Properties)
                     {
-                        if (implementationClassProperty.Name != implementationClassProperty.OriginalPropertyName
-                            && implementationClassProperty.OriginalPropertyName == interfaceProperty.Name
-                        )
+                        foreach (var implementationClassProperty in implementationClass.Properties)
                         {
-                            RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
-                            interfaceProperty.Name = implementationClassProperty.Name;
+                            if (implementationClassProperty.Name != implementationClassProperty.OriginalPropertyName
+                                && implementationClassProperty.OriginalPropertyName == interfaceProperty.Name
+                            )
+                            {
+                                RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
+                                interfaceProperty.Name = implementationClassProperty.Name;
+                            }
                         }
                     }
                 }
