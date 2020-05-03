@@ -250,7 +250,14 @@ namespace XmlSchemaClassGenerator
             XmlQualifiedName qualifiedName;
             if (!(typeModel is SimpleModel simpleTypeModel))
             {
-                qualifiedName = typeModel.XmlSchemaType.GetQualifiedName();
+                if (typeModel.IsAnonymous)
+                {
+                    qualifiedName = typeModel.XmlSchemaName;
+                }
+                else
+                {
+                    qualifiedName = typeModel.XmlSchemaType.GetQualifiedName();
+                }
             }
             else
             {
