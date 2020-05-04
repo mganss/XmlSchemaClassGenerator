@@ -29,7 +29,7 @@ namespace XmlSchemaClassGenerator.Tests
             Output = output;
         }
 
-        private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+        private IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
         {
             if (name is null)
             {
@@ -57,8 +57,9 @@ namespace XmlSchemaClassGenerator.Tests
 
             var set = new XmlSchemaSet();
 
-            using (var stringReader = new StringReader(xsd))
+            foreach (var xsd in xsds)
             {
+                using var stringReader = new StringReader(xsd);
                 var schema = XmlSchema.Read(stringReader, (s, e) =>
                 {
                     throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception);
@@ -70,6 +71,11 @@ namespace XmlSchemaClassGenerator.Tests
             gen.Generate(set);
 
             return writer.Content;
+        }
+
+        private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+        {
+            return ConvertXml(name, new[] {xsd}, generatorPrototype);
         }
 
         const string IS24Pattern = @"xsd\is24\*\*.xsd";
@@ -1721,6 +1727,119 @@ namespace Test
             xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
             Assert.NotNull(xmlRootAttribute);
             Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+        }
+
+        [Fact]
+        public void AmbiguousAnonymousTypesTest()
+        {
+            const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+	            <xs:complexType name=""TestType"">
+		            <xs:sequence>
+			            <xs:element name=""Property"">
+				            <xs:simpleType>
+					            <xs:restriction base=""xs:string"">
+						            <xs:enumeration value=""EnumValue""/>
+					            </xs:restriction>
+				            </xs:simpleType>
+			            </xs:element>
+					</xs:sequence>
+	            </xs:complexType>
+
+	            <xs:complexType name=""TestType2"">
+		            <xs:sequence>
+			            <xs:element name=""Property"">
+				            <xs:complexType>
+					            <xs:sequence>
+			                        <xs:element name=""Property"" type=""xs:string""/>
+                                </xs:sequence>
+				            </xs:complexType>
+			            </xs:element>
+					</xs:sequence>
+	            </xs:complexType>
+
+            </xs:schema>";
+            const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS2""
+                elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+
+	            <xs:complexType name=""TestType"">
+		            <xs:sequence>
+			            <xs:element name=""Property"">
+				            <xs:simpleType>
+					            <xs:restriction base=""xs:string"">
+						            <xs:enumeration value=""EnumValue""/>
+					            </xs:restriction>
+				            </xs:simpleType>
+			            </xs:element>
+					</xs:sequence>
+	            </xs:complexType>
+
+	            <xs:complexType name=""TestType2"">
+		            <xs:sequence>
+			            <xs:element name=""Property"">
+				            <xs:complexType>
+					            <xs:sequence>
+			                        <xs:element name=""Property"" type=""xs:string""/>
+                                </xs:sequence>
+				            </xs:complexType>
+			            </xs:element>
+					</xs:sequence>
+	            </xs:complexType>
+
+            </xs:schema>";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key =>key.XmlSchemaNamespace
+                }
+                , };
+            var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), new[]{xsd1, xsd2}, generator).ToArray();
+            Assert.Equal(2, contents.Length);
+
+            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), contents);
+            
+            var testType = assembly.GetType("Test_NS1.TestType");
+            Assert.NotNull(testType);
+            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("TestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+            testType = assembly.GetType("Test_NS1.TestTypeProperty");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("TestTypeProperty", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+            testType = assembly.GetType("Test_NS1.TestType2Property");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+
+
+            testType = assembly.GetType("Test_NS2.TestType");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("TestType", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+            testType = assembly.GetType("Test_NS2.TestTypeProperty");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("TestTypeProperty", xmlRootAttribute.ElementName);
+            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+            testType = assembly.GetType("Test_NS2.TestType2Property");
+            Assert.NotNull(testType);
+            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+            Assert.NotNull(xmlRootAttribute);
+            Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
             Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
         }
     }
