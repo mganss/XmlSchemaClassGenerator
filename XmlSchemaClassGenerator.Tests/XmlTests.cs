@@ -1797,7 +1797,7 @@ namespace Test
                 {
                     GenerateNamespace = key =>key.XmlSchemaNamespace
                 }
-                , };
+            };
             var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), new[]{xsd1, xsd2}, generator).ToArray();
             Assert.Equal(2, contents.Length);
 
@@ -1841,6 +1841,44 @@ namespace Test
             Assert.NotNull(xmlRootAttribute);
             Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
             Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+        }
+
+        [Fact]
+        public void TestShouldPatternForCollections()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
+            elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+            <xs:element name=""TestType"">
+				<xs:complexType>
+					<xs:choice maxOccurs=""unbounded"">
+						<xs:element name=""DateValue"" type=""xs:dateTime"" nillable=""true""/>
+					</xs:choice>
+				</xs:complexType>
+            </xs:element>
+            <xs:element name=""TestType2"">
+				<xs:complexType>
+					<xs:choice maxOccurs=""unbounded"">
+						<xs:element name=""StringValue"" type=""xs:string"" nillable=""true""/>
+					</xs:choice>
+				</xs:complexType>
+            </xs:element>
+            </xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => key.XmlSchemaNamespace
+                }
+            };
+
+            var contents = ConvertXml(nameof(TestShouldPatternForCollections), xsd, generator).ToArray();
+            Assert.Equal(1, contents.Length);
+            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), contents);
+            var testType = assembly.GetType("Test_NS1.TestType");
+            var serializer = new XmlSerializer(testType);
+            Assert.NotNull(serializer);
         }
     }
 }
