@@ -1058,6 +1058,11 @@ namespace XmlSchemaClassGenerator
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
                 var countReference = new CodePropertyReferenceExpression(listReference, "Count");
                 var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
+                if (Configuration.CollectionSettersMode == CollectionSettersMode.PublicWithoutConstructorInitialization)
+                {
+                    var notNullExpression = new CodeBinaryOperatorExpression(listReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null));
+                    notZeroExpression = new CodeBinaryOperatorExpression(notNullExpression, CodeBinaryOperatorType.BooleanAnd, notZeroExpression);
+                }
                 var returnStatement = new CodeMethodReturnStatement(notZeroExpression);
                 specifiedProperty.GetStatements.Add(returnStatement);
 

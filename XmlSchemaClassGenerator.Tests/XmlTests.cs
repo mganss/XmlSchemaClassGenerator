@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -220,6 +221,72 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
             }
         }
+        
+        [Fact]
+        public void TestListWithPublicPropertySettersWithoutConstructorsSpecified()
+        {
+            var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator
+            {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "List",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CollectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization
+            });
+            Assert.NotNull(assembly);
+            var myClassType = assembly.GetType("List.MyClass");
+            Assert.NotNull(myClassType);
+            var iListType = typeof(Collection<>);
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+            var myClassInstance = Activator.CreateInstance(myClassType);
+
+            var propertyNamesWithSpecifiedPostfix = publicCollectionPropertyInfos.Select(p => p.Name + "Specified").ToHashSet();
+            var propertiesWithSpecifiedPostfix =
+                myClassType.GetProperties().Where(p => propertyNamesWithSpecifiedPostfix.Contains(p.Name)).ToList();
+
+            //Null collection
+            foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
+            {
+                Assert.False((bool)propertyInfo.GetValue(myClassInstance));
+            }
+
+            foreach (var propertyInfo in publicCollectionPropertyInfos)
+            {
+                var collection = Activator.CreateInstance(propertyInfo.PropertyType);
+                propertyInfo.SetValue(myClassInstance, collection);
+            }
+
+            //Not Null but empty collection
+            foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
+            {
+                Assert.False((bool)propertyInfo.GetValue(myClassInstance));
+            }
+
+            foreach (var propertyInfo in publicCollectionPropertyInfos)
+            {
+            
+                var collection = Activator.CreateInstance(propertyInfo.PropertyType);
+                propertyInfo.PropertyType.InvokeMember("Add", BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.Instance, null, collection,
+                    new object[] {null});
+                propertyInfo.SetValue(myClassInstance, collection);
+            }
+
+            //Not Null and not empty collection
+            foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
+            {
+                Assert.True((bool)propertyInfo.GetValue(myClassInstance));
+            }
+        }
+
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
