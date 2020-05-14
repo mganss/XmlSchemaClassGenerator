@@ -1942,7 +1942,7 @@ namespace Test
             };
 
             var contents = ConvertXml(nameof(TestShouldPatternForCollections), xsd, generator).ToArray();
-            Assert.Equal(1, contents.Length);
+            Assert.Single(contents);
             var assembly = Compiler.Compile(nameof(TestShouldPatternForCollections), contents);
             var testType = assembly.GetType("Test_NS1.TestType");
             var serializer = new XmlSerializer(testType);
@@ -1977,7 +1977,7 @@ namespace Test
             };
 
             var contents = ConvertXml(nameof(TestDoNotForceIsNullableGeneration), xsd, generator).ToArray();
-            Assert.Equal(1, contents.Length);
+            Assert.Single(contents);
             var assembly = Compiler.Compile(nameof(TestDoNotForceIsNullableGeneration), contents);
             var testType = assembly.GetType("Test_NS1.TestType");
             var serializer = new XmlSerializer(testType);
@@ -2026,7 +2026,7 @@ namespace Test
             };
 
             var contents = ConvertXml(nameof(TestForceIsNullableGeneration), xsd, generator).ToArray();
-            Assert.Equal(1, contents.Length);
+            Assert.Single(contents);
             var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
             var testType = assembly.GetType("Test_NS1.TestType");
             var serializer = new XmlSerializer(testType);
