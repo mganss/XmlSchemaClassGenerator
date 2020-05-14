@@ -125,7 +125,7 @@ Options:
                                pattern (default is false)
       --sf, --separateFiles  generate a separate file for each class (default
                                is false)
-      --dnfin, --noNotForceIsNullable
+      --dnfin, --doNotForceIsNullable
                              do not force generator to emit IsNullable = true
                                in XmlElement annotation for nillable elements
                                when element is nullable (minOccurs < 1 or
