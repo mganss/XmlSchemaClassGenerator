@@ -46,6 +46,7 @@ namespace XmlSchemaClassGenerator.Console
             var useShouldSerialize = false;
             var separateClasses = false;
             var collectionSettersMode = CollectionSettersMode.Private;
+            var doNotForceIsNullable = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -120,6 +121,7 @@ without backing field initialization for collections
                 { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
                 { "s|useShouldSerialize", "use ShouldSerialize pattern instead of Specified pattern (default is false)", v => useShouldSerialize = v != null },
                 { "sf|separateFiles", "generate a separate file for each class (default is false)", v => separateClasses = v != null },
+                { "dnfin|noNotForceIsNullable", "do not force generator to emit IsNullable = true in XmlElement annotation for nillable elements when element is nullable (minOccurs < 1 or parent element is choice) (default is false)", v => doNotForceIsNullable = v != null }
             };
 
             var globsAndUris = options.Parse(args);
@@ -188,7 +190,8 @@ without backing field initialization for collections
                 GenerateComplexTypesForCollections = generateComplexTypesForCollections,
                 UseShouldSerializePattern = useShouldSerialize,
                 SeparateClasses = separateClasses,
-                CollectionSettersMode = collectionSettersMode
+                CollectionSettersMode = collectionSettersMode,
+                DoNotForceIsNullable = doNotForceIsNullable
             };
 
             if (pclCompatible)

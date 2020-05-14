@@ -228,6 +228,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.DisableComments = value; }
         }
 
+        public bool DoNotForceIsNullable
+        {
+            get { return _configuration.DoNotForceIsNullable; }
+            set { _configuration.DoNotForceIsNullable = value; }
+        }
+
         public string PrivateMemberPrefix
         {
             get { return _configuration.PrivateMemberPrefix; }

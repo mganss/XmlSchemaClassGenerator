@@ -206,6 +206,12 @@ namespace XmlSchemaClassGenerator
 
         public bool DisableComments { get; set; }
 
+        /// <summary>
+        /// If True then do not force generator to emit IsNullable=true in XmlElement annotation
+        /// for nillable elements when element is nullable (minOccurs &lt; 1 or parent element is choice)
+        /// </summary>
+        public bool DoNotForceIsNullable { get; set; }
+
         public string PrivateMemberPrefix { get; set; } = "_";
 
         /// <summary>

@@ -1226,7 +1226,7 @@ namespace XmlSchemaClassGenerator
                     }
                 }
 
-                if (IsNillable && !(IsCollection && Type is SimpleModel m && m.ValueType.IsValueType))
+                if (IsNillable && !(IsCollection && Type is SimpleModel m && m.ValueType.IsValueType) && !(IsNullable && Configuration.DoNotForceIsNullable))
                 {
                     attribute.Arguments.Add(new CodeAttributeArgument("IsNullable", new CodePrimitiveExpression(true)));
                 }

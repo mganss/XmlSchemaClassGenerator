@@ -125,6 +125,11 @@ Options:
                                pattern (default is false)
       --sf, --separateFiles  generate a separate file for each class (default
                                is false)
+      --dnfin, --noNotForceIsNullable
+                             do not force generator to emit IsNullable = true
+                               in XmlElement annotation for nillable elements
+                               when element is nullable (minOccurs < 1 or
+                               parent element is choice) (default is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
