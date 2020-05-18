@@ -455,12 +455,19 @@ namespace XmlSchemaClassGenerator
         private TypeModel CreateTypeModel(XmlSchemaSimpleType simpleType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
             var restrictions = new List<RestrictionModel>();
+            List<XmlSchemaFacet> facets = new List<XmlSchemaFacet>();
 
             if (simpleType.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
+                facets = typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList();
+            else if (simpleType.Content is XmlSchemaSimpleTypeUnion typeUnion
+                && typeUnion.BaseMemberTypes.All(b => b.Content is XmlSchemaSimpleTypeRestriction r && r.Facets.Count > 0))
+                facets = typeUnion.BaseMemberTypes.SelectMany(b => ((XmlSchemaSimpleTypeRestriction)b.Content).Facets.Cast<XmlSchemaFacet>()).ToList();
+
+            if (facets.Any())
             {
-                var enumFacets = typeRestriction.Facets.OfType<XmlSchemaEnumerationFacet>().ToList();
-                // If there's a pattern restriction mixed into the enumeration values, we'll generate a string to play it safe.
-                var isEnum = enumFacets.Count > 0 && !typeRestriction.Facets.OfType<XmlSchemaPatternFacet>().Any();
+                var enumFacets = facets.OfType<XmlSchemaEnumerationFacet>().ToList();
+                // If there are other restrictions mixed into the enumeration values, we'll generate a string to play it safe.
+                var isEnum = enumFacets.Count > 0 && enumFacets.Count == facets.Count;
                 if (isEnum)
                 {
                     // we got an enum
@@ -511,7 +518,7 @@ namespace XmlSchemaClassGenerator
                     return enumModel;
                 }
 
-                restrictions = GetRestrictions(typeRestriction.Facets.Cast<XmlSchemaFacet>(), simpleType).Where(r => r != null).Sanitize().ToList();
+                restrictions = GetRestrictions(facets, simpleType).Where(r => r != null).Sanitize().ToList();
             }
 
             var simpleModelName = _configuration.NamingProvider.SimpleTypeNameFromQualifiedName(qualifiedName);
