@@ -379,14 +379,30 @@ namespace XmlSchemaClassGenerator.Tests
         public void TestSeparateClasses()
         {
             var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Separate"));
-            Compiler.Generate("Tableau.Separate", TableauPattern, 
-                new Generator 
-                { 
-                    OutputWriter = output, 
+            Compiler.Generate("Tableau.Separate", TableauPattern,
+                new Generator
+                {
+                    OutputWriter = output,
                     SeparateClasses = true,
                     EnableDataBinding = true
                 });
             TestSamples("Tableau.Separate", TableauPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestArray()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Array"));
+            Compiler.Generate("Tableau.Array", TableauPattern,
+                new Generator
+                {
+                    OutputWriter = output,
+                    EnableDataBinding = true,
+                    CollectionType = typeof(System.Array),
+                    CollectionSettersMode = CollectionSettersMode.Public
+                });
+            TestSamples("Tableau.Array", TableauPattern);
         }
 
         [Fact, TestPriority(1)]

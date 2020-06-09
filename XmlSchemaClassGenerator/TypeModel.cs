@@ -717,7 +717,7 @@ namespace XmlSchemaClassGenerator
             {
                 return DefaultValue == null
                     && IsNullable && !(IsCollection || IsArray) && !IsList
-                    && ((PropertyType is EnumModel) || (PropertyType is SimpleModel && ((SimpleModel)PropertyType).ValueType.IsValueType));
+                    && ((PropertyType is EnumModel) || (PropertyType is SimpleModel model && model.ValueType.IsValueType));
             }
         }
 
@@ -727,7 +727,7 @@ namespace XmlSchemaClassGenerator
             {
                 return IsNillable
                     && !(IsCollection || IsArray)
-                    && ((PropertyType is EnumModel) || (PropertyType is SimpleModel && ((SimpleModel)PropertyType).ValueType.IsValueType));
+                    && ((PropertyType is EnumModel) || (PropertyType is SimpleModel model && model.ValueType.IsValueType));
             }
         }
 
@@ -1056,7 +1056,9 @@ namespace XmlSchemaClassGenerator
                 specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
 
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
-                var countReference = new CodePropertyReferenceExpression(listReference, "Count");
+                var collectionType = Configuration.CollectionImplementationType ?? Configuration.CollectionType;
+                var countProperty = collectionType == typeof(System.Array) ? "Length" : "Count";
+                var countReference = new CodePropertyReferenceExpression(listReference, countProperty);
                 var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
                 if (Configuration.CollectionSettersMode == CollectionSettersMode.PublicWithoutConstructorInitialization)
                 {
@@ -1082,6 +1084,7 @@ namespace XmlSchemaClassGenerator
             if ((IsCollection || isArray || (IsList && IsAttribute)) && Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
             {
                 var constructor = typeDeclaration.Members.OfType<CodeConstructor>().FirstOrDefault();
+
                 if (constructor == null)
                 {
                     constructor = new CodeConstructor { Attributes = MemberAttributes.Public | MemberAttributes.Final };
@@ -1090,10 +1093,24 @@ namespace XmlSchemaClassGenerator
                     constructor.Comments.AddRange(DocumentationModel.GetComments(constructorDocs).ToArray());
                     typeDeclaration.Members.Add(constructor);
                 }
+
                 var listReference = requiresBackingField ? (CodeExpression)new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), backingField.Name) :
                     new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
-                var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, collection: true, forInit: true, attribute: IsAttribute);
-                var initExpression = new CodeObjectCreateExpression(initTypeReference);
+                var collectionType = Configuration.CollectionImplementationType ?? Configuration.CollectionType;
+
+                CodeExpression initExpression;
+
+                if (collectionType == typeof(System.Array))
+                {
+                    var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, collection: false, forInit: true, attribute: IsAttribute);
+                    initExpression = new CodeArrayCreateExpression(initTypeReference);
+                }
+                else
+                {
+                    var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, collection: true, forInit: true, attribute: IsAttribute);
+                    initExpression = new CodeObjectCreateExpression(initTypeReference);
+                }
+
                 constructor.Statements.Add(new CodeAssignStatement(listReference, initExpression));
             }
 
@@ -1350,21 +1367,26 @@ namespace XmlSchemaClassGenerator
 
         public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
         {
-            var typeRef = new CodeTypeReference(configuration.CollectionType, configuration.CodeTypeReferenceOptions);
-            return GetFullTypeName(typeName, configuration, typeRef);
+            var type = configuration.CollectionType;
+            var typeRef = new CodeTypeReference(type, configuration.CodeTypeReferenceOptions);
+            return GetFullTypeName(typeName, typeRef, type);
         }
 
         public static string GetCollectionImplementationName(string typeName, GeneratorConfiguration configuration)
         {
-            var typeRef = new CodeTypeReference(configuration.CollectionImplementationType ?? configuration.CollectionType, configuration.CodeTypeReferenceOptions);
-            return GetFullTypeName(typeName, configuration, typeRef);
+            var type = configuration.CollectionImplementationType ?? configuration.CollectionType;
+            var typeRef = new CodeTypeReference(type, configuration.CodeTypeReferenceOptions);
+            return GetFullTypeName(typeName, typeRef, type);
         }
 
-        private static string GetFullTypeName(string typeName, GeneratorConfiguration configuration, CodeTypeReference typeRef)
+        private static string GetFullTypeName(string typeName, CodeTypeReference typeRef, Type type)
         {
-            if (configuration.CollectionType.IsGenericTypeDefinition)
-            {
+            if (type.IsGenericTypeDefinition)
                 typeRef.TypeArguments.Add(typeName);
+            else if (type == typeof(System.Array))
+            {
+                typeRef.ArrayElementType = new CodeTypeReference(typeName);
+                typeRef.ArrayRank = 1;
             }
             var typeOfExpr = new CodeTypeOfExpression(typeRef);
             var writer = new System.IO.StringWriter();
@@ -1397,14 +1419,14 @@ namespace XmlSchemaClassGenerator
 
             if (collection)
             {
-                if (forInit)
-                {
-                    type = (Configuration.CollectionImplementationType ?? Configuration.CollectionType).MakeGenericType(type);
-                }
+                var collectionType = forInit ? (Configuration.CollectionImplementationType ?? Configuration.CollectionType) : Configuration.CollectionType;
+
+                if (collectionType.IsGenericType)
+                    type = collectionType.MakeGenericType(type);
+                else if (collectionType == typeof(System.Array))
+                    type = type.MakeArrayType();
                 else
-                {
-                    type = Configuration.CollectionType.MakeGenericType(type);
-                }
+                    type = collectionType;
             }
 
             return new CodeTypeReference(type, Configuration.CodeTypeReferenceOptions);

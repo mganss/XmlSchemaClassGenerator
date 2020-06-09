@@ -47,6 +47,7 @@ namespace XmlSchemaClassGenerator.Tests
             "System.Private.Xml",
             "System.Private.Xml.Linq",
             "System.Runtime",
+            "System.Runtime.Extensions",
             "System.Xml.XDocument",
             "System.Xml.XmlSerializer",
         };
@@ -104,7 +105,9 @@ namespace XmlSchemaClassGenerator.Tests
                 CollectionSettersMode = generatorPrototype.CollectionSettersMode,
                 TextValuePropertyName = generatorPrototype.TextValuePropertyName,
                 EmitOrder = generatorPrototype.EmitOrder,
-                SeparateClasses = generatorPrototype.SeparateClasses
+                SeparateClasses = generatorPrototype.SeparateClasses,
+                CollectionType = generatorPrototype.CollectionType,
+                CollectionImplementationType = generatorPrototype.CollectionImplementationType
             };
 
             output.Configuration = gen.Configuration;
