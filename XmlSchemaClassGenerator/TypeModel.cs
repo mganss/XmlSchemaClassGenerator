@@ -935,6 +935,12 @@ namespace XmlSchemaClassGenerator
 
             AddDocs(member);
 
+            if (!IsNullable && Configuration.DataAnnotationMode != DataAnnotationMode.None)
+            {
+                var requiredAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(RequiredAttribute), Configuration.CodeTypeReferenceOptions));
+                member.CustomAttributes.Add(requiredAttribute);
+            }
+
             if (IsDeprecated)
             {
                 // From .NET 3.5 XmlSerializer doesn't serialize objects with [Obsolete] >(
