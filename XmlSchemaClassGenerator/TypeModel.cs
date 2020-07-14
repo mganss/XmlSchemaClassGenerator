@@ -1129,6 +1129,8 @@ namespace XmlSchemaClassGenerator
                 {
                     var arrayItemAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlArrayItemAttribute), Configuration.CodeTypeReferenceOptions),
                         propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, "Order", StringComparison.Ordinal)).ToArray());
+                    if (!arrayItemProperty.XmlSchemaName.IsEmpty && !string.IsNullOrEmpty(arrayItemProperty.XmlSchemaName.Namespace))
+                        arrayItemAttribute.Arguments.Add(new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(arrayItemProperty.XmlSchemaName.Namespace)));
                     member.CustomAttributes.Add(arrayItemAttribute);
                 }
             }

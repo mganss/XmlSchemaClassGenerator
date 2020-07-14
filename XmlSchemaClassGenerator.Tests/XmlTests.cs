@@ -2063,5 +2063,62 @@ namespace Test
             var xmlElementNullableAttribute2 = prop.GetCustomAttribute<XmlElementAttribute>();
             Assert.True(xmlElementNullableAttribute2.IsNullable);
         }
+
+        [Fact]
+        public void TestArrayOfMsTypeGeneration()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/214
+
+            var xsd0 =
+                @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" targetNamespace=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" elementFormDefault=""qualified"">
+            <xs:complexType name=""ArrayOfstring"">
+                <xs:sequence>
+	                <xs:element name=""string"" type=""xs:string"" nillable=""true"" minOccurs=""0"" maxOccurs=""unbounded""/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name=""ArrayOfstring"" type=""tns:ArrayOfstring"" nillable=""true""/>
+        </xs:schema>
+        ";
+            var xsd1 =
+                @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:q1=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" elementFormDefault=""qualified"">
+            <xs:import namespace=""http://schemas.microsoft.com/2003/10/Serialization/Arrays""/>
+            <xs:complexType name=""c_ai"">
+                <xs:sequence>
+	                <xs:element name=""d"" type=""q1:ArrayOfstring"" nillable=""true"" minOccurs=""0"">
+		                <xs:annotation>
+			                <xs:appinfo>
+				                <DefaultValue EmitDefaultValue=""false"" xmlns=""http://schemas.microsoft.com/2003/10/Serialization/""/>
+			                </xs:appinfo>
+		                </xs:annotation>
+	                </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name=""c_ai"" type=""c_ai"" nillable=""true""/>
+        </xs:schema>
+        ";
+            var validXml =
+                @"<c_ai xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+            <d>
+                <tns:string>String</tns:string>
+                <tns:string>String</tns:string>
+                <tns:string>String</tns:string>
+            </d>
+        </c_ai>
+        ";
+            var generator = new Generator
+            {
+                IntegerDataType = typeof(int),
+                NamespacePrefix = "Test_NS1",
+                GenerateNullables = true,
+                CollectionType = typeof(System.Collections.Generic.List<>)
+            };
+            var contents = ConvertXml(nameof(TestArrayOfMsTypeGeneration), new[] { xsd0, xsd1 }, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
+            var testType = assembly.GetType("Test_NS1.C_Ai");
+            var serializer = new XmlSerializer(testType);
+            Assert.NotNull(serializer);
+            dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
+            Assert.NotEmpty((System.Collections.IEnumerable)deserialized.D);  //<== oops
+        }
     }
 }
