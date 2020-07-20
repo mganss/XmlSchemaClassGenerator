@@ -860,13 +860,16 @@ namespace XmlSchemaClassGenerator
 
         public IEnumerable<Particle> GetElements(XmlSchemaGroupBase groupBase)
         {
-            foreach (var item in groupBase.Items)
+            if (groupBase?.Items != null)
             {
-                foreach (var element in GetElements(item, groupBase))
+                foreach (var item in groupBase.Items)
                 {
-                    element.MaxOccurs = Math.Max(element.MaxOccurs, groupBase.MaxOccurs);
-                    element.MinOccurs = Math.Min(element.MinOccurs, groupBase.MinOccurs);
-                    yield return element;
+                    foreach (var element in GetElements(item, groupBase))
+                    {
+                        element.MaxOccurs = Math.Max(element.MaxOccurs, groupBase.MaxOccurs);
+                        element.MinOccurs = Math.Min(element.MinOccurs, groupBase.MinOccurs);
+                        yield return element;
+                    }
                 }
             }
         }
