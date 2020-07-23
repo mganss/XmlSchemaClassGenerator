@@ -16,6 +16,7 @@ namespace XmlSchemaClassGenerator
         private readonly Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
         private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
         private readonly Dictionary<string, TypeModel> Types = new Dictionary<string, TypeModel>();
+        private readonly Dictionary<XmlQualifiedName, HashSet<Substitute>> SubstitutionGroups = new Dictionary<XmlQualifiedName, HashSet<Substitute>>();
 
         private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
 
@@ -179,6 +180,8 @@ namespace XmlSchemaClassGenerator
 
         private void CreateElements(IEnumerable<XmlSchemaElement> elements)
         {
+            var types = new List<ClassModel>();
+
             foreach (var rootElement in elements)
             {
                 var rootSchema = rootElement.GetSchema();
@@ -186,6 +189,7 @@ namespace XmlSchemaClassGenerator
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) { qualifiedName = rootElement.QualifiedName; }
                 var type = CreateTypeModel(source, rootElement.ElementSchemaType, qualifiedName);
+                ClassModel derivedClassModel = null;
 
                 if (type.RootElementName != null)
                 {
@@ -194,7 +198,7 @@ namespace XmlSchemaClassGenerator
                         // There is already another global element with this type.
                         // Need to create an empty derived class.
 
-                        var derivedClassModel = new ClassModel(_configuration)
+                        derivedClassModel = new ClassModel(_configuration)
                         {
                             Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(rootElement.QualifiedName),
                             Namespace = CreateNamespaceModel(source, rootElement.QualifiedName)
@@ -215,6 +219,8 @@ namespace XmlSchemaClassGenerator
                         ((ClassModel)derivedClassModel.BaseClass).DerivedTypes.Add(derivedClassModel);
 
                         derivedClassModel.RootElementName = rootElement.QualifiedName;
+
+                        types.Add(derivedClassModel);
                     }
                     else
                     {
@@ -227,14 +233,58 @@ namespace XmlSchemaClassGenerator
                     if (type is ClassModel classModel)
                     {
                         classModel.Documentation.AddRange(GetDocumentation(rootElement));
-                        if (!rootElement.SubstitutionGroup.IsEmpty)
-                        {
-                            classModel.IsSubstitution = true;
-                            classModel.SubstitutionName = rootElement.QualifiedName;
-                        }
+                        types.Add(classModel);
                     }
 
                     type.RootElementName = rootElement.QualifiedName;
+                }
+
+                if (!rootElement.SubstitutionGroup.IsEmpty)
+                {
+                    if (!SubstitutionGroups.TryGetValue(rootElement.SubstitutionGroup, out var substitutes))
+                    {
+                        substitutes = new HashSet<Substitute>();
+                        SubstitutionGroups.Add(rootElement.SubstitutionGroup, substitutes);
+                    }
+
+                    substitutes.Add(new Substitute { Element = rootElement, Type = derivedClassModel ?? type });
+                }
+            }
+
+            var properties = types.SelectMany(c => c.Properties).Where(p => p.XmlSchemaName != null).ToList();
+
+            //foreach (var prop in properties)
+            //{
+            //    var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
+            //    var elems = GetElements(prop.XmlParticle, prop.XmlParent);
+
+            //    foreach (var substitute in substitutes)
+            //    {
+            //        var cls = (ClassModel)prop.OwningType;
+            //        var schema = substitute.Element.GetSchema();
+            //        var source = CodeUtilities.CreateUri(schema.SourceUri);
+            //        var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute);
+
+            //        cls.Properties.AddRange(props);
+            //    }
+            //}
+
+            foreach (var prop in properties)
+            {
+                foreach (var substitute in GetSubstitutedElements(prop.XmlSchemaName))
+                    prop.SubstitutedElements.Add((substitute.Element.QualifiedName, substitute.Type));
+            }
+        }
+
+        private IEnumerable<Substitute> GetSubstitutedElements(XmlQualifiedName name)
+        {
+            if (SubstitutionGroups.TryGetValue(name, out var substitutes))
+            {
+                foreach (var substitute in substitutes)
+                {
+                    yield return substitute;
+                    foreach (var recursiveSubstitute in GetSubstitutedElements(substitute.Element.QualifiedName))
+                        yield return recursiveSubstitute;
                 }
             }
         }
@@ -652,7 +702,8 @@ namespace XmlSchemaClassGenerator
             return properties;
         }
 
-        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle, IEnumerable<Particle> items)
+        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle, IEnumerable<Particle> items,
+            Substitute substitute = null)
         {
             var properties = new List<PropertyModel>();
             var order = 0;
@@ -686,7 +737,8 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(element.QualifiedName);
+                    var effectiveElement = substitute?.Element ?? element;
+                    var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName);
                     var originalPropertyName = propertyName;
                     if (propertyName == typeModel.Name)
                     {
@@ -696,17 +748,18 @@ namespace XmlSchemaClassGenerator
                     property = new PropertyModel(_configuration)
                     {
                         OwningType = typeModel,
-                        XmlSchemaName = element.QualifiedName,
+                        XmlSchemaName = effectiveElement.QualifiedName,
                         Name = propertyName,
                         OriginalPropertyName = originalPropertyName,
-                        Type = CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
+                        Type = substitute?.Type ?? CreateTypeModel(source, element.ElementSchemaType, elementQualifiedName),
                         IsNillable = element.IsNillable,
                         IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                         DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !(item.XmlParent is XmlSchemaChoice)) ? element.FixedValue : null),
                         FixedValue = element.FixedValue,
                         Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
-                        XmlNamespace = !string.IsNullOrEmpty(element.QualifiedName.Namespace) && element.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? element.QualifiedName.Namespace : null,
+                        XmlNamespace = !string.IsNullOrEmpty(effectiveElement.QualifiedName.Namespace) && effectiveElement.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace 
+                            ? effectiveElement.QualifiedName.Namespace : null,
                         XmlParticle = item.XmlParticle,
                         XmlParent = item.XmlParent,
                     };

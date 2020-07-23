@@ -588,11 +588,13 @@ namespace XmlSchemaClassGenerator
         public XmlSchemaParticle XmlParticle { get; set; }
         public XmlSchemaObject XmlParent { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
+        public HashSet<(XmlQualifiedName Name, TypeModel Type)> SubstitutedElements { get; private set; }
 
         public PropertyModel(GeneratorConfiguration configuration)
         {
             Configuration = configuration;
             Documentation = new List<DocumentationModel>();
+            SubstitutedElements = new HashSet<(XmlQualifiedName Name, TypeModel Type)>();
         }
 
         internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter, bool withDataBinding = true)
@@ -1186,23 +1188,42 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
-                    if (PropertyType is ClassModel classType && classType.IsAbstract && classType.DerivedTypes.Any())
+                    if (SubstitutedElements.Any())
                     {
-                        var derivedTypes = classType.GetAllDerivedTypes().Where(t => t.IsSubstitution);
-                        foreach (var derivedType in derivedTypes)
+                        foreach (var substitutedElement in SubstitutedElements)
                         {
-                            var derivedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
-                                new CodeAttributeArgument(new CodePrimitiveExpression((derivedType.SubstitutionName ?? derivedType.XmlSchemaName).Name)),
-                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace))),
-                                new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(derivedType.XmlSchemaName.Namespace)));
+                            var substitutedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
+                                new CodeAttributeArgument(new CodePrimitiveExpression(substitutedElement.Name.Name)),
+                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(substitutedElement.Type.GetReferenceFor(OwningType.Namespace))),
+                                new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(substitutedElement.Name.Namespace)));
+
                             if (Order != null)
                             {
-                                derivedAttribute.Arguments.Add(new CodeAttributeArgument("Order",
+                                substitutedAttribute.Arguments.Add(new CodeAttributeArgument("Order",
                                     new CodePrimitiveExpression(Order.Value)));
                             }
-                            attributes.Add(derivedAttribute);
+
+                            attributes.Add(substitutedAttribute);
                         }
                     }
+
+                    //if (PropertyType is ClassModel classType && classType.IsAbstract && classType.DerivedTypes.Any())
+                    //{
+                    //    var derivedTypes = classType.GetAllDerivedTypes().Where(t => t.IsSubstitution);
+                    //    foreach (var derivedType in derivedTypes)
+                    //    {
+                    //        var derivedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
+                    //            new CodeAttributeArgument(new CodePrimitiveExpression((derivedType.SubstitutionName ?? derivedType.XmlSchemaName).Name)),
+                    //            new CodeAttributeArgument("Type", new CodeTypeOfExpression(derivedType.GetReferenceFor(OwningType.Namespace))),
+                    //            new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(derivedType.XmlSchemaName.Namespace)));
+                    //        if (Order != null)
+                    //        {
+                    //            derivedAttribute.Arguments.Add(new CodeAttributeArgument("Order",
+                    //                new CodePrimitiveExpression(Order.Value)));
+                    //        }
+                    //        attributes.Add(derivedAttribute);
+                    //    }
+                    //}
 
                     var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
                             new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
