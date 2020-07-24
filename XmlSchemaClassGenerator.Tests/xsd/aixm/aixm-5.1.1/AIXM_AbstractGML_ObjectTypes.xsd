@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--====================================================================-->
+<!--AIXM 5.1.1-->
+<!--www.aixm.aero-->
+<!--April 2016-->
+<!--====================================================================-->
+<!--
+                Copyright (c) 2016, EUROCONTROL & FAA
+                =====================================
+                All rights reserved.
+                Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+                        * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+                        * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+                        * Neither the names of EUROCONTROL or FAA nor the names of their contributors may be used to endorse or promote products derived from this specification without specific prior written permission.
+
+                THIS SPECIFICATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                ==========================================
+                Editorial note: this license is an instance of the BSD license template as
+                provided by the Open Source Initiative:
+                http://www.opensource.org/licenses/bsd-license.php
+        -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:aixm="http://www.aixm.aero/schema/5.1.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:gmd="http://www.isotc211.org/2005/gmd" targetNamespace="http://www.aixm.aero/schema/5.1.1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="5.1.1">
+        <annotation>
+                <appinfo>
+                        <gml:gmlProfileSchema>http://external.schemas.opengis.net/gmlAIXMProfile/1.1/gml321forAIXM.xsd</gml:gmlProfileSchema>
+                </appinfo>
+        </annotation>
+        <!--====================================================================-->
+        <!--Schema Imports and Includes-->
+        <!--====================================================================-->
+        <!--==== IMPORT GML 3.2 ====-->
+        <!-- <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="http://schemas.opengis.net/gml/3.2.1/gml.xsd"/> -->
+        <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="./gml/3.2.1/gml.xsd"/>
+        <!--==== IMPORT ISO19139 METADATA SCHEMA ====-->
+        <!-- <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd"/> -->
+        <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="./iso/19139/20070417/gmd/gmd.xsd"/>
+        <!--====================================================================-->
+        <!--Base AIXM Feature/Object Constructs-->
+        <!--====================================================================-->
+        <complexType name="AbstractAIXMFeatureBaseType" abstract="true">
+                <annotation>
+                        <documentation>This derives from gml:DynamicFeatureType, as all AIXM features are expected to have temporal properties modeled using the Timeslice model. While the GML specification does not mandate that dynamic features derive from gml:DynamicFeatureType, many GML-aware applications may only detect a dynamic feature by this type hierarchy. Note that all temporal properties of gml:DynamicFeatureType are removed during this restriction, because they will be added for each AIXM feature specifically, based on the TimeSlice model</documentation>
+                </annotation>
+                <complexContent>
+                        <restriction base="gml:DynamicFeatureType">
+                                <sequence>
+                                        <sequence>
+                                                <sequence>
+                                                        <element ref="gml:description" minOccurs="0"/>
+                                                        <element ref="gml:identifier" minOccurs="0"/>
+                                                        <element ref="gml:name" minOccurs="0" maxOccurs="unbounded"/>
+                                                </sequence>
+                                        </sequence>
+                                        <sequence>
+                                                <element ref="gml:boundedBy" minOccurs="0"/>
+                                        </sequence>
+                                </sequence>
+                                <attribute ref="gml:id" use="required"/>
+                        </restriction>
+                </complexContent>
+        </complexType>
+        <complexType name="AbstractAIXMFeatureType" abstract="true">
+                <annotation>
+                        <documentation>Adds the FeatureMetadata, which is common to all AIXM features</documentation>
+                </annotation>
+                <complexContent>
+                        <extension base="aixm:AbstractAIXMFeatureBaseType">
+                                <sequence>
+                                        <element name="featureMetadata" type="aixm:FeatureMetadataPropertyType" minOccurs="0"/>
+                                </sequence>
+                        </extension>
+                </complexContent>
+        </complexType>
+        <element name="AbstractAIXMFeature" type="aixm:AbstractAIXMFeatureType" abstract="true" substitutionGroup="gml:AbstractFeature">
+                <annotation>
+                        <documentation>Substitution head for AIXM features.</documentation>
+                </annotation>
+        </element>
+        <complexType name="AbstractAIXMObjectType" abstract="true">
+                <annotation>
+                        <documentation>Base type for AIXM complex types that are NOT features. For example, City, ContactInformation, AirspaceVolume, etc. It derives from AbstractGMLType so that AIXM objects are recognised as GML objects, thus ensuring that GML-aware applications recognise them properly. Retains only the mandatory gml:id attribute.</documentation>
+                </annotation>
+                <complexContent>
+                        <restriction base="gml:AbstractGMLType">
+                                <sequence>
+                                        <sequence/>
+                                </sequence>
+                                <attribute ref="gml:id" use="required"/>
+                        </restriction>
+                </complexContent>
+        </complexType>
+        <element name="AbstractAIXMObject" type="aixm:AbstractAIXMObjectType" abstract="true" substitutionGroup="gml:AbstractGML">
+                <annotation>
+                        <documentation>Substitution head for AIXM objects.</documentation>
+                </annotation>
+        </element>
+        <complexType name="AbstractAIXMPropertyType" abstract="true">
+                <annotation>
+                        <documentation>It provides a basis for deriving AIXM feature/object properties. It defines the nilReason attribute and currently, it is only used for properties that are derived from association with an AIM object.</documentation>
+                </annotation>
+                <attribute name="nilReason" type="gml:NilReasonEnumeration"/>
+        </complexType>
+        <!--====================================================================-->
+        <!--AIXM TimeSlice-->
+        <!--====================================================================-->
+        <complexType name="AbstractAIXMTimeSliceBaseType" abstract="true">
+                <annotation>
+                        <documentation>Base type of AIXM Timeslices.  Removes option attributes that are not used in AIXM.</documentation>
+                </annotation>
+                <complexContent>
+                        <restriction base="gml:AbstractTimeSliceType">
+                                <sequence>
+                                        <sequence/>
+                                        <sequence>
+                                                <annotation>
+                                                        <documentation>The efffectivity of the TimeSlice.</documentation>
+                                                </annotation>
+                                                <element ref="gml:validTime"/>
+                                        </sequence>
+                                </sequence>
+                                <attribute ref="gml:id" use="required"/>
+                        </restriction>
+                </complexContent>
+        </complexType>
+        <complexType name="AbstractAIXMTimeSliceType" abstract="true">
+                <annotation>
+                        <documentation>Adds in the AIXM specific properties, such as 'interpretation'.</documentation>
+                </annotation>
+                <complexContent>
+                        <extension base="aixm:AbstractAIXMTimeSliceBaseType">
+                                <sequence>
+                                        <element ref="aixm:interpretation"/>
+                                        <element ref="aixm:sequenceNumber" minOccurs="0"/>
+                                        <element ref="aixm:correctionNumber" minOccurs="0"/>
+                                        <element name="timeSliceMetadata" type="aixm:FeatureTimeSliceMetadataPropertyType" minOccurs="0"/>
+                                        <element ref="aixm:featureLifetime" minOccurs="0"/>
+                                </sequence>
+                        </extension>
+                </complexContent>
+        </complexType>
+        <!--====================================================================-->
+        <!--Feature collections-->
+        <!--====================================================================-->
+        <complexType name="AbstractAIXMMessageBaseType" abstract="true">
+                <complexContent>
+                        <extension base="aixm:AbstractAIXMFeatureBaseType">
+                                <sequence>
+                                        <element ref="aixm:sequenceNumber" minOccurs="0"/>
+                                        <element name="messageMetadata" type="aixm:MessageMetadataPropertyType" minOccurs="0"/>
+                                </sequence>
+                        </extension>
+                </complexContent>
+        </complexType>
+        <complexType name="AbstractAIXMMessageType" abstract="true">
+                <complexContent>
+                        <extension base="aixm:AbstractAIXMMessageBaseType">
+                                <attributeGroup ref="gml:AggregationAttributeGroup"/>
+                        </extension>
+                </complexContent>
+        </complexType>
+        <!--====================================================================-->
+        <!--Feature/Object Extensions-->
+        <!--====================================================================-->
+        <element name="AbstractExtension" type="aixm:AbstractExtensionType" abstract="true"/>
+        <complexType name="AbstractExtensionType" abstract="true">
+                <complexContent>
+                        <extension base="aixm:AbstractAIXMObjectType"/>
+                </complexContent>
+        </complexType>
+        <!--====================================================================-->
+        <!--Feature and TimeSlice Properties-->
+        <!--====================================================================-->
+        <element name="interpretation">
+                <annotation>
+                        <documentation>Property indicating how the timeslice is to be interpreted.  See the AIXM Temporality model for details.</documentation>
+                </annotation>
+                <simpleType>
+                        <restriction base="string">
+                                <enumeration value="BASELINE"/>
+                                <enumeration value="SNAPSHOT"/>
+                                <enumeration value="TEMPDELTA"/>
+                                <enumeration value="PERMDELTA"/>
+                        </restriction>
+                </simpleType>
+        </element>
+        <element name="sequenceNumber">
+                <annotation>
+                        <documentation>Used for the identification of the Time Slice concerned. See the AIXM Temporality model for details.</documentation>
+                </annotation>
+                <simpleType>
+                        <restriction base="unsignedInt"/>
+                </simpleType>
+        </element>
+        <element name="correctionNumber">
+                <annotation>
+                        <documentation>Used for indicating the order of the corrections of a Time Slice. See the AIXM Temporality model for details.</documentation>
+                </annotation>
+                <simpleType>
+                        <restriction base="unsignedInt"/>
+                </simpleType>
+        </element>
+        <element name="featureLifetime" type="gml:TimePrimitivePropertyType">
+                <annotation>
+                        <documentation>The start and end of life of the feature. See the AIXM Temporality model for details.</documentation>
+                </annotation>
+        </element>
+        <!--====================================================================-->
+        <!--Base AIXM Metadata Property Types-->
+        <!--====================================================================-->
+        <complexType name="FeatureMetadataPropertyType">
+                <complexContent>
+                        <extension base="gml:AbstractMetadataPropertyType">
+                                <sequence minOccurs="0">
+                                        <element ref="gmd:MD_Metadata"/>
+                                </sequence>
+                        </extension>
+                </complexContent>
+        </complexType>
+        <complexType name="FeatureTimeSliceMetadataPropertyType">
+                <complexContent>
+                        <extension base="gml:AbstractMetadataPropertyType">
+                                <sequence minOccurs="0">
+                                        <element ref="gmd:MD_Metadata"/>
+                                </sequence>
+                        </extension>
+                </complexContent>
+        </complexType>
+        <complexType name="MessageMetadataPropertyType">
+                <complexContent>
+                        <extension base="gml:AbstractMetadataPropertyType">
+                                <sequence minOccurs="0">
+                                        <element ref="gmd:MD_Metadata"/>
+                                </sequence>
+                        </extension>
+                </complexContent>
+        </complexType>
+</schema>

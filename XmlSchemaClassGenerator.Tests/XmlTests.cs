@@ -2120,5 +2120,66 @@ namespace Test
             dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
             Assert.NotEmpty((System.Collections.IEnumerable)deserialized.D);  //<== oops
         }
+
+        [Fact, TestPriority(1)]
+        public void AirspaceServicesTest1()
+        {
+            var outputPath = Path.Combine("output", "aixm");
+
+            string xlink = "http://www.w3.org/1999/xlink";
+            string gml3 = "http://www.opengis.net/gml/3.2";
+            string gts = "http://www.isotc211.org/2005/gts";
+            string gss = "http://www.isotc211.org/2005/gss";
+            string gsr = "http://www.isotc211.org/2005/gsr";
+            string gmd = "http://www.isotc211.org/2005/gmd";
+            string gco = "http://www.isotc211.org/2005/gco";
+
+            string fixmBase = "http://www.fixm.aero/base/4.1";
+            string fixmFlight = "http://www.fixm.aero/flight/4.1";
+            string fixmNm = "http://www.fixm.aero/nm/1.2";
+            string fixmMessaging = "http://www.fixm.aero/messaging/4.1";
+
+            string adr = "http://www.aixm.aero/schema/5.1.1/extensions/EUR/ADR";
+            string aixmV511 = "http://www.aixm.aero/schema/5.1.1";
+
+            string adrmessage = "http://www.eurocontrol.int/cfmu/b2b/ADRMessage";
+
+            var _xsdToCsharpNsMap = new Dictionary<NamespaceKey, string>
+            {
+                { new NamespaceKey(), "other" },
+                { new NamespaceKey(xlink), "org.w3._1999.xlink" },
+                { new NamespaceKey(gts), "org.isotc211._2005.gts" },
+                { new NamespaceKey(gss), "org.isotc211._2005.gss" },
+                { new NamespaceKey(gsr), "org.isotc211._2005.gsr" },
+                { new NamespaceKey(gmd), "org.isotc211._2005.gmd" },
+                { new NamespaceKey(gco), "org.isotc211._2005.gco" },
+                { new NamespaceKey(gml3), "net.opengis.gml._3" },
+                { new NamespaceKey(aixmV511), "aero.aixm.v5_1_1" },
+                { new NamespaceKey(fixmNm), "aero.fixm.v4_1_0.nm.v1_2" },
+                { new NamespaceKey(fixmMessaging), "aero.fixm.v4_1_0.messaging" },
+                { new NamespaceKey(fixmFlight), "aero.fixm.v4_1_0.flight" },
+                { new NamespaceKey(fixmBase), "aero.fixm.v4_1_0.base" },
+                { new NamespaceKey(adr), "aero.aixm.schema._5_1_1.extensions.eur.adr" },
+                { new NamespaceKey(adrmessage), "_int.eurocontrol.cfmu.b2b.adrmessage" }
+            };
+
+            var gen = new Generator
+            {
+                OutputFolder = outputPath,
+                NamespaceProvider = _xsdToCsharpNsMap.ToNamespaceProvider(),
+                CollectionSettersMode = CollectionSettersMode.Public
+            };
+            var xsdFiles = new[]
+            {
+                    "AIXM_AbstractGML_ObjectTypes.xsd",
+                    "AIXM_DataTypes.xsd",
+                    "AIXM_Features.xsd",
+                    "extensions\\ADR-23.5.0\\ADR_DataTypes.xsd",
+                    "extensions\\ADR-23.5.0\\ADR_Features.xsd",
+                    "message\\ADR_Message.xsd",
+                    "message\\AIXM_BasicMessage.xsd",
+            }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "aixm", "aixm-5.1.1", x)).ToList();
+            gen.Generate(xsdFiles);
+        }
     }
 }

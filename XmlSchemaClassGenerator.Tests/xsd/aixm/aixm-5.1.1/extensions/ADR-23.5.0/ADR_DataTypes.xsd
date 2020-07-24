@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ====================================================================-->
+<!-- AIXM 5.1.1 - ADR extension Schema for NM Version 23.5.0 -->
+<!-- Released:  September 2019 -->
+<!-- ====================================================================-->
+<!-- Copyright (c) 2014-2019, EUROCONTROL -->
+<!-- =============================== -->
+<!--   All rights reserved.-->
+<!--   Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: -->
+<!--     * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. -->
+<!--     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution. -->
+<!--     * Neither the names of EUROCONTROL or FAA nor the names of their contributors may be used to endorse or promote products derived from this specification without specific prior written permission. -->
+<!-- -->
+<!--   THIS SPECIFICATION IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. -->
+<!--   ========================================== -->
+<!--   Editorial note: this license is an instance of the BSD license template as provided by the Open Source Initiative: http://www.opensource.org/licenses/bsd-license.php -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:adr="http://www.aixm.aero/schema/5.1.1/extensions/EUR/ADR" xmlns:aixm="http://www.aixm.aero/schema/5.1.1" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.aixm.aero/schema/5.1.1/extensions/EUR/ADR" version="23.5.0">
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/3.2.1/gml.xsd"/>
+  <import namespace="http://www.aixm.aero/schema/5.1.1" schemaLocation="../../AIXM_DataTypes.xsd"/>
+  <simpleType name="AircraftAddressesBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <restriction base="xsd:string">
+      <pattern value="([A-F0-9\*\?]){1,6}"/>
+      <whiteSpace value="preserve"/>
+    </restriction>
+  </simpleType>
+  <complexType name="AircraftAddressesType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:AircraftAddressesBaseType">
+        <attribute name="nillReason">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="AircraftRegistrationsBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <restriction base="xsd:string">
+      <pattern value="([A-Z0-9\?\*]){1,7}"/>
+      <whiteSpace value="preserve"/>
+    </restriction>
+  </simpleType>
+  <complexType name="AircraftRegistrationsType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:AircraftRegistrationsBaseType">
+        <attribute name="nillReason">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeAirportHeliportNMDesignatorBaseType">
+    <annotation>
+      <documentation>A valid Aerodrome designator.&#13;
+&lt;ul&gt;&#13;
+	&lt;li&gt;The NM designator, when assigned, is unique across all Aerodromes.&lt;/li&gt;&#13;
+&lt;/ul&gt;&#13;
+&lt;ul&gt;&#13;
+	&lt;li&gt;The Aerodrome.designator begins with a country code.&lt;/li&gt;&#13;
+&lt;/ul&gt;&#13;
+&lt;ul&gt;&#13;
+	&lt;li&gt;The icaoCountryCode can be 1 or 2 characters long.&lt;/li&gt;&#13;
+	&lt;li&gt;The other characters must be according to the following REGEXP pattern:&lt;/li&gt;&#13;
+&lt;/ul&gt;&#13;
+        - in case of 2 character country code: &#13;
+	[0-9A-Z][0-9] | [0-9][0-9A-Z]&#13;
+        - in case of 1 character country code: &#13;
+	[0-9A-Z][0-9A-Z][0-9] | [0-9A-Z][0-9][0-9A-Z] | [0-9][0-9A-Z][0-9A-Z]&#13;
+&lt;ul&gt;&#13;
+	&lt;li&gt;In some cases, only the first character of the icaoCountryCode may be used in case there are insufficient unique designators for a Country.&lt;/li&gt;&#13;
+&lt;/ul&gt;</documentation>
+    </annotation>
+    <restriction base="aixm:AlphanumericType">
+      <maxLength value="4"/>
+      <minLength value="4"/>
+    </restriction>
+  </simpleType>
+  <complexType name="CodeAirportHeliportNMDesignatorType">
+    <annotation>
+      <documentation>A complex data type that enables the provision of a NIL reason for any attribute using this type.</documentation>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeAirportHeliportNMDesignatorBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeAirspaceReservationImpactBaseType">
+    <annotation>
+      <documentation>A list of coded values indicating the operational impact of the Airspace over the route segment.</documentation>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="WITHIN">
+            <annotation>
+              <documentation>The route segment is located within the Airspace and it is available only when the AIrspace is not reserved.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="NEARBY">
+            <annotation>
+              <documentation>The route segment is located in the vicinity of the Airspace and it is available only when the Airspace is not active (because of upstream/downstream segments that are located within the airspace).</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="OFFLOAD">
+            <annotation>
+              <documentation>The route segment recuperates the traffic affected by the activation of the airspace.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="NOT_AFFECTED">
+            <annotation>
+              <documentation>Even if geographically located within the horizontal border of the Airspace, the route segment is not affected by the reservation of the Airspace.</documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeAirspaceReservationImpactType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeAirspaceReservationImpactBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeConditionalRouteBaseType">
+    <annotation>
+      <documentation>The type of conditional route, according to the Flexible use of Airspace rules.</documentation>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="CDR_1">
+            <annotation>
+              <documentation>Conditional Route Type 1 (normally available for flight planning).</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="CDR_2">
+            <annotation>
+              <documentation>Conditional Route Type 2 (normally not available for flight planning).</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="CDR_3">
+            <annotation>
+              <documentation>Conditional Route Type 3 (available as ATC re-routing only).</documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeConditionalRouteType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeConditionalRouteBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeFeatureUsageBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="OPERATIONAL">
+            <annotation>
+              <documentation>The attributes of the TimeSlice are exposed.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="WITHHELD">
+            <annotation>
+              <documentation>The attributes of the TimeSlice are not visible, they are 'withheld'.</documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeFeatureUsageType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeFeatureUsageBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeFlightPlanSourceBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="AFIL">
+            <annotation>
+              <documentation>The flight plan is provided to an air traffic services unit by an aircraft during its flight.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="AFP">
+            <annotation>
+              <documentation>The source of the flight plan is a ATC flight plan proposal message. Notification by an ATS unit about new or revised information concerning an aircraft filed as IFR/GAT within the IFPZ that is already in flight.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="FPL">
+            <annotation>
+              <documentation>The source of the flight plan is a flight plan message.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="FNM">
+            <annotation>
+              <documentation>The source of the flight plan is flight notification message. Estimation provided by Gander OACC for those flights entering the North Atlantic airspace via Gander. </documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="MFS">
+            <annotation>
+              <documentation>The source of the flight plan is a message from SHANWICK/SANTA MARIA.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="RPL">
+            <annotation>
+              <documentation>The source of the flight plan is a repetitive flight plan message.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="RQP">
+            <annotation>
+              <documentation>The source of the flight plan is a request flight plan message.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="UNK">
+            <annotation>
+              <documentation>The source of the flight plan is unknown. </documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeFlightPlanSourceType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeFlightPlanSourceBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeFlowCombinationRoleBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="INCLUDED">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="EXCLUDED">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="EXEMPTED">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="INCLUDED_EXEMPTED">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeFlowCombinationRoleType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeFlowCombinationRoleBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodePointUsageBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="EN_ROUTE">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="ENTRY">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="ENTRY_EXIT">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="EXIT">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="FRA_ENTRY">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="FRA_EXIT">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="FRA_INTERMEDIATE">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="FRA_ARRIVAL">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="FRA_DEPARTURE">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="LAND_FALL">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="MILITARY">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="OCEANIC_ENTRY_EXIT">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="TERMINAL">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+          <enumeration value="VFR">
+            <annotation>
+              <documentation/>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodePointUsageType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodePointUsageBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeProcessingIndicatorBaseType">
+    <annotation>
+      <documentation>Two types that should disappear in the future:&#13;
+OTHER:__ADR__AD_FLIGHT_RULE&#13;
+OTHER:__ADR__FLIGHT_PROPERTY_ON_TP</documentation>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="AD_CP">
+            <annotation>
+              <documentation>This is Aerodrome DCT or Aerodrome Connecting Points. &#13;
+It corresponds to the FlightRestrictions in RAD Appendix 5.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="FRA_DCT">
+            <annotation>
+              <documentation>FRA DCT restrictions. Airspace or Airspace Border.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="FPR">
+            <annotation>
+              <documentation>Flight Profile Restriction. &#13;
+Restrictions which reflect known agreements between ATCs to transfer flights between them (often formulated into "letters of agreement" (LOAs). They are used by NM to calculate a more reliable vertical flight profile, but not in flight plan validation</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="RAD_DCT">
+            <annotation>
+              <documentation>Restrictions used to define direct flight limitations traversing or crossing the border of an Airspace.</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="TFR">
+            <annotation>
+              <documentation>This is the normal RAD restriction.</documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeProcessingIndicatorType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeProcessingIndicatorBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+  <simpleType name="CodeVerticalLimitReferenceBaseType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <union>
+      <simpleType>
+        <restriction base="xsd:string">
+          <enumeration value="CALCULATED">
+            <annotation>
+              <documentation>Calculated Flight Level</documentation>
+            </annotation>
+          </enumeration>
+          <enumeration value="REQUESTED">
+            <annotation>
+              <documentation>Requested Flight Level</documentation>
+            </annotation>
+          </enumeration>
+        </restriction>
+      </simpleType>
+      <simpleType>
+        <restriction base="xsd:string">
+          <pattern value="OTHER(:(\w|_){1,58})?"/>
+        </restriction>
+      </simpleType>
+    </union>
+  </simpleType>
+  <complexType name="CodeVerticalLimitReferenceType">
+    <annotation>
+      <documentation/>
+    </annotation>
+    <simpleContent>
+      <extension base="adr:CodeVerticalLimitReferenceBaseType">
+        <attribute name="nilReason" type="gml:NilReasonEnumeration">
+          <annotation>
+            <documentation/>
+          </annotation>
+        </attribute>
+      </extension>
+    </simpleContent>
+  </complexType>
+</schema>
