@@ -64,6 +64,8 @@ namespace XmlSchemaClassGenerator
                 CreateElements(elements);
             }
 
+            CreateSubstitutes();
+
             if (configuration.GenerateInterfaces)
             {
                 RenameInterfacePropertiesIfRenamedInDerivedClasses();
@@ -71,6 +73,27 @@ namespace XmlSchemaClassGenerator
             }
 
             AddXmlRootAttributeToAmbiguousTypes();
+        }
+
+        private void CreateSubstitutes()
+        {
+            var properties = Types.Values.OfType<ClassModel>().SelectMany(c => c.Properties).Where(p => p.XmlSchemaName != null).ToList();
+
+            foreach (var prop in properties)
+            {
+                var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
+                var elems = GetElements(prop.XmlParticle, prop.XmlParent);
+
+                foreach (var substitute in substitutes)
+                {
+                    var cls = (ClassModel)prop.OwningType;
+                    var schema = substitute.Element.GetSchema();
+                    var source = CodeUtilities.CreateUri(schema.SourceUri);
+                    var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute);
+
+                    cls.Properties.AddRange(props);
+                }
+            }
         }
 
         private void AddXmlRootAttributeToAmbiguousTypes()
@@ -180,8 +203,6 @@ namespace XmlSchemaClassGenerator
 
         private void CreateElements(IEnumerable<XmlSchemaElement> elements)
         {
-            var types = new List<ClassModel>();
-
             foreach (var rootElement in elements)
             {
                 var rootSchema = rootElement.GetSchema();
@@ -219,8 +240,6 @@ namespace XmlSchemaClassGenerator
                         ((ClassModel)derivedClassModel.BaseClass).DerivedTypes.Add(derivedClassModel);
 
                         derivedClassModel.RootElementName = rootElement.QualifiedName;
-
-                        types.Add(derivedClassModel);
                     }
                     else
                     {
@@ -233,7 +252,6 @@ namespace XmlSchemaClassGenerator
                     if (type is ClassModel classModel)
                     {
                         classModel.Documentation.AddRange(GetDocumentation(rootElement));
-                        types.Add(classModel);
                     }
 
                     type.RootElementName = rootElement.QualifiedName;
@@ -249,30 +267,6 @@ namespace XmlSchemaClassGenerator
 
                     substitutes.Add(new Substitute { Element = rootElement, Type = derivedClassModel ?? type });
                 }
-            }
-
-            var properties = types.SelectMany(c => c.Properties).Where(p => p.XmlSchemaName != null).ToList();
-
-            //foreach (var prop in properties)
-            //{
-            //    var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
-            //    var elems = GetElements(prop.XmlParticle, prop.XmlParent);
-
-            //    foreach (var substitute in substitutes)
-            //    {
-            //        var cls = (ClassModel)prop.OwningType;
-            //        var schema = substitute.Element.GetSchema();
-            //        var source = CodeUtilities.CreateUri(schema.SourceUri);
-            //        var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute);
-
-            //        cls.Properties.AddRange(props);
-            //    }
-            //}
-
-            foreach (var prop in properties)
-            {
-                foreach (var substitute in GetSubstitutedElements(prop.XmlSchemaName))
-                    prop.SubstitutedElements.Add((substitute.Element.QualifiedName, substitute.Type));
             }
         }
 
