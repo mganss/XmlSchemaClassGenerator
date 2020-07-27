@@ -79,7 +79,7 @@ namespace XmlSchemaClassGenerator.Tests
             string customNsPattern = "{0}|{1}={2}";
 
             var uri = new Uri(xmlSchema, UriKind.RelativeOrAbsolute);
-            var fullNetNs = (string.IsNullOrEmpty(netPrefix)) ? netNs : string.Join('.', netPrefix, netNs);
+            var fullNetNs = (string.IsNullOrEmpty(netPrefix)) ? netNs : string.Join(".", netPrefix, netNs);
 
             var expected = new KeyValuePair<NamespaceKey, string>(new NamespaceKey(uri, xmlNs), fullNetNs);
             var actual = CodeUtilities.ParseNamespace(string.Format(customNsPattern, xmlNs, xmlSchema, netNs), netPrefix);
@@ -95,7 +95,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             string customNsPattern = "{0}={1}";
 
-            var fullNetNs = (string.IsNullOrEmpty(netPrefix)) ? netNs : string.Join('.', netPrefix, netNs);
+            var fullNetNs = (string.IsNullOrEmpty(netPrefix)) ? netNs : string.Join(".", netPrefix, netNs);
             var expected = new KeyValuePair<NamespaceKey, string>(new NamespaceKey(null, xmlSchema), fullNetNs);
             var actual = CodeUtilities.ParseNamespace(string.Format(customNsPattern, xmlSchema, netNs), netPrefix);
 

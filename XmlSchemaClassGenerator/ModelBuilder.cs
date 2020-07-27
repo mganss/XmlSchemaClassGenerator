@@ -660,6 +660,8 @@ namespace XmlSchemaClassGenerator
                             }
                         }
 
+                        attributeName = typeModel.GetUniquePropertyName(attributeName);
+
                         var property = new PropertyModel(_configuration)
                         {
                             OwningType = typeModel,
@@ -670,9 +672,18 @@ namespace XmlSchemaClassGenerator
                             IsNullable = attribute.Use != XmlSchemaUse.Required,
                             DefaultValue = attribute.DefaultValue ?? (attribute.Use != XmlSchemaUse.Optional ? attribute.FixedValue : null),
                             FixedValue = attribute.FixedValue,
-                            Form = attribute.Form == XmlSchemaForm.None ? attribute.GetSchema().AttributeFormDefault : attribute.Form,
                             XmlNamespace = !string.IsNullOrEmpty(attribute.QualifiedName.Namespace) && attribute.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace ? attribute.QualifiedName.Namespace : null,
                         };
+
+                        if (attribute.Form == XmlSchemaForm.None)
+                        {
+                            if (attribute.RefName != null && !attribute.RefName.IsEmpty)
+                                property.Form = XmlSchemaForm.Qualified;
+                            else
+                                property.Form = attribute.GetSchema().AttributeFormDefault;
+                        }
+                        else
+                            property.Form = attribute.Form;
 
                         var attributeDocs = GetDocumentation(attribute);
                         property.Documentation.AddRange(attributeDocs);
@@ -738,6 +749,8 @@ namespace XmlSchemaClassGenerator
                     {
                         propertyName += "Property"; // member names cannot be the same as their enclosing type
                     }
+
+                    propertyName = typeModel.GetUniquePropertyName(propertyName);
 
                     property = new PropertyModel(_configuration)
                     {
