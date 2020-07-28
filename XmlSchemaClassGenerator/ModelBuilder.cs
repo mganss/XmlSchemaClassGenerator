@@ -416,7 +416,20 @@ namespace XmlSchemaClassGenerator
                 // If it's a restriction, do not duplicate attributes on the derived class, they're already in the base class.
                 // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
             }
-            else { attributes = complexType.Attributes; }
+            else 
+            { 
+                attributes = complexType.Attributes;
+
+                if (attributes.Count == 0 && complexType.ContentModel != null)
+                {
+                    var content = complexType.ContentModel.Content;
+
+                    if (content is XmlSchemaComplexContentExtension extension)
+                        attributes = extension.Attributes;
+                    else if (content is XmlSchemaComplexContentRestriction restriction)
+                        attributes = restriction.Attributes;
+                }
+            }
 
             if (attributes != null)
             {
