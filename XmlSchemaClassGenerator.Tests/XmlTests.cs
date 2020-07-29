@@ -364,6 +364,12 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("IS24ImmoTransfer", IS24ImmoTransferPattern);
             TestSamples("IS24ImmoTransfer", IS24ImmoTransferPattern);
+
+            Compiler.Generate("IS24ImmoTransferSeparate", IS24ImmoTransferPattern, new Generator
+            {
+                SeparateSubstitutes = true
+            });
+            TestSamples("IS24ImmoTransferSeparate", IS24ImmoTransferPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -666,7 +672,16 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void TestBpmn()
         {
-            var assembly = Compiler.Generate("Bpmn", BpmnPattern);
+            PerformBpmnTest("Bpmn");
+            PerformBpmnTest("BpmnSeparate", new Generator
+            {
+                SeparateSubstitutes = true
+            });
+        }
+
+        private void PerformBpmnTest(string name, Generator generator = null)
+        { 
+            var assembly = Compiler.Generate(name, BpmnPattern, generator);
             Assert.NotNull(assembly);
 
             var type = assembly.GetTypes().SingleOrDefault(t => t.Name == "TDefinitions");

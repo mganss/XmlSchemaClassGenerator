@@ -252,6 +252,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.SeparateClasses = value; }
         }
 
+        public bool SeparateSubstitutes
+        {
+            get { return _configuration.SeparateSubstitutes; }
+            set { _configuration.SeparateSubstitutes = value; }
+        }
+
         public void Generate(IEnumerable<string> files)
         {
             var set = new XmlSchemaSet();

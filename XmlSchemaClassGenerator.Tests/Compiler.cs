@@ -107,7 +107,8 @@ namespace XmlSchemaClassGenerator.Tests
                 EmitOrder = generatorPrototype.EmitOrder,
                 SeparateClasses = generatorPrototype.SeparateClasses,
                 CollectionType = generatorPrototype.CollectionType,
-                CollectionImplementationType = generatorPrototype.CollectionImplementationType
+                CollectionImplementationType = generatorPrototype.CollectionImplementationType,
+                SeparateSubstitutes = generatorPrototype.SeparateSubstitutes
             };
 
             output.Configuration = gen.Configuration;

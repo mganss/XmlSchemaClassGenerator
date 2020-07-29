@@ -587,11 +587,13 @@ namespace XmlSchemaClassGenerator
         public XmlSchemaParticle XmlParticle { get; set; }
         public XmlSchemaObject XmlParent { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
+        public List<Substitute> Substitutes { get; set; }
 
         public PropertyModel(GeneratorConfiguration configuration)
         {
             Configuration = configuration;
             Documentation = new List<DocumentationModel>();
+            Substitutes = new List<Substitute>();
         }
 
         internal static string GetAccessors(string memberName, string backingFieldName, PropertyValueTypeCode typeCode, bool privateSetter, bool withDataBinding = true)
@@ -1185,6 +1187,25 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
+                    if (!Configuration.SeparateSubstitutes && Substitutes.Any())
+                    {
+                        foreach (var substitute in Substitutes)
+                        {
+                            var substitutedAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
+                                new CodeAttributeArgument(new CodePrimitiveExpression(substitute.Element.QualifiedName.Name)),
+                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(substitute.Type.GetReferenceFor(OwningType.Namespace))),
+                                new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(substitute.Element.QualifiedName.Namespace)));
+
+                            if (Order != null)
+                            {
+                                substitutedAttribute.Arguments.Add(new CodeAttributeArgument("Order",
+                                    new CodePrimitiveExpression(Order.Value)));
+                            }
+
+                            attributes.Add(substitutedAttribute);
+                        }
+                    }
+
                     var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlElementAttribute), Configuration.CodeTypeReferenceOptions),
                             new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
                     if (Order != null)

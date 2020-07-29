@@ -82,16 +82,24 @@ namespace XmlSchemaClassGenerator
             foreach (var prop in properties)
             {
                 var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
-                var elems = GetElements(prop.XmlParticle, prop.XmlParent);
 
-                foreach (var substitute in substitutes)
+                if (_configuration.SeparateSubstitutes)
                 {
-                    var cls = (ClassModel)prop.OwningType;
-                    var schema = substitute.Element.GetSchema();
-                    var source = CodeUtilities.CreateUri(schema.SourceUri);
-                    var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute);
+                    var elems = GetElements(prop.XmlParticle, prop.XmlParent);
 
-                    cls.Properties.AddRange(props);
+                    foreach (var substitute in substitutes)
+                    {
+                        var cls = (ClassModel)prop.OwningType;
+                        var schema = substitute.Element.GetSchema();
+                        var source = CodeUtilities.CreateUri(schema.SourceUri);
+                        var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute);
+
+                        cls.Properties.AddRange(props);
+                    }
+                }
+                else
+                {
+                    prop.Substitutes = substitutes;
                 }
             }
         }
