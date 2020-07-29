@@ -84,7 +84,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
         const string WadlPattern = @"xsd\wadl\*.xsd";
         const string ListPattern = @"xsd\list\list.xsd";
-        const string SimplePattern = @"xsd\simple\simple.xsd";
+        const string SimplePattern = @"xsd\simple\*.xsd";
         const string ArrayOrderPattern = @"xsd\array-order\array-order.xsd";
         const string ClientPattern = @"xsd\client\client.xsd";
         const string IataPattern = @"xsd\iata\*.xsd";
