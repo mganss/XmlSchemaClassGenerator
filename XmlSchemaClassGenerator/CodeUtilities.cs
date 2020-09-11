@@ -365,6 +365,11 @@ namespace XmlSchemaClassGenerator
         public static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
         {
             var parts = nsArg.Split(new[] { '=' }, 2);
+            if (parts.Length != 2)
+            {
+                throw new ArgumentException("XML and C# namespaces should be separated by '='.");
+            }
+            
             var xmlNs = parts[0];
             var netNs = parts[1];
             var parts2 = xmlNs.Split(new[] { '|' }, 2);
