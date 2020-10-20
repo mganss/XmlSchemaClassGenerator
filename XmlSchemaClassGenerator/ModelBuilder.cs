@@ -665,10 +665,9 @@ namespace XmlSchemaClassGenerator
             return properties;
         }
 
-        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle, IEnumerable<Particle> items)
+        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle, IEnumerable<Particle> items, int order = 0)
         {
             var properties = new List<PropertyModel>();
-            var order = 0;
 
             foreach (var item in items)
             {
@@ -755,7 +754,11 @@ namespace XmlSchemaClassGenerator
                             }
 
                             var groupItems = GetElements(groupRef.Particle);
-                            var groupProperties = CreatePropertiesForElements(source, typeModel, item.XmlParticle, groupItems);
+                            var groupProperties = CreatePropertiesForElements(source, typeModel, item.XmlParticle, groupItems, order).ToList();
+                            if (_configuration.EmitOrder)
+                            {
+                                order += groupProperties.Count;
+                            }
                             properties.AddRange(groupProperties);
                         }
                     }
