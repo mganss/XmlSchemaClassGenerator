@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 
@@ -250,6 +251,17 @@ namespace XmlSchemaClassGenerator
         {
             get { return _configuration.SeparateClasses; }
             set { _configuration.SeparateClasses = value; }
+        }
+
+        public bool SeparateSubstitutes
+        {
+            get { return _configuration.SeparateSubstitutes; }
+            set { _configuration.SeparateSubstitutes = value; }
+        }
+
+        static Generator()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
         public void Generate(IEnumerable<string> files)

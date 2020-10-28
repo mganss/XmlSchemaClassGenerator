@@ -269,5 +269,10 @@ namespace XmlSchemaClassGenerator
         /// Separates each class into an individual file
         /// </summary>
         public bool SeparateClasses { get; set; } = false;
+
+        /// <summary>
+        /// Generates a separate property for each element of a substitution group
+        /// </summary>
+        public bool SeparateSubstitutes { get; set; } = false;
     }
 }

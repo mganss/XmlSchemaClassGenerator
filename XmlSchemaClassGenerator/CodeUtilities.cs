@@ -329,6 +329,23 @@ namespace XmlSchemaClassGenerator
             return string.Format("{0}{1}", propBackingFieldName, i);
         }
 
+        public static string GetUniquePropertyName(this TypeModel tm, string name)
+        {
+            if (tm is ClassModel cls)
+            {
+                var i = 0;
+                var n = name;
+                var baseClasses = cls.AllBaseClasses.ToList();
+
+                while (baseClasses.SelectMany(b => b.Properties).Any(p => p.Name == n))
+                    n = name + (++i);
+
+                return n;
+            }
+
+            return name;
+        }
+
         static readonly Regex NormalizeNewlinesRegex = new Regex(@"(^|[^\r])\n", RegexOptions.Compiled);
 
         internal static string NormalizeNewlines(string text)
