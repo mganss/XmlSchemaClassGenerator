@@ -372,20 +372,28 @@ namespace XmlSchemaClassGenerator
                         member.Name += " { get; set; }";
                     }
 
-                    var docs = new[] { new DocumentationModel { Language = "en", Text = "Gets or sets the text value." },
+                    var docs = new List<DocumentationModel> { new DocumentationModel { Language = "en", Text = "Gets or sets the text value." },
                         new DocumentationModel { Language = "de", Text = "Ruft den Text ab oder legt diesen fest." } };
-                    member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
                     var attribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTextAttribute), Configuration.CodeTypeReferenceOptions));
-                    if (BaseClass is SimpleModel simpleModel && (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute))
+
+                    if (BaseClass is SimpleModel simpleModel)
                     {
-                        var name = BaseClass.GetQualifiedName();
-                        if (name.Namespace == XmlSchema.Namespace)
+                        docs.AddRange(simpleModel.Restrictions.Select(r => new DocumentationModel { Language = "en", Text = r.Description }));
+                        member.CustomAttributes.AddRange(simpleModel.GetRestrictionAttributes().ToArray());
+
+                        if (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute)
                         {
-                            var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
-                            attribute.Arguments.Add(dataType);
+                            var name = BaseClass.GetQualifiedName();
+                            if (name.Namespace == XmlSchema.Namespace)
+                            {
+                                var dataType = new CodeAttributeArgument("DataType", new CodePrimitiveExpression(name.Name));
+                                attribute.Arguments.Add(dataType);
+                            }
                         }
                     }
+
+                    member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
 
                     member.CustomAttributes.Add(attribute);
                     classDeclaration.Members.Add(member);
@@ -551,7 +559,7 @@ namespace XmlSchemaClassGenerator
 
         public List<PropertyModel> Properties { get; set; }
         public List<InterfaceModel> Interfaces { get; }
-        
+
         public void AddInterfaces(IEnumerable<InterfaceModel> interfaces)
         {
             foreach (var interfaceModel in interfaces)
@@ -559,7 +567,7 @@ namespace XmlSchemaClassGenerator
                 Interfaces.Add(interfaceModel);
                 interfaceModel.DerivedTypes.Add(this);
             }
-            
+
         }
     }
 
