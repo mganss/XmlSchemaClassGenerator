@@ -77,29 +77,42 @@ namespace XmlSchemaClassGenerator
 
         private void CreateSubstitutes()
         {
-            var properties = Types.Values.OfType<ClassModel>().SelectMany(c => c.Properties).Where(p => p.XmlSchemaName != null).ToList();
+            var classesProps = Types.Values.OfType<ClassModel>().Select(c => c.Properties.Where(p => p.XmlSchemaName != null).ToList()).ToList();
 
-            foreach (var prop in properties)
+            foreach (var classProps in classesProps)
             {
-                var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
+                var order = 0;
 
-                if (_configuration.SeparateSubstitutes)
+                foreach (var prop in classProps)
                 {
-                    var elems = GetElements(prop.XmlParticle, prop.XmlParent);
-
-                    foreach (var substitute in substitutes)
+                    if (_configuration.EmitOrder)
                     {
-                        var cls = (ClassModel)prop.OwningType;
-                        var schema = substitute.Element.GetSchema();
-                        var source = CodeUtilities.CreateUri(schema.SourceUri);
-                        var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute);
-
-                        cls.Properties.AddRange(props);
+                        prop.Order = order;
+                        order++;
                     }
-                }
-                else
-                {
-                    prop.Substitutes = substitutes;
+
+                    var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
+
+                    if (_configuration.SeparateSubstitutes)
+                    {
+                        var elems = GetElements(prop.XmlParticle, prop.XmlParent);
+
+                        foreach (var substitute in substitutes)
+                        {
+                            var cls = (ClassModel)prop.OwningType;
+                            var schema = substitute.Element.GetSchema();
+                            var source = CodeUtilities.CreateUri(schema.SourceUri);
+                            var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute, order);
+
+                            cls.Properties.AddRange(props);
+
+                            order += props.Count();
+                        }
+                    }
+                    else
+                    {
+                        prop.Substitutes = substitutes;
+                    }
                 }
             }
         }
@@ -404,7 +417,7 @@ namespace XmlSchemaClassGenerator
                 IsAbstract = complexType.IsAbstract,
                 IsAnonymous = string.IsNullOrEmpty(complexType.QualifiedName.Name),
                 IsMixed = complexType.IsMixed,
-                IsSubstitution = complexType.Parent is XmlSchemaElement && !((XmlSchemaElement)complexType.Parent).SubstitutionGroup.IsEmpty
+                IsSubstitution = complexType.Parent is XmlSchemaElement parent && !parent.SubstitutionGroup.IsEmpty
             };
 
             classModel.Documentation.AddRange(docs);

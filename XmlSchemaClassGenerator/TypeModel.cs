@@ -152,7 +152,7 @@ namespace XmlSchemaClassGenerator
                 var typeAttribute = new CodeAttributeDeclaration(new CodeTypeReference(typeof(XmlTypeAttribute), Configuration.CodeTypeReferenceOptions),
                     new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)),
                     new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlSchemaName.Namespace)));
-                if (IsAnonymous && (!(this is ClassModel classModel) || classModel.BaseClass == null))
+                if (IsAnonymous && (this is not ClassModel classModel || classModel.BaseClass == null))
                 {
                     // don't generate AnonymousType if it's derived class, otherwise XmlSerializer will
                     // complain with "InvalidOperationException: Cannot include anonymous type '...'"
@@ -865,7 +865,7 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(backingField);
             }
 
-            if (DefaultValue == null)
+            if (DefaultValue == null || ((IsCollection || isArray || (IsList && IsAttribute)) && IsNullable))
             {
                 var propertyName = Name;
 
