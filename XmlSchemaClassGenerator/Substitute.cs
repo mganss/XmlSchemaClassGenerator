@@ -5,7 +5,7 @@ using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
 {
-    public class Substitute: IEquatable<Substitute>
+    public sealed class Substitute: IEquatable<Substitute>
     {
         public XmlSchemaElement Element { get; set; }
         public TypeModel Type { get; set; }
