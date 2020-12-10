@@ -67,7 +67,7 @@ Options:
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of automatic approximation
-                               TYPE can be i[nt], l[ong], or d[ecimal].
+                               TYPE can be i[nt], l[ong], or d[ecimal]
       --fb, --fallback, --use-integer-type-as-fallback
                              use integer type specified via -i only if no type
                                can be deduced
@@ -100,7 +100,8 @@ Options:
                                default is null)
       --csm, --collectionSettersMode=Private, Public, PublicWithoutConstructorInitialization
                              generate a private, public or public setters
-                               without backing field initialization for collections
+                               without backing field initialization for
+                               collections
                                (default is Private; can be: Private, Public,
                                PublicWithoutConstructorInitialization)
       --ctro, --codeTypeReferenceOptions=GlobalReference, GenericTypeParameter
@@ -125,6 +126,9 @@ Options:
                                pattern (default is false)
       --sf, --separateFiles  generate a separate file for each class (default
                                is false)
+      --sg, --separateSubstitutes
+                             generate a separate property for each element of a
+                               substitution group (default is false)
       --dnfin, --doNotForceIsNullable
                              do not force generator to emit IsNullable = true
                                in XmlElement annotation for nillable elements
