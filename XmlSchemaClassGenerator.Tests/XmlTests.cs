@@ -222,7 +222,7 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
             }
         }
-        
+
         [Fact]
         public void TestListWithPublicPropertySettersWithoutConstructorsSpecified()
         {
@@ -274,7 +274,7 @@ namespace XmlSchemaClassGenerator.Tests
 
             foreach (var propertyInfo in publicCollectionPropertyInfos)
             {
-            
+
                 var collection = Activator.CreateInstance(propertyInfo.PropertyType);
                 propertyInfo.PropertyType.InvokeMember("Add", BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.Instance, null, collection,
                     new object[] {null});
@@ -473,7 +473,7 @@ namespace XmlSchemaClassGenerator.Tests
                 var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);
                 var generator = new XmlSampleGenerator(set, rootElement.QualifiedName);
-                
+
                 using var xw = XmlWriter.Create(sb, new XmlWriterSettings { Indent = true });
 
                 // generate sample xml
@@ -680,7 +680,7 @@ namespace XmlSchemaClassGenerator.Tests
         }
 
         private void PerformBpmnTest(string name, Generator generator = null)
-        { 
+        {
             var assembly = Compiler.Generate(name, BpmnPattern, generator);
             Assert.NotNull(assembly);
 
@@ -1533,13 +1533,13 @@ namespace Test
         public void RenameInterfacePropertyInDerivedClassTest()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
                 <xs:complexType name=""ClassItemBase"">
 			        <xs:sequence>
                         <xs:group ref=""Level1""/>
-                    </xs:sequence>	
+                    </xs:sequence>
 		        </xs:complexType>
 
 	            <xs:element name=""ClassItem"">
@@ -1548,7 +1548,7 @@ namespace Test
                             <xs:extension base=""ClassItemBase""/>
 		                </xs:complexContent>
 		            </xs:complexType>
-                </xs:element>	  
+                </xs:element>
 
                 <xs:element name=""SomeType1"">
 		            <xs:complexType>
@@ -1560,19 +1560,19 @@ namespace Test
 		            <xs:choice>
                         <xs:group ref=""Level2""/>
 		            </xs:choice>
-	            </xs:group>	  
+	            </xs:group>
 
 	            <xs:group name=""Level2"">
 		            <xs:choice>
 			            <xs:group ref=""Level3""/>
 		            </xs:choice>
-	            </xs:group>	  
-                
+	            </xs:group>
+
 	            <xs:group name=""Level3"">
 		            <xs:choice>
 			            <xs:element name=""ClassItemBase"" type=""xs:string""/>
 		            </xs:choice>
-	            </xs:group>	 
+	            </xs:group>
 
             </xs:schema>";
 
@@ -1612,44 +1612,44 @@ namespace Test
         public void DoNotGenerateSamePropertiesInDerivedInterfacesClassTest()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
 	            <xs:element name=""ParentClass"">
 		            <xs:complexType>
 			            <xs:group ref=""Level1""/>
 		            </xs:complexType>
-                </xs:element>	   
+                </xs:element>
 
 	            <xs:group name=""Level1"">
 		            <xs:choice>
                     <xs:sequence>
                         <xs:element name=""InterfaceProperty"" type=""xs:string""/>
                         <xs:group ref=""Level2""/>
-                    </xs:sequence>			            
+                    </xs:sequence>
 		            </xs:choice>
-	            </xs:group>	  
+	            </xs:group>
 
 	            <xs:group name=""Level2"">
                     <xs:sequence>
                         <xs:element name=""InterfaceProperty"" type=""xs:string""/>
                         <xs:group ref=""Level3""/>
-                    </xs:sequence>	
-	            </xs:group>	  
+                    </xs:sequence>
+	            </xs:group>
 
 	            <xs:group name=""Level22"">
                     <xs:sequence>
                         <xs:element name=""InterfaceProperty"" type=""xs:string""/>
                         <xs:element name=""Level22OwnProperty"" type=""xs:string""/>
                         <xs:group ref=""Level3""/>
-                    </xs:sequence>	
-	            </xs:group>	  
-                
+                    </xs:sequence>
+	            </xs:group>
+
 	            <xs:group name=""Level3"">
 		            <xs:choice>
 			            <xs:element name=""InterfaceProperty"" type=""xs:string""/>
 		            </xs:choice>
-	            </xs:group>	 
+	            </xs:group>
 
             </xs:schema>";
 
@@ -1666,13 +1666,13 @@ namespace Test
             var content = Assert.Single(contents);
 
             var assembly = Compiler.Compile(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), content);
-            
+
             var listType = assembly.GetType("Test.ParentClass");
             Assert.NotNull(listType);
-            
+
             var listTypePropertyInfo = listType.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
             Assert.NotNull(listTypePropertyInfo);
-            
+
             var level1Interface = assembly.GetType("Test.ILevel1");
             Assert.NotNull(level1Interface);
             Assert.Empty(level1Interface.GetProperties());
@@ -1692,7 +1692,7 @@ namespace Test
         public void NillableWithDefaultValueTest()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" 
+            <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
                 <xs:complexType name=""TestType"">
@@ -1714,10 +1714,10 @@ namespace Test
             var content = Assert.Single(contents);
 
             var assembly = Compiler.Compile(nameof(NillableWithDefaultValueTest), content);
-            
+
             var testType = assembly.GetType("Test.TestType");
             Assert.NotNull(testType);
-            
+
             var propertyInfo = testType.GetProperties().FirstOrDefault(p => p.Name == "IntProperty");
             Assert.NotNull(propertyInfo);
             var testTypeInstance = Activator.CreateInstance(testType);
@@ -1742,11 +1742,11 @@ namespace Test
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
 		        <xs:element name=""EnumTestType"">
-		            <xs:simpleType>			
+		            <xs:simpleType>
 					    <xs:restriction base=""xs:string"">
 						    <xs:enumeration value=""EnumValue""/>
 					    </xs:restriction>
-				    </xs:simpleType>			
+				    </xs:simpleType>
 	            </xs:element>
 
             </xs:schema>";
@@ -1762,7 +1762,7 @@ namespace Test
             var content = Assert.Single(contents);
 
             var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content);
-            
+
             var testType = assembly.GetType("Test.EnumTestType");
             Assert.NotNull(testType);
             var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
@@ -1779,11 +1779,11 @@ namespace Test
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
 		        <xs:element name=""EnumTestType"">
-		            <xs:simpleType>			
+		            <xs:simpleType>
 					    <xs:restriction base=""xs:string"">
 						    <xs:enumeration value=""EnumValue""/>
 					    </xs:restriction>
-				    </xs:simpleType>			
+				    </xs:simpleType>
 	            </xs:element>
 
             </xs:schema>";
@@ -1792,11 +1792,11 @@ namespace Test
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
 		        <xs:element name=""EnumTestType"">
-		            <xs:simpleType>			
+		            <xs:simpleType>
 					    <xs:restriction base=""xs:string"">
 						    <xs:enumeration value=""EnumValue""/>
 					    </xs:restriction>
-				    </xs:simpleType>			
+				    </xs:simpleType>
 	            </xs:element>
 
             </xs:schema>";
@@ -1813,7 +1813,7 @@ namespace Test
             var content2 = Assert.Single(contents2);
 
             var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content1, content2);
-            
+
             var testType = assembly.GetType("Test_NS1.EnumTestType");
             Assert.NotNull(testType);
             var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
@@ -1901,7 +1901,7 @@ namespace Test
             Assert.Equal(2, contents.Length);
 
             var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), contents);
-            
+
             var testType = assembly.GetType("Test_NS1.TestType");
             Assert.NotNull(testType);
             var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
@@ -2201,14 +2201,14 @@ namespace Test
             /*
             var testFiles = new Dictionary<string, string>
             {
-                { "airport1.xml", "AirportHeliportType" }, 
-                { "airportHeliportTimeSlice.xml", "AirportHeliportTimeSliceType" }, 
-                { "airspace1.xml", "AirspaceType" }, 
-                { "navaid1.xml", "NavaidType" }, 
-                { "navaidTimeSlice.xml", "NavaidTimeSliceType" }, 
-                { "navaidWithAbstractTime.xml", "NavaidWithAbstractTime" }, 
-                { "navaid.xml", "Navaid" }, 
-                { "routesegment1.xml", "RouteSegment" }, 
+                { "airport1.xml", "AirportHeliportType" },
+                { "airportHeliportTimeSlice.xml", "AirportHeliportTimeSliceType" },
+                { "airspace1.xml", "AirspaceType" },
+                { "navaid1.xml", "NavaidType" },
+                { "navaidTimeSlice.xml", "NavaidTimeSliceType" },
+                { "navaidWithAbstractTime.xml", "NavaidWithAbstractTime" },
+                { "navaid.xml", "Navaid" },
+                { "routesegment1.xml", "RouteSegment" },
                 { "timePeriod.xml", "TimePeriod" },
             };
 

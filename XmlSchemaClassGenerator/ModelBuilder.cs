@@ -165,7 +165,10 @@ namespace XmlSchemaClassGenerator
                         {
                             if (implementationClassProperty.Name != implementationClassProperty.OriginalPropertyName
                                 && implementationClassProperty.OriginalPropertyName == interfaceProperty.Name
-                            )
+                                && implementationClassProperty.XmlSchemaName == interfaceProperty.XmlSchemaName
+                                && implementationClassProperty.XmlParent?.Parent is XmlSchemaGroup implementationGroup
+                                && interfaceProperty.XmlParent?.Parent is XmlSchemaGroup interfaceGroup
+                                && implementationGroup.QualifiedName == interfaceGroup.QualifiedName)
                             {
                                 RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
                                 interfaceProperty.Name = implementationClassProperty.Name;
@@ -829,12 +832,14 @@ namespace XmlSchemaClassGenerator
                     {
                         if (item.XmlParticle is XmlSchemaGroupRef groupRef)
                         {
+                            var group = Groups[groupRef.RefName];
+
                             if (_configuration.GenerateInterfaces)
                             {
-                                CreateTypeModel(CodeUtilities.CreateUri(groupRef.SourceUri), Groups[groupRef.RefName], groupRef.RefName);
+                                CreateTypeModel(CodeUtilities.CreateUri(groupRef.SourceUri), group, groupRef.RefName);
                             }
 
-                            var groupItems = GetElements(groupRef.Particle);
+                            var groupItems = GetElements(group.Particle);
                             var groupProperties = CreatePropertiesForElements(source, typeModel, item.XmlParticle, groupItems, order: order).ToList();
                             if (_configuration.EmitOrder)
                             {
