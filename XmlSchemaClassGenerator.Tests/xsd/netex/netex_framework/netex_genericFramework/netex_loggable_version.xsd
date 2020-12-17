@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_loggable_version">
+	<xsd:include schemaLocation="netex_loggable_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="netex_grouping_version.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2017-08-10</Created>
+				</Date>
+				<Date><Modified>2017-06-28</Modified>  Cr0040  Add GENERAL LOGGABLEand Revise Loggable Structure.  
+					            Add generic LOGGABLE supertype 
+								Add PointOnLoggable  for list of points (RetainCommonLoggableMember for backwards compatibility)
+								AddLinkOnLoggable  for list of just links.  
+								Add nameOfLinkClass attribute to help implementors. 
+								Add used to be just a list of LinkSequences.  
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines LOGGABLE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_section_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Steam Intellect, London N1 1JS</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - POINT AND LINK types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>LOGGABLE  types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<!-- ==COMMON LOGGABLE=========================================================== -->
+	<xsd:element name="Log" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A Collection of LOG ENTRIES grouped together in a file or any other kind of storage. +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="Log_VersionStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Log_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for  LOG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="LogGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for a LOG.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="nameOfLogEntryClass" type="NameOfClass">
+					<xsd:annotation>
+						<xsd:documentation>Name of LogEntry Cass of  LOG</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LogGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LOG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="logEntries" type="logEntries_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>LOG ENTRies using LOG.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="logEntries_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of  LOG ENTries   +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="LogEntry" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="LogEntry" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A time-stamped record of an event or change of state.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="LogEntry_VersionStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LogEntry_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for LOG ENTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="LogEntryGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LogEntryGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LOG ENTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of LOG ENTRY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of LOG ENTRY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Date" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timestamp of LOG ENTRY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+</xsd:schema>

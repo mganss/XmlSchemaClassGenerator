@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a flat   fare set for w ith a group ticket in NeTex XML  
+ 
+Uses Flat fares   There  are thre  FARE PRODUCT ,: Standard  (one way and return)  and Group Ticket (one way)
+ 
+ 
+1. OVERVIEW
+============
+There is  a flat fare to use the network of OPERATOR DTA 
+
+ Fare type									 Single Price    	Return
+  Standard fare 							1.00 EUR		 	1.75
+   Group Tickeet 10 or more people 75% discount  n/a	
+==================================
+2. DETAILS
+
+There is one OPERATOR  :  mybus:DTA
+
+There are Three   FARE PRODUCTs
+
+	 Standard: PREASSIGNED FARE PRODUCT myfares:flat_standard_single  
+		VALIDITY PARAMETER ASSIGNMENTs
+			OPERATOR mybus:DTA
+		FARE USAGE PARAMETERs
+			FREQUENCY OF USE   one trip  unlimited  myfares:FrequencyOfUse:return 
+
+	 Standard: PREASSIGNED FARE PRODUCT myfares:flat_standard_return
+		VALIDITY PARAMETER ASSIGNMENTs
+			OPERATOR mybus:DTA
+		FARE USAGE PARAMETERs 
+			FREQUENCY OF USE   one trip  unlimited  myfares:FrequencyOfUse:return 
+
+	Group PREASSIGNED FARE PRODUCT myfares:flat_group
+		VALIDITY PARAMETER ASSIGNMENTs
+			OPERATOR mybus:DTA
+		FARE USAGE PARAMETERs
+			FREQUENCY OF USE   one trip  unlimited  myfares:FrequencyOfUse:return 
+			GROUP TICKET - 10 or more  myfares:GroupTicketRef:group
+ 
+	Prices 
+		FARE PRODUCT PRICE : myfares:standard   1.00 EUR
+		FARE PRODUCT PRICE : myfares:return  1.75 EUR
+								 
+		USAGE PARAMETER   PRICE :myfares:group"> 75%
+									 
+
+A COMPOSITE FRAME is used to group the component FRAMEs
+ 
+   - It has a VALIDITY CONDITION  that specifies it is valid from Jan to June
+
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A FARE FRAME is used to contain  the FARE    elements 
+ 		A RESOURCE is used to contain the OPERATORs, etc
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="mybus:range">
+						<FromDate>2011-01-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<FareFrameRef ref="myfares:any">REQUEST</FareFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple point to point fares</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="myfares:DTA@Flat">
+			<validityConditions>
+				<ValidBetween>
+					<FromDate>2011-01-01T00:00:00Z</FromDate>
+					<ToDate>2011-07-01T00:00:00Z</ToDate>
+				</ValidBetween>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="myfares">
+					<Xmlns>myfares</Xmlns>
+					<XmlnsUrl>http://www.myfares,com/fares</XmlnsUrl>
+					<Description>Fare data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="myfares"/>
+				<DefaultCurrency>EUR</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="1.0" id="myfares:DTA@Flat@products">
+					<prerequisites>
+						<ResourceFrameRef version="1.0" ref="mybus:DTA@Common_Resources"/>
+					</prerequisites>
+					<!--- ====Fare Structure======= -->
+					<tariffs>
+						<Tariff version="1.0" id="myfares:Flat">
+							<Name>Flat  tariff</Name>
+							<OperatorRef version="any" ref="mybus:DTA"/>
+							<TypeOfTariffRef version="ntx:v1.0"  ref="ntx:flat"/>
+							<fareStructureElements>
+								<FareStructureElement version="1.0" id="myfares:Flat@access">
+									<GenericParameterAssignment order="1" id="myfares:Flat@access" version="1.0">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>metro</VehicleModes>
+											<OperatorRef version="any" ref="mybus:DTA"/>
+										</validityParameters>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="myfares:Flat@eligibility">
+									<Name>Eligible user types</Name>
+									<GenericParameterAssignment order="1" id="myfares:Flat@eligibility" version="1.0">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+										<LimitationGroupingType>XOR</LimitationGroupingType>
+										<limitations>
+											<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+											<UserProfile version="any" id="myfares:adult">
+												<Name>Child Fare</Name>
+												<MinimumAge>17</MinimumAge>
+											</UserProfile>
+											<UserProfile version="any" id="myfares:child">
+												<Name>Child Fare</Name>
+												<MaximumAge>16</MaximumAge>
+											</UserProfile>
+											<GroupTicket version="any" id="myfares:group">
+												<Name>Group Fare - 10 or more people</Name>
+												<MinimumNumberOfPersons>10</MinimumNumberOfPersons>
+											</GroupTicket>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:Flat@conditions_of_travel@single" version="1.0">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:Flat@conditions_of_travel@single">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="any" id="myfares:Flat@conditions_of_travel@single@trip">
+												<Name>Single</Name>
+												<TripType>single</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="myfares:Flat@conditions_of_travel@single@frequency">
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="myfares:Flat@conditions_of_travel@single@interchanging">
+												<CanInterchange>true</CanInterchange>
+												<FromMode>metro</FromMode>
+												<ToMode>metro</ToMode>
+												<CanBreakJourney>false</CanBreakJourney>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:Flat@conditions_of_travel@outbound" version="1.0">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:Flat@conditions_of_travel@outbound">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="any" id="myfares:Flat@conditions_of_travel@outbound@trip">
+												<Name>Outbound</Name>
+												<TripType>single</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="myfares:Flat@conditions_of_travel@outbound@frequency">
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="myfares:Flat@conditions_of_travel@outbound@interchanging">
+												<CanInterchange>true</CanInterchange>
+												<CanBreakJourney>false</CanBreakJourney>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:Flat@conditions_of_travel@inbound" version="1.0">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:Flat@conditions_of_travel@inbound">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="any" id="myfares:Flat@conditions_of_travel@inbound@trip">
+												<Name>Return</Name>
+												<TripType>returnOnly</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="myfares:Flat@conditions_of_travel@inbound@frequency">
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="myfares:Flat@conditions_of_travel@inbound@interchanging">
+												<CanInterchange>true</CanInterchange>
+												<CanBreakJourney>false</CanBreakJourney>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<!-- === PRICES ==== -->
+							<priceGroups>
+								<PriceGroupRef version="1.0" ref="myfares:Flat"/>
+							</priceGroups>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="1.0" id="myfares:Single_trip">
+							<Name>Adult  Standard Flat  fare  - One way </Name>
+							<TypeOfFareProductRef version="ntx:v1.0"  ref="ntx:trip"/>
+							<OperatorRef version="any" ref="mybus:DTA"/>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="1.0" id="myfares:Single_trip@travel">
+									<Name>A metro Trip</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@access"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@conditions_of_travel@single"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTs======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct version="1.0" id="myfares:Single_trip@travel" order="1">
+									<Name>First ride</Name>
+									<IsFirstInSequence>true</IsFirstInSequence>
+									<IsLastInSequence>true</IsLastInSequence>
+									<ValidableElementRef version="1.0" ref="myfares:Single_trip@travel"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+						<PreassignedFareProduct version="1.0" id="myfares:Return_trip">
+							<Name>Adult  Standard Flat  fare  - One way </Name>
+										<TypeOfFareProductRef version="ntx:v1.0" ref="ntx:trip"/>
+							<OperatorRef version="any" ref="mybus:DTA"/>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="1.0" id="myfares:Return_trip@travel@outbound">
+									<Name>Outbound  metro Trip</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@access"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@conditions_of_travel@outbound"/>
+									</fareStructureElements>
+								</ValidableElement>
+								<ValidableElement version="1.0" id="myfares:Return_trip@travel@inbound">
+									<Name>Return metro Trip</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@access"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Flat@conditions_of_travel@inbound"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTs======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct version="1.0" id="myfares:Return_trip@travel" order="1">
+									<Name>Outbound  trip</Name>
+									<IsFirstInSequence>false</IsFirstInSequence>
+									<IsLastInSequence>true</IsLastInSequence>
+									<ValidableElementRef version="1.0" ref="myfares:Return_trip@travel@outbound"/>
+								</AccessRightInProduct>
+								<AccessRightInProduct version="1.0" id="myfares:Return_trip@travel" order="2">
+									<Name>Return tripe</Name>
+									<IsFirstInSequence>false</IsFirstInSequence>
+									<IsLastInSequence>true</IsLastInSequence>
+									<ValidableElementRef version="1.0" ref="myfares:Return_trip@travel@inbound"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!--- ====Sales Packages ====== -->
+					<salesOfferPackages>
+						<SalesOfferPackage version="1.0" id="myfares:Single_trip-SOP@p-ticket@individual">
+							<Name>Individual Single, Paper Ticket </Name>
+							<validityParameterAssignments>
+								<GenericParameterAssignment order="1" id="myfares:Single_trip-SOP@p-ticket@individual" version="1.0">
+									<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+									<LimitationGroupingType>XOR</LimitationGroupingType>
+									<limitations>
+										<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+										<UserProfileRef version="any" ref="myfares:adult"/>
+										<UserProfileRef version="any" ref="myfares:child"/>
+									</limitations>
+								</GenericParameterAssignment>
+							</validityParameterAssignments>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement order="1" version="1.0" id="myfares:Single_trip-SOP@p-ticket@individual">
+									<TypeOfTravelDocumentRef version="any" ref="myfares:paper_ticket"/>
+									<FareProductRef version="1.0" ref="myfares:Single_trip"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+						<SalesOfferPackage version="1.0" id="myfares:Return_trip-SOP@p-ticket@individual">
+							<Name>Individual Return, Paper Ticket </Name>
+							<validityParameterAssignments>
+								<GenericParameterAssignment order="1" id="myfares:Return_trip-SOP@p-ticket@individual" version="1.0">
+									<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+									<LimitationGroupingType>XOR</LimitationGroupingType>
+									<limitations>
+										<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+										<UserProfileRef version="any" ref="myfares:adult"/>
+										<UserProfileRef version="any" ref="myfares:child"/>
+									</limitations>
+								</GenericParameterAssignment>
+							</validityParameterAssignments>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement order="1" version="1.0" id="myfares:Return_trip-SOP@p-ticket@individual">
+									<TypeOfTravelDocumentRef version="any" ref="myfares:paper_ticket"/>
+									<FareProductRef version="1.0" ref="myfares:Return_trip"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+						<SalesOfferPackage version="1.0" id="myfares:Single_trip-SOP@p-ticket@group">
+							<Name>Group Single, Paper Ticket </Name>
+							<validityParameterAssignments>
+								<GenericParameterAssignment order="1" id="myfares:Single_trip-SOP@p-ticket@group" version="1.0">
+									<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+									<LimitationGroupingType>XOR</LimitationGroupingType>
+									<limitations>
+										<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+										<GroupTicketRef version="any" ref="myfares:group"/>
+									</limitations>
+								</GenericParameterAssignment>
+							</validityParameterAssignments>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement order="1" version="1.0" id="myfares:Single_trip-SOP@p-tickett@group">
+									<TypeOfTravelDocumentRef version="any" ref="myfares:paper_ticket"/>
+									<FareProductRef version="1.0" ref="myfares:Single_trip"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+						<SalesOfferPackage version="1.0" id="myfares:Return_trip-SOP@p-ticket@group">
+							<Name>Group Return , Paper Ticket </Name>
+							<validityParameterAssignments>
+								<GenericParameterAssignment order="1" id="myfares:Return_trip-SOP@p-ticket@group" version="1.0">
+									<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+									<LimitationGroupingType>XOR</LimitationGroupingType>
+									<limitations>
+										<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+										<GroupTicketRef version="any" ref="myfares:group"/>
+									</limitations>
+								</GenericParameterAssignment>
+							</validityParameterAssignments>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement order="1" version="1.0" id="myfares:Return_trip-SOP@p-ticket@group">
+									<TypeOfTravelDocumentRef version="any" ref="myfares:paper_ticket"/>
+									<FareProductRef version="1.0" ref="myfares:Return_trip"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+					</salesOfferPackages>
+				</FareFrame>
+				<!--- ====Fare Prices======= -->
+				<FareFrame version="1.0" id="myfares:DTA@Flat@prices">
+					<prerequisites>
+						<FareFrameRef version="1.0" ref="myfares:DTA@Flat@products"/>
+					</prerequisites>
+					<!--- ====Pricing Parmaters======= -->
+					<PricingParameterSet version="1.0" id="myfares:Flat@prices">
+						<pricingRules>
+							<DiscountingRule version="any" id="myfares:group_discount">
+								<DiscountAsPercentage>75</DiscountAsPercentage>
+							</DiscountingRule>
+						</pricingRules>
+					</PricingParameterSet>
+					<priceGroups>
+						<PriceGroup version="1.0" id="myfares:Flat">
+							<Name>Prices for Flat  Fare Products</Name>
+							<members>
+								<SalesOfferPackagePrice version="1.0" id="myfares:Single_trip-SOP@p-ticket@individual">
+									<Name>Return fare</Name>
+									<Amount>1.00</Amount>
+									<Currency>EUR</Currency>
+									<SalesOfferPackageRef version="1.0" ref="myfares:Single_trip-SOP@p-ticket@individual"/>
+								</SalesOfferPackagePrice>
+								<SalesOfferPackagePrice version="1.0" id="myfares:Return_trip-SOP@p-ticket@individual">
+									<Name>Single fare</Name>
+									<Amount>1.75</Amount>
+									<Currency>EUR</Currency>
+									<SalesOfferPackageRef version="1.0" ref="myfares:Return_trip-SOP@p-ticket@individual"/>
+								</SalesOfferPackagePrice>
+								<SalesOfferPackagePrice version="1.0" id="Single_trip-SOP@p-ticket@group">
+									<Name>Group discount - all fares</Name>
+									<SalesOfferPackagePriceRef version="1.0" ref="myfares:Single_trip-SOP@p-ticket@individual"/>
+									<DiscountingRuleRef version="any" ref="myfares:group_discount"/>
+									<SalesOfferPackageRef version="1.0" ref="myfares:Single_trip-SOP@p-ticket@group"/>
+								</SalesOfferPackagePrice>
+								<SalesOfferPackagePrice version="1.0" id="Return_trip-SOP@p-ticket@group">
+									<Name>Group discount - all fares</Name>
+									<SalesOfferPackagePriceRef version="1.0" ref="myfares:Return_trip-SOP@p-ticket@individual"/>
+									<DiscountingRuleRef version="any" ref="myfares:group_discount"/>
+									<SalesOfferPackageRef version="1.0" ref="myfares:Return_trip-SOP@p-ticket@group"/>
+								</SalesOfferPackagePrice>
+							</members>
+						</PriceGroup>
+					</priceGroups>
+				</FareFrame>
+				<!--- ===========RESOURCEs========== -->
+				<ResourceFrame version="1.0" id="mybus:DTA@Common_Resources">
+					<Name>Common Resources</Name>
+					<codespaces>
+						<Codespace id="ntx">
+							<Xmlns>ntx</Xmlns>
+							<XmlnsUrl>http://netex.org.uk/</XmlnsUrl>
+							<Description>Netex built in value</Description>
+						</Codespace>
+					</codespaces>
+					<typesOfValue>
+						<ValueSet version="ntx:v1.0" id="ntx:Types_of_Tariff" classOfValues="TypeOfTariff">
+							<Name>Types of Tariff</Name>
+							<values>
+								<!--- ====Types OfTariff ========= -->
+								<TypeOfTariff version="ntx:v1.0" id="ntx:Distance_kilometers">
+									<Name>Kilometer Distance Kilometers</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:flat">
+									<Name>Flat</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:point_to_point">
+									<Name>Point to point</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:zone_to_zone">
+									<Name>Zone to Zone</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:zonal">
+									<Name>Zonal</Name>
+								</TypeOfTariff>
+										<TypeOfTariff version="ntx:v1.0" id="ntx:unit_distance">
+									<Name>Unit distance (count of stops, sections, zones)</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:section">
+									<Name>Section</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:banded">
+									<Name>Section</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:stored_value">
+									<Name>Stored value</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:discount">
+									<Name>Discount value</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:multitrip">
+									<Name>Multitrip carnet</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:identity_card">
+									<Name>SIdentity</Name>
+								</TypeOfTariff>
+							</values>
+						</ValueSet>
+						<ValueSet version="ntx:v1.0" id="ntx:Types_of_FareProduct" classOfValues="TypeOfFareProduct">
+							<Name>Types of Fare Product</Name>
+							<values> 
+								<TypeOfFareProduct version="ntx:v1.0" id="ntx:trip">
+									<Name>Trip product</Name>
+								</TypeOfFareProduct>
+														<TypeOfFareProduct version="ntx:v1.0" id="ntx:multi_trip">
+									<Name>Multitrip / carnet  product</Name>
+								</TypeOfFareProduct>
+									<TypeOfFareProduct version="ntx:v1.0" id="ntx:period_pass">
+									<Name>Peroid pass product</Name>
+								</TypeOfFareProduct>
+										<TypeOfFareProduct version="ntx:v1.0" id="ntx:day_pass">
+									<Name>Day pass product</Name>
+								</TypeOfFareProduct>
+																	<TypeOfFareProduct version="ntx:v1.0" id="ntx:discount_card">
+									<Name>Discount  product</Name>
+								</TypeOfFareProduct>
+								 
+							</values>
+						</ValueSet>				
+						<ValueSet version="any" id="myfares:Types_of_TravelDocument" classOfValues="TypeOfTravelDocument">
+							<Name>Types of Travel document</Name>
+							<values>
+								<TypeOfTravelDocument version="any" id="myfares:mobile_app">
+									<Name>Mobile Electronic</Name>
+								</TypeOfTravelDocument>
+								<TypeOfTravelDocument version="any" id="myfares:paper_ticket">
+									<Name>Printed ticket</Name>
+								</TypeOfTravelDocument>
+							</values>
+						</ValueSet>
+						<ValueSet version="ntx:v1.0" id="ntx:Types_of_AccessRightAssignment" classOfValues="TypeOfAccessRightAssignment">
+							<Name>Types of Access Right Assignment</Name>
+							<values>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:eligible">
+									<Name>Eligible for a product or discount</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access">
+									<Name>Grants access rights to use or travel on a network</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access_when">
+									<Name>Grants access rights to use or travel within a given period</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_purchase_when">
+									<Name>Specified conditiosn on when a product can eb purchased</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:condition_of_use">
+									<Name>Defines a condition or restriction on use</Name>
+								</TypeOfAccessRightAssignment>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+					<organisations>
+						<!--- =====Agency========= -->
+						<Operator version="any" id="mybus:DTA">
+							<Name>Demo Transit Authority</Name>
+						</Operator>
+					</organisations>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 (x64) (http://www.altova.com) by Nicholas JS Knowles (Trapeze Group Limited) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_fareZone_support">
+	<xsd:include schemaLocation="../part1_tacticalPlanning/netex_servicePattern_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_section_support.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-03-28</Modified> CR019 Fixes: 1a. FareZoneRefs/Ref should be ,multiple, not single 
+													  1b fareScheduledStopPointRefs/Ref should be multiple, not single
+													add tiled to fare zone  topology				
+				</Date>
+				<Date>
+					<Modified>2017-08-10 </Modified>Make FareSection a type of GeneralSection not CommonSection	 
+				</Date>
+				<Date>
+					<Modified>2018-10-01</Modified>NK: Correct  substitution group on FarePointInPattern  to PointInLinkSequence
+				</Date>
+				<Date>
+					<Modified>20109-02-25</Modified>UK-05 Fix: Introduce a dummy TariffZoneRef_ so that FareZone can be a specialisation of TariffZone. Workaround to XMLSPY sg  issue.
+				</Date>
+				<Date>
+					<Modified>20109-02-25</Modified>UK-14  Add extra  ScopingMethod  attribute to FareZone with enum values   explicitStops,   implicitSpatialProjection, implicitSpatialProjection
+						</Date>
+				<Date>
+					<Modified>20109-02-25</Modified>UK-13  Add extra  ZoneTopologyEnumeration   attribute  enum values   annular,   sequence, overlappingSequence
+						</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines FARE ZONE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_fares}netex_fareZone_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+						 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the SIRI standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - topographic types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: FARE ZONE identifier types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ====FARE SCHEDULED STOP POINT==================================================== -->
+	<xsd:simpleType name="FareScheduledStopPointIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a FARE SCHEDULED STOP POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ScheduledStopPointIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="FareScheduledStopPointRef" type="FareScheduledStopPointRefStructure" substitutionGroup="ScheduledStopPointRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a FARE SCHEDULED STOP POINT.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="FareScheduledStopPointRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a FARE SCHEDULED STOP POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="ScheduledStopPointRefStructure">
+				<xsd:attribute name="ref" type="FareScheduledStopPointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of FARE SCHEDULED STOP POINT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="fareScheduledStopPointRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE SCHEDULED STOP POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="FareScheduledStopPointRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--======BORDER POINT===================================================-->
+	<xsd:simpleType name="BorderPointIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a BORDER POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TimingPointIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="BorderPointRef" type="BorderPointRefStructure" abstract="false" substitutionGroup="TimingPointRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a BORDER POINT. (TAP TSI B.1.3 Border Boint Code).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BorderPointRefStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a BORDER POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TimingPointRefStructure">
+				<xsd:attribute name="ref" type="BorderPointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a BORDER POINT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====FARE POINT IN JOURNEY PATTERN.======================================================== -->
+	<xsd:simpleType name="FarePointInPatternIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a FARE POINT IN JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="PointInJourneyPatternIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="FarePointInPatternRef" type="FarePointInPatternRefStructure" substitutionGroup="PointInJourneyPatternRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a FARE POINT IN JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="FarePointInPatternRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a FARE POINT IN JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="PointInJourneyPatternRefStructure">
+				<xsd:attribute name="ref" type="FarePointInPatternIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a FARE POINT IN JOURNEY PATTERN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="SeriesPresentationEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Fare Point Presentation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="required"/>
+			<xsd:enumeration value="optionalLeft"/>
+			<xsd:enumeration value="optionalRight"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ====FARE SECTION .======================================================== -->
+	<xsd:simpleType name="FareSectionIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a FARE SECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="GeneralSectionIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="FareSectionRef" type="FareSectionRefStructure" substitutionGroup="GeneralSectionRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a FARE SECTION.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="FareSectionRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a FARE SECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="GeneralSectionRefStructure">
+				<xsd:attribute name="ref" type="FareSectionIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a FARE SECTION.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====FARE ZONE .======================================================== -->
+	<xsd:simpleType name="FareZoneIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a FARE ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TariffZoneIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="FareZoneRef" type="FareZoneRefStructure" substitutionGroup="TariffZoneRef_">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a FARE ZONE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="FareZoneRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a FARE ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TariffZoneRefStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ZoneTopologyEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Fare Zone Topology.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="overlapping">
+				<xsd:annotation>
+					<xsd:documentation>Zones are of arbitrary shape and may overlap.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="honeycomb">
+				<xsd:annotation>
+					<xsd:documentation>Zones are arranged as a tiled honeycomb of regular polygons (e.g. Hexagons, squares etc. The zones are contiguous and do not overlap.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="ring">
+				<xsd:annotation>
+					<xsd:documentation>Zones are arranged in rings . The nested inner zones are included in any containing  outer zones.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="annular">
+				<xsd:annotation>
+					<xsd:documentation>Zones are arranged in tiled hollow rings. The area of any  immediately nested zone  is excluded from the  containing  outer zone.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="nested">
+				<xsd:annotation>
+					<xsd:documentation>Zones are nested, that is some zones are fully contained within other zones and are automatically included if the outer zone is selected. They may also overlap their neighbours.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="tiled">
+				<xsd:annotation>
+					<xsd:documentation>Zones are arranged as adjacent tiles or arbitrary shapes that do not overlap.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="sequence">
+				<xsd:annotation>
+					<xsd:documentation>Zones are arranged as adjacent tiles in sequence that touch at either or both ends. They do not overlap.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="overlappingSequence">
+				<xsd:annotation>
+					<xsd:documentation>Zones are arranged as adjacent tiles in sequence that touch at either or both ends. They may partially overlap such that some stops are in both zones.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="fareZoneRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE ZONEs</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="FareZoneRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ====FARE ZONE .======================================================== -->
+	<xsd:simpleType name="ScopingMethodEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for FARE ZONE Scoping Method</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="explicitStops">
+				<xsd:annotation>
+					<xsd:documentation>Stops that are members of the zone are explicitly listed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="implicitSpatialProjection">
+				<xsd:annotation>
+					<xsd:documentation>Any stop that is spatially contained within the zone is assumed to be a  member.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="explicitPeripheryStops">
+				<xsd:annotation>
+					<xsd:documentation>The extent of the zone is indicated by a set of stops marking the border points on the periphery of the FARE ZONE. Any stop that is spatially contained within the indicated zone is assumed to be a  member.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Other method</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

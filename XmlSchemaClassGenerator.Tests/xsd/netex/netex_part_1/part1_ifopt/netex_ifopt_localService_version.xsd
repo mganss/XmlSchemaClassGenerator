@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_localService_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_utility/netex_utility_types.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceRestrictions_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_utility/netex_units.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_localService_support.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_serviceFeature_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipment_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2007-06-12</Created>
+				</Date>
+				<Date>
+					<Modified>2007-06-12</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-10-10</Modified>CR051 Add Keep for period to lost property service and maximum Duration to LeftLuggage
+				</Date>
+				<Date>
+					<Modified>2019-03-25</Modified>FR49 CD #65  Accessibility changes
+					CD add LuggageMaximalWeihgt to LuggageService.
+					NJSK Review: Correct Typo on LuggageMaximumWeight.  Make datatype weightType. Also add to LeftLuggageService.
+				</Date>
+				<Date>
+					<Modified>2019-03-27</Modified>FR49 CD #65  Accessibility changes					 
+					NJSK Review: Rename LuggageMaximumWeight. to MaximumBagWight to be consistent with doc
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines EQUIPMENT types for Place access.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_ifopt}netex_ifopt_localService_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the TransModel standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - LOCAL SERVICE types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>LOCAL SERVICE types for IFOPT Fixed Objects in Public Transport.</xsd:documentation>
+	</xsd:annotation>
+	<xsd:group name="LocalServiceChoice">
+		<xsd:annotation>
+			<xsd:documentation>Choice of LOCAL SERVICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="AssistanceService"/>
+			<xsd:element ref="ComplaintsService">
+				<xsd:annotation>
+					<xsd:documentation>Complaints Service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="LostPropertyService">
+				<xsd:annotation>
+					<xsd:documentation>Lost Property Service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="LuggageService"/>
+			<xsd:element ref="TicketingService"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ====Local Service=================================================================== -->
+	<xsd:complexType name="localServices_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of LOCAL SERVICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="LocalServiceRef"/>
+					<xsd:element ref="LocalService" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="LocalService" type="LocalService_VersionStructure" abstract="true" substitutionGroup="Equipment">
+		<xsd:annotation>
+			<xsd:documentation>A named service relating to the use of the SITE or transport services at a particular location, for example porterage, assistance for disabled users, booking offices etc.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LocalService_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LOCAL SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Equipment_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="LocalServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LocalServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LOCAL SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="typesOfServiceFeature" type="typeOfServiceFeatureRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Classification of FEATUREs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="TicketingService" substitutionGroup="LocalService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of LOCAL SERVICE for ticketing, providing ticket counter and online purchase information, also associated with payment method and TYPE OF TICKET.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TicketingService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TicketingServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TicketingServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TicketingService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for Ticketing Service.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LocalService_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TicketingServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TicketingServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TICKETING SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="VehicleModes" type="VehicleModeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Modes for which TICKETING SERVICEs apply.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TicketingServiceList" type="TicketingServiceFacilityListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Service available.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TicketTypeList" type="TicketTypeListOfEnumerations" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Ticket Types available.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TicketCounterService" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is a ticket counter staffed by humans.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OnlinePurchaseForCollection" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is online purchase for collection.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OnlinePurchaseForETicket" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is online purchase for eticket.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OnlinePurchaseForSelfPrintTicket" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is online purchase for self print.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MobileDeviceTickets" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is mobile device tickets.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PaymentMethods" type="PaymentMethodListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Method of payment allowed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="AssistanceService" substitutionGroup="LocalService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of LOCAL SERVICE for ASSISTANCE providing information like language, accessibility trained staff, etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="AssistanceService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="AssistanceServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="AssistanceServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AssistanceService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for an ASSISTANCE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LocalService_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="AssistanceServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AssistanceServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for an ASSISTANCE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="AssistanceFacilityList" minOccurs="0"/>
+			<xsd:element name="AssistanceAvailability" type="AssistanceAvailabilityEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Availability of assistance service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Staffing" type="StaffingEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Staffing service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccessibilityToolList" type="AccessibilityToolListOfEnumerations" minOccurs="0"/>
+			<xsd:element name="Languages" type="LanguageListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Languages spoken for assistance.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccessibilityTrainedStaff" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether staff are accessibility trained.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EmergencyServiceList" type="EmergencyServiceListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Emergency service assistance available.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SafetyFacilityList" type="SafetyFacilityListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Safety facilities.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="LuggageService" substitutionGroup="LocalService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of CUSTOMER SERVICE for luggage services (provides luggage service facilities and characteristics like luggage trolley, free to use, etc.).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LuggageService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LuggageServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LuggageServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LuggageService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for LUGGAGE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LocalService_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="LuggageServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LuggageServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LUGGAGE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="LuggageServiceFacilityList" type="LuggageServiceFacilityListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>LUGGAGE SERVICEs available.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LuggageTrolleys" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there are wheel chair trolleys.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="WheelchairLuggageTrolleys" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there are wheel chair trolleys.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FreeToUse" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the service is free to use.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagWidth" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum width of luggage accepted by service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum height of luggage accepted by service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagDepth" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum depth of luggage accepted by service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagWeight" type="WeightType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum weight of the luggage. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="CustomerService" type="CustomerService_VersionStructure" abstract="false" substitutionGroup="LocalService">
+		<xsd:annotation>
+			<xsd:documentation>Generic specialisation of LOCAL SERVICE for CUSTOMER SERVICEs (lost properties, meeting point, complaints, etc.).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CustomerService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for CUSTOMER SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LocalService_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CustomerServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CUSTOMER SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="ComplaintsService" substitutionGroup="CustomerService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of CUSTOMER SERVICE for COMPLAINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="ComplaintsService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ComplaintsServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ComplaintsService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a COMPLAINTS SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CustomerService_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ComplaintsServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a COMPLAINTS SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="LeftLuggageService" substitutionGroup="CustomerService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of CUSTOMER SERVICE for left luggage (provides left luggage information like self service locker, locker free, etc.).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LeftLuggageService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LeftLuggageServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LeftLuggageServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LeftLuggageService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LEFT LUGGAGE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CustomerService_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="LeftLuggageServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LeftLuggageServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LEFT LUGGAGE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CounterService" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there are wheel chair trolleys.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SelfServiceLockers" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there are self service lockers.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FeePerBag" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is a fee per bag.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LockerFee" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is a locker fee.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagWidth" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Width of Locker.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Height of Locker.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagDepth" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Depth of Locker.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBagWeight" type="WeightType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum weight of the luggage. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum time for which luggage can be left. +V1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="LostPropertyService" substitutionGroup="CustomerService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of CUSTOMER SERVICE for lost properties.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LostPropertyService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="PropertyKeptForDuration" type="xsd:duration" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Period for which lost property is kept - after this tiome it may be disposed of.  +v1.1</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LostPropertyServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LostPropertyService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LOST PROPERTY SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CustomerService_VersionStructure">
+				<xsd:group ref="LostPropertyServiceGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LostPropertyServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LOST PROPERTY SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PropertyKeptForDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Period for which lost property is kept - after this time it may be disposed of. +V1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="MeetingPointService" substitutionGroup="CustomerService">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of CUSTOMER SERVICE for meeting points (provides characteristics like description, label, etc.).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="MeetingPointService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LocalServiceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="MeetingPointServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="MeetingPointServiceIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="MeetingPointService_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a MEETING POINT SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="CustomerService_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="MeetingPointServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="MeetingPointServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a MEETING POINT SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MeetingPointServiceType" type="MeetingPointEnumeration">
+				<xsd:annotation>
+					<xsd:documentation>Type of MEETING POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Label" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Label of meeting point.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+</xsd:schema>

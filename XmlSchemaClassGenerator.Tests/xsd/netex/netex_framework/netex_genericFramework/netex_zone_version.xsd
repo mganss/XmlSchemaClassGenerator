@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:core="http://www.govtalk.gov.uk/core" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_zone_version">
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gml_extract_all_objects_v_3_2_1.xsd"/>
+	<!--Actual dependency-->
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gmlBasic2d-extract-v3_2_1-.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLink_version.xsd"/>
+	<xsd:include schemaLocation="netex_zone_support.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-03-28  Add Zones to RESOURCE FRAME</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-11-08</Modified>Add  TARIFF ZONE Presentation Group
+				</Date>
+				<Date>
+					<Modified>2018-03-09</Modified>Correct Type on GENERAL ZONE element
+				</Date>
+				<Date>
+					<Modified>2019-02-25</Modified>UK-18 Introduce a dummy TariffZone_ type to workaround substitutiongroup restrictions  in XML spy
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines ZONE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_zone_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+ 					<Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - ZONE types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>ZONE types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in RESOURCE FRAME)=================================================== -->
+	<xsd:complexType name="zonesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of ZONEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Zone" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="tariffZonesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of TARIFF ZONEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="TariffZone_" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ====Zone======================================================= -->
+	<xsd:element name="Zone" type="Zone_VersionStructure" abstract="false" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A two-dimensional PLACE within the service area of a public transport operator (administrative zone, TARIFF ZONE, ACCESS ZONE, etc.).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Zone_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfPoints_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="ZoneGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ZoneGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="types" type="typeOfZoneRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Classification of ZONE. Used for arbitrary documentation -.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Centroid" type="SimplePoint_VersionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Centre Coordinates of ZONE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="gml:Polygon" minOccurs="0"/>
+			<xsd:element name="projections" type="projections_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Projections of ZONE onto another layer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ParentZoneRef" type="ZoneRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Parent ZONE that contains this ZONE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="GeneralZone" abstract="false" substitutionGroup="Zone">
+		<xsd:annotation>
+			<xsd:documentation>A GENERAL ZONE used to define a zonal fare structure in a zone-counting or zone-matrix system.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GeneralZone_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ZoneIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GeneralZone_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a General ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Zone_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="TariffZone_" type="Zone_VersionStructure" abstract="true" substitutionGroup="Zone">
+		<xsd:annotation>
+			<xsd:documentation>Dummy TARIFF ZONE  to workaround xML spy Substitution Group limitations</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TariffZone" abstract="false" substitutionGroup="TariffZone_">
+		<xsd:annotation>
+			<xsd:documentation>A ZONE used to define a zonal fare structure in a zone-counting or zone-matrix system.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TariffZone_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TariffZoneGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TariffZoneIdType">
+						<xsd:annotation>
+							<xsd:documentation>Reference to a TYPE OF  TARIFF ZONE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TariffZone_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TARIFF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Zone_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TariffZoneGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TariffZoneGroup">
+		<xsd:annotation>
+			<xsd:documentation>Presentation Elements of a ZONE+v1.1</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Presentation" type="PresentationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Presentation values to use when rendering ZONE such as a colour.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PrintedPresentation" type="PrintPresentationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Presentation values to use in printed material for ZONE such as a colour. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="TypeOfZone" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>Classification of a ZONe.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfZone_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfZoneIdType">
+						<xsd:annotation>
+							<xsd:documentation>Reference to a TYPE OF ZONE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfZone_ValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="ZoneView" type="Zone_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified view of SCHEDULED STOP POINT. Includes derived some propertries of a stop.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Zone_DerivedViewStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for SCHEDULED STOP POINT VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element ref="ZoneRef" minOccurs="0"/>
+					<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of Stop Point.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="TypeOfZoneRef" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

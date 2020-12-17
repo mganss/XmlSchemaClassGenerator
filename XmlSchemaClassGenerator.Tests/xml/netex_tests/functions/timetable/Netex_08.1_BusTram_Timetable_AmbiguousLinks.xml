@@ -1,0 +1,1564 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a  timetable for a linear route in NeTex XML 
+ where there are ambiguous links , that is, multiple alternative  Service and timing links between the  same stop points for
+different modes (in this case bus and tram).  
+
+To remove ambiguity, modes can be specifed on links and specific run times  
+
+The example  also shows  the use of two different     Time Demand Types to give different journey  timings for the same TIMING PATTERN
+
+
+1. OVERVIEW
+============
+
+   LINE 24 has    five stops         A - B  - C  -  P - Q, covered by   bus 
+													:		:	   :	:
+   LINE 46 has four  stops   	     	 B  - C -  P -Q  , covered by tram, overlapping for  B C, P-Q
+  
+The Tram and bus SERVICE LINKs   over A-B-C-P-Q are   distinct.
+The Tram and bus  TIMING LINKs over B-C are the same.
+The Tram and bus     TIMING LINKs over C-P-Q are distinct.
+
+DIRECTION 
+
+There are Two Journeys for each service, one in an off peak time, and one in a Busy time demand time and one at a less busy time 
+
+The bus is affected by this, the tram is not. 
+    hde:sj_24o_01   at 14:20   outbound  From Alpha
+    hde:sj_46o_02   at 14:40   outbound  From Bravo
+ 
+And the timetable is thus
+				bus												Tram 
+			sj_24o_01  TDT1 sj_24o_02	TDT2	 sj_46o_01	TDT1	sj_46o_01	TDT2	
+
+	A	 		14:20			18:00	 					.......	 							.......	
+	B	 		14:30	+10	18:15	+15				14:40 	 					18:00
+	C	 		14:45	+15	18:35	+20				14:50			+10		18:10 		+10
+	P	 		14:00	+15	18:55	+20				15:00			+10		18:10		+10
+	Q	 		15:15	+15	17:15	+20				15:10			+10		18:10		+10
+										
+In this example we include both  detailed TIMING & JOURNEY PATTERN data as well as the
+SERVICE JOURNEY with  CALLs.
+
+The CALLs are in effect derived from the other  data and could be omitted
+ 
+==================================
+2. DETAILS
+
+SCHEDULED STOP POINTs
+	    A)   mybus:ssp_001  Alpha						 
+		B)  mybus:ssp_002   Bravo							 
+		C)  mybus:ssp_077	 Charley
+		D)  mybus:ssp_021	 Papa
+		E)  mybus:ssp_022	 Quebec
+
+	There are two wayy CONNECTIONs at B,C,P,Q
+
+LINE  24   A - B - C - P  Q 
+
+SERVICE LINKS
+			SERVICE LINK :	A		 - B     	mybus:SSP_001+SSP_002_ bus
+			SERVICE LINK :	B		 - C		mybus:SSP_002+SSP_077_ bus
+			SERVICE LINK :	C		 - P		mybus:SSP_077+SSP_021_ bus
+			SERVICE LINK :	P		 - Q		mybus:SSP_021+SSP_022_ bus
+
+There is just one SERVICE JOURNEYs in the timetable  for LINE 24
+
+     (i)  SERVICE JOURNEY hde:sj_24o_01         
+             Departs 14:20   on         DAY TYPE      DayType DT01   (MTWTF)
+			SERVICE PATTERN:  ServicePattern:svp_24o
+
+ 
+The   SERVICE  PATTERN  for bus has  five  STOP POINTs IN JOURNEY PATTERN referencing the  five  SCHEDULED STOP POINTs  
+ which are connected by four SERVICE LINKs   .   A - B - C - P  Q 
+ 
+ SERVICE PATTERN:  ServicePattern:svp_24o  ===>   JOURNEY PATTERN:  ServiceJourneyPattern:sjp_24o
+ 
+  pointsInSequence
+	1 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_24o_01
+			SCHEDULED STOP POINT:  A   mybus:SSP_001 
+	2 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_24o_02
+			SCHEDULED STOP POINT:  B   mybus:SSP_002 
+	3 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_24o_03
+			SCHEDULED STOP POINT:  C   mybus:SSP_077 
+	4 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_24o_04
+			SCHEDULED STOP POINT:  P   mybus:SSP_021 
+	5 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_24o_05
+			SCHEDULED STOP POINT:  Q   mybus:SSP_022 
+
+  linksInSequence
+	1 SERVICE LINK IN JOURNEY PATTERN   : hde:slijp_24o_01 
+		SERVICE LINK :	A		 - B     	mybus:SSP_001+SSP_002_bus 	VehicleMode: Bus
+	2 SERVICE LINK IN JOURNEY PATTERN :    : hde:slijp_24o_02 
+		SERVICE LINK :	B		 - C		mybus:SSP_002+SSP_077_bus 	VehicleMode: Bus
+	3 SERVICE LINK IN JOURNEY PATTERN :    : hde:slijp_24o_03 
+		SERVICE LINK :	C		 - P		mybus:SSP_077+SSP_021_bus 	VehicleMode: Bus
+	4 SERVICE LINK IN JOURNEY PATTERN :  P    : hde:slijp_24o_04
+		SERVICE LINK :	P		 - Q		mybus:SSP_021+SSP_022_bus	 VehicleMode: Bus 
+
+
+    The TIMING PATTERN for bus  has   three intermediate TIMING POINTs which are not SCHEDULED STOP POINTs, as well as the five     SCHEDULED STOP POINTs
+			  A - a_t1- a_t2 - B  - b-t1- C   - P - Q
+
+
+TIMING POINTs are  stops A, B, C, P, Q and
+     TIMING POINT: mybus:SSP_001_t1
+	 TIMING POINT: mybus:SSP_001_t2
+     TIMING POINT: mybus:SSP_002_t1
+ 
+The Tram and bus  TIMING LINKs over B-C are the same
+The Tram and bus TIMING LINKs over C-P-Q are distinct
+
+TIMING LINKs
+		TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001+SSP_001_t1
+		TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1+SSP_001_t2
+		TIMING LINK :	a_t2	-	B		 	mybus:SSP_001_t2+SSP_002
+		TIMING LINK :	B		 - b_t1			mybus:SSP_002+SSP_002_t1
+		TIMING LINK :	b_t1	- 	C			mybus:SSP_002_t1+SSP_077
+		TIMING LINK :	C		- 	P			mybus:SSP_0077+SSP_021_bus
+		TIMING LINK :	P		- 	Q			mybus:SSP_0021+SSP_022_bus
+
+There are two   TIME DEMAND TYPE with some  shared and some  bus and tram only  RUN TIMES 
+ 
+		 			Bus						Tram 
+	  TDT_OffPeak  	TDT_Peak	 TDT_OffPeak  TDT_Peak	 
+
+	A-at1	  +4		+ 5				...			...			RUN TIMEs 
+	at1-at2	  +4		+ 5				...		....			RUN TIMEs 
+	at2-B	  +2	+ 5					...		....			RUN TIMEs 	
+
+ [A-B]          [ +10]  [+15]			...		....		RUN TIMEs 
+					+2		+1				...		...			WAIT TIMES
+	B-bt1	  +8		+9			+5		+5			RUN TIMEs 	
+	bt1-C	  +05	+10			+5		+5			RUN TIMEs 	
+[B-C]          [ +15]  [+20]       [ +10]   [+10]
+	C-P	 	 +15	+20				+10		+10			RUN TIMEs 	
+	P-Q	 	 +15	+20				+10		+10			RUN TIMEs 	
+
+[A-Q	]		 {+55]  [+75]									 		JOURNEY PATTERN RUN TIME  	
+[B-Q	]									[+30]   [+30]		 		JOURNEY PATTERN RUN TIME
+
+				bus												Tram 
+			sj_24o_01  OffPeak sj_24o_02 Peak	 sj_46o_01	OffPeak	sj_46o_01	Peak	
+	A	 		14:20				18:00	 					.......	 							.......	
+	B	 		14:30	+10		18:15	+15				.......	 							.......	
+	B	 		14:32	+2		18:17	+2				14:40 	 					18:00
+	C	 		14:45	+15		18:35	+20				14:50			+10		18:10 		+10
+	P	 		15:00	+15		18:55	+20				15:00			+10		18:20		+10
+	Q	 		15:15	+15		19:15	+20				15:10			+10		18:30		+10
+							+55				+75									+30						+30
+
+    The TIMING PATTERN  has  thus eight POINTs IN TIMING PATTERN, referencing the  TIMING POINTs 
+	connected by seven   TIMING LINKs  
+
+ TIMING PATTERN:  TimingPattern:tp_24o
+	1.  A   Depart
+	1.1. TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_01
+			TIMING POINT:  A   mybus:SSP_001
+			TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001+SSP_001_t1
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_001+SSP_001_t1  	 4M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_001+SSP_001_t1  	 5M
+    1.2. TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_02
+			TIMING POINT: mybus:SSP_001_t1
+			TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1+SSP_001_t2
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_001_t1+SSP_001_t2  	 4M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_001_t1+SSP_001_t2  	 5M
+	1.3. TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_03
+			TIMING POINT: mybus:SSP_001_t2
+			TIMING LINK :	a_t2	-	B				mybus:SSP_001_t2+SSP_002
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_001_t2+SSP_002  	 2M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_001_t2+SSP_002  	 5M
+
+  2.  B  Arrive
+		2.1	TIMING POINT :	B		 - 	a_t1     	mybus:SSP_002    
+				JOURNEY WAIT TIME  mybus:tdtr_OffPeak_SSP_00002	   2M
+ 				JOURNEY WAIT TIME  mybus:tdtr_Peak_SSP_00002	   1M
+        B  Depart  
+	2.2 TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_04
+			TIMING POINT:  B   mybus:SSP_002
+			TIMING LINK :	A		 - b_t1			mybus:SSP_002+SSP_002_t1
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_002+SSP_002_t1  	 8M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_002+SSP_002_t1  	 9M
+    2.3. TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_05
+			TIMING POINT: mybus:SSP_002_t1
+			TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1+SSP_077
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_002_t1+SSP_077  	 5M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_002_t1+SSP_077  	 10M
+ 
+	3.. C Depart
+		3.1 TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_06
+			TIMING POINT:  C   mybus:SSP_077
+			TIMING LINK :	C		- 	P			mybus:SSP_077+SSP_021_bus	 VehicleMode: Bus
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_077+SSP_021_bus  	 15M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_077+SSP_021_bus  	 20M
+
+	4. P Depart
+		 4.1 TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_07
+			 TIMING POINT:  P   mybus:SSP_021
+			TIMING LINK :	P		- 	Q			mybus:SSP_021+SSP_022_bus	 VehicleMode: Bus
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_021+SSP_022_bus  	 15M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_021+SSP_022_bus  	 20M
+
+	5. Q Arrive
+		5.1	TIMING POINT IN JOURNEY PATTERN	: hde:tpip_24o_08
+			TIMING POINT:  Q   mybus:SSP_022 
+
+There is a link for the whole route as well
+	0 TIMING LINK :	A		 - 	Q    	mybus:SSP_001+SSP_022_bus
+ 			JOURNEY RUN TIME  mybus:tdtr_OffPeak_SSP_001+SSP_022	  55M
+			JOURNEY RUN TIME  mybus:tdtr_Peak_SSP_001+SSP_022	  75M
+
+The SERVICE JOURNEY  PATTERN  for Line 24  has  eight   POINT IN JOURNEY PATTERN referencing the  five SCHEDULED STOP POINTs  and three additional timing points
+ which are connected by two      SERVICE LINKs   .and five TIMING LINKs
+ 
+ SERVICE JOURNEY PATTERN:  TimingPattern:tp_24o
+	1 POINT IN JOURNEY PATTERN		SCHEDULED STOP POINT:  A   mybus:SSP_001
+			SERVICE LINK :	A		 - B     	mybus:SSP_001+SSP_002_bus
+			TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001+SSP_001_t1  
+
+    2. POINT IN JOURNEY PATTERN:		TIMING POINT: mybus:SSP_001_t1
+			TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1+SSP_001_t2 
+
+	3.  POINT IN JOURNEY PATTERN:		TIMING POINT: mybus:SSP_001_t2
+			TIMING LINK :	a_t2	-	B				mybus:SSP_001_t2+SSP_002
+
+	4 POINT IN JOURNEY PATTERN: SCHEDULED STOP POINT:  B   mybus:SSP_002
+			SERVICE LINK :	B		 - C		mybus:SSP_002+SSP_077_bus
+			TIMING LINK :	A		 - b_t1			mybus:SSP_002+SSP_002_t1   
+
+	5. POINT IN JOURNEY PATTERN: 		TIMING POINT: mybus:SSP_002_t1
+			TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1+SSP_077  
+
+	6 POINT IN JOURNEY PATTERN: 		SCHEDULED STOP POINT:  C   mybus:SSP_077
+	 		SERVICE LINK :	B		 - C		mybus:SSP_077+SSP_021_bus
+			TIMING LINK :	b_t1		- 	C		mybus:SSP_077+SSP_021_bus   
+
+	7. POINT IN JOURNEY PATTERN: 		 SCHEDULED STOP POINT:  P   mybus:SSP_021
+	 			SERVICE LINK :	C		 - P		mybus:SSP_021+SSP_022_bus
+			TIMING LINK :	P		- 	Q			mybus:SSP_021+SSP_022_bus
+	8. POINT IN JOURNEY PATTERN: 		 SCHEDULED STOP POINT:  Q   mybus:SSP_022 
+
+
+LINE 46
+=======
+
+There is just one SERVICE JOURNEYs in the timetable  for LINE 46
+     (ii)  SERVICE JOURNEY hde:sj_46o_02     
+             Departs 14:50   on         DAY TYPE      DayType DT01   (MTWTF) 
+
+
+SERVICE LINKS
+   Theer are three mode specific links for Line 46 Journeys
+			SERVICE LINK :	B		 - C		mybus:SSP_002+SSP_077_ tram
+			SERVICE LINK :	C		 - P		mybus:SSP_077+SSP_021_ tram
+			SERVICE LINK :	P		 - Q		mybus:SSP_021+SSP_022_ tram
+
+The   SERVICE  PATTERN  for tram has  four  STOP POINTs IN JOURNEY PATTERN referencing the  four SCHEDULED STOP POINTs  
+ which are connected by three      SERVICE LINKs   .
+ 
+ SERVICE PATTERN:  ServicePattern:svp_46o  ===>   JSERVICE OURNEY PATTERN:  ServiceJourneyPattern:sjp_46o
+ 
+ 
+  pointsInSequence
+ 
+	1 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_46o_01
+			SCHEDULED STOP POINT:  B   mybus:SSP_002 
+	2 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_46o_02
+			SCHEDULED STOP POINT:  C   mybus:SSP_077 
+	3 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_46o_03
+			SCHEDULED STOP POINT:  P   mybus:SSP_021 
+	4 STOP POINT IN JOURNEY PATTERN  :	hde:spijp_46o_04
+			SCHEDULED STOP POINT:  Q   mybus:SSP_022 
+  
+LinksInSeqeunce
+ 
+	1 SERVICE LINK IN JOURNEY PATTERN     : hde:slijp_46o_01 
+		SERVICE LINK :	B		 - C		mybus:SSP_002+SSP_077_tram	VehicleMode: Tram
+	2 SERVICE LINK IN JOURNEY PATTERN :    : hde:slijp_46o_02 
+		SERVICE LINK :	C		 - P		mybus:SSP_077+SSP_021_tram 	VehicleMode: Tram
+	3 SERVICE LINK IN JOURNEY PATTERN :  P    : hde:slijp_46o_03
+		SERVICE LINK :	P		 - Q		mybus:SSP_021+SSP_022_tram	 VehicleMode: Tram 
+
+
+    The TIMING PATTERN for tram   has   one  intermediate TIMING POINTs which is  not  a SCHEDULED STOP POINT, as well as the four     SCHEDULED STOP POINTs
+			 B  - b-t1- C   - P - Q
+
+The Tram and bus  TIMING LINKs over B-C are the same
+The Tram and bus TIMING LINKs over C-P-Q are distinct, as the run times
+
+TIMING LINKs 	 
+		TIMING LINK :	B		 - b_t1		mybus:SSP_002+SSP_002_t1
+		TIMING LINK :	b_t1	- 	C			mybus:SSP_002_t1+SSP_077
+		TIMING LINK :	C		- 	P			mybus:SSP_0077+SSP_021_tram
+		TIMING LINK :	P		- 	Q			mybus:SSP_0021+SSP_022_tram
+
+	 			Bus						Tram 
+	  TDT_OffPeak  	TDT_Peak	 TDT_OffPeak  TDT_Peak	 
+ 
+	B-bt1	  +8		+9			+5		+5			RUN TIMEs 	
+	bt1-C	  +05	+10			+5		+5			RUN TIMEs 	
+[B-C]          [ +15]  [+20]       [ +10]   [+10]
+	C-P	 	 +15	+20				+10		+10			RUN TIMEs 	
+	P-Q	 	 +15	+20				+10		+10			RUN TIMEs 	
+
+[A-Q	]		 {+55]  [+75]									 		JOURNEY PATTERN RUN TIME  	
+[B-Q	]									[+30]   [+30]		 		JOURNEY PATTERN RUN TIME
+
+				bus												Tram 
+			sj_24o_01  OffPeak sj_24o_02 Peak	 sj_46o_01	OffPeak	sj_46o_01	Peak	 
+	B	 		14:32	+2		18:17	+2				14:40 	 					18:00
+	C	 		14:45	+15		18:35	+20				14:50			+10		18:10 		+10
+	P	 		15:00	+15		18:55	+20				15:00			+10		18:20		+10
+	Q	 		15:15	+15		19:15	+20				15:10			+10		18:30		+10
+							+55				+75									+30						+30
+ 
+
+    The TIMING PATTERN  has  thus five  POINTs IN TIMING PATTERN, referencing the  TIMING POINTs 
+	connected by seven   TIMING LINKs    
+ TIMING PATTERN:  TimingPattern:tp_46o 
+ 
+   1     B  Depart  
+	1.1 TIMING POINT IN JOURNEY PATTERN	: hde:tpip_46o_04
+			TIMING POINT:  B   mybus:SSP_002
+			TIMING LINK :	A		 - b_t1			mybus:SSP_002+SSP_002_t1
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_002+SSP_002_t1  	 5M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_002+SSP_002_t1  	 5M
+    1.2. TIMING POINT IN JOURNEY PATTERN	: hde:tpip_46o_05
+			TIMING POINT: mybus:SSP_002_t1
+			TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1+SSP_077
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_002_t1+SSP_077  	 5M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_002_t1+SSP_077  	 5M
+ 
+	2.. C Depart
+		2.1 TIMING POINT IN JOURNEY PATTERN	: hde:tpip_46o_06
+			TIMING POINT:  C   mybus:SSP_077
+			TIMING LINK :	C		- 	P			mybus:SSP_077+SSP_021_tram	 VehicleMode: Tram
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_077+SSP_021_tram  	 10M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_077+SSP_021_tram  	 10M
+
+	3. P Depart
+		 4.1 TIMING POINT IN JOURNEY PATTERN	: hde:tpip_46o_07
+			 TIMING POINT:  P   mybus:SSP_021
+			TIMING LINK :	P		- 	Q			mybus:SSP_021+SSP_022_tram	 VehicleMode: Tram
+				JOURNEY RUN TIME  mybus:tdtr_TD_OffPeak_SSP_021+SSP_022_tram  	 10M
+				JOURNEY RUN TIME  mybus:tdtr_TD_Peak_SSP_021+SSP_022_tram  	 10M
+
+	4. Q Arrive
+		5.1	TIMING POINT IN JOURNEY PATTERN	: hde:tpip_46o_08
+			TIMING POINT:  Q   mybus:SSP_022 
+
+ 
+There is alink for the whole route as well
+	0 TIMING LINK :	B		 - 	Q    	mybus:SSP_002+SSP_022_tram
+
+   
+A COMPOSITE FRAME is used to group the component FRAMEs
+ 
+   - It has a VALIDITY CONDITION  that specifies it is valid from Sept to Matrch
+
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A TIMETABLE FRAME is used to contain  the SERVICE JOURNEY   elements 
+ 
+			 a SERVICE CALENDAR FRAMEb	A SERVICE CALENDAR FRAME is used to contain the DAY TYPEs etc 
+
+The Calendar is shown coded as
+      Compact : OPERATING DAYs are assumed for each calendar date within the period of the calendar 
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="hde:TimetableFrameTIM_23_O">REQUEST</TimetableFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple timetable frame with two journeys and service calendar</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="hde:CAL_02">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Stop data  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<ServiceFrame version="any" id="mybus:svf_12">
+					<Name>Stops for Winter timetable for route 24 </Name>
+					<!--- =========DIRECTIONs=========== -->
+					<directions>
+						<Direction version="any" id="mybus:DR_Westbound">
+							<Name>Westbound</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Southbound">
+							<Name>Eastbound</Name>
+						</Direction>
+					</directions>
+					<!--- =========ROUTEs=========== -->
+					<routes>
+						<Route version="any" id="mybus:RT_24o">
+							<Name>Line 24 Alpha to Quebec</Name>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Westbound"/>
+						</Route>
+						<Route version="any" id="mybus:RT_46o">
+							<Name>Line 46  Bravo  to Quebec</Name>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Westbound"/>
+						</Route>
+					</routes>
+					<!--- =========LINEs=========== -->
+					<lines>
+						<Line version="any" id="mybus:LN_24">
+							<Name>Line 24 Alpha to Quebec bus</Name>
+							<ShortName>Line 24</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>24</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_46">
+							<Name>Line 46 Bravo to Quebec Tram</Name>
+							<ShortName>Line 46</ShortName>
+							<TransportMode>tram</TransportMode>
+							<PublicCode>46</PublicCode>
+						</Line>
+					</lines>
+					<!--- =========DESTINATION DISPLAYs============ -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="mybus:DST_Alpha">
+							<Name>Alpha</Name>
+							<ShortName>Bravo</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Bravo">
+							<Name>Bravo</Name>
+							<ShortName>Alpha</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Quebec">
+							<Name>Quebec </Name>
+							<ShortName>Quebec </ShortName>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>ALPH</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo Street</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo</ShortName>
+							<PublicCode>BRAV</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_077">
+							<Name>Charley Crescent</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Charley</ShortName>
+							<PublicCode>CHAS</PublicCode>
+							<StopType>onstreetTram</StopType>
+							<VehicleModes>bus tram</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_021">
+							<Name>Papa Road</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Papa</ShortName>
+							<PublicCode>PAPA</PublicCode>
+							<StopType>onstreetTram</StopType>
+							<VehicleModes>bus tram</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_022">
+							<Name>Quebec Square</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Quebec</ShortName>
+							<PublicCode>QUEB</PublicCode>
+							<StopType>onstreetTram</StopType>
+							<VehicleModes>bus tram</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- =========SERVICE LINKs=========== -->
+					<serviceLinks>
+						<!--
+   LINE 24 has    five stops         A - B  - C  -  P - Q, covered by   bus  
+   LINE 46 has four  stops   	     	B  - C -  P -Q  , covered by tram, overlapping for  B C, P-Q
+-->
+						<ServiceLink version="any" id="mybus:SL@SSP_001+SSP_002_bus">
+							<Name>Alpha   to Quebec BUS</Name>
+							<FromPointRef version="any" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" ref="mybus:SSP_002"/>
+							<VehicleMode>bus</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_002+SSP_077_bus">
+							<Name>Bravo to Charley BUS</Name>
+							<FromPointRef version="any" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" ref="mybus:SSP_077"/>
+							<VehicleMode>bus</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_077+SSP_021_bus">
+							<Name>Charley to Papa BUS</Name>
+							<FromPointRef version="any" ref="mybus:SSP_077"/>
+							<ToPointRef version="any" ref="mybus:SSP_021"/>
+							<VehicleMode>bus</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_021+SSP_022_bus">
+							<Name>Papa to Quebec BUS</Name>
+							<FromPointRef version="any" ref="mybus:SSP_021"/>
+							<ToPointRef version="any" ref="mybus:SSP_022"/>
+							<VehicleMode>bus</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_001+SSP_002_tram">
+							<Name>Alpha   to Quebec  TRAM</Name>
+							<FromPointRef version="any" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" ref="mybus:SSP_002"/>
+							<VehicleMode>tram</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_002+SSP_077_tram">
+							<Name>Bravo to Charley TRAM</Name>
+							<FromPointRef version="any" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" ref="mybus:SSP_077"/>
+							<VehicleMode>tram</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_077+SSP_021_tram">
+							<Name>Charley to Papa TRAM</Name>
+							<FromPointRef version="any" ref="mybus:SSP_077"/>
+							<ToPointRef version="any" ref="mybus:SSP_021"/>
+							<VehicleMode>tram</VehicleMode>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@SSP_021+SSP_022_tram">
+							<Name>Papa to Quebec TRAM</Name>
+							<FromPointRef version="any" ref="mybus:SSP_021"/>
+							<ToPointRef version="any" ref="mybus:SSP_022"/>
+							<VehicleMode>tram</VehicleMode>
+						</ServiceLink>
+					</serviceLinks>
+					<!--- =========SERVICE PATTERNs=========== -->
+					<servicePatterns>
+						<ServicePattern version="any" id="hde:svp_24o">
+							<Name>Bravo to  Quebec TRAM</Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_24o"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spijp_24o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spijp_24o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_002+SSP_077_bus"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spijp_24o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_bus"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spijp_24o_04">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_bus"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="5" id="hde:spijp_24o_05">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:slijp_24o_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:slijp_24o_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_002+SSP_077_bus"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:slijp_24o_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_bus"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="4" id="hde:slijp_24o_04">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_bus"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+						<ServicePattern version="any" id="hde:svp_46o">
+							<Name>Alpha to Charley</Name>
+							<RouteRef version="any" ref="mybus:RT_46o"/>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_46o"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spijp_46o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_002+SSP_077_tram"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spijp_46o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_tram"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spijp_46o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_tram"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spijp_46o_04">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:slijp_46o_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_002+SSP_077_tram"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:slijp_46o_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_tram"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:slijp_46o_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_tram"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+					</servicePatterns>
+					<!--- =========CONNECTIONs=========== -->
+					<connections>
+						<Connection version="any" id="mybus:cx_SSP_002">
+							<Name>Bravo Connection to line 46</Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							</From>
+							<To>
+								<TransportMode>tram</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							</To>
+						</Connection>
+						<Connection version="any" id="mybus:cx_SSP_077">
+							<Name>Charley Connection to line 46</Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							</From>
+							<To>
+								<TransportMode>tram</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							</To>
+						</Connection>
+						<Connection version="any" id="mybus:cx_SSP_021">
+							<Name>Papa Connection to line 46</Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+							</From>
+							<To>
+								<TransportMode>tram</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+							</To>
+						</Connection>
+						<Connection version="any" id="mybus:cx_SSP_022">
+							<Name>Papa Connection to line 46</Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+							</From>
+							<To>
+								<TransportMode>tram</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+							</To>
+						</Connection>
+					</connections>
+					<!--- =========TIMING POINTs============ -->
+					<timingPoints>
+						<TimingPoint version="any" id="mybus:SSP_001_t1">
+							<Name>After Alpha &amp; Castle  Point 1</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</TimingPoint>
+						<TimingPoint version="any" id="mybus:SSP_001_t2">
+							<Name>After Alpha &amp; Castle  Point 2</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</TimingPoint>
+						<TimingPoint version="any" id="mybus:SSP_002_t1">
+							<Name>After Bravo  Point 1</Name>
+							<Location>
+								<Longitude>53.4000</Longitude>
+								<Latitude>0.4000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</TimingPoint>
+					</timingPoints>
+					<!--- =========TIMING LINKS=========== -->
+					<timingLinks>
+						<TimingLink version="any" id="mybus:TL@SSP_001+SSP_022_TOTAL_bus">
+							<Name>Overall timing Alpha  to  Quebec</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_022"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_002+SSP_022_TOTAL_tram">
+							<Name>Overall timing Bravo   to  Quebec</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_022"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_001+SSP_001_t1">
+							<Name>Alpha to  After Alpha  t1</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_001_t1+SSP_001_t2">
+							<Name>After Alpha    t1 to After Alpha  t2</Name>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_001_t2+SSP_002">
+							<Name>After Alpha  t2 to Bravo</Name>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_002+SSP_002_t1">
+							<Name>Bravo to After Bravo t1</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_002_t1+SSP_077">
+							<Name>After Bravo t1 to Charley</Name>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_077"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_077+SSP_021_bus">
+							<Name>CHarley to Papa</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_021"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_022"/>
+							<VehicleMode>bus</VehicleMode>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_021+SSP_022_bus">
+							<Name>Papa to Quebec </Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_021"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_022"/>
+							<VehicleMode>bus</VehicleMode>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_077+SSP_021_tram">
+							<Name>Charley to Papa TRAM</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_021"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_022"/>
+							<VehicleMode>tram</VehicleMode>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:TL@SSP_021+SSP_022_tram">
+							<Name>Papa to Quebec TRAM</Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_021"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_022"/>
+							<VehicleMode>tram</VehicleMode>
+						</TimingLink>
+					</timingLinks>
+					<!--- =========TIMING PATTERNs============ -->
+					<timingPatterns>
+						<TimingPattern version="any" id="hde:tp_24o">
+							<Name>Route 24</Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_24o_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_001_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_24o_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_001_t1+SSP_001_t2"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="3" id="hde:tpip_24o_03">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_001_t2+SSP_002"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="4" id="hde:tpip_24o_04">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="5" id="hde:tpip_24o_05">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_002_t1+SSP_077"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="6" id="hde:tpip_24o_06">
+									<TimingPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_bus"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="7" id="hde:tpip_24o_07">
+									<TimingPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_bus"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="8" id="hde:tpip_24o_08">
+									<TimingPointRef version="any" ref="mybus:SSP_022"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="hde:tp_46o">
+							<Name>Route 24</Name>
+							<RouteRef version="any" ref="mybus:RT_46o"/>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_46o_01">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_46o_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_002_t1+SSP_077"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="3" id="hde:tpip_46o_03">
+									<TimingPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_tram"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="4" id="hde:tpip_46o_04">
+									<TimingPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_tram"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="5" id="hde:tpip_46o_05">
+									<TimingPointRef version="any" ref="mybus:SSP_022"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+					</timingPatterns>
+					<!--- ======JOURNEY PATTERNs=========== -->
+					<journeyPatterns>
+						<!-- 
+		 			Bus						Tram 
+	  TDT_OffPeak  	TDT_Peak	 TDT_OffPeak  TDT_Peak	 
+
+	[A-Q		+55   +75									 		JOURNEY PATTERN RUN TIME  	
+	[B-Q									+30   +30		 		JOURNEY PATTERN RUN TIME
+
+
+-->
+						<ServiceJourneyPattern version="any" id="hde:sjp_24o">
+							<Name>Alpha to Quebec   BUS</Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="mybus:jprt_24o_SSP_001+SSP_077_tdt_Peak">
+									<Name>Alpha   to Quebec Bus Peak total run time</Name>
+									<TimeDemandTypeRef version="any" ref="mybus:tdt_Peak"/>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_022_TOTAL_bus"/>
+									<RunTime>PT75M</RunTime>
+								</JourneyPatternRunTime>
+								<JourneyPatternRunTime version="any" id="mybus:jprt_24o_SSP_001+SSP_077_tdt_OffPeak">
+									<Name>Alpha   to Quebec Bus Off Peak total run time</Name>
+									<TimeDemandTypeRef version="any" ref="mybus:tdt_OffPeak"/>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_022_TOTAL_bus"/>
+									<RunTime>PT55M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spip_24o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+								</StopPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:spip_24o_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="3" id="hde:spip_24o_03">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+								</TimingPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spip_24o_04">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="5" id="hde:spip_24o_05">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+								</TimingPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="6" id="hde:spip_24o_06">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="7" id="hde:spip_24o_07">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="8" id="hde:spip_24o_08">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:sjp_46o">
+							<Name>Bravo  to Quebec TRAM</Name>
+							<RouteRef version="any" ref="mybus:RT_46o"/>
+							<DirectionType>outbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="mybus:jprt_46o1_SSP_001+SSP_077_tdt_Peak">
+									<Name>Bravo  to Quebec TRAM Peak total run time</Name>
+									<TimeDemandTypeRef version="any" ref="mybus:tdt_Peak"/>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_022_TOTAL_tram"/>
+									<RunTime>PT70M</RunTime>
+								</JourneyPatternRunTime>
+								<JourneyPatternRunTime version="any" id="mybus:jprt_46o1_SSP_001+SSP_077_tdt_OffPeak">
+									<Name>Bravo  to Quebec TRAM Off Peak total  run time</Name>
+									<TimeDemandTypeRef version="any" ref="mybus:tdt_OffPeak"/>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_022_TOTAL_tram"/>
+									<RunTime>PT70M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spip_46o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:spip_46o_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+								</TimingPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spip_46o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spip_46o_04">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="5" id="hde:spip_46o_05">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:lijp_46o_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_002+SSP_077_tram"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:lijp_46o_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_tram"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:lijp_46o_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_tram"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServiceJourneyPattern>
+					</journeyPatterns>
+					<!--- ======TIME DEMAND TYPEs========= -->
+					<timeDemandTypes>
+						<!--			
+		 			Bus						Tram 
+	  TDT_OffPeak  	TDT_Peak	 TDT_OffPeak  TDT_Peak	 
+
+	A-at1	  +4		+ 5				...			...			RUN TIMEs 
+	at1-at2	  +4		+ 5				...		....			RUN TIMEs 
+	at2-B	  +2	+ 5					...		....			RUN TIMEs 	
+
+ [A-B]          [ +10]  [+15]				...		....		RUN TIMEs 
+					2			1				2			1			WAIT TIMES
+ 							.......	
+	B-bt1	  +8		+9			+5		+5			RUN TIMEs 	
+	bt1-C	  +05	+10			+5		+5			RUN TIMEs 	
+[B-C]          [ +15]  [+20]       [ +10]   [+10]
+	C-P	 	 +15	+20				+10		+10			RUN TIMEs 	
+	P-Q	 	 +15	+20				+10		+10			RUN TIMEs 	
+-->
+						<TimeDemandType version="any" id="mybus:tdt_OffPeak">
+							<Name>Off Peak</Name>
+							<runTimes>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_001+SSP_001_t1">
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_001_t1"/>
+									<RunTime>PT4M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_001_t1+SSP_001_t2">
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001_t1+SSP_001_t2"/>
+									<RunTime>PT4M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_001_t2+SSP_002">
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001_t2+SSP_002"/>
+									<RunTime>PT2M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_002+SSP_002_t1_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									<RunTime>PT8M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_002+SSP_002_t1_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_002_t1+SSP_077_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002_t1+SSP_077"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_002_t1+SSP_077_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002_t1+SSP_077"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_077+SSP_021_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_bus"/>
+									<RunTime>PT15M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_077+SSP_021_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_tram"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_021+SSP_022_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_bus"/>
+									<RunTime>PT15M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_OffPeak_SSP_021+SSP_022_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_tram"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+							</runTimes>
+							<waitTimes>
+								<JourneyWaitTime version="any" id="mybus:tdwt_OffPeak_24o1_SSP_002">
+									<Name>Wait at Stop Bravo OFF PEAK</Name>
+									<VehicleMode>bus</VehicleMode>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<WaitTime>PT2M</WaitTime>
+								</JourneyWaitTime>
+							</waitTimes>
+						</TimeDemandType>
+						<TimeDemandType version="any" id="mybus:tdt_Peak">
+							<Name>Peak times</Name>
+							<runTimes>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_001+SSP_001_t1">
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_001_t1"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_001_t1+SSP_001_t2">
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001_t1+SSP_001_t2"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_001_t2+SSP_002">
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_001_t2+SSP_002"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_002+SSP_002_t1_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									<RunTime>PT9M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_002+SSP_002_t1_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_002_t1+SSP_077_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002_t1+SSP_077"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_002_t1+SSP_077_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_002_t1+SSP_077"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_077+SSP_021_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_bus"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_077+SSP_021_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_tram"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_021+SSP_022_bus">
+									<VehicleMode>bus</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_bus"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_Peak_SSP_021+SSP_022_tram">
+									<VehicleMode>tram</VehicleMode>
+									<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_tram"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+							</runTimes>
+							<waitTimes>
+								<JourneyWaitTime version="any" id="mybus:tdwt_Peak_24o1_SSP_002">
+									<Name>Wait at Stop Bravo PEAK</Name>
+									<VehicleMode>bus</VehicleMode>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<WaitTime>PT1M</WaitTime>
+								</JourneyWaitTime>
+							</waitTimes>
+						</TimeDemandType>
+					</timeDemandTypes>
+				</ServiceFrame>
+				<!-- ======TIMETABLE ======= -->
+				<TimetableFrame version="any" id="hde:TIM_23_O">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="hde:Cnd001">
+							<Description>Sept  to March</Description>
+							<FromDate>2010-11-01T00:00:00Z</FromDate>
+							<ToDate>2011-03-31T00:00:00Z</ToDate>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+								<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+							</dayTypes>
+						</AvailabilityCondition>
+					</validityConditions>
+					<Name>Winter timetable for route 23 outbound</Name>
+					<VehicleModes>bus</VehicleModes>
+					<vehicleJourneys>
+						<!-- 
+				bus												Tram 
+			sj_24o_01  OffPeak sj_24o_02 Peak	 sj_46o_01	OffPeak	sj_46o_01	Peak	
+
+	A	 		14:20				18:00	 					.......	 							.......	
+	B	 		14:30	+10		18:15	+15				.......	 							.......	
+	B	 		14:32	+2		18:17	+2				14:40 	 					18:00
+	C	 		14:45	+15		18:35	+20				14:50			+10		18:10 		+10
+	P	 		15:00	+15		18:55	+20				15:00			+10		18:20		+10
+	Q	 		15:15	+15		19:15	+20				15:10			+10		18:30		+10
+-->
+						<ServiceJourney version="any" id="hde:sj_24o_01">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:tdt_OffPeak"/>
+							<LineView>
+								<LineRef version="any" ref="mybus:LN_24"/>
+								<TransportMode>bus</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_24o"/>
+								<RouteRef version="any" ref="mybus:RT_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24o_01_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_001_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>14:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<Arrival>
+										<Time>14:30:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>14:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+									<Note>Arrival at Terminus</Note>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_001_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_bus"/>
+									<Departure>
+										<Time>14:45:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_004" order="4">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_bus"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_bus"/>
+									<Departure>
+										<Time>15:00:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_003" order="5">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+									<Arrival>
+										<Time>15:15:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_24o_02">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:tdt_Peak"/>
+							<LineView>
+								<LineRef version="any" ref="mybus:LN_24"/>
+								<TransportMode>bus</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_24o"/>
+								<RouteRef version="any" ref="mybus:RT_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24o_02_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_001+SSP_001_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>18:00:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<Arrival>
+										<Time>18:15:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>18:17:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+									<Note>Arrival at Terminus</Note>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_bus"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_bus"/>
+									<Departure>
+										<Time>18:35:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_004" order="4">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_bus"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_bus"/>
+									<Departure>
+										<Time>18:55:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_003" order="5">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+									<Arrival>
+										<Time>19:15:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_46o_01">
+							<DepartureTime>14:40:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_46o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:tdt_OffPeak"/>
+							<LineView>
+								<LineRef version="any" ref="mybus:LN_46"/>
+								<TransportMode>tram</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_46o"/>
+								<RouteRef version="any" ref="mybus:RT_46o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_46o_01_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<Departure>
+										<Time>14:40:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_46o_01_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_tram"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_tram"/>
+									<Departure>
+										<Time>14:50:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_46o_01_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_tram"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_tram"/>
+									<Departure>
+										<Time>15:00:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_46o_01_004" order="4">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+									<Arrival>
+										<Time>15:10:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_46o_02">
+							<DepartureTime>18:00:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_46o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:tdt_Peak"/>
+							<LineView>
+								<LineRef version="any" ref="mybus:LN_46"/>
+								<TransportMode>tram</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_46o"/>
+								<RouteRef version="any" ref="mybus:RT_46o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_46o_02_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_002+SSP_002_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_001+SSP_002_bus"/>
+									<Departure>
+										<Time>18:00:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_46o_02_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_077+SSP_021_tram"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_077+SSP_021_tram"/>
+									<Departure>
+										<Time>18:10:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_46o_02_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_021"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:TL@SSP_021+SSP_022_tram"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SL@SSP_021+SSP_022_tram"/>
+									<Departure>
+										<Time>18:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_46o_02_004" order="4">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_022"/>
+									<Arrival>
+										<Time>18:30:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+					</vehicleJourneys>
+					<notices>
+						<Notice version="any" id="hde:sj_24o_02">
+							<Text>foot note text</Text>
+							<CanBeAdvertised>true</CanBeAdvertised>
+							<variants>
+								<DeliveryVariant version="any" id="hde:sj_24o_02_01">
+									<DeliveryVariantMediaType>textToSpeech</DeliveryVariantMediaType>
+									<VariantText>mobile foot note text</VariantText>
+								</DeliveryVariant>
+							</variants>
+						</Notice>
+					</notices>
+				</TimetableFrame>
+				<!--  Service Calendar Nov 2010   COMPACT Coding  === -->
+				<ServiceCalendarFrame version="any" id="hde:CAL_02">
+					<Name>Service Calendar Nov 2010 ALTERNATE MORE COMPACT Coding  </Name>
+					<ServiceCalendar version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2010-11-14</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="hde:DT_01-MF-NH">
+							<Name>Weekdays unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="hde:DT_02-AA-NH">
+							<Name>Everyday unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Everyday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="hde:DT_03-WE-NH">
+							<Name>Weekends unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Saturday Sunday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="hde:DT_04-AA-NH">
+							<Name>Holidays</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Everyday</DaysOfWeek>
+									<HolidayTypes>AnyHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-01">
+							<Description>Monday 2010-11-01</Description>
+							<Date>2010-11-01</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-02">
+							<Description>Tuesday 2010-11-02</Description>
+							<Date>2010-11-02</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-03">
+							<Description>Wednesday 2010-11-03</Description>
+							<Date>2010-11-03</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-04">
+							<Description>Thusday 2010-11-04</Description>
+							<Date>2010-11-04</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-05">
+							<Description>MFriday 2010-11-05</Description>
+							<Date>2010-11-05</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-06">
+							<Description>Saturday 2010-11-06</Description>
+							<Date>2010-11-06</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-07">
+							<Description>Sunday 2010-11-07</Description>
+							<Date>2010-11-07</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+						<!-- Week 2 -->
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-08">
+							<Description>Monday 2010-11-08</Description>
+							<Date>2010-11-08</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-09">
+							<Description>Tuesday 2010-11-09</Description>
+							<Date>2010-11-09</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-10">
+							<Description>Wednesday 2010-11-10</Description>
+							<Date>2010-11-10</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-11">
+							<Description>Thusday 2010-11-11</Description>
+							<Date>2010-11-11</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-12">
+							<Description>MFriday 2010-11-12</Description>
+							<Date>2010-11-12</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-113">
+							<Description>Saturday 2010-11-13</Description>
+							<Date>2010-11-13</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-14">
+							<Description>Sunday 2010-11-14</Description>
+							<Date>2010-11-14</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

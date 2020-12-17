@@ -1,0 +1,945 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_salesContract_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_loggable_version.xsd"/>
+	<xsd:include schemaLocation="netex_customerPurchasePackage_support.xsd"/>
+	<xsd:include schemaLocation="netex_retailConsortium_support.xsd"/>
+	<xsd:include schemaLocation="netex_salesContract_support.xsd"/>
+	<xsd:include schemaLocation="netex_customerEligibility_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_securityList_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_address_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes 
+				</Date>
+				<Date>
+					<Modified>2017-08-10</Modified>  Align with TM6
+					  Make Passenger Contract Event a type of LogEntry.
+					  Rename Passenger Contract Event to PassengerContractEntry.
+					  Add Customer Account
+					  Add Customer Eligibilities 
+				</Date>
+				<Date>
+					<Modified>2017-08-10</Modified> Align with TM6
+					  Rename Passenger Contract   to FareContract.
+					  Rename Passenger Contract Event to FareContractEntry.
+					  Rename Passenger Contract Security Listing  to FareContractSecurityListing
+					  Rename Type of Passenger Contract  to TypeOfFareContract.
+					  Rename Type of Passenger Contract Entry  to TypeOfFareContractEntry .
+					  Adjust References in Dependent packages. 
+				</Date>
+				<Date>
+					<Modified>2018-06-10</Modified> Fix for  Align with TM6         correct use of case on fareContracts
+				</Date>
+				<Date>
+					<Modified>2019-03-10</Modified> UK-28  Add reference to CustomerAccount to FareContract
+						Add fareContracts / CustomerAccount to Customer 
+						Remove FareContractEntries from CustomerAccount  : Use relationship on FareCOntract
+						Add email to CustomerContact details
+						Add customerPurchasePackageRefs to CustomerAccount. This canbe derived from FarContractEntries
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the SALES FARE CONTRACT types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_salesTransactions}netex_salesContract_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx SALES FARE CONTRACT   types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx SALES CONTRACT  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<xsd:group name="FareContractsInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for SALES TRANSACTION in Frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="customers" type="customersInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>CUSTOMERs in FRAME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="customerAccounts" type="customerAccountsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>CUSTOMER ACCOUNTs  in FRAME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fareContracts" type="fareContractsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FARE CONTRACTs  in FRAME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="customersInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of CUSTOMERs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:sequence>
+					<xsd:element ref="Customer" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="fareContractsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of SALES FARE CONTRACTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:sequence>
+					<xsd:element ref="FareContract" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="customerAccountsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of CUSTOMER ACCOUNTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:sequence>
+					<xsd:element ref="CustomerAccount" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==== CUSTOMER-->
+	<xsd:complexType name="customers_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of CUSTOMERs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="CustomerRef"/>
+					<xsd:element ref="Customer"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Customer" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>An identified person or organisation involved in a fare process. There may be a FARE CONTRACT between the CUSTOMER and the OPERATOR or the AUTHORITY ruling the consumption of services.
+ 		</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Customer_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CustomerGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CustomerIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Customer_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CUSTOMER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="CustomerGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CustomerGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for CUSTOMER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="CustomerParticularsGroup"/>
+			<xsd:group ref="CustomerContactGroup"/>
+			<xsd:group ref="CustomerProfileGroup"/>
+			<xsd:element name="customerAccounts" type="customerAccounts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>CUSTOMER ACCOUNTs belonging to customer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fareContracts" type="fareContracts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FARE CONTRACTs belonging to customer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CustomerParticularsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Particular Elements for CUSTOMER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Surname" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Curname of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FirstName" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>First name of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Title" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Title  of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DateOfBirth" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Date of birth of  CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Gender" type="GenderEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Genfer of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Height" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Height of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Photo" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Photo of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CustomerContactGroup">
+		<xsd:annotation>
+			<xsd:documentation>Contact Elements for CUSTOMER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Email" type="EmailAddressType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Email address of CUSTOMER. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Phone" type="TelephoneContactStructure" minOccurs="0"/>
+			<xsd:element ref="PostalAddress" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CustomerProfileGroup">
+		<xsd:annotation>
+			<xsd:documentation>Profile Elements for CUSTOMER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="IdentityDocumentRef" type="PrivateCodeStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Identifier of Identity document of CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="customerEligibilities" type="customerEligibilities_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Eligibilities  for CUSTOMER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====FARE CONTRACT  -->
+	<xsd:complexType name="fareContracts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE CONTRACTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="FareContractRef"/>
+					<xsd:element ref="FareContract"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FareContract" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A contract with a particular (but possibly anonymous) customer, ruling the consumption of transport services (and joint services). A FARE CONTRACT may be designed for a fixed SALES OFFER PACKAGE (e.g. ticket) or to allow successive purchases of SALES OFFER PACKAGEs.
+
+
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareContract_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareContractGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareContractIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareContract_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE CONTRACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareContractGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareContractGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for FARE CONTRACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of FARE CONTRACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of FARE CONTRACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start Date of FARE CONTRACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End Date of FARE CONTRACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Status" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Status of FARE CONTRACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="CustomerRef" minOccurs="0"/>
+			<xsd:element ref="CustomerAccountRef" minOccurs="0"/>
+			<xsd:element ref="TypeOfFareContractRef" minOccurs="0"/>
+			<xsd:element name="fareContractEntries" type="fareContractEntries_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Events in CONTRACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====P ASSENGER CONTRACT ENTRY-->
+	<xsd:complexType name="fareContractEntries_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE CONTRACT ENTRYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="FareContractEntryRef"/>
+					<xsd:element ref="FareContractEntry_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FareContractEntry_" type="DataManagedObjectStructure" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy type for FARE CONTRACT ENTRY.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="FareContractEntry" abstract="true" substitutionGroup="FareContractEntry_">
+		<xsd:annotation>
+			<xsd:documentation>A log entry describing an event referring to the life of a FARE CONTRACT: initial contracting, sales, validation entries, etc. A subset of a FARE CONTRACT ENTRY is often materialised on a TRAVEL DOCUMENT.
+
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareContractEntry_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareContractEntryGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareContractEntryIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareContractEntry_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE CONTRACT ENTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LogEntry_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareContractEntryGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareContractEntryGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for FARE CONTRACT ENTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="IsValid" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether FARE CONTRACT ENTRY is valid.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfFareContractEntryRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>A classifiication of FARE CONTRACT ENTRYs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="FareContractRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====TYPE OF FARE CONTRACT ======================================== -->
+	<xsd:complexType name="typesOfFareContract_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of TYPE OF FARE CONTRACT s.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="TypeOfFareContractRef"/>
+					<xsd:element ref="TypeOfFareContract"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TypeOfFareContract_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TYPE OF FARE CONTRACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TypeOfFareContract" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of FARE CONTRACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfFareContract_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfFareContractIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- ====TYPE OF FARE CONTRACT ENTRY ======================================== -->
+	<xsd:complexType name="typesOfFareContractEntry_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of TYPE OF FARE CONTRACT ENTRYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="TypeOfFareContractEntryRef"/>
+					<xsd:element ref="TypeOfFareContractEntry">
+						<xsd:annotation>
+							<xsd:documentation>A TYPE OF FARE CONTRACT ENTRY specifying access rights for the FARE CONTRACT ENTRY ELEMENTs within the range of this UNIT: 0-5 km, 4-6 zones etc.
+</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TypeOfFareContractEntry" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of a FARE CONTRACT ENTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfFareContractEntry_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfFareContractEntryIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfFareContractEntry_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TYPE OF FARE CONTRACT ENTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==== CUSTOMER ACCOUNT ======================-->
+	<xsd:complexType name="customerAccounts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of CUSTOMER ACCOUNTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="CustomerAccountRef"/>
+					<xsd:element ref="CustomerAccount"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CustomerAccount" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A contract with a particular (but possibly anonymous) customer, ruling the consumption of transport services (and joint services). A CUSTOMER ACCOUNT may be designed for a fixed SALES OFFER PACKAGE (e.g. ticket) or to allow successive purchases of SALES OFFER PACKAGEs.
+
+
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CustomerAccount_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CustomerAccountGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CustomerAccountIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CustomerAccount_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="CustomerAccountGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CustomerAccountGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of CUSTOMER ACCOUNT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of CUSTOMER ACCOUNT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start Date of CUSTOMER ACCOUNT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End Date of CUSTOMER ACCOUNT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="CustomerRef" minOccurs="0"/>
+			<xsd:group ref="CustomerAccountPropertiesGroup"/>
+			<xsd:group ref="CustomerAccountContentsGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CustomerAccountPropertiesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Property Elements for CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TypeOfCustomerAccountRef" minOccurs="0"/>
+			<xsd:element ref="CustomerAccountStatusRef" minOccurs="0"/>
+			<xsd:element name="CustomerAccountStatusType" type="AccountStatusTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Standard values for account status. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CustomerAccountContentsGroup">
+		<xsd:annotation>
+			<xsd:documentation>PropContent Elements for CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="fareContracts" type="fareContracts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FARE CONTRACTs for CUSTOMER ACCOUNT +v1.1.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="customerPurchasePackages" type="customerPurchasePackageRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>CUSTOMER PURCHASE PACKAGES  for CUSTOMER ACCOUT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====TYPE OF CUSTOMER ACCOUNT ======================================== -->
+	<xsd:complexType name="typesOfCustomerAccount_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of TYPE OF CUSTOMER ACCOUNTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="TypeOfCustomerAccountRef"/>
+					<xsd:element ref="TypeOfCustomerAccount"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TypeOfCustomerAccount" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of a CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfCustomerAccount_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfCustomerAccountIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfCustomerAccount_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TYPE OF CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ====CUSTOMER ACCOUNT STATUS ======================================== -->
+	<xsd:complexType name="typesOfAccountStatus_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of CUSTOMER ACCOUNT STATUSes.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="CustomerAccountStatusRef"/>
+					<xsd:element ref="CustomerAccountStatus"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CustomerAccountStatus" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of a CUSTOMER ACCOUNT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CustomerAccountStatus_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CustomerAccountStatusIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CustomerAccountStatus_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CUSTOMER ACCOUNT STATUS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==== CUSTOMER ACCOUNT SECURITY LISTING ======================================== -->
+	<xsd:element name="CustomerAccountSecurityListing" abstract="false" substitutionGroup="SecurityListing_">
+		<xsd:annotation>
+			<xsd:documentation>A listing of a CUSTOMER ACCOUNT on a SECURITY LIST.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CustomerAccountSecurityListing_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SecurityListingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CustomerAccountSecurityListingGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements for PASSENGER SECURITY LISTING</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CustomerAccountSecurityListingIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CustomerAccountSecurityListing_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CUSTOMER ACCOUNT SECURITY LISTING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="SecurityListing_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="CustomerAccountSecurityListingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CustomerAccountSecurityListingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for CUSTOMER ACCOUNT  SECURITY LISTING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="CustomerAccountRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== CUSTOMER SECURITY LISTING ======================================== -->
+	<xsd:element name="CustomerSecurityListing" abstract="false" substitutionGroup="SecurityListing_">
+		<xsd:annotation>
+			<xsd:documentation>A listing of a CUSTOMER on a SECURITY LIST.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CustomerSecurityListing_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SecurityListingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CustomerSecurityListingGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements for PASSENGER SECURITY LISTING</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CustomerSecurityListingIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CustomerSecurityListing_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CUSTOMER SECURITY LISTING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="SecurityListing_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="CustomerSecurityListingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CustomerSecurityListingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for CUSTOMER SECURITY LISTING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="CustomerRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== FARE CONTRACT SECURITY LISTING ======================================== -->
+	<xsd:element name="FareContractSecurityListing" abstract="false" substitutionGroup="SecurityListing_">
+		<xsd:annotation>
+			<xsd:documentation>A listing of a FARE CONTRACT on a SECURITY LIST.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareContractSecurityListing_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SecurityListingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareContractSecurityListingGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements for PASSENGER SECURITY LISTING</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareContractSecurityListingIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareContractSecurityListing_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE CONTRACT SECURITY LISTING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="SecurityListing_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareContractSecurityListingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareContractSecurityListingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for FARE CONTRACT  SECURITY LISTING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="FareContractRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- -->
+</xsd:schema>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple GTFS Calendar  Example ======  
+This Example provides an example of mapping of a GTFS Calendar.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+ 
+  
+1. DATA
+Calendar.txt
+	service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+	FULLW,1,1,1,1,1,1,1,20070101,20101231
+	WE,0,0,0,0,0,1,1,20070101,20101231
+
+2. MAPPING
+
+A CALENDAR maps to a SERVICE CALENDAR   with DAY TYPEs
+
+GTFS			NeTEx
+service_id,		<ServiceCalendarFrame #service_id> @id
+monday,		<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>monday 
+tuesday,		<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>tuesday 
+wednesday,	<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>wednesday 
+thursday,		<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>thursday 
+friday,			<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>friday 
+saturday,		<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>saturday 
+sunday,		<ServiceCalendarFrame #service_id><DayType #service_id><properties><PropertyOfDay><DaysOfWeek>sunday 
+start_date,	<ServiceCalendarFrame #service_id><ServiceCalendar #service_id><FromDate>  #start_date
+end_date,		<ServiceCalendarFrame #service_id><ServiceCalenda  #service_id><ToDate> #end_date
+ 
+3. Notes
+
+    If the DAY TYPES have the same validity condition they can go in the same frame
+
+A SERVICE CALENDAR is enclsoed in a SERVICE CALENDAR FRAME
+
+ GTFS Data copyright Google Inc
+
+version 1.1 revised ids
+ NeTEx (C) CEN Copyright 2010, 2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Trip data  (trip.txt file)</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="mygtfsxm:FULLW">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+			</FrameDefaults>
+			<frames>
+				<ServiceCalendarFrame version="any" id="FULLW">
+					<ServiceCalendar version="any" id="FULLW">
+						<FromDate>2007-01-01</FromDate>
+						<ToDate>2010-12-31</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id=":FULLW">
+							<Name>Weekdays</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+				</ServiceCalendarFrame>
+				<ServiceCalendarFrame version="any" id="WE">
+					<ServiceCalendar version="any" id="WE">
+						<FromDate>2007-01-01</FromDate>
+						<ToDate>2010-12-31</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="WE">
+							<Name>Weekdays</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Saturday	Sunday</DaysOfWeek>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

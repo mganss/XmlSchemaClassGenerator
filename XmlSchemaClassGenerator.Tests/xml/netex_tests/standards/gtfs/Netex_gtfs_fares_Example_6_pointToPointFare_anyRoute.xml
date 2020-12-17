@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Network Example ====== 
+This Example provides an example of mapping of a GTFS FareRule.txt file to NeTEx 
+http://code.google.com/p/googletransitdatafeed/wiki/FareExamples
+
+September 2011  
+================
+
+Example 7: Fare depends on station pairs, how you get there doesn't matter
+
+In this example only the entry and exit points from the system matter. 
+To define this fare structure for the feed, each station must have its own unique zone ID defined in stops.txt. Each station is considered a single zone. 
+  
+* The fare_attributes.txt and fare_rules.txt files define one row for each pair of stations. 
+
+ * In fare_attributes.txt, the origin_id and destination_id fields identify station pairs by zone 
+
+
+1.1 Example data
+fare_attributes.txt.
+	fare_id  price  currency_type  payment_method  transfers  
+	S1_to_S2  1.75  USD  0   
+	S1_to_S3  3.25  USD  0   
+	S1_to_S4  4.55  USD  0   
+...      
+	S10+S1  5.65  USD  0   
+
+fare_rules.txt.
+	fare_id  origin_id  destination_id  
+	S1_to_S2  S1  S2  
+	S1_to_S3  S1  S3  
+	S1_to_S4  S1  S4  
+.	..    
+	S10+S1  S10  S1  
+
+ 
+1.2 Calculating an adult fare 
+
+The trip planner calculates an itinerary, and then looks up the fare rules until it finds a matching origin/destination station pair. 
+The public feed from SF Bay Area BART provides a real-world illustration of this type of fare structure. 
+
+
+2. MAPPING TO NETEX
+ 
+Mapping is complex depending on fare structure. (E.g. different for flat fare, point-to-point fare, etc)
+NeTEx may be augmented with further distinctions not covered by GTFS
+
+A GTFS Fare_Attribute  maps to a NeTEx FARE  PRICE of some specific sort (FARE PRODUCT PRICE,  TIME INTERVAL PRICE, DISTANCE MATRIX ELEMENT PRICE, etc)
+
+A GTFS FareRule maps to a NeTEx  TARIFF + FARE STRUCTURE   ELEMENT + DISTANCE MATRIX ELEMENT   + FARE PRODUCT + VALIDABLE ELEMENT + 
+
+                       For a Point to Pont fare we use the gtfs fare_id for the DISTANCE MATRIX ELEMENT between each origon /destination  and introduce a  BOILERPLATE_P2P id for the single  FARE PRDUCT
+  
+2.1 Fare Rules 
+
+GTFS					NeTEx
+fare_id,					<PreassignedFareProduct #BOILERPLATE_P2P_id > 
+							<PreassignedFareProduct #BOILERPLATE_P2P_id> <accessRightsInProduct> <AcccessRightInProduct #BOILERPLATE_P2P_id> <ValidibleElement #BOILERPLATE_P2P_id>
+									==> 	<PreassignedFareProduct #BOILERPLATE_P2P_id><validableElements><ValidityParameter #BOILERPLATE_P2P_id> <fareStructureElements>
+									==><Tariff #BOILERPLATE_P2P_><FareStructureElement #BOILERPLATE_P2P_id@access"> <GenericParameterAssignment  #BOILERPLATE_P2P_id@access_details>	<validityParameters>   
+route_id,				
+origin_id,				-  <Tariff #BOILERPLATE_P2P_id> <distanceMatrixElements><DistanceMatrixElement #fare_id> <StartScheduledStopPointRef #origin_id>
+destination_id,		-  <Tariff #BOILERPLATE_P2P_id> <distanceMatrixElements><DistanceMatrixElement #fare_id> <StartScheduledStopPointRef #destination_id>
+contains_id	,		-
+ 
+2.2 Fare Attributes
+
+GTFS						NeTEx
+fare_id,						<PriceGroup><members><FarePrice  #fare_id>
+price,						<FarePrice #BOILERPLATE_P2P_id><Amount>
+currency_type,			<FarePrice #BOILERPLATE_P2P_id><Currency>
+payment_method,		<Tariff><FareStructureElement id="#fare_id@conditions_of_travel"> <GenericParameterAssignment  #fare_id@conditions_of_travel>	<limitations>   
+		0 =Pay on Boarding                                       <PurchaseWindow  #fare_id><PurchaseMoment> (#onBoarding)
+		1 = Fare must be paid before boarding 			<PurchaseWindow  #fare_id><PurchaseMoment> (#beforeBoarding)
+transfers,					<PreassignedFareProduct #BOILERPLATE_P2P_id> <accessRightsInProduct> <AcccessRightInProduct #BOILERPLATE_P2P_id> <ValidibleElement #BOILERPLATE_P2P_id>
+									==> 	<PreassignedFareProduct #BOILERPLATE_P2P_id><validableElements><ValidityParameter #BOILERPLATE_P2P_id> <fareStructureElements>
+									==><Tariff><FareStructureElement id="#BOILERPLATE_P2P_id@conditions_of_travel"> <GenericParameterAssignment  #BOILERPLATE_P2P_id@conditions_of_travel>	<limitations>  
+										 <Interchanging  #BOILERPLATE_P2P_id@conditions_of_travel@interchanging><MaximumNumberOfInterchanges>1</MaximumNumberOfInterchanges>
+										 <FrequencyOfUse  #BOILERPLATE_P2P_id@conditions_of_travel@frequency><FrequencyOfUseType>unlimited | none | single
+transfer_duration		<PreassignedFareProduct #BOILERPLATE_P2P_id> <accessRightsInProduct> <AcccessRightInProduct #BOILERPLATE_P2P_id> <ValidibleElement #BOILERPLATE_P2P_id>
+									==> 	<PreassignedFareProduct #BOILERPLATE_P2P_id><validableElements><ValidityParameter #BOILERPLATE_P2P_id> <fareStructureElements>
+									==><Tariff><FareStructureElement id="#BOILERPLATE_P2P_id@conditions_of_travel"> <GenericParameterAssignment  #BOILERPLATE_P2P_id@conditions_of_travel>	<limitations>   
+											<UsageValidityPeriod  #BOILERPLATE_P2P_id@conditions_of_travel@validity><StandardDuration>
+											<UsageValidityPeriod  #BOILERPLATE_P2P_id@conditions_of_travel@validity> <UsageEnd> endoOfDay | endOfRide |endOfPeriod |etc
+
+GTFS Data copyright Google Inc
+
+v1.1 Revised to use Tariff
+ NeTEx (C) CEN Copyright 2010, 2011, 2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example6  of GTFS Agency Fare  data</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="mygtfsxm:CompositeFrame:DTA">
+			<Name>GTFS Example 7 : Zonal  fare  structure</Name>
+			<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_profile@composite"/>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo AGency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<ResourceFrame version="1.0" id="mygtfsxm:DTA@agency">
+					<organisations>
+						<!--- =====Agency========= -->
+						<Authority version="any" id="mygtfsxm:DTA">
+							<Name>Demo Transit Authority</Name>
+							<ContactDetails>
+								<Url>http://code.google.com/p/googletransitdatafeed/wiki/FareExamples</Url>
+							</ContactDetails>
+						</Authority>
+					</organisations>
+				</ResourceFrame>
+				<!--- ==============SERVICE FRAME =========== -->
+				<ServiceFrame version="1.0" id="mygtfsxm:DTA@network">
+					<Name>Stop points - these could be external references but are declared explicitly here for  clarity </Name>
+					<prerequisites>
+						<ResourceFrameRef version="1.0" ref="mygtfsxm:DTA@agency"/>
+					</prerequisites>
+					<scheduledStopPoints>
+						<!--- ====TARIFF ZONEs ======== -->
+						<ScheduledStopPoint version="any" id="mygtfsxm:S1">
+							<Name>Stop S1</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S2">
+							<Name>Stop S2</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S3">
+							<Name>Stop S3</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S4">
+							<Name>Stop S4</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S5">
+							<Name>Stop S5</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S6">
+							<Name>Stop S6</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S7">
+							<Name>Stop S7</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S8">
+							<Name>Stop S8</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S9">
+							<Name>Stop S9</Name>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:S10">
+							<Name>Stop S10</Name>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+				</ServiceFrame>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="1.0" id="mygtfsxm:DTA">
+					<validityConditions>
+						<ValidBetween>
+							<FromDate>2011-12-30T00:00:00Z</FromDate>
+						</ValidBetween>
+					</validityConditions>
+					<prerequisites>
+						<ServiceFrameRef version="1.0" ref="mygtfsxm:DTA@network"/>
+					</prerequisites>
+					<AuthorityRef ref="mygtfsxm:Authority:DTA"/>
+					<!--- ====Fare USAGE PARAMETERS======= -->
+					<!--- ====Fare Structure======= -->
+					<tariffs>
+						<Tariff version="any" id="mygtfsxm:BOILERPLATE_P2P">
+							<TypeOfTariffRef version="gtfs:1.5" ref="gtfs:point_to_point"/>
+							<fareStructureElements>
+								<FareStructureElement version="1.0" id="myfares:BOILERPLATE_P2P@access">
+									<distanceMatrixElements>
+										<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S2"/>
+										<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S3"/>
+										<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S4"/>
+										<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S10"/>
+									</distanceMatrixElements>
+									<GenericParameterAssignment order="1" id="myfares:BOILERPLATE_P2P@access" version="1.0">
+										<TypeOfAccessRightAssignmentRef versionRef="fxc:v1.0" ref="fxc:can_access"/>
+										<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>bus</VehicleModes>
+											<AuthorityRef ref="mygtfsxm:Authority:DTA"/>
+										</validityParameters>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:BOILERPLATE_P2P@conditions_of_travel" version="1.0">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:BOILERPLATE_P2P@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef versionRef="fxc:v1.0" ref="fxc:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<FrequencyOfUse version="any" id="mygtfsxm:BOILERPLATE_P2P@oneTrip">
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="any" id="mygtfsxm:BOILERPLATE_P2P@interchanging">
+												<CanInterchange>true</CanInterchange>
+											</Interchanging>
+														<PurchaseWindow version="any" id="mygtfsxm:BOILERPLATE_P2P@purchase">
+												<PurchaseMoment>beforeBoarding</PurchaseMoment>
+											</PurchaseWindow>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<distanceMatrixElements>
+								<DistanceMatrixElement version="any" id="mygtfsxm:S1_to_S2">
+									<StartStopPointRef version="any" ref="mygtfsxm:S1"/>
+									<EndStopPointRef version="any" ref="mygtfsxm:S2"/>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="mygtfsxm:S1_to_S3">
+									<StartStopPointRef version="any" ref="mygtfsxm:S1"/>
+									<EndStopPointRef version="any" ref="mygtfsxm:S3"/>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="mygtfsxm:S1_to_S4">
+									<StartStopPointRef version="any" ref="mygtfsxm:S1"/>
+									<EndStopPointRef version="any" ref="mygtfsxm:S4"/>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="mygtfsxm:S1_to_S10">
+									<StartStopPointRef version="any" ref="mygtfsxm:S1"/>
+									<EndStopPointRef version="any" ref="mygtfsxm:S10"/>
+								</DistanceMatrixElement>
+							</distanceMatrixElements>
+							<fareTables>
+								<FareTableRef version="any" ref="mygtfsxm:BOILERPLATE_P2P"/>
+							</fareTables>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="any" id="mygtfsxm:BOILERPLATE_P2P"> 
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="any" id="mygtfsxm:trip">
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="myfares:BOILERPLATE_P2P@access"/>
+										<FareStructureElementRef version="1.0" ref="myfares:BOILERPLATE_P2P@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTS======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" version="any" id="mygtfsxm:BOILERPLATE_P2P">
+									<Name>A trip on the network</Name>
+									<ValidableElementRef version="any" ref="mygtfsxm:trip"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<fareTables>
+						<FareTable version="any" id="mygtfsxm:BOILERPLATE_P2P">
+							<pricesFor>
+								<PreassignedFareProductRef version="any" ref="mygtfsxm:BOILERPLATE_P2P"/>
+							</pricesFor>
+							<cells>
+								<DistanceMatrixElementPrice version="any" id="mygtfsxm:S1_to_S2">
+									<Amount>1.75</Amount>
+									<Currency>USD</Currency>
+									<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S2"/>
+								</DistanceMatrixElementPrice>
+								<DistanceMatrixElementPrice version="any" id="mygtfsxm:S1_to_S3">
+									<Amount>3.25</Amount>
+									<Currency>USD</Currency>
+									<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S3"/>
+								</DistanceMatrixElementPrice>
+								<DistanceMatrixElementPrice version="any" id="mygtfsxm:S1_to_S4">
+									<Amount>5.65</Amount>
+									<Currency>USD</Currency>
+									<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S4"/>
+								</DistanceMatrixElementPrice>
+								<DistanceMatrixElementPrice version="any" id="mygtfsxm:S1_to_S10">
+									<Amount>4.55</Amount>
+									<Currency>USD</Currency>
+									<DistanceMatrixElementRef version="any" ref="mygtfsxm:S1_to_S10"/>
+								</DistanceMatrixElementPrice>
+							</cells>
+						</FareTable>
+					</fareTables>
+				</FareFrame>
+			</frames>
+		</CompositeFrame>
+		<!--- =====RESOURCEs======== -->
+		<ResourceFrame version="gtfs:1.5" id="gtfs:GTFS">
+			<Name>Built-in GTFS Code Values</Name>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="gtfs">
+					<Xmlns>gtfs</Xmlns>
+					<XmlnsUrl>http://www.google.com/transit/gtfs</XmlnsUrl>
+					<Description>GTFS code values</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="gtfs"/>
+			</FrameDefaults>
+			<typesOfValue>
+				<ValueSet version="gtfs:1.5" id="gtfs:Charging_Moments" classOfValues="ChargingMoment">
+					<Name>GTFS Built in  Charging Methods: FareAttribute@payment_method</Name>
+					<values>
+						<!--- ====Charging method========= -->
+						<ChargingMoment version="gtfs:1.5" id="gtfs:0">
+							<Name>Pay on Boarding</Name>
+						</ChargingMoment>
+						<ChargingMoment version="gtfs:1.5" id="gtfs:1">
+							<Name>Fare must be paid before boarding</Name>
+						</ChargingMoment>
+					</values>
+				</ValueSet>
+				<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Types_of_Frame" classOfValues="TypeOfFrame">
+					<Name>GTFS Built in Types of Frame</Name>
+					<values>
+						<TypeOfFrame version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:GTFS_profile@composite">
+							<Name>GTFS Built in Types of Frame - flat fare structure</Name>
+						</TypeOfFrame>
+					</values>
+				</ValueSet>
+				<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Types_of_Tariff" classOfValues="TypeOfTariff">
+					<Name>GTFS Built in Types of Frame</Name>
+					<values>
+						<TypeOfTariff version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:flat">
+							<Name>GTFS Built in Types of Tariff - flat fare  </Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:point_to_point">
+							<Name>GTFS Built in Types of Tariff - fpoint to point</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:zone_sequence">
+							<Name>GTFS Built in Types of Tariff - zone sequence </Name>
+						</TypeOfTariff>
+					</values>
+				</ValueSet>
+			</typesOfValue>
+		</ResourceFrame>
+	</dataObjects>
+</PublicationDelivery>

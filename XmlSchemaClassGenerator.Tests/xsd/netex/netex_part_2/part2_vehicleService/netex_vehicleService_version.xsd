@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_vehicleService_version">
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_vehicleService_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_line_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_vehicleAndCrewPoint_support.xsd"/>
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_journeyDesignator_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_vehicleType_support.xsd"/>
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_coupledJourney_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Date><Modified>2017-012-05</Modified> Correct DayOffsetType  on Course of COurnet
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the VEHICLE SERVICE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_2/part2_vehicleService}netex_vehicleService_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx VEHICLE SERVICE  types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: VEHICLE SERVICE types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:group name="VehicleScheduleInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a VEHICLE SCHEDULE FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="blocks" type="blocksInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BLOCKs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="coursesOfJourneys" type="coursesOfJourneysInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>COURSE OF JOURNEYs (Runs) in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="vehicleServices" type="vehicleServicesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE SERVICES in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="reliefOpportunities" type="reliefOpportunitiesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE SERVICES in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="blocksInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of BLOCKS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="Block"/>
+					<xsd:element ref="CompoundBlock"/>
+					<xsd:element ref="TrainBlock"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="coursesOfJourneysInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of COURSE OF JOURNEYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="CourseOfJourneys" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="vehicleServicesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of VEHICLE SERVICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehicleService" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="reliefOpportunitiesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of RELIEF OPPORTUNITies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="ReliefOpportunity" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Block=================================================== -->
+	<xsd:element name="Block" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>The work of a vehicle from the time it leaves a PARKING POINT after parking until its next return to park at a PARKING POINT. Any subsequent departure from a PARKING POINT after parking marks the start of a new BLOCK. The period of a BLOCK has to be covered by DUTies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Block_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BlockGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="BlockIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Block_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="BlockGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="BlockGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="BlockPropertiesGroup"/>
+			<xsd:group ref="BlockTimingGroup"/>
+			<xsd:group ref="BlockReferencesGroup"/>
+			<xsd:group ref="BlockComponentsGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="BlockPropertiesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="BlockTimingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Timing Elements for BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time to complete BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start time of BLOCK- In principle this can be derived from the Start time of the first journey and the preparation duration but may be stated  explicitly as well.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTimeDayOffset" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset of Start time from current OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FinishingDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time to complete BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End time of BLOCK. In principle this can be derived from the Start time of the last journey and the finishing duration but may be stated  explicitly as well.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTimeDayOffset" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset of end time from current OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dayTypes" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DAY TYPEs for BLOCK.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="dayTypeRefs_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="BlockReferencesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Reference elements for BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="VehicleServicePartRef" minOccurs="0"/>
+			<xsd:element ref="VehicleTypeRef" minOccurs="0"/>
+			<xsd:element name="StartPointRef" type="PointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Point at which BLOCK starts Should be a PARKING POINT but might be of unknown type.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndPointRef" type="PointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Point at which BLOCK ends Point at which BLOCK starts Should be a PARKING POINT but might be of unknown type.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="BlockComponentsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Component Elements for BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="journeys" type="journeyRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEYS making up BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="coursesOfJourneys" type="coursesOfJourneys_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Runs in BLOCK PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="blockParts" type="blockParts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BLOCK PARTS in BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="reliefOpportunities" type="reliefOpportunities_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>RELIEF OPPORTUNITIES of a BLOCK-</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="TrainBlock" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A composite train formed of several BLOCKs coupled together during a certain period. Any coupling or separation action marks the start of a new TRAIN BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TrainBlock_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BlockGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TrainBlockGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TrainBlockIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TrainBlock_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TRAIN BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Block_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TrainBlockGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TrainBlockGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for TRAIN BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="coupledJourneys" type="coupledJourneys_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEYS making up BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="blockParts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of BLOCK PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="BlockPartRef"/>
+					<xsd:element ref="BlockPart"/>
+					<xsd:element ref="TrainBlockPart"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="BlockPart" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A part of a BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="BlockPart_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BlockPartGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="BlockPartIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BlockPart_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a BLOCK PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="BlockPartGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger">
+					<xsd:annotation>
+						<xsd:documentation>Order of part within BLOCK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="BlockPartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for BLOCK PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of BLOCK PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of BLOCK PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BlockRef" minOccurs="0"/>
+			<xsd:element ref="VehicleTypeRef" minOccurs="0"/>
+			<xsd:element ref="CompoundBlockRef" minOccurs="0"/>
+			<xsd:choice minOccurs="0">
+				<xsd:element ref="JourneyPartCoupleRef"/>
+				<xsd:element name="journeyParts" type="journeyPartRefs_RelStructure">
+					<xsd:annotation>
+						<xsd:documentation>JOURNEY PARTs in BLOCK PART.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="CompoundBlock" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A composite BLOCK formed of several BLOCKs coupled together during a certain period. Any coupling or separation action marks the start of a new COMPOUND BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CompoundBlockStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CompoundBlockGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CompoundBlockIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CompoundBlockStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for COMPOUND BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="CompoundBlockGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CompoundBlockGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for COMPOUND BLOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of COMPOUND BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of COMPOUND BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="VehicleTypeRef" minOccurs="0"/>
+			<xsd:element name="StartPointRef" type="TimingPointInJourneyPatternRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Staring timing point of COMPOUND BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndPointRef" type="TimingPointInJourneyPatternRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Ending timing point of COMPOUND BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="parts" type="blockParts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BLOCK PARTs which make up COMPOUND BLOCK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="TrainBlockPart" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>The work of a vehicle from the time it leaves a PARKING POINT after parking until its next return to park at a PARKING POINT. Any subsequent departure from a PARKING POINT after parking marks the start of a new TRAIN BLOCK PART. The period of a TRAIN BLOCK PART has to be covered by DUTies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TrainBlockPart_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BlockPartGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TrainBlockPartGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TrainBlockPartIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TrainBlockPart_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TRAIN BLOCK PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="BlockPart_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TrainBlockPartGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TrainBlockPartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for TRAIN BLOCK PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StartTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start time of BLOCK PART- In principle this can be derived from the Start time of the first journey and the preparation duration but may be stated  explicitly as well.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTimeDayOffset" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset of Start time from current OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End time of BLOCK PART. In principle this can be derived from the Start time of the last journey and the finishing duration but may be stated  explicitly as well.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTimeDayOffset" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset of end time from current OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TypeOfCoupling" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of Coupling.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:element name="VehicleService" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A work plan for a vehicle for a whole day, planned for a specific DAY TYPE. A VEHICLE SERVICE includes one or several VEHICLE SERVICE PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleService_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleServiceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleServiceIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleService_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for VEHICLE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleServiceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for VEHICLE SERVICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of VEHICLE SERVICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of VEHICLE SERVICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="vehicleServiceParts" type="vehicleServiceParts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Parts of a VEHICLE SERVICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="vehicleServiceParts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLE SERVICE PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="VehicleServicePartRef"/>
+					<xsd:element ref="VehicleServicePart"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehicleServicePart" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A part of a VEHICLE SERVICE composed of one or more BLOCKs and limited by periods spent at the GARAGE managing the vehicle in question.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleServicePart_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleServicePartGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleServicePartIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleServicePart_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for VEHICLE SERVICE PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleServicePartGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleServicePartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for VEHICLE SERVICE PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of VEHICLE SERVICE PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of VEHICLE SERVICE PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="VehicleServiceRef" minOccurs="0"/>
+			<xsd:element name="StartPointRef" type="GaragePointRefStructure" minOccurs="0"/>
+			<xsd:element name="EndPointRef" type="GaragePointRefStructure" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====course of journey================================================================ -->
+	<xsd:complexType name="coursesOfJourneys_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of COURSE OF JOURNEYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="CourseOfJourneysRef"/>
+					<xsd:element ref="CourseOfJourneys"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CourseOfJourneys" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A part of a BLOCK composed of consecutive VEHICLE JOURNEYs defined for the same DAY TYPE, all operated on the same LINE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CourseOfJourneys_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CourseOfJourneysGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CourseOfJourneysIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CourseOfJourneys_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for COURSE OF JOURNEYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="CourseOfJourneysGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CourseOfJourneysGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for COURSE OF JOURNEYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of COURSE OF JOURNEYs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of COURSE OF JOURNEYs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CourseOfJourneysNumber" type="xsd:nonNegativeInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Numeric identifier of COURSE of JOURNEYS.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How long the run takes to prepare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTimeInBlock" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time at which run starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTimeDayOffset" type="DayOffsetType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset of Start time from current OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FinishingDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How long the run takes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BlockRef" minOccurs="0"/>
+			<xsd:element ref="LineRef" minOccurs="0"/>
+			<xsd:element name="journeys" type="journeyRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEYS making up COURSE OF JOURNEYs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="reliefOpportunities_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of RELIEF OPPORTUNITies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="ReliefOpportunityRef"/>
+					<xsd:element ref="ReliefOpportunity"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ReliefOpportunity" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A time in a BLOCK where a vehicle passes a RELIEF POINT. This opportunity may or may not be actually used for a relief.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="ReliefOpportunity_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ReliefOpportunityGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CourseOfJourneysIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ReliefOpportunity_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for RELIEF OPPORTUNITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="ReliefOpportunityGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ReliefOpportunityGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for RELIEF OPPORTUNITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of RELIEF OPPORTUNITY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of RELIEF OPPORTUNITY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Time" type="xsd:time">
+				<xsd:annotation>
+					<xsd:documentation>Time at which RELIEF OPPORTUNITY occurs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DayOffset" type="DayOffsetType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset of time from current OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BlockRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>

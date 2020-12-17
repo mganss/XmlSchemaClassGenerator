@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (x64) (http://www.altova.com) by Christophe Duquesne (Dryade) -->
+<xsd:schema xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:acsb="http://www.ifopt.org.uk/acsb" targetNamespace="http://www.siri.org.uk/siri" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="siri_common_services">
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>CEN TC278 WG3 SG7 Team</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG7 Editor Nicholas Knowles, Kizoom. mailto:schemer@siri.org.uk</Creator>
+				<Date>
+					<Created>2004-09-29</Created>
+				</Date>
+				<Date>
+					<Modified>2005-02-14</Modified>
+				</Date>
+				<Date>
+					<Modified>2005-02-20</Modified>
+				</Date>
+				<Date>
+					<Modified>2005-05-11</Modified>
+				</Date>
+				<Date><Modified>2007-04-17</Modified>
+					 - Name Space changes
+				</Date>
+				<Date><Modified>2008-10-09</Modified>
+					 -- Add Subscriber ref to TermninateSubscription Request
+				</Date>
+				<Date><Modified>2008-11-17</Modified>
+					 -- Revise for substitution groups and move down to siri subdirectory
+				</Date>
+				<Date><Modified>2012-03-23</Modified>
+					 +SIRI v2.0
+					   - Add DataReady to Check Status
+					   - Add DistanceUnits and VelocityUnits to ServiceRequestContext
+					   - [FR]    Add Extensions tag to Terminate SubscriptionRequest
+				</Date>
+				<Date><Modified>2014-03-31</Modified>
+					 +SIRI v2.0 Comments
+					   - Add terminate subscription notification
+				</Date>
+				<Date><Modified>2014-07-30</Modified>
+					 +SIRI v2.0 revise Comments
+					   -  Inter revision to make CheskStatus a type of ProductResponse.
+					   -  Mark with SubstoitutionGroups
+
+				</Date>
+				<Description>
+					<p>SIRI is a European CEN standard for the exchange of real-time information.</p>
+					<p>This subschema describes common communication requests that are the same for all services. </p>
+					<p>It contains the following request</p>
+					<ul>
+						<li>GS: Terminate Subscription Resquest </li>
+						<li>GS: Terminate Subscription Response</li>
+						<li>GS: Subscription Response </li>
+						<li>GS: Data Ready Notification</li>
+						<li>GS: Data Ready Acknowledgement</li>
+						<li>GS: Data Supply Request</li>
+						<li>GS: Data Received Response </li>
+						<li>GS: Check Status Request</li>
+						<li>GS: Check Status Response</li>
+						<li>GS: Heartbeat Request</li>
+					</ul>
+					<p>Siri supports both direct requests and publish subscribe patterns of interaction</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.siri.org.uk/schema/2.0/xsd/siri/}siri_common_services.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.siri.org.uk/schema/2.0/xsd/siri/siri_requests-v2.0.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+        <Copyright>CEN, VDV, RTIG 2004-2012</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the VDV, RTIG XML and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 2.0 Draft</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport, Ports and maritime transport, Public transport,
+Rail transport, Roads and road transport
+</Category>
+					<Project>CEN TC278 WG3 SG7</Project>
+				</Subject>
+				<Title>SIRI XML schema. Service Interface for Real-time  Information. Common Requests </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>SIRI Framework - Common Requests.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="siri_requests-v2.0.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:group name="SiriCommonIndexGroup">
+		<xsd:annotation>
+			<xsd:documentation>Convenience artefact to pick out main elements of the common requests.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="SubscriptionManagementGroup"/>
+			<xsd:group ref="DataSupplyGroup"/>
+			<xsd:group ref="StatusRequestGroup"/>
+			<xsd:group ref="StatusResponseGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StatusRequestGroup">
+		<xsd:annotation>
+			<xsd:documentation>Requests about system status.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="CheckStatusRequest"/>
+			<xsd:element ref="HeartbeatNotification"/>
+		</xsd:choice>
+	</xsd:group>
+	<!--== Requests ===================================================================== -->
+	<xsd:complexType name="ContextualisedRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for General SIRI Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ServiceRequestContext" type="ServiceRequestContextStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>General request properties - typically configured rather than repeated on request.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="RequestTimestamp"/>
+			<xsd:group ref="AuthenticatedRequestGroup"/>
+			<xsd:group ref="RequestorEndpointGroup"/>
+			<xsd:group ref="DelegatorEndpointGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="ServiceEndpointAddressGroup">
+		<xsd:annotation>
+			<xsd:documentation>Address elements for SIRI messages to the Producer server.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CheckStatusAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which CheckStatus requests are to be sent.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscribeAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which subscription requests are to be sent.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ManageSubscriptionAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which subscription requests are to be sent. If absent, same as SubscribeAddress.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GetDataAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which requests are to return data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ClientEndpointAddressGroup">
+		<xsd:annotation>
+			<xsd:documentation>Address elements for SIRI messages to the Subscriber/Consumer client.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StatusResponseAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which CheckStatus responses and heartbeats are to be sent. If absent, same as SubscriberAddress.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriberAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which subscription responses are to be sent.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NotifyAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which notifcations requests are to be sent. If absent, same as SubscriberAddress.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConsumerAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which data is to be sent. If absent, same as NotifyAddress.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="ServiceRequestContextStructure">
+		<xsd:annotation>
+			<xsd:documentation>Configurable context for requests. Intended Primarily as a documentation mechanism.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="ServiceEndpointAddressGroup"/>
+			<xsd:group ref="ClientEndpointAddressGroup"/>
+			<xsd:group ref="ReferenceContextGroup"/>
+			<xsd:group ref="TemporalContextGroup"/>
+			<xsd:group ref="DeliveryContextGroup"/>
+			<xsd:group ref="ResourceContextGroup"/>
+			<xsd:group ref="PredictionMethodGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="DeliveryContextGroup">
+		<xsd:annotation>
+			<xsd:documentation>Delivery options.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DeliveryMethod" type="DeliveryMethodEnumeration" default="direct" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether Delivery is fetched or retrieved.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MultipartDespatch" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether multi-part delivery is allowed, i.e. the breaking up of updates into more than one delivery messages with a MoreData flag,</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConfirmDelivery" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether Consumers should issue an acknowledgement on successful receipt of a delivery. Default is ' false'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:simpleType name="DeliveryMethodEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Delivery Method: Fetched or Direct Delivery.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="direct"/>
+			<xsd:enumeration value="fetched"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:group name="PredictionMethodGroup">
+		<xsd:annotation>
+			<xsd:documentation> Prediction options.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AllowedPredictors" type="PredictorsEnumeration" default="anyone" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Who may make a prediction.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PredictionFunction" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of prediction method used.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:simpleType name="PredictorsEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for predictors.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="avmsOnly"/>
+			<xsd:enumeration value="anyone"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:group name="TemporalContextGroup">
+		<xsd:annotation>
+			<xsd:documentation>Timing related elements in Request Context:</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DataHorizon" type="PositiveDurationType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum data horizon for requests.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RequestTimeout" type="PositiveDurationType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timeout for requests. [Should this be separate for each type?]</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="DataNameSpacesStructure">
+		<xsd:annotation>
+			<xsd:documentation>Name spaces.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StopPointNameSpace" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name space for STOP POINTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LineNameSpace" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name space for LINE names and DIRECTIONss.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ProductCategoryNameSpace" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name space for Product Categories.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ServiceFeatureNameSpace" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name space for service features.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VehicleFeatureNameSpace" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name space for VEHICLE features.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="ReferenceContextGroup">
+		<xsd:annotation>
+			<xsd:documentation>Namespace related elements in Request Context.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DataNameSpaces" type="DataNameSpacesStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default names pace used to scope data identifiers.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Language" type="xsd:language" default="en" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Preferred language in which to return text values.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default geospatial Coordinates used by service.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element name="WgsDecimalDegrees" type="EmptyType">
+					<xsd:annotation>
+						<xsd:documentation>Geospatial coordinates are given as Wgs 84 Latiude and longitude, decimial degrees of arc.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="GmlCoordinateFormat" type="SrsNameType">
+					<xsd:annotation>
+						<xsd:documentation>Name of GML Coordinate format used for Geospatial points in responses.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="DistanceUnits" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Units for Distance Type. Default is metres. +SIRI v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VelocityUnits" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Units for Distance Type. Default is metres per second. +SIRI v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ResourceContextGroup">
+		<xsd:annotation>
+			<xsd:documentation>Resources related elements in Request Context.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MaximimumNumberOfSubscriptions" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum Number of subscriptions that can be sustained by the subscriber. If absent no limit.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!--===SUBSCRIPTION MANAGEMENT ==================================================================== -->
+	<xsd:group name="SubscriptionManagementGroup">
+		<xsd:annotation>
+			<xsd:documentation>groups the subscription request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="SubscriptionResponse"/>
+			<xsd:element ref="TerminateSubscriptionRequest"/>
+			<xsd:element ref="TerminateSubscriptionResponse"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === GS: Terminate Subscription Resquest=================================================== -->
+	<xsd:element name="TerminateSubscriptionRequest" type="TerminateSubscriptionRequestStructure" substitutionGroup="AuthenticatedRequest">
+		<xsd:annotation>
+			<xsd:documentation>Request from Subscriber to Subscription Manager to terminate a subscription. Answered with a TerminateSubscriptionResponse.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TerminateSubscriptionRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for request to terminate a subscription or subscriptions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AuthenticatedRequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="RequestorEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking information relating to the original requestor. This allows the aggregation to be stateless. +SIRI 2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+					<xsd:group ref="TerminateSubscriptionTopicGroup"/>
+					<xsd:element ref="Extensions" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TerminateSubscriptionTopicGroup">
+		<xsd:annotation>
+			<xsd:documentation>Parameters that specify the content to be processed.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SubscriberRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Participant identifier of Subscriber. Subscription ref will be unique within this.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="All" type="EmptyType">
+					<xsd:annotation>
+						<xsd:documentation>Terminate all subscriptions for the requestor.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="SubscriptionRef" type="SubscriptionQualifierStructure" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>Terminate the subscription identfiied by the reference.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="TerminationStatusGroup">
+		<xsd:annotation>
+			<xsd:documentation>Status Info.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TerminationResponseStatus" type="TerminationResponseStatusStructure" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Status of each subscription termnination response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === GS: Terminate Subscription Response======================================================== -->
+	<xsd:element name="TerminateSubscriptionResponse" type="TerminateSubscriptionResponseStructure" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Request from Subscriber to Subscription Manager to terminate a subscription. Answered with a TerminateSubscriptionResponse.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TerminateSubscriptionResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Response to a request to terminate a subscription or subscriptions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseEndpointStructure">
+				<xsd:sequence>
+					<xsd:group ref="TerminationStatusGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TerminationResponseStatusStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Status of termination response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ResponseTimestamp" minOccurs="0"/>
+			<xsd:group ref="ContextualisedResponseEndpointGroup"/>
+			<xsd:group ref="SubscriptionIdentifierResourcePropertyGroup" minOccurs="0"/>
+			<xsd:element ref="Status"/>
+			<xsd:element name="ErrorCondition" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of any error or warning condition.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:choice>
+							<xsd:element ref="CapabilityNotSupportedError"/>
+							<xsd:element ref="UnknownSubscriberError"/>
+							<xsd:element ref="UnknownSubscriptionError"/>
+							<xsd:element ref="OtherError"/>
+						</xsd:choice>
+						<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Text description of error.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- === GS: Terminate Subscription Notification ======================================================== -->
+	<xsd:element name="SubscriptionTerminatedNotification" type="SubscriptionTerminatedNotificationStructure" substitutionGroup="ProducerResponse">
+		<xsd:annotation>
+			<xsd:documentation>Notification from Subscriber to Subscription Manager to terminate a subscription.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SubscriptionTerminatedNotificationStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Notification to terminate a subscription or subscriptions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProducerResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="SubscriptionIdentifierResourcePropertyGroup" maxOccurs="unbounded"/>
+					<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Text description providing additional information about the reason for the subscription termination.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Extensions" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Responses==================================================================== -->
+	<xsd:group name="StatusResponseGroup">
+		<xsd:annotation>
+			<xsd:documentation>Responses that infrom about the service status.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="CheckStatusResponse"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:complexType name="StatusResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Response Status.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="ContextualisedResponseEndpointGroup"/>
+					<xsd:group ref="SubscriptionIdentifierResourcePropertyGroup" minOccurs="0"/>
+					<xsd:element ref="Status" minOccurs="0"/>
+					<xsd:element name="ErrorCondition" type="ServiceDeliveryErrorConditionStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Description of any error or warning condition.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="SuccessInfoGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ResponseStatus" type="StatusResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Contains infromation about the processing of a an individual service subscription - either success info or an error condition. (VDV Acknowledgement).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- === GS: Subscription Response======================================================== -->
+	<xsd:element name="SubscriptionResponse" type="SubscriptionResponseStructure" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Response from Producer to Consumer to inform whether subscriptions have been created. Answers a previous SubscriptionRequest.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SubscriptionResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Subscription Response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseEndpointStructure">
+				<xsd:sequence>
+					<xsd:group ref="SubscriptionResponsePayloadGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SubscriptionResponsePayloadGroup">
+		<xsd:annotation>
+			<xsd:documentation>Subscription Response content.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ResponseStatus" maxOccurs="unbounded"/>
+			<xsd:element name="SubscriptionManagerAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Endpoint address of subscription manager if different from that of the Producer or known default.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ServiceStartedTime" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time at which service providing the subscription was last started. Can be used to detect restarts. If absent, unknown.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="Extensions" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===DATA DELIVERY ============================================================== -->
+	<xsd:group name="DeliveryRequestGroup">
+		<xsd:annotation>
+			<xsd:documentation>General requests for fetched data delivery.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="DataReadyNotification"/>
+			<xsd:element ref="DataSupplyRequest"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- === GS: Data Ready Notification======================================================== -->
+	<xsd:element name="DataReadyNotification" type="DataReadyRequestStructure" substitutionGroup="ProducerRequest">
+		<xsd:annotation>
+			<xsd:documentation>Request from Producer to Consumer to notify that data update is ready to fetch. Answered with a DataReadyResponse.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:group name="DataSupplyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Groups the data supply messages.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="DataReadyNotification"/>
+			<xsd:element ref="DataSupplyRequest"/>
+			<xsd:element ref="DataReceivedAcknowledgement"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="DataReadyRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Request from Producer to Consumer to notify that data update is ready to fetch. Answered with a DataReadyResponse.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractNotificationStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- === GS: Data Ready Acknowledgement======================================================= -->
+	<xsd:element name="DataReadyAcknowledgement" type="DataReadyResponseStructure" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Response from Consumer to Producer to acknowledge to Producer that a DataReadyRequest has been received.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DataReadyResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Data ready Acknowledgement Response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ConsumerResponseEndpointStructure">
+				<xsd:sequence>
+					<xsd:element ref="Status" minOccurs="0"/>
+					<xsd:element name="ErrorCondition" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Description of any error or warning condition as to why Consumer cannot fetch data.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:choice>
+									<xsd:element ref="UnknownSubscriptionError"/>
+									<xsd:element ref="OtherError"/>
+								</xsd:choice>
+								<xsd:sequence>
+									<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>Text description of error.</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ====GS: Data Supply Request ======================================================= -->
+	<xsd:element name="DataSupplyRequest" type="DataSupplyRequestStructure" substitutionGroup="AbstractRequest">
+		<xsd:annotation>
+			<xsd:documentation>Request from Consumer to Producer to fetch update previously notified by a Data ready message. Answered with a Service Delivery.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DataSupplyRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Data supply Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ConsumerRequestEndpointStructure">
+				<xsd:sequence>
+					<xsd:group ref="DataSupplyTopicGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DataSupplyTopicGroup">
+		<xsd:annotation>
+			<xsd:documentation>Specifies content to be included in data supply.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="NotificationRef" type="MessageRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a specific notification message for which data is to be fetched. Can be used to distinguish between notfcatiosn for the same service and subscriber but for different filters.If none specified,</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AllData" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether to return all data, or just new updates since the last delivery. Default false, i.e. just updates.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====GS: Data Received Response ======================================================= -->
+	<xsd:element name="DataReceivedAcknowledgement" type="DataReceivedResponseStructure" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Response from Consumer to Producer to acknowledge that data hase been received. Used as optioanl extra step if reliable delivery is needed. Answers a ServiceDelivery.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DataReceivedResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Data received Acknowledgement Response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ConsumerResponseEndpointStructure">
+				<xsd:sequence>
+					<xsd:group ref="DataReceivedPayloadGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DataReceivedPayloadGroup">
+		<xsd:annotation>
+			<xsd:documentation>Data received Acknowledgement content.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Status"/>
+			<xsd:element name="ErrorCondition" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of any error or warning condition.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:choice>
+							<xsd:element ref="UnknownSubscriptionError"/>
+							<xsd:element ref="OtherError"/>
+						</xsd:choice>
+						<xsd:sequence>
+							<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Text description of error.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DeliveryEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements identifying data Consumer, i.e. requestor, if synchronous delivery or subscriber if asynchronous.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="RequestorRef" minOccurs="0"/>
+			<xsd:element name="MessageRef" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to an arbitrary unique reference associated with the request which gave rise to this response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== GS: Check Status Request =================================================== -->
+	<xsd:element name="CheckStatusRequest" type="CheckStatusRequestStructure" substitutionGroup="AbstractTrackedRequest">
+		<xsd:annotation>
+			<xsd:documentation>Request from Consumer to Producer to check whether services is working. Answers a CheckStatusRequest.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CheckStatusRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for check status request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="RequestStructure">
+				<xsd:sequence>
+					<xsd:element ref="Extensions" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="version" type="VersionString" default="2.0">
+					<xsd:annotation>
+						<xsd:documentation>Version number of request.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- =====GS: Check Status Request ============================================= -->
+	<xsd:element name="CheckStatusResponse" type="CheckStatusResponseStructure" substitutionGroup="ProducerResponse">
+		<xsd:annotation>
+			<xsd:documentation>Response from Producer to Consumer to inform whether services is working. Answers a CheckStatusRequest.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CheckStatusResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Service Status Check Response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProducerResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="CheckStatusPayloadGroup"/>
+					<xsd:element ref="Extensions" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CheckStatusPayloadGroup">
+		<xsd:annotation>
+			<xsd:documentation>Data received AcknowledgementService Status Check Request content.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Status" minOccurs="0"/>
+			<xsd:element name="DataReady" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether data delivery is ready to be fetched SIRI v 2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ErrorCondition" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of any error or warning condition that applies to the status check.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:choice>
+							<xsd:element ref="ServiceNotAvailableError"/>
+							<xsd:element ref="OtherError"/>
+						</xsd:choice>
+						<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Text description of error.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:group ref="SuccessInfoGroup"/>
+			<xsd:element name="ServiceStartedTime" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time at which current instantiation of service started.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== GS: Heartbeat Response ================================================ -->
+	<xsd:element name="HeartbeatNotification" type="HeartbeatNotificationStructure" substitutionGroup="ProducerRequest">
+		<xsd:annotation>
+			<xsd:documentation>Notification from Producer to Consumer to indicate that the service is running normally.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="HeartbeatNotificationStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Service Heartbeat Notification.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProducerRequestEndpointStructure">
+				<xsd:sequence>
+					<xsd:group ref="CheckStatusPayloadGroup"/>
+					<xsd:element ref="Extensions" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<!-- ===WSDL=============================================================== -->
+	<xsd:complexType name="TerminateSubscriptionRequestBodyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Body of Terminate Subscription Request content. Used in WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="TerminateSubscriptionTopicGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="SubscriptionResponseBodyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Body of Subscription Response. Used in WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ResponseStatus" maxOccurs="unbounded"/>
+			<xsd:element name="SubscriptionManagerAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Endpoint address of subscription manager if different from that of the Producer or known default.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ServiceStartedTime" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time at which service providing the subscription was last started. Can be used to detect restarts. If absent, unknown.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="DataSupplyRequestBodyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Body of Data Supply Request. Used in WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="DataSupplyTopicGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CheckStatusResponseBodyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Body of Service Status Check Response. Used in WSDL.</xsd:documentation>
+			<xsd:documentation>Same as CheckStatusResponseStructure, but without extension to be consistent with the other operation definition.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="CheckStatusPayloadGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

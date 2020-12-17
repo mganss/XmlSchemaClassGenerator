@@ -386,7 +386,7 @@ namespace XmlSchemaClassGenerator
             {
                 throw new ArgumentException("XML and C# namespaces should be separated by '='.");
             }
-            
+
             var xmlNs = parts[0];
             var netNs = parts[1];
             var parts2 = xmlNs.Split(new[] { '|' }, 2);

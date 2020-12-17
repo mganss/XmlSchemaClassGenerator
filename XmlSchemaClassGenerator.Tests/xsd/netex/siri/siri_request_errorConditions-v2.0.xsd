@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (x64) (http://www.altova.com) by Christophe Duquesne (Dryade) -->
+<xsd:schema xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.siri.org.uk/siri" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="siri_request_errorConditions">
+	<xsd:include schemaLocation="../siri_utility/siri_types-v2.0.xsd"/>
+	<xsd:include schemaLocation="siri_request_support-v2.0.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>CEN TC278 WG3 SG7 Team</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG7 Editor Nicholas Knowles, Kizoom. mailto:schemer@siri.org.uk</Creator>
+				<Date><Created>2012-03-24</Created>
+					 Factored out of SIRI request 
+				</Date>
+				<Date><Modified>2009-03-31</Modified>
+					 - Add errorConditionelement to enable WSDL axis binding 
+				</Date>
+				<Date><Modified>2011-04-18</Modified>
+					 - ErrorConditionStructure Line 841 should not be abstract. Fix from RV ixxi.biz
+						 Also Add ServiceConditionErrorConditionElement 
+						 
+						Add new error conditions
+						
+						UnknownParticipant	Recipient for a message to be distributed is unknown. +SIRI v2.0
+						UnknownEndpoint	Endpoint to which a message is to be distributed is unknown. +SIRI v2.0
+						EndpointDeniedAccess	Distribution message could not be delivered because not authorised.. +SIRI v2.0
+						EndpointNotAvailable	Recipient of a message to be distributed is not available. +SIRI v2.0
+						UnapprovedKey	User authorisation Key is not  enabled. +SIRI v2.0
+						
+						InvalidDataReferences	Request contains references to  identifiers that are not known.  +SIRI v2.0
+						ParametersIgnored	Request contained parameters that were not supported by the producer. A response has been provided but some parameters have been ignored. +SIRI v2.0
+						UnknownExtensions	Request contained extensions that were not supported bu the producer. A response has been provided but some or all extensions have been ignored.. +SIRI v2.0
+
+				</Date>
+				<Date><Modified>2012-03-23</Modified>
+					 +SIRI v2.0
+					  Add error number to Error structure
+					  Factor our Permission model to separate package siri_permissions
+				</Date>
+				<Description>
+					<p>SIRI is a European CEN standard for the exchange of real-time information. This subschema defines common request error conditions </p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.siri.org.uk/schema/2.0/xsd/siri/}siri_requests_errorConditions-v2.0.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.siri.org.uk/schema/2.0/xsd/siri_uility/siri_types-v2.0.xsd</Requires>
+					<Requires>http://www.siri.org.uk/schema/2.0/xsd/siri_uility/siri_participant-v2.0.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+
+        <Copyright>CEN, VDV, RTIG 2004-2012</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the VDV, RTIGXML and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 2.0 Draft</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport, Ports and maritime transport, Public transport,
+Rail transport, Roads and road transport
+</Category>
+					<Project>CEN TC278 WG3 SG7</Project>
+				</Subject>
+				<Title>SIRI XML schema. Common Request Error Conditions </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>SIRI Framework Error COnditions.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:element name="ErrorCondition" type="ErrorConditionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Description of error or warning condition associated with response.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ErrorConditionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for RequestErrorCondition.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:group ref="ApplicationErrorGroup"/>
+			</xsd:choice>
+			<xsd:element name="Description" type="NaturalLanguageStringStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Text description of error.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="SuccessInfoGroup">
+		<xsd:annotation>
+			<xsd:documentation>Additional information provided if request is successful.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ValidUntil" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End of data horizon of the data producer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ShortestPossibleCycle" type="PositiveDurationType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Minimum interval at which updates can be sent.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="ErrorConditionElement" type="ErrorConditionElementStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Element fror an erroc condition  (for use in WSDL.)</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ErrorConditionElementStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Standard ErrorConditions for Service request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:group ref="ServiceRequestErrorGroup"/>
+				<xsd:element ref="UnknownSubscriptionError"/>
+			</xsd:choice>
+			<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Text description of error.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ErrorDescriptionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Description of an error.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- =======Error conditions========================================================== -->
+	<xsd:element name="ErrorCode" type="ErrorCodeStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI Error code.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ErrorCodeStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error Code.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ErrorText" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Addtional Description of error. This allows a descripotion to be supplied when the Error code is used in a specific WSDL fault, rather than within a general error condition.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="number" type="xsd:integer">
+			<xsd:annotation>
+				<xsd:documentation>Error code number associated with error.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="ServiceDeliveryErrorConditionElement" type="ServiceDeliveryErrorConditionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Element fror an erroc condition for use in WSDL.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceDeliveryErrorConditionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Standard ErrorConditiosn for Service request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:group ref="ServiceRequestErrorGroup"/>
+			</xsd:choice>
+			<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Text description of error.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="ServiceRequestErrorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Errors that may arise in the execution of a request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:group ref="DistributionErrorGroup"/>
+			<xsd:group ref="ApplicationErrorGroup"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ===  DISTRIBUTION (+SIRI v2.0)================================================== -->
+	<xsd:group name="DistributionErrorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Errors that may arise in the execution of a delegated distribution request. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="UnapprovedKeyAccessError"/>
+			<xsd:element ref="UnknownParticipantError">
+				<xsd:annotation>
+					<xsd:documentation>Error: Recipient for a message to be distributed is unknown. I.e. delegatior is found, but  +SIRI v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="UnknownEndpointError"/>
+			<xsd:element ref="EndpointDeniedAccessError"/>
+			<xsd:element ref="EndpointNotAvailableAccessError"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ===Error: Unapproved Key Access ============================================= -->
+	<xsd:element name="UnapprovedKeyAccessError" type="UnapprovedKeyAccessStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Recipient of a message to be distributed is not available. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="UnapprovedKeyAccessStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: UnapprovedKey +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="Key" type="xsd:normalizedString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>User key.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Capability Not Supported============================================== -->
+	<xsd:element name="UnknownParticipantError" type="UnknownParticipantErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Recipient for a message to be distributed is unknown. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="UnknownParticipantErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: Unknown Participant. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="ParticipantRef" type="ParticipantRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Reference to  Participant who is unknown. + SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Unknown Endpoint ============================================ -->
+	<xsd:element name="UnknownEndpointError" type="UnknownEndpointErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Recipient for a message to be distributed is unknown. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="UnknownEndpointErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: Unknown Endpoint +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="Endpoint" type="EndpointAddress" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Endpoint that is not known. + SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Endpoint Denied Access ============================================= -->
+	<xsd:element name="EndpointDeniedAccessError" type="EndpointDeniedAccessStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error:Endpoint to which a message is to be distributed did not allow access by the cloient. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="EndpointDeniedAccessStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: EndpointDeniedAccess +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="Endpoint" type="EndpointAddress" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Endpoint that was denied access  + SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Endpoint Not Available============================================= -->
+	<xsd:element name="EndpointNotAvailableAccessError" type="EndpointNotAvailableAccessStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error:Recipient of a message to be distributed is not available. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="EndpointNotAvailableAccessStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: EndpointNotAvailable +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="Endpoint" type="EndpointAddress" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Endpoint that is noit available. + SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===APPLICATION================================================== -->
+	<!-- ===== ============================================ -->
+	<xsd:group name="ApplicationErrorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Errors that may arise in the execution of a request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="ServiceNotAvailableError"/>
+			<xsd:element ref="CapabilityNotSupportedError"/>
+			<xsd:element ref="AccessNotAllowedError"/>
+			<xsd:element ref="InvalidDataReferencesError"/>
+			<xsd:element ref="BeyondDataHorizon">
+				<xsd:annotation>
+					<xsd:documentation>Error: Data period or subscription period is outside of period covered by service.   +SIRI v2.0.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="NoInfoForTopicError"/>
+			<xsd:element ref="ParametersIgnoredError"/>
+			<xsd:element ref="UnknownExtensionsError">
+				<xsd:annotation>
+					<xsd:documentation>Error: Request contained extensions that were not supported by the producer. A response has been provided but some or all extensions have been ignored.  +SIRI v2.0.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="AllowedResourceUsageExceededError"/>
+			<xsd:element ref="OtherError"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ===Error: Service Not Available ============================================= -->
+	<xsd:element name="ServiceNotAvailableError" type="ServiceNotAvailableErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Functional service is not available to use (but it is still capable of giving this response).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceNotAvailableErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Service Not Available error.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="ExpectedRestartTime" type="xsd:dateTime" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Expected time for reavailability of service.  +SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Capability Not Supported============================================== -->
+	<xsd:element name="CapabilityNotSupportedError" type="CapabilityNotSupportedErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Service does not support the requested capability.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CapabilityNotSupportedErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: Service does not support requested capability.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="CapabilityRef" type="CapabilityCodeType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Id of capabiliuty that is not supported.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Beyond Data Horizon ============================================== -->
+	<xsd:element name="BeyondDataHorizon" type="BeyondDataHorizonErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Data period or subscription period is outside of period covered by service.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BeyondDataHorizonErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for error.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===== AUTHORISATION========================================= -->
+	<!-- ===Error: Access not allowed ============================================= -->
+	<xsd:element name="AccessNotAllowedError" type="AccessNotAllowedErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Requestor is not authorised to the service or data requested.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AccessNotAllowedErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type forError:Access Not Allowed.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: No Info for Topic================================================= -->
+	<xsd:element name="NoInfoForTopicError" type="NoInfoForTopicErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Valid request was made but service does not hold any data for the requested topic. expression.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="NoInfoForTopicErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: No Info for Topic</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Invalid Data References ======================================= -->
+	<xsd:element name="InvalidDataReferencesError" type="InvalidDataReferencesErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Request contains references to  identifiers that are not known.  +SIRI v2.0.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="InvalidDataReferencesErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for InvalidDataReferencesError:. +SIRI v2.0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="InvalidRef" type="xsd:NMTOKEN" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Invalid reference values encoountered.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Invalid Data References ======================================= -->
+	<xsd:element name="ParametersIgnoredError" type="ParametersIgnoredErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Request contained parameters that were not supported by the producer. A response has been provided but some parameters have been ignored. +SIRI v2.0.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ParametersIgnoredErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Parameters Ignored Error:. +SIRI v2.0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="ParameterName" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Name of the unsupported parameter.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Unknown Extensions======================================= -->
+	<xsd:element name="UnknownExtensionsError" type="UnknownExtensionsErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Request contained extensions that were not supported by the producer. A response has been provided but some or all extensions have been ignored..  +SIRI v2.0.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="UnknownExtensionsErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Unknown Extensions Error:. +SIRI v2.0.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="ExtensionName" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Name of the unknown encountered extensions.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Allowed Resource Usage Exceeded ============================================= -->
+	<xsd:element name="AllowedResourceUsageExceededError" type="AllowedResourceUsageExceededErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Valid request was made but request would exceed the permitted resource usage of the client.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AllowedResourceUsageExceededErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for error. AllowedResourceUsageExceeded.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ==== SUBSCRIPTION ERRORS=========================================== -->
+	<!-- ===Error: Unknown Subscriber  ============================================= -->
+	<xsd:element name="UnknownSubscriberError" type="UnknownSubscriberErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Subscriber not found.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="UnknownSubscriberErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: Subscriber not found.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="SubscriberRef" type="ParticipantRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Id of subscriber that was not found + SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ===Error: Unknown Subscription  ============================================= -->
+	<xsd:element name="UnknownSubscriptionError" type="UnknownSubscriptionErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Subscription not found.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="UnknownSubscriptionErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Error: Subscription not found.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure">
+				<xsd:sequence>
+					<xsd:element name="SubscriptionCode" type="SubscriptionQualifierStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Ubscription code that could not be found. + SIRI v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Error: Other Error ============================================= -->
+	<xsd:element name="OtherError" type="OtherErrorStructure" substitutionGroup="ErrorCode">
+		<xsd:annotation>
+			<xsd:documentation>Error: Error type other than the well defined codes.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OtherErrorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for error.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ErrorCodeStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

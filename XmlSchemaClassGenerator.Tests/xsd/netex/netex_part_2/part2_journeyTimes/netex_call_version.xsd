@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_call_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_servicePattern_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_stopAssignment_version.xsd"/>
+	<xsd:include schemaLocation="netex_interchangeRule_version.xsd"/>
+	<xsd:include schemaLocation="netex_passingTimes_version.xsd"/>
+	<xsd:include schemaLocation="netex_call_support.xsd"/>
+	<xsd:include schemaLocation="netex_vehicleService_support.xsd"/>
+	<xsd:include schemaLocation="netex_journeyDesignator_support.xsd"/>
+	<xsd:include schemaLocation="../part2_vehicleService/netex_duty_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Date><Modified>2017-05-25</Modified>CR0035 Add CHeck COnstraint to call part
+					<!-- Name Space changes -->
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the CALL types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_2/part2_journeyTimes}netex_call_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx CALL identifier  types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: CALL  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ==== CALL =========================================-->
+	<xsd:complexType name="calls_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>CALLs associated with entity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Call_" minOccurs="2" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Call_" type="VersionedChildStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Dummy CALL.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Call" substitutionGroup="Call_">
+		<xsd:annotation>
+			<xsd:documentation>A visit to a SCHEDULED STOP POINT as part of a VEHICLE JOURNEY. A CALL is a view of a POINT IN JOURNEY PATTERN that adds in derived data.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Call_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CallIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Call-Z" substitutionGroup="Call_">
+		<xsd:annotation>
+			<xsd:documentation>A visit to a SCHEDULED STOP POINT as part of a VEHICLE JOURNEY. A CALL is a view of a POINT IN JOURNEY PATTERN that adds in derived data. No Constraints</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Call_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CallIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Call_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="CallGroup"/>
+					<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger">
+					<xsd:annotation>
+						<xsd:documentation>Order of Call within Journey.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="constrained" type="xsd:boolean"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CallGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="StopPointInJourneyPatternViewPropertiesGroup"/>
+			<xsd:element ref="ServiceJourneyRef" minOccurs="0"/>
+			<xsd:element name="PointInJourneyPatternRef" type="PointInJourneyPatternRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Point in JOURNEY PATTERN upon which this call is based. Can be used to obtain full association sets.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="CallTimingGroup">
+				<xsd:annotation>
+					<xsd:documentation>Elements describing the timing of the  CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="StopPointInPatternPropertiesGroup">
+				<xsd:annotation>
+					<xsd:documentation>Elements describing the STOP POINT IN JOURNEY PATTERN properties of the call.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="ServiceRequirementTypeGroup"/>
+			<xsd:element name="Note" type="MultilingualString" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Text annotation that applies to this CALL. This is for internal use. Customer facing should be added to footnote.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CallTimingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing  Call timing aspects of the the CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Arrival" type="ArrivalStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arrival at CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Departure" type="DepartureStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Departure from a CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Frequency" type="FrequencyStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Frequency of service at CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="ArrivalStructure">
+		<xsd:annotation>
+			<xsd:documentation>Reorganisation  of Passing times as arrival.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Time" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Latest Arrival time.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of days after the starting  day of the journey. Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ForAlighting" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether  alighting is allowed at the stop  Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IsFlexible" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether use of stop is flexible, i.e. requires phoning to arrange. Must be a  FLEXIBLE LINE.  Default is false.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="CallPartGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DepartureStructure">
+		<xsd:annotation>
+			<xsd:documentation>Reorganisation of Passing times as Departure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Time" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timetabled departure time - Earliest time to depart.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of days of departure time after the starting  day of the journey, if  not same calendar day. Default is 0 for same dayi.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ForBoarding" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether  boarding is allowed at the stop. Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IsFlexible" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether use of stop is flexible, i.e. requires phoning to arrange. Must be a FLEXIBLE LINE.  Default is false.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="WaitTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timetabled waiting interval.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="CallPartGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="CallPartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing an arrival or Departure part of the CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPartRef" minOccurs="0"/>
+			<xsd:element name="journeyMeetings" type="journeyMeetingViews_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEY MEETINGs for visit.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="interchanges" type="serviceJourneyInterchanges_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>INTERCHANGEs for visit.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="interchangeRules" type="interchangeRules_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>INTERCHANGE RULEs for visit.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:element ref="TimeDemandTypeRef"/>
+				<xsd:element ref="TimebandRef"/>
+			</xsd:choice>
+			<xsd:element ref="DutyPartRef" minOccurs="0"/>
+			<xsd:group ref="QuayAssignmentGroup"/>
+			<xsd:element ref="AccessibilityAssessment" minOccurs="0"/>
+			<xsd:element ref="CheckConstraint" minOccurs="0"/>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICEs of a CALL that apply only to the Arrival  or departure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== CALL =========================================-->
+	<xsd:complexType name="deadRunCalls_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>DEAD RUN CALLs associated with entity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence minOccurs="2" maxOccurs="unbounded">
+					<xsd:element name="DeadRunCall" type="DeadRunCall_VersionedChildStructure"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DeadRunCall_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for DEAD RUN CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="DeadRunCallGroup"/>
+					<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedDeadRunCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedDeadRunCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger">
+					<xsd:annotation>
+						<xsd:documentation>Order of DEAD RUN CALL within Journey.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DeadRunCallGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the DEAD RUN CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:annotation>
+					<xsd:documentation>Restrict just to SCHEDULED STOP POINTs.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element ref="PointRef"/>
+				<xsd:element ref="ScheduledStopPointView" minOccurs="0"/>
+			</xsd:choice>
+			<xsd:element name="PointInJourneyPatternRef" type="PointInJourneyPatternRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Point in JOURNEY PATTERN upon which this DEAD RUN CALL is based. Can be used to obtain full association sets.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="DeadRunCallTimingGroup">
+				<xsd:annotation>
+					<xsd:documentation>Elements describing the timing of the  DEAD RUN CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="StopPointInPatternPropertiesGroup" minOccurs="0"/>
+			<xsd:element name="Note" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Text annotation that applies to this DEAD RUN CALL. This is for internal use. Customer facing should be added to footnote.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DeadRunCallTimingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Timing Elements describing the DEAD RUN CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Arrival" type="DeadRunCallPartStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arrival at DEAD RUN CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Departure" type="DeadRunCallPartStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Departure from a DEAD RUN CALL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="DeadRunCallPartStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DEAD RUN CALL part.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Time" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Latest Arrival time.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DayOffset" type="DayOffsetType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation> Number of days of arrival time after the starting  day  journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="WaitTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timetabled waiting interval.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="DeadRunCallPartGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="DeadRunCallPartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing an arrival or Departure part of the DEAD RUN CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPartRef" minOccurs="0"/>
+			<xsd:element ref="TimeDemandTypeRef" minOccurs="0"/>
+			<xsd:element ref="DutyPartRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== DatedCall=========================================-->
+	<xsd:complexType name="datedCalls_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>DatedCALLs associated with entity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="DatedCall" minOccurs="2" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>A CALL that is part of a DATED JOURNEY and so takes place on a specified date.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DatedCall" substitutionGroup="Call_">
+		<xsd:annotation>
+			<xsd:documentation>A visit to a SCHEDULED STOP POINT as part of a VEHICLE JOURNEY. A CALL is a view of a POINT IN JOURNEY PATTERN that adds in derived data.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DatedCall_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DatedCallGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DatedCallIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DatedCall_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for DATED CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Call_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="DatedCallGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DatedCall-Z" substitutionGroup="Call_">
+		<xsd:annotation>
+			<xsd:documentation>A visit to a SCHEDULED STOP POINT as part of a VEHICLE JOURNEY. A CALL is a view of a POINT IN JOURNEY PATTERN that adds in derived data.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DatedCall_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DatedCallGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DatedCallIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="DatedCallGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the DATED CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="DriverRef" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="ArrivalDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Date of  departure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DepartureDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Date of departure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====Junk=========================================================== -->
+	<!-- ======================================================================= -->
+	<xsd:group name="CallDetailsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the CALL. Must match the context of the call.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PointInJourneyPattern" minOccurs="0"/>
+			<xsd:element ref="TimetabledPassingTime" minOccurs="0"/>
+			<xsd:element ref="ScheduledStopPoint" minOccurs="0"/>
+			<xsd:element ref="PassengerStopAssignment" minOccurs="0"/>
+			<xsd:element ref="DynamicStopAssignment" minOccurs="0"/>
+			<xsd:element ref="JourneyPattern" minOccurs="0"/>
+			<xsd:element ref="ServiceJourneyInterchange" minOccurs="0"/>
+			<xsd:element ref="ServiceJourneyPatternInterchange" minOccurs="0"/>
+			<xsd:element ref="Connection" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>

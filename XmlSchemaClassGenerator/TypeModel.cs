@@ -594,6 +594,7 @@ namespace XmlSchemaClassGenerator
         public bool IsKey { get; set; }
         public XmlSchemaParticle XmlParticle { get; set; }
         public XmlSchemaObject XmlParent { get; set; }
+        public Particle Particle { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
         public List<Substitute> Substitutes { get; set; }
 

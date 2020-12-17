@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:core="http://www.govtalk.gov.uk/core" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2016-05-30T12:00:00Z</PublicationTimestamp>
+	<ParticipantRef>RUT</ParticipantRef>
+	<Description>Generell PublicationDelivery</Description>
+	<!-- Relevante frames legges under dataObjects, bør legges inn i enklest mulig lesbar rekkefølge -->
+	<dataObjects>
+		<!-- CompositeFrame brukes å samle ulike frames inn i objekt -->
+		<CompositeFrame version="any" created="2016-05-30T12:00:00Z" id="NSR:CompositeFrame:NUMBER">
+			<!-- Gyldighetsperiode (gjelder alle underliggende frames) -->
+			<validityConditions>
+				<AvailabilityCondition version="any" id="NSR:AvailabilityCondition:NUMBER"/>
+			</validityConditions>
+			<codespaces>
+				<!-- Codespace, f.eks. for Nasjonalt Stoppestedsregister -->
+				<Codespace id="nsr_data">
+					<Xmlns>NSR</Xmlns>
+					<XmlnsUrl>http://www.rutebanken.no/nasjonltstoppestedsregister</XmlnsUrl>
+				</Codespace>
+			</codespaces>
+			<frames>
+				<ResourceFrame id="NSR:ResourceFrame:NUMBER" version="any">
+					<FrameDefaults>
+						<!-- Alle elementer med id-attributt blir prefixet med dette codespacet (dvs RUT:) -->
+						<DefaultCodespaceRef ref="nsr_data"/>
+						<DefaultLocale>
+							<TimeZone>CET</TimeZone>
+							<SummerTimeZone>CEST</SummerTimeZone>
+							<!-- Alle tekster er på norsk om ikke eksplisitt spesifisert -->
+							<DefaultLanguage>no</DefaultLanguage>
+						</DefaultLocale>
+						<!-- Alle koordinater leveres i henhold til WGS84, ref. "EPSG:4326" -->
+						<DefaultLocationSystem>EPSG:4326</DefaultLocationSystem>
+					</FrameDefaults>
+					<organisations>
+						<Authority version="any" id="NSR:Authority">
+							<CompanyNumber>NUMBER</CompanyNumber>
+							<Name>Nasjonalt stoppestedsregister</Name>
+							<LegalName>RUTEBANKEN AS</LegalName>
+							<ContactDetails>
+								<Url>http://www.nasjonalreiseplanlegger.com/</Url>
+							</ContactDetails>
+							<OrganisationType>authority</OrganisationType>
+						</Authority>
+					</organisations>
+				</ResourceFrame>
+				<!-- SiteFrame innholder stops, quays og PoI (point of interest) -->
+				<SiteFrame id="NSR:SiteFrame" version="any">
+					<stopPlaces>
+						<!-- Merk at her brukes det codespace NSR som viser at disse elementene eies av Nasjonalt Stoppestedsregister -->
+						<StopPlace version="any" id="NSR:StopPlace:NUMBER">
+							<Name>Navn</Name>
+							<quays>
+								<Quay version="any" id="NSR:Quay:NUMBER"/>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<!-- ServiceFrame definerer en service, som networks, routePoints, routes, lines, schedulesStopPoints, stop assignments og destinationDisplays som brukes av et Service Pattern -->
+				<ServiceFrame id="NSR:ServiceFrame" version="any">
+					<!-- Beskrivelse av nettverk, hvis relevant -->
+					<Network version="any" id="NSR:Network:NUMBER"/>
+					<!-- Beskrivelse av linjen(e) som leveres i filen -->
+					<routePoints>
+						<RoutePoint version="any" id="NSR:RoutePoint:NUMBER">
+							<projections>
+								<PointProjection version="any" id="NSR:PointProjection:NUMBER"/>
+							</projections>
+						</RoutePoint>
+					</routePoints>
+					<!-- Beskrivelse av overordnet rute -->
+					<routes>
+						<Route version="any" id="NSR:Route:NUMBER">
+							<Name>NAME</Name>
+							<LineRef ref="NSR:Line:NUMBER"/>
+							<DirectionType>outbound</DirectionType>
+							<!-- rutepunkter (minimum to) -->
+							<pointsInSequence>
+								<PointOnRoute version="any" id="NSR:PointOnRoute:NUMBER-1" order="1">
+									<RoutePointRef version="any" ref="NSR:RoutePoint:NUMBER"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="NSR:PointOnRoute:NUMBER-2" order="2">
+									<RoutePointRef version="any" ref="NSR:RoutePoint:NUMBER"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+					</routes>
+					<!-- Beskrive av linjen ruten tilhører -->
+					<lines>
+						<Line version="any" id="NSR:Line:NUMBER">
+							<Name>LINJENAVN</Name>
+							<PublicCode>LINJENUMMER/KODE</PublicCode>
+							<OperatorRef ref="NSR:Authority"/>
+						</Line>
+					</lines>
+					<!-- Skiltkasser -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="NSR:DestinationDisplay:NAME"/>
+					</destinationDisplays>
+					<!-- Definisjon av rutens stoppunkter -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="NSR:ScheduledStopPoint:NUMBER"/>
+					</scheduledStopPoints>
+					<!-- Knytting av rutens stoppunkter til fysisk stoppested -->
+					<stopAssignments>
+						<PassengerStopAssignment version="any" id="NSR:PassengerStopAssignment:NUMBER" order="1">
+							<ScheduledStopPointRef version="any" ref="NSR:ScheduledStopPoint:NUMBER"/>
+							<StopPlaceRef version="any" ref="NSR:StopPlace:NUMBER"/>
+							<QuayRef version="any" ref="NSR:Quay:NUMBER"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+					<!-- Turmønster -->
+					<journeyPatterns>
+						<JourneyPattern version="any" id="NRH:JourneyPattern:NUMBER"/>
+					</journeyPatterns>
+				</ServiceFrame>
+				<!-- ServiceCalendarFrame definerer kalenderobjekter (dager, dagtyper, operasjonsperioder, tidspunkt etc.) -->
+				<ServiceCalendarFrame id="NRH:ServiceCalendarFrame" version="any">
+					<ServiceCalendar version="any" id="RUT:ServiceCalendar:NUMBER"/>
+					<dayTypes>
+						<DayType version="any" id="NSR:DayType:NAME"/>
+					</dayTypes>
+				</ServiceCalendarFrame>
+				<!-- TimetableFrame definerer ServiceJourney, dvs avgang(er) for en gitt dag/periode. -->
+				<TimetableFrame id="NSR:TimetableFrame:NUMBER" version="any">
+					<!-- Turer -->
+					<vehicleJourneys>
+						<ServiceJourney version="any" id="NRH:ServiceJourney:NUMBER">
+							<dayTypes>
+								<DayTypeRef ref="NRH:JourneyPattern:NUMBER"/>
+							</dayTypes>
+							<JourneyPatternRef ref="NRH:JourneyPattern:NUMBER"/>
+							<!-- turens stopp (minimum to) -->
+							<passingTimes>
+								<TimetabledPassingTime version="any" id="NSR:TimetabledPassingTime:NUMBER"/>
+							</passingTimes>
+						</ServiceJourney>
+					</vehicleJourneys>
+				</TimetableFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

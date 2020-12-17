@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_journeyPatternTimings_version">
+	<xsd:include schemaLocation="netex_journeyPattern_support.xsd"/>
+	<xsd:include schemaLocation="netex_journeyPatternTimings_support.xsd"/>
+	<xsd:include schemaLocation="netex_journeyTiming_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the JOURNEY PATTERN TIMING types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_tacticalPlanning}netex_journeyPatternTimings_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the VDV, RTIG XML and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx JOURNEY PATTERN TIMING types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NetEx: JOURNEY PATTERN TIMING types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:group name="TimingPointWaitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TIMING POINT IN JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="IsWaitPoint" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether point is a wait point.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:element name="WaitTime" type="xsd:duration">
+					<xsd:annotation>
+						<xsd:documentation>Wait time as interval. OPTIMISATION assuming default Time Demand. Use this to declare a single wait time Other wise a list of times for different time demands.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="waitTimes" type="journeyPatternWaitTimes_RelStructure">
+					<xsd:annotation>
+						<xsd:documentation>Wait times for TIMING POINT. There may be different times for different time demands.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="headways" type="journeyPatternHeadways_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Wait times for TIMING POINT. There may be different times for different time demands.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===JourneyPatternWaitTime===================================================== -->
+	<xsd:complexType name="journeyPatternWaitTimes_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PATTERN WAIT TIMEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="JourneyPatternWaitTimeRef"/>
+					<xsd:element ref="JourneyPatternWaitTime" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPatternWaitTime" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>The time a vehicle has to wait at a specific TIMING POINT IN JOURNEY PATTERN, for a specified TIME DEMAND TYPE. This wait time can be superseded by a VEHICLE JOURNEY WAIT TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPatternWaitTime_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyTimingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyWaitTimeGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyPatternWaitTimeGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPatternWaitTimeIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPatternWaitTime_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY PATTERN WAIT TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyWaitTime_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyPatternWaitTimeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPatternWaitTimeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a JOURNEY PATTERN WAIT TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPatternRef" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===JourneyPatternRunTime===================================================== -->
+	<xsd:complexType name="journeyPatternRunTimes_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PATTERN RUN TIMEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="JourneyPatternRunTimeRef"/>
+					<xsd:element ref="JourneyPatternRunTime" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation>JOURNEY PATTERN RUN TIME for a specified TIME DEMAND.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPatternRunTime" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>The time taken to traverse a TIMING LINK in a particular JOURNEY PATTERN, for a specified TIME DEMAND TYPE If it exists, it will override the DEFAULT SERVICE JOURNEY RUN TIME and DEFAULT DEAD RUN RUN TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPatternRunTime_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyTimingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyRunTimeGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="JourneyPatternRunTimeGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPatternRunTimeIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPatternRunTime_VersionedChildStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY PATTERN RUN TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyRunTime_VersionedChildStructure">
+				<xsd:group ref="JourneyPatternRunTimeGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPatternRunTimeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a JOURNEY PATTERN RUN TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPatternRef" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===JourneyPatternRunTime===================================================== -->
+	<xsd:complexType name="journeyPatternLayovers_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PATTERN LAYOVERs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyPatternLayover" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>JOURNEY PATTERN LAYOVER for a specified TIME DEMAND TYPE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPatternLayover" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Time allowance at the end of each journey on a specified JOURNEY PATTERN, to allow for delays and for other purposes. This layover supersedes any global layover and may be superseded by a specific VEHICLE JOURNEY LAYOVER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPatternLayoverStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyTimingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyLayoverGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyPatternLayoverGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPatternLayoverIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPatternLayoverStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a JOURNEY PATTERN LAYOVER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyLayoverStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyPatternLayoverGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPatternLayoverGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a JOURNEY PATTERN LAYOVER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPatternRef" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ===JourneyPatternWaitTime===================================================== -->
+	<xsd:complexType name="journeyPatternHeadways_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PATTERN HEADWAYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyPatternHeadway" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPatternHeadway" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Headway interval information that is available for all the VEHICLE JOURNEYs running on the JOURNEY PATTERN. This is a default value that can be superseded by the VEHICLE JOURNEY HEADWAY on a specific journey. This information must be consistent with HEADWAY JOURNEY GROUP if available (HEADWAY JOURNEY GROUP being a more detailed way of describing headway services).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPatternHeadway_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyTimingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="HeadwayIntervalGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyPatternHeadwayGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPatternHeadwayIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPatternHeadway_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY PATTERN HEADWAY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyHeadway_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyPatternHeadwayGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPatternHeadwayGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a JOURNEY PATTERN HEADWAY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPatternRef" minOccurs="0"/>
+			<xsd:element ref="TimingPointRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>

@@ -1,0 +1,1485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:siri="http://www.siri.org.uk/siri" version="1.1" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--
+UK NeTEx Profile: NPTG Data
+=============
+This Example shows an extract of actual NaPTAN   data for two  NaPTAN StopAreas and three NaPTAN Stop Points   encoded  in NeTEx  format
+
+The example includes an encoding of a standard ste of data values that can be used to describe teh profile and validate additional UK code values
+
+(C) Crown Copyright 2018-2019
+
+==========================================
+1. Overview:
+
+1.1 NaPTan Stop Points
+
+NaPTAN describes both   timetabled and physical   aspects of  stop in a  single entity, Stop Point.   a NaPTAN stop point thus represents variously a Station,  a stop on the street, an entrance 
+NeTEx separates  the concepts of the stop in the schedule     (SCHEDULED STOP POINT )  from the concept  of a stop as a physical  localtion  or group of locations  (STOP PLACE, QUAY, BOARDING POINT, ENTRANCE)
+
+              
+A NeTEx  STOP PLACE (and QUAY) can be  associated   with a  SCHEDULED STOP POINT.   using a STOP ASSIGNMENT
+
+1.2 NaPTan Stop  Areas
+
+  Each NaPTAN StopArea can be represented by a  NeTEx STOP AREA.  In particular this is useful where StopAreas are used to group multimodal stops at an interchange,
+
+A  Simplified  mapping might just use a STOP PLACE.
+
+1.3 Administrative areas
+
+The Administrative are is indicated by a ResponsibiltySetRef .  A separate responsibility set is defined in NPTG for each admin area. 
+
+================================
+2.  Summary
+
+2.1  A COMPOSITE FRAME is used  to hold the whole data set, with TYPE OF FRAME = UK_NAPTAN_data
+
+:::::::::::::
+2.2 A SERVICE FRAME is used to hold the main stop content data ( STOP PLACEs and STOP AREAs etc ,) :  with TYPE OF FRAME = nptg:UK_NAPTAN_profile_payload_data
+       NapTAn data is groupeed by AREA, so for demo purposes a Separate farme is used for each Administrative Area
+				 
+2.3 Each NaPTAN stop area  is mapped to an element of a  NeTEx STOP AREA, and identified with the same identifier  Ni.e. AtcoCode as in NaPTA
+			-	NaPTAN  StopArea  => NeTEx StopArea
+			-	NaPTAN ParentStopAreaRef => NeTEx ParentStopAreaRef. 
+
+The Type of the NaPTAN StopArea can   be represented with a  NeTExTypeOfZone code
+
+2.4 Each NaPTAN point type is mapped to an element of a  NeTEx STOP PLACE, and identified with the same identifier i.e. AtcoCode.
+
+The NaPTAN StopClassification and StopType can be used to determine how each type of stop is handled
+
+2.4.1    Each NaPTAN StopPoint that is an interchange   (i.e. of NaPTAN ‘access area’ stop type RLY, MET, etc) can be represented by a NeTEx STOP PLACE.
+			-	NaPTAN StopPoint (AccessArea) => NeTEx StopPlace.
+
+2.4.2    Each NaPTAN StopPoint that is a platform or other physical point of access (i.e. of NaPTAN stop type, BCS, PLT, etc ) can be represented by a NeTEx QUAY within a STOP PLACE given by the associated NaPTAN interchange.
+			-	NaPTAN StopPoint (Physical Stop) =>NeTEx StopPlace / Quay.
+
+2.4.3    Each NaPTAN StopPoint that is an entrance to an interchange (.e. of NaPTAN stop type BSE, RSE, FER, etc ) can be represented by a NeTEx ENTRANCE within a STOP PLACE given by the associated NaPTAN interchange
+			-	NaPTAN StopPoint (Entrance) =>NeTEx  StopPlace / Entrance.
+
+2.4.4  Each NaPTAN StopPoint that is not part of an interchange (mostly just on-street bus stops of type  BCT,) can be represented by a NeTEx QUAY; in this case an additional STOP PLACE will have to be created to contain it.  Pairs of on street stops (as indicated by a NaPTAN Stop Are of type GCLS) can be assigned to a single STOP PLACE
+
+
+2.5 Each NaPTAN point type is also mapped to  NeTEx SCHEDULED STOP POINT.   
+              ATtributes that relate to the timeing (eg default wait tim) can be assigned to the   CHEDULED STOP POINT.
+ 
+2.6  A NeTEx STOP PLACE ASSIGNMENT is used to created to explicitly link the STOP PLACE  attributes to its assoicated  SCHEDULED STOP POINT  .   
+::::::::::::::::::::::
+3.0 Metadata
+3.1.  A Resource FRAME is used  to provide a set of  Frame Type to annotate the frames data can be validated
+				This defines  values for TYPEs OF FRAME,  
+3.2.  A Resource FRAME is used  to provide a set of  NaPTAN code values against which stop  data can be validated
+				This defines  values for  DATA SOURCEs, RESPONSIBILITY SETs,  TYPEs OF ZONE, TYPEs OF PLACE
+					e.g.  NaPTAN StopPoint.StopClassifcation    ==>  NeTEx TypeOfPlace, TypeOfZone
+
+3.3  A Resourcee FRAME is used  to provide a set of  NPTG  code values against which the  NPTG data elements  can be validated
+				This defines  values for  DATA SOURCEs, RESPONSIBILITY SETs,  TYPEs OF ZONE, TYPEs OF PLACE
+					e.g.   NPTG  SourceLocalityType    ==>  NeTEx TypeOfPlace
+ 
+-->
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest>
+		<RequestTimestamp>2017-01-01T00:00:00Z</RequestTimestamp>
+		<Description>Request for  NaPTan  data  are </Description>
+		<topics>
+			<NetworkFrameTopic>
+				<Current/>
+				<TypeOfFrameRef ref="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP_OFFER:FXCP" versionRef="any"/>
+				<NetworkFilterByValue>
+				
+ 					<objectReferences>
+						<TransportAdministrativeZoneRef ref="nptgAdminArea:060"/>
+						<TransportAdministrativeZoneRef ref="nptgAdminArea:086"/>
+						<TransportAdministrativeZoneRef ref="nptgAdminArea:110"/>
+					</objectReferences>
+						<NetworkRef ref="NAPTAN"  versionRef="napt:v2.4"/>
+				</NetworkFilterByValue>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="epd:UK:DFT:CompositeFrame_UK_PI_STOP_OFFER:NAPTAN-060+086+110:napt" responsibilitySetRef="napt:stop_data" dataSourceRef="napt:dft">
+			<Name>Sample extract of NaPTAn data encoded a in NeTEx</Name>
+			<TypeOfFrameRef ref="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP_OFFER:FXCP" version="fxc:v1.0"/>
+			<!-- ==== CODESPACES == -->
+			<codespaces>
+				<CodespaceRef ref="fxc_metadata"/>			 
+				<CodespaceRef ref="epd_data"/>
+				<CodespaceRef ref="napt_metadata"/>
+				<CodespaceRef ref="nptg_metadata"/>
+				<CodespaceRef ref="naptStop_data"/>
+			</codespaces>
+			<frames>
+				<!---   ONE FRAME OER ADMIN   AREAS   -->
+				<!--   ======= PAYLOAD= ========================================================= -->
+				<SiteFrame id="epd:UK:DFT:SiteFrame_UK_PI_STOP:NAPTAN-060:napt" version="9.6" responsibilitySetRef="nptgAdminArea:060" dataSourceRef="napt:dft">
+					<Name>Stample STop and Stop Area data encoded NeTEx - Area 60</Name>
+					<TypeOfFrameRef ref="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP:FXCP" version="fxc:v1.0"/>
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="naptStop_data"/>
+						<DefaultDataSourceRef ref="napt:dft" version="napt:v2.4"/>
+						<DefaultResponsibilitySetRef ref="nptgAdminArea:060" versionRef="nptg:v2.1"/>
+					</FrameDefaults>
+					<!--  ======= NaPTAn Stop Data  ======   -->
+					<stopPlaces>
+						<StopPlace version="any" id="naptStop:260010966" responsibilitySetRef="nptgAdminArea:060">
+							<Name>Netherley Road</Name>
+							<TopographicPlaceView>
+								<TopographicPlaceRef ref="nptgLocality:E0000004"/>
+								<!--	NaPTAN StopPoint.Place. NptgLocalityRef  -->
+								<Name>Aberdeen</Name>
+								<!--	NaPTAN StopPoint.Place. NptgLocalityName -->
+							</TopographicPlaceView>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay id="naptStop:260010966" version="1">
+									<Centroid>
+										<Location>
+											<gml:pos srsName="UKOS">442914</gml:pos>
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@BCT"/>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@MKD"/>
+									</placeTypes>
+									<!--	<Street>Netherley Road</Street>  -->
+									<RoadAddress version="any" id="naptStop:260010966@address">
+										<RoadName>Netherley Road</RoadName>
+										<BearingCompass>N</BearingCompass>
+									</RoadAddress>
+									<TransportMode>bus</TransportMode>
+									<PublicCode>xyccccccc</PublicCode>
+									<!-- made up value -->
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<!--  ADD MORE STOPS etc etc  -->
+					</stopPlaces>
+				</SiteFrame>
+				<SiteFrame id="epd:UK:DFT:SiteFrame_UK_PI_STOP:NAPTAN-086:napt" version="5.4" responsibilitySetRef="nptgAdminArea:086" dataSourceRef="napt:dft">
+					<Name>Sample Stop and Stop Area data encoded in NeTEx  - Area 86</Name>
+					<TypeOfFrameRef ref="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP:FXCP" version="fxc:v1.0"/>
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="naptStop_data"/>
+						<DefaultDataSourceRef ref="napt:dft" version="napt:v2.4"/>
+						<DefaultResponsibilitySetRef ref="nptgAdminArea:086" versionRef="nptg:v2.1"/>
+					</FrameDefaults>
+					<!--  ======= NaPTAn Stop Data  ======   -->
+					<stopPlaces>
+						<StopPlace responsibilitySetRef="nptgAdminArea:086" version="1" id="naptStop:2400100348@Place">
+							<Name>White Deer Park Nursing Home</Name>
+							<!-- NAPT_<NaptanCode>  -->
+							<TopographicPlaceView>
+								<TopographicPlaceRef ref="nptgLocality:E0015410"/>
+								<!--	NaPTAN StopPoint.Place. NptgLocalityRef  -->
+								<Name>Somehwere TODO</Name>
+								<!--	NaPTAN StopPoint.Place. NptgLocalityName -->
+							</TopographicPlaceView>
+							<AtCentre>false</AtCentre>
+							<!-- NAPT_<LocalityCentre>0 -->
+							<TransportMode>bus</TransportMode>
+							<tariffZones>
+								<TariffZoneRef created="2010-10-07T14:27:15" changed="2010-10-07T14:27:15" modification="new" ref="THANET"/>
+							</tariffZones>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay id="naptStop:2400100348" version="1">
+									<Centroid>
+										<Location>
+											<Longitude>1.4324975357</Longitude>
+											<Latitude>51.3469852361</Latitude>
+											<gml:pos srsName="UKOS">639127  166471</gml:pos>
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@BCT"/>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@MKD"/>
+									</placeTypes>
+									<RoadAddress version="any" id="naptStop:2400100348@address">
+										<RoadName>Detling Avenue</RoadName>
+										<!-- NAPT_<Street> -->
+										<BearingCompass>SE</BearingCompass>
+										<!-- NAPT_<CompassPoint> -->
+									</RoadAddress>
+									<NameSuffix>opp</NameSuffix>
+									<Landmark>White Deer Park Nursing Home</Landmark>
+									<TransportMode>bus</TransportMode>
+									<PublicCode>kntgwjdg</PublicCode>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<!-- ====   -->
+						<!--  ADD MORE STOPS etc etc  -->
+					</stopPlaces>
+				</SiteFrame>
+				<SiteFrame id="epd:UK:DFT:SiteFrame_UK_PI_STOP:NaPTAN-110:napt" version="2.0" responsibilitySetRef="nptgAdminArea:110" dataSourceRef="napt:dft">
+					<Name>Sample Stop and Stop Area data encoded in NeTEx - Area 110</Name>
+					<TypeOfFrameRef ref="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP:FXCP" version="fxc:v1.0"/>
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="napt_metadata"/>
+						<DefaultDataSourceRef ref="napt:dft" version="napt:v2.4"/>
+						<DefaultResponsibilitySetRef ref="nptgAdminArea:110" versionRef="nptg:v2.1"/>
+					</FrameDefaults>
+					<!--  ======= NaPTAn Stop Data  ======   -->
+					<stopPlaces>
+						<!-- 
+<StopPoint CreationDateTime="2006-09-08T14:30:00" ModificationDateTime="2007-09-26T13:00:00" Modification="revise" RevisionNumber="1" Status="active">
+			<AtcoCode>9100ABDARE</AtcoCode>
+			<Descriptor>
+				<CommonName>Aberdare Rail Station</CommonName>
+				<Street>-</Street>
+			</Descriptor>
+			<Place>
+				<NptgLocalityRef>E0054662</NptgLocalityRef>
+				<LocalityCentre>1</LocalityCentre>
+				<Location>
+					<Translation>
+						<GridType>UKOS</GridType>
+						<Easting>300400</Easting>
+						<Northing>202800</Northing>
+						<Longitude>-3.44308344608</Longitude>
+						<Latitude>51.71505790608</Latitude>
+					</Translation>
+				</Location>
+			</Place>
+			<StopClassification>
+				<StopType>RLY</StopType>
+				<OffStreet>
+					<Rail>
+						<AccessArea/>
+						<AnnotatedRailRef CreationDateTime="2003-11-04T00:00:00" ModificationDateTime="2006-09-18T18:24:34" Modification="revise" RevisionNumber="2">
+							<TiplocRef>ABDARE</TiplocRef>
+							<CrsRef>ABA</CrsRef>
+							<StationName>Aberdare Rail Station</StationName>
+							<Location>
+								<GridType>UKOS</GridType>
+								<Easting>300400</Easting>
+								<Northing>202800</Northing>
+							</Location>
+						</AnnotatedRailRef>
+					</Rail>
+				</OffStreet>
+			</StopClassification>
+			<StopAreas>
+				<StopAreaRef CreationDateTime="2006-12-08T00:00:00" ModificationDateTime="2006-12-08T00:00:00" Modification="new" RevisionNumber="0" Status="active">910GABDARE</StopAreaRef>
+			</StopAreas>
+			<AdministrativeAreaRef>110</AdministrativeAreaRef>
+			<PlusbusZones>
+				<PlusbusZoneRef CreationDateTime="2006-09-08T14:30:00" ModificationDateTime="2007-09-26T13:00:00" Modification="revise" RevisionNumber="1" Status="active">ABDARE</PlusbusZoneRef>
+			</PlusbusZones>
+		</StopPoint>
+-->
+						<StopPlace responsibilitySetRef="nptgAdminArea:110" version="1" id="naptStop:9100ABDARE">
+							<Name>Aberdare Rail Station</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-3.4430991465</Longitude>
+									<Latitude>51.715057473</Latitude>
+									<gml:pos srsName="UKOS">300400  202800</gml:pos>
+									<!-- NaPTAn StopPoint.AnnotatedRailRef.Location Translation GridType -->
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@RLY"/>
+								<!-- NaPTAn StopPoint.StopClassification.StopType  -->
+							</placeTypes>
+							<TopographicPlaceRef ref="nptgLocality:E0054662" versionRef="1"/>
+							<AtCentre>true</AtCentre>
+							<!-- NaPTAn StopPoint.Place. LocalityCentre  -->
+							<entrances>
+								<StopPlaceEntrance id="naptStop:9100ABDARE0A" version="1">
+									<Name>Aberdare Rail Station - Main Entrance</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-3.4430991462</Longitude>
+											<Latitude>51.715057474</Latitude>
+											<gml:pos srsName="UKOS">300400  202800</gml:pos>
+											<!-- NaPTAn StopPoint.Place.Location Translation GridType  -->
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@RSE"/>
+									</placeTypes>
+									<RoadAddress version="any" id="naptStop:9100ABDARE0A">
+										<RoadName>Station Road  Avenue</RoadName>
+										<!-- NaPTAn StopPoint.Descriptor.Street -->
+										<BearingCompass>SE</BearingCompass>
+										<!-- NAPT_<CompassPoint ? -->
+									</RoadAddress>
+								</StopPlaceEntrance>
+							</entrances>
+							<TransportMode>rail</TransportMode>
+							<tariffZones>
+								<TariffZoneRef created="2009-10-29T16:30:45" changed="2009-10-29T16:30:45" modification="new" versionRef="0" ref="nptg:TariffZone:ABDARE"/>
+								<!-- NaPTAn StopPoint.PlusbusZonesPlusbusZoneRef -->
+							</tariffZones>
+							<StopPlaceType>railStation</StopPlaceType>
+							<quays>
+								<Quay id="naptStop:9100ABDARE01" version="1">
+									<Name>Platform 1</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-3.4430991462</Longitude>
+											<Latitude>51.715057474</Latitude>
+											<gml:pos srsName="UKOS">300400  202800</gml:pos>
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@PLT"/>
+									</placeTypes>
+									<TransportMode>rail</TransportMode>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+								<Quay id="naptStop:9100ABDARE02" version="1">
+									<Name>Platform 2</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-3.4430991462</Longitude>
+											<Latitude>51.715057474</Latitude>
+											<gml:pos srsName="UKOS">300400  202800</gml:pos>
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@PLT"/>
+									</placeTypes>
+									<TransportMode>rail</TransportMode>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<!--
+<StopPoint CreationDateTime="2006-09-08T14:30:00" ModificationDateTime="2007-09-26T13:00:00" Modification="revise" RevisionNumber="1" Status="active">
+			<AtcoCode>9100ABDO</AtcoCode>
+			<Descriptor>
+				<CommonName>Aberdour Rail Station</CommonName>
+				<Street>-</Street>
+			</Descriptor>
+			<Place>
+				<NptgLocalityRef>ES000016</NptgLocalityRef>
+				<MainNptgLocalities>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">ES000016</NptgLocalityRef>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">ES000892</NptgLocalityRef>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">N0067072</NptgLocalityRef>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">N0071887</NptgLocalityRef>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">N0071892</NptgLocalityRef>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">N0071897</NptgLocalityRef>
+					<NptgLocalityRef CreationDateTime="2004-01-13T00:00:00" ModificationDateTime="2004-01-13T00:00:00" RevisionNumber="0">N0071898</NptgLocalityRef>
+				</MainNptgLocalities>
+				<LocalityCentre>1</LocalityCentre>
+				<Location>
+					<Translation>
+						<GridType>UKOS</GridType>
+						<Easting>319100</Easting>
+						<Northing>685400</Northing>
+						<Longitude>-3.30056001734</Longitude>
+						<Latitude>56.05459191149</Latitude>
+					</Translation>
+				</Location>
+			</Place>
+			<StopClassification>
+				<StopType>RLY</StopType>
+				<OffStreet>
+					<Rail>
+						<AccessArea/>
+						<AnnotatedRailRef CreationDateTime="2003-11-04T00:00:00" ModificationDateTime="2006-09-18T18:24:34" Modification="revise" RevisionNumber="1">
+							<TiplocRef>ABDO</TiplocRef>
+							<CrsRef>AUR</CrsRef>
+							<StationName>Aberdour Rail Station</StationName>
+							<Location>
+								<GridType>UKOS</GridType>
+								<Easting>319100</Easting>
+								<Northing>685400</Northing>
+							</Location>
+						</AnnotatedRailRef>
+					</Rail>
+				</OffStreet>
+			</StopClassification>
+			<StopAreas>
+				<StopAreaRef CreationDateTime="2006-12-08T00:00:00" ModificationDateTime="2006-12-08T00:00:00" Modification="new" RevisionNumber="0" Status="active">910GABDO</StopAreaRef>
+			</StopAreas>
+			<AdministrativeAreaRef>110</AdministrativeAreaRef>
+		</StopPoint>
+-->
+						<StopPlace responsibilitySetRef="nptgAdminArea:110" version="1" id="naptStop:9100ABDO">
+							<Name>Aberdour Rail Station</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-3.30056001734</Longitude>
+									<Latitude>56.05459191149</Latitude>
+									<gml:pos srsName="UKOS">319100  685400</gml:pos>
+									<!-- NaPTAn StopPoint.AnnotatedRailRef.Location Translation GridType  -->
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@RLY"/>
+								<!-- NaPTAn StopPoint.StopClassification.StopType  -->
+							</placeTypes>
+							<TopographicPlaceRef ref="nptgLocality:ES000016" versionRef="EXTERNAL"/>
+							<AtCentre>true</AtCentre>
+							<!-- NaPTAn StopPoint.Place. LocalityCentre  -->
+							<entrances>
+								<StopPlaceEntrance id="naptStop:9100ABDO0A" version="1">
+									<Name>Aberdour Rail Station - Main Entrance</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-3.4430991462</Longitude>
+											<Latitude>51.715057474</Latitude>
+											<gml:pos srsName="UKOS">300400  202800</gml:pos>
+											<!-- NaPTAn StopPoint.Place.Location Translation GridType  -->
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@RSE"/>
+									</placeTypes>
+									<RoadAddress version="any" id="naptStop:9100ABDO0A">
+										<RoadName>Station Road  Avenue</RoadName>
+										<!-- NaPTAn StopPoint.Descriptor.Street -->
+										<BearingCompass>SE</BearingCompass>
+										<!-- NAPT_<CompassPoint ? -->
+									</RoadAddress>
+								</StopPlaceEntrance>
+							</entrances>
+							<TransportMode>rail</TransportMode>
+							<tariffZones>
+								<TariffZoneRef created="2009-10-29T16:30:45" changed="2009-10-29T16:30:45" modification="new" versionRef="0" ref="nptg:TariffZone:ABDO"/>
+								<!-- NaPTAn StopPoint.PlusbusZonesPlusbusZoneRef -->
+							</tariffZones>
+							<StopPlaceType>railStation</StopPlaceType>
+							<mainTerminusForPlaces>
+								<!--  NaPTAn StopPoint. MainNptgLocalities.NptgLocalityRef> -->
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="ES000016"/>
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="ES000892"/>
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="N0067072"/>
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="N0071887"/>
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="N0071892"/>
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="N0071897"/>
+								<TopographicPlaceRef created="2004-01-13T00:00:00" changed="2004-01-13T00:00:00" versionRef="0" ref="N0071898"/>
+							</mainTerminusForPlaces>
+							<quays>
+								<Quay id="naptStop:9100ABDO01" version="1">
+									<Name>Platform 1</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-3.4430991462</Longitude>
+											<Latitude>51.715057474</Latitude>
+											<gml:pos srsName="UKOS">300400  202800</gml:pos>
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@PLT"/>
+									</placeTypes>
+									<TransportMode>rail</TransportMode>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+								<Quay id="naptStop:9100ABDO02" version="1">
+									<Name>Platform 2</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-3.4430991462</Longitude>
+											<Latitude>51.715057474</Latitude>
+											<gml:pos srsName="UKOS">300400  202800</gml:pos>
+										</Location>
+									</Centroid>
+									<placeTypes>
+										<TypeOfPlaceRef version="napt:v2.1" ref="napt:StopType@PLT"/>
+									</placeTypes>
+									<TransportMode>rail</TransportMode>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<!-- ====   -->
+						<!--  ADD MORE STOPS etc etc  -->
+					</stopPlaces>
+				</SiteFrame>
+		 
+				
+					</frames>
+		</CompositeFrame>
+				
+				
+					<!--   === COMMON UK FARE RESOURCES===  -->
+		<CompositeFrame id="fxc:UK:DFT:TypeOfFrame_UK_PI_METADATA_OFFER:FXCP:fxc" version="fxc:v1.0" responsibilitySetRef="fxc:FXC_metadata" dataSourceRef="fxc:dft">
+			<ValidBetween>
+				<FromDate>2019-05-01T00:00:00</FromDate>
+				<ToDate>2022-12-31T12:00:00</ToDate>
+			</ValidBetween>
+			<Name>UK FXCP Passenger Information Profile common resources</Name>
+			<TypeOfFrameRef version="fxc:v1.0" ref="fxc:UK:DFT:TypeOfFrame_UK_PI_METADATA_OFFER:FXCP:fxc"/>
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="fxc_metadata"/>
+				<DefaultDataSourceRef ref="fxc:dft" version="fxc:v1.0"/>
+				<DefaultResponsibilitySetRef ref="fxc:FXC_metadata" version="fxc:v1.0"/>
+			</FrameDefaults>
+			<frames>
+				<!--   ======META DATA - COULD BE EXTERNALISED ======================================== -->
+				<!-- === Profile Frame Types ===  -->
+				<ResourceFrame id="fxc:UK:DFT:ResourceFrame_UK_PI_METADATA_FRAMES:FXCP:fxc" version="fxc:v1.0" responsibilitySetRef="fxc:FXC_metadata" dataSourceRef="fxc:dft">
+					<Name>UK FXCP  Fare profile Frame types and codepaces</Name>
+					<codespaces>
+						<Codespace id="fxc_metadata">
+							<Xmlns>fxc</Xmlns>
+							<XmlnsUrl>netex.org.uk/fxc</XmlnsUrl>
+							<Description>UK FareXChange Profile metadata</Description>
+						</Codespace>
+						<Codespace id="epd_data">
+							<Xmlns>epd</Xmlns>
+							<XmlnsUrl>http://fnetex-cen.eu/epd</XmlnsUrl>
+							<Description>European Passenger Information profile data -use for UK frame names</Description>
+						</Codespace>
+					</codespaces>
+					<dataSources>
+						<DataSource id="fxc:dft" version="fxc:v1.0">
+							<Email>standards@netex.org.uk</Email>
+						</DataSource>
+					</dataSources>
+					<!-- ========Responsibility Sets========== -->
+					<responsibilitySets>
+						<ResponsibilitySet version="fxc:v1.0" id="fxc:FXC_metadata">
+							<Name>Common</Name>
+							<roles>
+								<ResponsibilityRoleAssignment version="fxc:v1.0" id="fxc:FXC_metadata:DfT">
+									<DataRoleType>creates distributes</DataRoleType>
+									<StakeholderRoleType>DataRegistrar</StakeholderRoleType>
+									<ResponsibleOrganisationRef ref="nptg:DfT" versionRef="nptg:v2.1"/>
+									<ResponsibleAreaRef ref="nptgUkRegion:GB"   versionRef="nptg:v2.1"/>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+					</responsibilitySets>
+					<typesOfValue>
+						<!-- ======== TYPE S OF   FRAME========= -->
+						<ValueSet version="fxc:1.0" id="fxc:Types_of_Specific_Frame_Basic" classOfValues="TypeOfFrame">
+							<Name>Types of FXC Specific  Frame Basic </Name>
+							<values>
+								<!-- === ANCILLARY  ==== -->
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_COMMON:FXCP">
+									<Name>UK FXCP  common Local resources</Name>
+									<FrameClassRef nameOfClass="ResourceFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_CALENDAR:FXCP">
+									<Name>UK FXCP  Service calendar</Name>
+									<FrameClassRef nameOfClass="ServiceCalendarFrame"/>
+								</TypeOfFrame>
+								<!-- === PAYLOAD  ==== -->
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP:FXCP">
+									<Name>UK FXCP Stops: NapTAN Stop Place  and NPTG Locations Frame</Name>
+									<FrameClassRef nameOfClass="SiteFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_NETWORK:FXCP">
+									<Name>UK FXCP Network</Name>
+									<FrameClassRef nameOfClass="ServiceFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_TIMETABLE:FXCP">
+									<Name>UK FXCP Tietable: N</Name>
+									<FrameClassRef nameOfClass="TimetableFrame"/>
+								</TypeOfFrame>
+								<!-- === METADATA   ==== -->
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_METADATA:FXCP">
+									<Name>UK Bus Profile common resources</Name>
+									<FrameClassRef nameOfClass="ResourceFrame"/>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<ValueSet version="fxc::v2.4" id="fxc:Types_of_Offer_Frame_Basic" classOfValues="TypeOfFrame">
+							<Name>Types of UK Offer Frame</Name>
+							<values>
+								<!-- === COMPOSITE ====  -->
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP_OFFER:FXCP">
+									<Name>UK FXCP   composite container STOP OFFER</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_LINE_OFFER:FXCP">
+									<Name>UK FXCP   composite container LINE OFFER</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_NETWORK_OFFER:FXCP">
+									<Name>UK FXCP   composite container LINE OFFER</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_METADATA_OFFER:FXCP:fxc">
+									<Name>UK FXCP composite used to group other UKmetadta</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<!-- ======== TYPE S OF   FRAME========= -->
+						<ValueSet version="fxc:1.0" id="fxc:Types_of_Specific_Frame_for_Fares" classOfValues="TypeOfFrame">
+							<Name>Types of FXC Specific  Frame</Name>
+							<values>
+								<!-- === PAYLOAD  ==== -->
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_FARE_COMMON:FXCP">
+									<Name>UK Bus Profile fare common paramaters</Name>
+									<FrameClassRef nameOfClass="FareFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_FARE_NETWORK:FXCP">
+									<Name>UK Bus Profile fare network</Name>
+									<FrameClassRef nameOfClass="ServiceFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_FARE_PRODUCT:FXCP">
+									<Name>UK FXCP Fare Porducts Frame</Name>
+									<FrameClassRef nameOfClass="FareFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_FARE_PRICE:FXCP">
+									<Name>UK FXCP Fare Prices Frame</Name>
+									<FrameClassRef nameOfClass="FareFrame"/>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<ValueSet version="fxc:v1.0" id="fxc:Types_of_Offer_Frame_for_Fares" classOfValues="TypeOfFrame">
+							<Name>Types of UK Offer Frame</Name>
+							<values>
+								<!-- === COMPOSITE ====  -->
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_STOP_FARE_OFFER:FXCP">
+									<Name>UK FXCP   composite container STOP OFFER</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_LINE_FARE_OFFER:FXCP">
+									<Name>UK FXCP   composite container LINE OFFER</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_NETWORK_FARE_OFFER:FXCP">
+									<Name>UK FXCP   composite container NETWORK OFFER</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<ValueSet version="fxc:v1.0" id="fxc:Types_of_Transaction_Frame" classOfValues="TypeOfFrame">
+							<Name>Types of UK Trasnaction  Frame</Name>
+							<values>
+								<TypeOfFrame version="fxc:v1.0" id="fxc:UK:DFT:TypeOfFrame_UK_PI_FARE_TRANSACTIONS:FXCP">
+									<Name>UK Bus Profile Operator sample transactions</Name>
+									<FrameClassRef nameOfClass="SalesTransactionFrame"/>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+		 
+				</ResourceFrame>
+						<!-- === NaPTAN Common fixed definitions  ===  -->
+				<ResourceFrame version="napt:v2.4" id="fxc:UK:DFT:ResourceFrame_UK_PI_METADATA:NaPTAN:napt" responsibilitySetRef="napt:NaPTAN_metadata" dataSourceRef="napt:dft">
+					<ValidBetween>
+						<FromDate>2005-01-01T00:00:00</FromDate>
+					</ValidBetween>
+					<Name>Static Naptan  code values</Name>
+					<Description>This frame contains code  values used to validate NaPTAN data.</Description>
+					<TypeOfFrameRef version="fxc:v1.0" ref="fxc:UK:DFT:TypeOfFrame_UK_PI_METADATA:FXCP"/>
+					<codespaces>
+						<Codespace id="napt_metadata">
+							<Xmlns>napt</Xmlns>
+							<XmlnsUrl>http://www.naptan.org.uk</XmlnsUrl>
+							<Description>UK National Public Transport Access Nodes     codes</Description>
+						</Codespace>
+						<!-- A single napt: space could beused for codes, Napatn stops and Naptan stop areas (since th code  values do not overlap) ,  but we use more sepciic ones for clarity  -->
+						<Codespace id="naptStop_data">
+							<Xmlns>naptStop</Xmlns>
+							<XmlnsUrl>http://www.naptan.org.uk/stops</XmlnsUrl>
+							<Description>UK National Public Transport Access Nodes: Stops.</Description>
+						</Codespace>
+					</codespaces>
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="napt_metadata"/>
+						<DefaultDataSourceRef ref="napt:dft" version="napt:v2.4"/>
+						<DefaultResponsibilitySetRef ref="napt:NaPTAN_metadata" version="napt:v2.4"/>
+					</FrameDefaults>
+					<versions>
+						<Version id="napt:v2.4" version="any">
+							<Description>NaPTAN  version 2.4</Description>
+							<VersionType>baseline</VersionType>
+						</Version>
+					</versions>
+					<dataSources>
+						<DataSource id="napt:dft" version="napt:v2.4">
+							<Email>standards@naptan.org.uk</Email>
+						</DataSource>
+					</dataSources>
+					<!-- ========Responsibility Sets========== -->
+					<responsibilitySets>
+						<ResponsibilitySet version="napt:v2.4" id="napt:NaPTAN_metadata">
+							<Name>Common</Name>
+							<roles>
+								<ResponsibilityRoleAssignment version="napt:v2.4" id="napt:NaPTAN_metadata">
+									<DataRoleType>creates distributes</DataRoleType>
+									<StakeholderRoleType>DataRegistrar</StakeholderRoleType>
+									<ResponsibleOrganisationRef ref="nptg:DfT" version="nptg:v2.1"/>
+									<ResponsibleAreaRef ref="nptgUkRegion:GB" nameOfRefClass="TransportAdministrativeZone" versionRef="0" xsi:type="TransportAdministrativeZoneRefStructure">UK</ResponsibleAreaRef>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+						<ResponsibilitySet version="napt:v2.4" id="napt:stop_data">
+							<Name>Common</Name>
+							<roles>
+								<ResponsibilityRoleAssignment version="napt:v2.4" id="napt:naptan_data">
+									<DataRoleType>creates distributes</DataRoleType>
+									<StakeholderRoleType>Other</StakeholderRoleType>
+									<ResponsibleOrganisationRef ref="nptg:DfT" version="nptg:v2.1"/>
+									<ResponsibleAreaRef ref="nptgUkRegion:GB" nameOfRefClass="TransportAdministrativeZone" versionRef="0" xsi:type="TransportAdministrativeZoneRefStructure">UK</ResponsibleAreaRef>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+					</responsibilitySets>
+					<!-- ==== Fixed values == -->
+					<typesOfValue>
+						<!-- ==== Fixed values == -->
+						<ValueSet version="napt:v2.4" id="napt:NaPTAN_Stop_Classifications_StopPlace" classOfValues="TypeOfPlace">
+							<Name>NaPTan Stop StopClassifications</Name>
+							<values>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@BST">
+									<Name> Bus Station Access ARea.</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@AIR">
+									<Name>Airport   </Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@FER">
+									<Name>Ferry Terminal     </Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@RLY">
+									<Name>Rail Station  </Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@MET">
+									<Name>Metro Station</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.4" id="napt:StopType@LCB">
+									<Name>Lift Station</Name>
+								</TypeOfPlace>
+							</values>
+						</ValueSet>
+						<ValueSet version="napt:v2.4" id="napt:NaPTAN_Stop_Classifications_StopPlaceEntrance" classOfValues="TypeOfPlace">
+							<Name>NaPTan Stop StopClassifications</Name>
+							<values>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@BSE">
+									<Name>Bus Station Entrance</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@FTD">
+									<Name>Ferry Terminal   Entrance </Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@RSE">
+									<Name>Rail Station Entrance</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@TMU">
+									<Name>Metro Station Entrance</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.4" id="napt:StopType@LSE">
+									<Name>Lift Station Entrance</Name>
+								</TypeOfPlace>
+							</values>
+						</ValueSet>
+						<ValueSet version="napt:v2.4" id="napt:NaPTAN_Stop_Classifications_Quay" classOfValues="TypeOfPlace">
+							<Name>NaPTan Stop StopClassifications</Name>
+							<values>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@BCT">
+									<Name>Naptan Bus COach Tram stop on street </Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@BCS">
+									<Name> Bus / Coach bay / stand / stance within Bus / Coach Stations.</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@BCQ">
+									<Name> Variabel Bay.</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@GAT">
+									<Name>Airside Gate </Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@FBT">
+									<Name>Ferry Berth</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@RPL">
+									<Name>Rail Platform</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@PLT">
+									<Name>Metro Platform</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.4" id="napt:StopType@LPL">
+									<Name>Lift Station  Platform</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@TXR">
+									<Name>Taxi Rank</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@STR">
+									<Name>Shared Taxi Rank</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.4" id="napt:StopType@SDA">
+									<Name>Set Down Area</Name>
+								</TypeOfPlace>
+							</values>
+						</ValueSet>
+						<ValueSet version="napt:v2.4" id="napt:NaPTAN_Bus_Stop_Types" classOfValues="TypeOfPlace">
+							<Name>NapTAn STope Types   s</Name>
+							<values>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@MKD">
+									<Name>Marked stopr</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@HAR">
+									<Name>Hail and Ride</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@CUS">
+									<Name>stom (unmarked, or only marked on road).</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="napt:v2.1" id="napt:StopType@FLX">
+									<Name>Unmarked stop </Name>
+								</TypeOfPlace>
+							</values>
+						</ValueSet>
+						<ValueSet version="napt:v2.4" id="napt:NaPTAN_StopArea_Classifications" classOfValues="TypeOfZone">
+							<Name>NaPTan Stop StopClassifications</Name>
+							<values>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GPBS">
+									<Name>Paired on-street Bus / Coach / Tram stops.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GCLS">
+									<Name>Clustered on-street Bus / Coach / Tram stops.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GAIR">
+									<Name>Airport Building.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GBCS">
+									<Name>Bus / Coach Station.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GFTD">
+									<Name>Ferry Terminal / Dock Building.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GTMU">
+									<Name>Tram / Metro / Underground Station.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GRLS">
+									<Name>Railway station.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GMLT">
+									<Name>Multimode Interchange.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GOTH">
+									<Name>Other Structure.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.1" id="napt:StopAreaType@GCCH">
+									<Name>Coach Service Coverage.</Name>
+								</TypeOfZone>
+								<TypeOfZone version="napt:v2.4" id="napt:StopAreaType@GLCB">
+									<Name> Lift or Cablecar station (+NaPT v2.4)</Name>
+								</TypeOfZone>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+				<ResourceFrame version="nptg:v2.1" id="fxc:UK:DFT:ResourceFrame_UK_PI_METADATA:NPTG:nptg" responsibilitySetRef="nptg:NPTG_metadata" dataSourceRef="nptg:dft">
+					<ValidBetween>
+						<FromDate>2004-01-01T00:00:00</FromDate>
+					</ValidBetween>
+					<Name>Static code values for UK NPTG data</Name>
+					<Description>This frame contains code  valuesused to validate the NPTG  </Description>
+					<TypeOfFrameRef version="fxc:v1.0" ref="fxc:UK:DFT:TypeOfFrame_UK_PI_METADATA:FXCP"/>
+					<codespaces>
+						<Codespace id="nptg_metadata">
+							<Xmlns>nptg</Xmlns>
+							<XmlnsUrl>http://www.nptg.org.uk/nptg</XmlnsUrl>
+							<Description>UK National Public Transport gazetteer     fixed codes.   .</Description>
+						</Codespace>
+						<Codespace id="nptgLocality_data">
+							<Xmlns>nptgLocality</Xmlns>
+							<XmlnsUrl>http://nptg.org.uk/locations</XmlnsUrl>
+							<Description>National Public Transport gazetteer locations</Description>
+						</Codespace>
+						<Codespace id="nptgTariffZone_data">
+							<Xmlns>nptgTariffZone</Xmlns>
+							<XmlnsUrl>http://nptg.org.uk/tariffZones</XmlnsUrl>
+							<Description>National Public Transport gazetteer plus bus zones</Description>
+						</Codespace>
+						<Codespace id="nptgAdminArea_data">
+							<Xmlns>nptgAdminArea</Xmlns>
+							<XmlnsUrl>http://www.nptg.org.uk/adminAreas</XmlnsUrl>
+							<Description>UK National Public Transport gazetteer. Codes of administrative areas, are unique within the UK.</Description>
+						</Codespace>
+					</codespaces>
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="nptg_metadata"/>
+						<DefaultDataSourceRef ref="nptg:dft" version="nptg:v2.1"/>
+						<DefaultResponsibilitySetRef ref="nptg:NPTG_metadata" version="nptg:v2.1"/>
+					</FrameDefaults>
+					<versions>
+						<Version id="nptg:v2.1" version="any">
+							<Description>NPTG version 2.1</Description>
+							<VersionType>baseline</VersionType>
+						</Version>
+					</versions>
+					<dataSources>
+						<DataSource id="nptg:dft" version="nptg:v2.1">
+							<Email>standards@nptg.org.uk</Email>
+						</DataSource>
+					</dataSources>
+					<!-- ========Responsibility Sets========== -->
+					<responsibilitySets>
+						<ResponsibilitySet version="nptg:v2.1" id="nptg:NPTG_metadata">
+							<Name>Common</Name>
+							<roles>
+								<ResponsibilityRoleAssignment version="nptg:v2.1" id="nptg:NPTG_metadata">
+									<DataRoleType>creates distributes</DataRoleType>
+									<StakeholderRoleType>DataRegistrar</StakeholderRoleType>
+									<ResponsibleOrganisationRef ref="nptg:DfT" version="nptg:v2.1"/>
+									<ResponsibleAreaRef ref="nptgUkRegion:GB" nameOfRefClass="TransportAdministrativeZone" versionRef="0" xsi:type="TransportAdministrativeZoneRefStructure">UK</ResponsibleAreaRef>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+						<ResponsibilitySet version="nptg:v2.1" id="nptg:NPTG_data">
+							<Name>Common</Name>
+							<roles>
+								<ResponsibilityRoleAssignment version="nptg:v2.1" id="nptg:NPTG_data">
+									<DataRoleType>creates distributes</DataRoleType>
+									<StakeholderRoleType>EntityLegalOwnership</StakeholderRoleType>
+									<ResponsibleOrganisationRef ref="nptg:DfT" version="nptg:v2.1"/>
+									<ResponsibleAreaRef ref="nptg:UK">TODO</ResponsibleAreaRef>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+					</responsibilitySets>
+					<!-- ==== Fixed values == -->
+					<typesOfValue>
+						<!-- ====Frame Types   TODO MERGE FRAME TYPES INTO FXC PI frame types== -->
+						<ValueSet version="nptg:v2.1" id="nptg:UK_NPTG_profile@Types_of_frame" classOfValues="TypeOfFrame">
+							<Name>Types of frame for UK NKTG profile</Name>
+							<values>
+								<TypeOfFrame version="nptg:v2.1" id="nptg:UK_NPTG_profile_payload">
+									<Name>NPTG Locations and  Tariff Zones Frame</Name>
+									<FrameClassRef nameOfClass="SiteeFrame"/>
+									<classes>
+										<ClassInFrame nameOfClass="TopographicPlace">
+											<!-- 	 TopographicPlace maps to  a NPTG Locality 
+<NptgLocality Status="active" Modification="delete" DataRightRef="DR01" CreationDateTime="2001-12-17T09:30:47Z" BaselineVersion="1" ModificationDateTime="2001-12-17T09:30:47Z" id="E0000003"  RevisionNumber="1">
+			<NptgLocalityCode>E0000003</NptgLocalityCode>
+			<Descriptor Modification="delete" Status="active" DataRightRef="DR01" CreationDateTime="2001-12-17T09:30:47Z" ModificationDateTime="2001-12-17T09:30:47Z" BaselineVersion="1" id="E0000001-1"  RevisionNumber="1">
+				<LocalityName>Locality Three</LocalityName>
+				<ShortName>Locality 3</ShortName>
+				<Qualify>
+					<QualifierName>Loc 22 </QualifierName>
+					<NptgLocalityRef>E0000022</NptgLocalityRef>
+				</Qualify>
+			</Descriptor> 
+			<ParentNptgLocalityRef Status="pending" CreationDateTime="2001-12-17T09:30:47Z" ModificationDateTime="2001-12-17T09:30:47Z" BaselineVersion="1" RevisionNumber="1">E0000022</ParentNptgLocalityRef>
+			<AdministrativeAreaRef>101</AdministrativeAreaRef>
+			<NptgDistrictRef>111</NptgDistrictRef>
+			<AdjacentLocalities>
+				<NptgLocalityRef Status="active" CreationDateTime="2001-12-17T09:30:47Z" ModificationDateTime="2001-12-17T09:30:47Z" BaselineVersion="1" RevisionNumber="1">E0000001</NptgLocalityRef>
+			</AdjacentLocalities>
+			<SourceLocalityType> Pa</SourceLocalityType>
+			<LocalityClassification> village</LocalityClassification>
+			<Location id="NMTOKEN" Precision="10m">
+				<GridType>UKOS</GridType>
+				<Easting>999999</Easting>
+				<Northing>1999999</Northing>
+			</Location> 
+		</NptgLocality>			-->
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="_id">
+													<!--  NptgLocality.NptgLocalityCode-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_version">
+													<!--  NptgLocality.RevisionNumber-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_created">
+													<!--  NptgLocality.CreationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_changed">
+													<!--  NptgLocality.ModificationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_modification">
+													<!--  NptgLocality.Modification -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_status">
+													<!--  NptgLocality.Status -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Name">
+													<!--  NptgLocality.Descriptor.LocalityName -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Name.lang">
+													<!--  NptgLocality.Descriptor.Name.Lang-->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Centroid.Location.Longitude">
+													<!--  NptgLocality.Location.Longitude -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Centroid.Location.Latitude">
+													<!--  NptgLocality.Location.Latitude -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Centroid.Location.gml.pos">
+													<!-- NptgLocality.Location.GridType .  NptgLocality.Location.Easting,    NptgLocality.Location.Northing>  -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Centroid.Location.Precision">
+													<!-- NptgLocality.Location.Precision.    -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Descriptor.Name">
+													<!--  NptgLocality.Descriptor.LocalityName -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Descriptor.Name._lang">
+													<!--  NptgLocality.Descriptor.LocalityName.Lang-->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Descriptor.ShortName">
+													<!--  NptgLocality.Descriptor.ShortName -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Descriptor.ShortName._lang">
+													<!--  NptgLocality.Descriptor.ShortName.Lang-->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Descriptor.Qualifier">
+													<!--  NptgLocality.Descriptor.Qualify.QualifierName -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Descriptor.Qualifier.Name._lang">
+													<!--  NptgLocality.Descriptor.Qualify.QualifierName.Lang-->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="TypeOfTopographicPlace">
+													<!--  NptgLocality.LocalityClassification -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="responsibilitySet">
+													<!--  NptgLocality.AdministrativeAreaRef -->
+													<RelationshipRef nameOfClass="ResponsibilitySetRef"/>
+													<Mandatory>required</Mandatory>
+													<Containment>byReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="parentZone">
+													<RelationshipRef nameOfClass="ParentZoneRef"/>
+													<!--  NptgLocality.NptgDistrictRef-->
+													<Mandatory>optional</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="placeTypes">
+													<RelationshipRef nameOfClass="TypeOfPlaceRef"/>
+													<!--  NptgLocality.SourceLocalityType -->
+													<Mandatory>required</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="country">
+													<RelationshipRef nameOfClass="CountryRef"/>
+													<Mandatory>optional</Mandatory>
+													<Containment>byReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="parentTopographicPlace">
+													<RelationshipRef nameOfClass="ParentTopographicPlaceRef"/>
+													<!--  NptgLocality.ParentNptgLocalityRef -->
+													<Mandatory>optional</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="alternativeDescriptors">
+													<!--  NB Only coccasionally  actually populated in current data set -->
+													<RelationshipRef nameOfClass="TopographicPlaceDescriptior"/>
+													<!--   NptgLocality.alternativeDeiscriptors.Descriptor -->
+													<Mandatory>optional</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="adjacentLocalities">
+													<!--  NB Only coccasionally  actually populated in current data set -->
+													<RelationshipRef nameOfClass="TopographicPlaceRef"/>
+													<!--   NptgLocality.AdjacentLocalities.NptgLocalityRef -->
+													<Mandatory>optional</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="containedIn">
+													<!--  NB Not  actually populated in current data set ? -->
+													<RelationshipRef nameOfClass="TopographicPlaceRef"/>
+													<!--   NptgLocality.Descriptor.Qualify.NptgLocalityRef -->
+													<Mandatory>optional</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+										<ClassInFrame nameOfClass="TopographicDescriptor">
+											<!-- 	 TopographicPlace maps to  a NPTG Locality. 		lternativeDescriptors.Descrip  -->
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="_id">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.NptgLocalityCode-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_version">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.RevisionNumber-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_created">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.CreationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_changed">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.ModificationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_modification">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.Modification -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Name">
+													<!-- NptgLocality.AlternativeDescriptors.Descriptor.LocalityName -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="ShortName">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.ShortName -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Qualifier">
+													<!--  NptgLocality.AlternativeDescriptors.Descriptor.Qualify.QualifierName -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="responsibilitySet">
+													<!--  NptgLocality.AdministrativeAreaRef -->
+													<RelationshipRef nameOfClass="ResponsibilitySetRef"/>
+													<Mandatory>required</Mandatory>
+													<Containment>byReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="containedIn">
+													<!--  NB Not  actually populated in current data set ? -->
+													<RelationshipRef nameOfClass="TopographicPlaceRef"/>
+													<!--   NptgLocality.AlternativeDescriptors.Descriptor.Qualify.NptgLocalityRef -->
+													<Mandatory>optional</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+										<!-- Classes for Plus Bus Zone -->
+										<ClassInFrame nameOfClass="TariffZone">
+											<!-- 	 TariffZone  maps to  a NPTG PlusBuzSOne -->
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="_id">
+													<!--  NptgPlusBusZone.PlusBusZoneCode-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_version">
+													<!--  NptgPlusBusZone.RevisionNumber-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_created">
+													<!--  NptgPlusBusZone.CreationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_changed">
+													<!--  NptgPlusBusZone.ModificationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_modification">
+													<!--  NptgPlusBusZone.Modification -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Name">
+													<!--  NptgPlusBusZone.Name-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Name._lang">
+													<!--  NptgPlusBusZone.Name.Lang-->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="PrivateCode">
+													<!--  NptgPlusBusZone.PlusBusZoneCode-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="types">
+													<!--  Fixed    -->
+													<RelationshipRef nameOfClass="TypeOfZoneRef"/>
+													<Mandatory>required</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="country">
+													<!--  NptgPlusBusZone.Country-->
+													<RelationshipRef nameOfClass="CountryRef"/>
+													<Mandatory>optional</Mandatory>
+													<Containment>byReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="projection">
+													<!--  NptgPlusBusZone.Mapping  ..  <Location><Easting>  .. <Northing>  -->
+													<RelationshipRef nameOfClass="Polygon"/>
+													<Mandatory>required</Mandatory>
+													<Containment>inline</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+										<ClassInFrame nameOfClass="Polygon">
+											<!-- 	 gml:Polygon  maps to  a NPTG PlusBusZone.Mapping  -->
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="_gml.id">
+													<!--  NptgPlusBusZone.Mapping.PlusBusZoneCode -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_srsName">
+													<!-- NptgPlusBusZone.Mapping.GridType -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="gml.exterior.LinearRIng.pos">
+													<!-- NptgPlusBusZone.Mapping.GridType.Easting  NptgPlusBusZone.Mapping.GridType.Northng  -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+										</ClassInFrame>
+									</classes>
+									<ModificationSet>all</ModificationSet>
+								</TypeOfFrame>
+								<TypeOfFrame version="nptg:v2.1" id="nptg:UK_NPTG_profile_admin_context">
+									<Name>NPTG Admin areas for NPTG </Name>
+									<classes>
+										<ClassInFrame nameOfClass="GeneralOrganisation">
+											<!--  Fixed    -->
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="Name">
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="parts">
+													<!--  NPTG Region    -->
+													<RelationshipRef nameOfClass="OrganisationPart"/>
+													<Mandatory>required</Mandatory>
+													<Containment>inline</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+										<ClassInFrame nameOfClass="OrganisationPart">
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="Name">
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="PublicCode">
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="administrativeZones">
+													<RelationshipRef nameOfClass="TransportAdministrativeZone"/>
+													<Mandatory>required</Mandatory>
+													<Containment>inline</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+										<ClassInFrame nameOfClass="TransportAdministrativeZone">
+											<!-- Maps some aspects of  NPTG Admin Area								
+	<AdministrativeArea Modification="new" Status="active" DataRightRef="DR01" CreationDateTime="2001-12-17T09:30:47Z" ModificationDateTime="2001-12-17T09:30:47Z" BaselineVersion="1"   RevisionNumber="1" >
+					<AdministrativeAreaCode>101</AdministrativeAreaCode>
+					<AtcoAreaCode>001</AtcoAreaCode>
+					<Name>Nptg Admin area 101</Name>
+					<ShortName>Nptg Admin area 101 short Name</ShortName>
+
+
+
+		<MaximumLengthForShortNames>24</MaximumLengthForShortNames>   USE KEY LIST FOR MAPPING
+					<National>false</National>       represent by TypeOf 
+					<NaptanPrefixes>   <CodespaceAssignment><CodePrefix>
+						<AlphaPrefix>333</AlphaPrefix>
+					</NaptanPrefixes>
+					<CleardownRange>   
+						<CleardownStart>2</CleardownStart>   <CodespaceAssignment><StartValue>
+						<CleardownEnd>4</CleardownEnd>  <CodespaceAssignment><EndValue>
+					</CleardownRange>
+
+  -->
+											<Mandatory>required</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="_id">
+													<!--  Nptg AdministrativeArea.AdministrativeAreaCode -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_version">
+													<!--  Nptg AdministrativeArea.RevisionNumber-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_created">
+													<!--  Nptg AdministrativeArea.CreationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_changed">
+													<!--  Nptg AdministrativeArea.ModificationDateTime  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_modification">
+													<!--  Nptg AdministrativeArea.Modification -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="Name">
+													<!--  Nptg AdministrativeArea.Name -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="ShortName">
+													<!--  Nptg AdministrativeArea.ShortName -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="PrivateCode">
+													<!--  N ptg AdministrativeArea.AtcoAreaCode>  -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="types">
+													<!--  N ptg AdministrativeArea.National>  -->
+													<RelationshipRef nameOfClass="TypeOfZoneRef"/>
+													<Mandatory>required</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="projections">
+													<RelationshipRef nameOfClass="TopographicProjection"/>
+													<Mandatory>optional</Mandatory>
+													<Containment>inline</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="subzones">
+													<RelationshipRef nameOfClass="TransportAdministrativeZone"/>
+													<Mandatory>optional</Mandatory>
+													<Containment>inline</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="codespaceAssignments">
+													<!--  N ptg AdministrativeArea.NaptanPrefixes>  -->
+													<RelationshipRef nameOfClass="CodespaceAssignment"/>
+													<Mandatory>optional</Mandatory>
+													<Containment>inline</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+										<ClassInFrame nameOfClass="CodespaceAssignment">
+											<!--   NPTG  <AdministrativeArea 	 
+							........
+					<NaptanPrefixes>   <CodespaceAssignment><CodePrefix>
+						<AlphaPrefix>333</AlphaPrefix>
+					</NaptanPrefixes>
+					<CleardownRange>   
+						<CleardownStart>2</CleardownStart>   <CodespaceAssignment><StartValue>
+						<CleardownEnd>4</CleardownEnd>  <CodespaceAssignment><EndValue>
+					</CleardownRange> -->
+											<Mandatory>optional</Mandatory>
+											<attributes>
+												<ClassAttributeInFrame name="_id">
+													<!--  Nptg AdministrativeArea.AdministrativeAreaCode  + prefix -->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="_version">
+													<!--  Nptg AdministrativeArea.RevisionNumber-->
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="CodePrefix">
+													<!--  Nptg AdministrativeArea.AtcoCode  -->
+													<!--  Nptg AdministrativeArea.NaptanPrefixes.AlphaPrefix   -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="StartValue">
+													<!--  Nptg AdministrativeArea.CleardownRange.Start  -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="EndValue">
+													<!--  Nptg AdministrativeArea.CleardownRange.End -->
+													<Mandatory>optional</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+											<relationships>
+												<ClassRelationshipInFrame name="codespace">
+													<RelationshipRef nameOfClass="CodespaceRef"/>
+													<Mandatory>required</Mandatory>
+													<Containment>byReference</Containment>
+												</ClassRelationshipInFrame>
+												<ClassRelationshipInFrame name="typeOfCodespaceAssignment">
+													<!--  Nptg AdministrativeArea.AtcoCode -->
+													<!--  Nptg AdministrativeArea.NaptanPrefixes -->
+													<!--  Nptg AdministrativeArea.CleardownRange -->
+													<RelationshipRef nameOfClass="TypeOfCodespaceAssignmentRef"/>
+													<Mandatory>required</Mandatory>
+													<Containment>byVersionedReference</Containment>
+												</ClassRelationshipInFrame>
+											</relationships>
+										</ClassInFrame>
+									</classes>
+									<ModificationSet>all</ModificationSet>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<!-- ==== Fixed values == -->
+						<ValueSet version="nptg:v2.1" id="nptg:UK_NPTG_profile@Place_types" classOfValues="TypeOfPlace">
+							<Name>NPTG Place Types   s</Name>
+							<values>
+								<TypeOfPlace version="nptg:v2.1" id="nptg:SourceLocalityType@Lo">
+									<Name>NPTG Source Loc  = Lo</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="nptg:v2.1" id="nptg:SourceLocalityType@Co">
+									<Name>NPTG Source Loc  = Co</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="nptg:v2.1" id="nptg:SourceLocalityType@Pa">
+									<Name>NPTG Source Loc  = Pa</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="nptg:v2.1" id="nptg:SourceLocalityType@ar">
+									<Name>NPTG Source Loc  = ar</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="nptg:v2.1" id="nptg:SourceLocalityType@Add">
+									<Name>NPTG Source Loc  = Add</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="nptg:v2.1" id="nptg:SourceLocalityType@U">
+									<Name>NPTG Source Loc  = U</Name>
+								</TypeOfPlace>
+							</values>
+						</ValueSet>
+						<ValueSet version="nptg:v2.1" id="nptg:UK_NPTG_profile@Organisation_part_types" classOfValues="TypeOfZone">
+							<Name>NPTG Organisation Part Types   s</Name>
+							<values>
+								<TypeOfZone version="nptg:v2.1" id="nptg:UkRegion">
+									<Name>An NPTG Region</Name>
+								</TypeOfZone>
+								<TypeOfZone version="nptg:v2.1" id="nptg:AdministrativeArea@National">
+									<Name>An NPTG Administrative Area with National scope (e.g. 910, 920 etc)</Name>
+								</TypeOfZone>
+								<TypeOfZone version="nptg:v2.1" id="nptg:AdministrativeArea@Local">
+									<Name>An NPTG Administrative Area with Local scope</Name>
+								</TypeOfZone>
+								<TypeOfZone version="nptg:v2.1" id="nptg:UkDistrict">
+									<Name>An NPTG District</Name>
+								</TypeOfZone>
+								<TypeOfZone version="nptg:v2.1" id="nptg:UkLocality">
+									<Name>An NPTG Locality</Name>
+								</TypeOfZone>
+								<TypeOfZone version="nptg:v2.1" id="nptg:PlusBusZone">
+									<Name>An PlusBus Tariff Zone</Name>
+								</TypeOfZone>
+							</values>
+						</ValueSet>
+						<ValueSet version="nptg:v2.1" id="nptg:UK_NPTG_profile@Sms_codes" classOfValues="TypeOfCodespaceAssignment">
+							<Name>NPTG Codespace Assignment Types</Name>
+							<values>
+								<TypeOfCodespaceAssignment version="nptg:v2.1" id="nptg:naptan_prefix">
+									<Name>NPTG Stop prefix</Name>
+								</TypeOfCodespaceAssignment>
+								<TypeOfCodespaceAssignment version="nptg:v2.1" id="nptg:naptan_sms">
+									<Name>NPTG  Stop SMS prefix</Name>
+								</TypeOfCodespaceAssignment>
+								<TypeOfCodespaceAssignment version="nptg:v2.1" id="nptg:naptan_cleardown">
+									<Name>NPTG  stop cleardown range  </Name>
+								</TypeOfCodespaceAssignment>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+					<organisations>
+						<!---  DFT  -->
+						<GeneralOrganisation id="nptg:DfT" modification="new" status="active" responsibilitySetRef="nptg:NPTG" version="nptg:v2.1">
+							<Name>Department for Transport</Name>
+						</GeneralOrganisation>
+					</organisations>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

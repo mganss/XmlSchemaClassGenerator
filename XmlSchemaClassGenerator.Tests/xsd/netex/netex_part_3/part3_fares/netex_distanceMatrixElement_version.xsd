@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.10" id="netex_distanceMatrixElement_version">
+	<xsd:include schemaLocation="netex_fareSeries_version.xsd"/>
+	<xsd:include schemaLocation="netex_fareTable_version.xsd"/>
+	<xsd:include schemaLocation="netex_geographicStructureFactor_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes
+				</Date>
+				<Date>
+					<Modified>2017-12-10</Modified>Fix add notice assignments as per spec 
+				</Date>
+				<Date>
+					<Modified>2019-03-01</Modified>EURA-(nk) Add DistanceMatrixInverseRef for backwards direction of reference to a DIstance Matrix Element
+				</Date>
+				<Date>
+					<Modified>2019-03-08</Modified>UK-44 Improve ability to construct large tariffs
+											Add UseToExclude flag to GroupOfDistanceMatrixElements
+				</Date>
+				<Date>
+					<Modified>2019-03-25</Modified>Fix #40 by Skinkie from 2019.01.07 . Fix typo on DistanceMatrixElement.IsDirect.  
+					 NB this will break existing XML that uses IsDirect. 
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the DISTANCE MATRIX ELEMENT types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_fares}netex_distanceMatrixElement_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx DISTANCE MATRIX ELEMENT types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx DISTANCE MATRIX ELEMENT types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- === ENTIITY IN VERSION IN FRAME= === ================================================== -->
+	<xsd:group name="DistanceMatrixElementsInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>DISTANCE MATRIX ELEMENTs in FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="distanceMatrixElements" type="distanceMatrixElements_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DISTANCE MATRIX ELEMENTs in Frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="groupsOfDistanceMatrixElements" type="groupsOfDistanceMatrixElements_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>GROUPs OF DISTANCE MATRIX ELEMENTs in Frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="distanceMatrixElementsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of DISTANCE MATRIX ELEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:sequence>
+					<xsd:element ref="DistanceMatrixElement" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="groupsOfDistanceMatrixElementsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of GROUPS OF DISTANCE MATRIX ELEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:sequence>
+					<xsd:element ref="DistanceMatrixElement" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- == GROUP OF DISTANCE MATRIX ELEMENT  ======================-->
+	<xsd:complexType name="groupsOfDistanceMatrixElements_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of GROUP OF DISTANCE MATRIX ELEMENTss.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="GroupOfDistanceMatrixElementsRef"/>
+					<xsd:element ref="GroupOfDistanceMatrixElements"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="GroupOfDistanceMatrixElements" abstract="false" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A group of DISTANCE MATRIX ELEMENTs; may set common properties for a given set of origin and destination pairs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GroupOfDistanceMatrixElements_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfDistanceMatrixElementsGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GroupOfDistanceMatrixElementsIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GroupOfDistanceMatrixElements_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for GROUP OF DISTANCE MATRIX ELEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GroupOfDistanceMatrixElementsGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GroupOfDistanceMatrixElementsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a GROUP OF DISTANCE MATRIX ELEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="UseToExclude" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include  (i.e.false) </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="PriceableObjectPricesGroup"/>
+			<xsd:element name="Distance" type="DistanceType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>GROUP OF DISTANCE MATRIX ELEMENTs to use when advertising Train -If different from Id.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="structureFactors" type="geographicalStructureFactors_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Use of GEOGRAPHICAL STRUCTURE FACTORss in a particular sequence.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICEs applying to element.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="members" type="distanceMatrixElements_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TARIFFs applying to element.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="prices" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>prices associated with DSISTANCE MATRIX ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="distanceMatrixElementPrices_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === DISTANCE MATRIX ELEMENT  ================================================= -->
+	<xsd:complexType name="distanceMatrixElements_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of DISTANCE MATRIX ELEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="DistanceMatrixElementRef"/>
+					<xsd:element ref="DistanceMatrixElement"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DistanceMatrixElement" abstract="false" substitutionGroup="PriceableObject">
+		<xsd:annotation>
+			<xsd:documentation>A cell of an origin-destination matrix for TARIFF ZONEs or STOP POINTs, expressing a fare distance for the corresponding trip: value in km, number of fare units etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DistanceMatrixElement_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PriceableObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DistanceMatrixElementGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DistanceMatrixElementIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DistanceMatrixElement_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="PriceableObject_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="DistanceMatrixElementGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DistanceMatrixElementGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="DistanceMatrixElementDetailsGroup"/>
+			<xsd:group ref="DistanceMatrixElementODGroup"/>
+			<xsd:group ref="DistanceMatrixElementComponentGroup"/>
+			<xsd:group ref="DistanceMatrixElementPricingGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DistanceMatrixElementODGroup">
+		<xsd:annotation>
+			<xsd:documentation>Origin Destination Elements for a DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:choice>
+					<xsd:element name="StartStopPointRef" type="ScheduledStopPointRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>Start SCHEDULED STOP POINT for Cell of DISTANCE MATRIX.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="StartStopPointView" type="ScheduledStopPoint_DerivedViewStructure">
+						<xsd:annotation>
+							<xsd:documentation>Expanded view of Start POINT with Name etc.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+				<xsd:choice>
+					<xsd:element name="StartTariffZoneRef" type="TariffZoneRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>Start TARIFF ZONE for Cell of DISTANCE MATRIX.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="StartTariffZoneView" type="Zone_DerivedViewStructure">
+						<xsd:annotation>
+							<xsd:documentation>Expanded view of start TARIFF ZONE for Cell of DISTANCE MATRIX.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+				<xsd:element name="FromFareSectionRef" type="FareSectionRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>FARE SECTION at which  element begins.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="FromFarePointInPatternRef" type="FarePointInPatternRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>POINT within FARE SECTION tat which element begins.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:choice>
+				<xsd:choice>
+					<xsd:element name="EndStopPointRef" type="ScheduledStopPointRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>End SCHEDULED STOP POINT for Cell of DISTANCE MATRIX.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="EndStopPointView" type="ScheduledStopPoint_DerivedViewStructure">
+						<xsd:annotation>
+							<xsd:documentation>Expanded view of end POINT with Name etc.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+				<xsd:choice>
+					<xsd:element name="EndTariffZoneRef" type="TariffZoneRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>End TARIFF ZONE for Cell of DISTANCE MATRIX.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="EndTariffZoneView" type="Zone_DerivedViewStructure">
+						<xsd:annotation>
+							<xsd:documentation>Expanded view of endTARIFF ZONE for Cell of DISTANCE MATRIX.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+				<xsd:element name="ToFareSectionRef" type="FareSectionRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>FARE SECTION at which  element ends.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="ToFarePointInPatternRef" type="FarePointInPatternRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>POINT within FARE SECTION tat which element ends.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DistanceMatrixElementComponentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Component Elements for a DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="seriesConstraints" type="SeriesConstraints_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SERIES CONSTRAINTs constraining DISTANCE MATRIX ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="structureFactors" type="geographicalStructureFactors_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Use of FARE STRUCTURE ELEMENTs in a particular sequence.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DistanceMatrixElementDetailsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Detail Elements for a DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Distance" type="DistanceType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DISTANCE MATRIX ELEMENT to use when advertising Train -If different from Id.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RelativeRanking" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Relative preference assigned to this element if there are multiple entries between two points.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IsDirect" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether considered as direct fare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="InverseAllowed" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether an inverse element in the opposite direction can be assumed with the same prices. (Optimisation to reduce  data exchanged)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DistanceMatrixElementPricingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Pricing Elements for a DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="tariffs" type="tariffRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TARIFFs applying to element.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="FareTableRef" minOccurs="0"/>
+			<xsd:element name="prices" type="distanceMatrixElementPrices_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>prices associated with DSISTANCE MATRIX ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- == DISTANCE MATRIX ELEMENT PRICE.================================ -->
+	<xsd:complexType name="distanceMatrixElementPrices_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of DISTANCE MATRIX ELEMENT PRICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="DistanceMatrixElementPriceRef"/>
+					<xsd:element ref="DistanceMatrixElementPrice"/>
+					<xsd:element ref="CellRef_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DistanceMatrixElementPrice" substitutionGroup="FarePrice_">
+		<xsd:annotation>
+			<xsd:documentation>A set of all possible price features of a DISTANCE MATRIX ELEMENT: default total price etc.
+.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DistanceMatrixElementPrice_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FarePriceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DistanceMatrixElementPriceGroup" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DistanceMatrixElementPriceIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DistanceMatrixElementPrice_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a DISTANCE MATRIX ELEMENT PRICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FarePrice_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="DistanceMatrixElementPriceGroup" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DistanceMatrixElementPriceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DISTANCE MATRIX ELEMENT PRICe.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="DistanceMatrixElementRef"/>
+			<xsd:element ref="GroupOfDistanceMatrixElementsRef"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- == DISTANCE MATRIX ELEMENT View-->
+	<xsd:element name="DistanceMatrixElementView" type="DistanceMatrixElement_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified  view of CONNECTING JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DistanceMatrixElement_DerivedViewStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CONNECTING JOURNEY VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:choice>
+						<xsd:element name="StartStopPointRef" type="ScheduledStopPointRefStructure">
+							<xsd:annotation>
+								<xsd:documentation>Start SCHEDULED STOP POINT for Cell of DISTANCE MATRIX.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="StartTariffZoneRef" type="TariffZoneRefStructure">
+							<xsd:annotation>
+								<xsd:documentation>Start TARIFF ZONE for Cell of DISTANCE MATRIX.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:choice>
+					<xsd:element name="StartName" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of Start Stop Point.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:choice>
+						<xsd:element name="EndStopPointRef" type="ScheduledStopPointRefStructure">
+							<xsd:annotation>
+								<xsd:documentation>End SCHEDULED STOP POINT for Cell of DISTANCE MATRIX.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="EndTariffZoneRef" type="TariffZoneRefStructure">
+							<xsd:annotation>
+								<xsd:documentation>End TARIFF ZONE for Cell of DISTANCE MATRIX.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:choice>
+					<xsd:element name="EndName" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of Stop Point.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

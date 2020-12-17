@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====  GTFS StopTimes to NeTEx  Example ====== 
+This Example provides an example of mapping of a   GTFS StopTimes.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+
+1. DATA
+
+StopTimes.txt
+trip_Id,arrival_time,departure_time,stop_Id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled
+STBA,6:00:00,6:00:00,STAGECOACH,1, Nye County Airport,1,0,
+STBA,6:20:00,6:20:00,BEATTY_AIRPORT,2,,0,1,
+CITY1,6:00:00,6:00:00,STAGECOACH,1,,,,,
+CITY1,6:05:00,6:07:00,NANAA,2,,,,
+CITY1,6:12:00,6:14:00,NADAV,3,,,,
+CITY1,6:19:00,6:21:00,DADAN,4,,,,
+CITY1,6:26:00,6:28:00,EMSI,5,,,,
+CITY2,6:28:00,6:30:00,EMSI,1,,,,
+CITY2,6:35:00,6:37:00,DADAN,2,,,,
+CITY2,6:42:00,6:44:00,NADAV,3,,,,
+CITY2,6:49:00,6:51:00,NANAA,4,,,,
+CITY2,6:56:00,6:58:00,STAGECOACH,5,,,,
+AB1,8:00:00,8:00:00,BEATTY_AIRPORT,1,,,,
+AB1,8:10:00,8:15:00,BULLFROG,2,,,,
+AB2,12:05:00,12:05:00,BULLFROG,1,,,,
+AB2,12:15:00,12:15:00,BEATTY_AIRPORT,2
+BFC1,8:20:00,8:20:00,BULLFROG,1
+BFC1,9:20:00,9:20:00,FUR_CREEK_RES,2
+BFC2,11:00:00,11:00:00,FUR_CREEK_RES,1
+BFC2,12:00:00,12:00:00,BULLFROG,2
+AAMV1,8:00:00,8:00:00,BEATTY_AIRPORT,1
+AAMV1,9:00:00,9:00:00,AMV,2
+AAMV2,10:00:00,10:00:00,AMV,1
+AAMV2,11:00:00,11:00:00,BEATTY_AIRPORT,2
+AAMV3,13:00:00,13:00:00,BEATTY_AIRPORT,1
+AAMV3,14:00:00,14:00:00,AMV,2
+AAMV4,15:00:00,15:00:00,AMV,1
+AAMV4,16:00:00,16:00:00,BEATTY_AIRPORT,2
+
+Headsign , pick up type and droppoff type valeus added to data
+
+2. MAPPING
+
+A GTFS StopTime  mays to a NeTEx  CALL of  a SERVICE JOURNEY 
+
+GTFS												NeTEx
+trip_Id,												<ServiceJourney #trip_id> @id
+arrival_time,   									<ServiceJourney #trip_id> <Call #trip_id #order><Arrival> <Time> #arrival_time
+departure_time, 								<ServiceJourney #trip_id> <Call #trip_id #order><Departure> <Time> #departure_time
+stop_Id,											<ServiceJourney #trip_id> <Call #trip_id #order><ScheduledStopPointRef #stop_Id> 
+stop_sequence,  								<ServiceJourney #trip_id> <Call #trip_id #order><Order> #stop_sequence
+stop_headsign,  								<ServiceJourney #trip_id> <Call #trip_id #order><DestinationDisplayView><Name> #stop_headsign
+pickup_type, 	0  = regular pick up	<ServiceJourney #trip_id> <Call #trip_id #order><Departure> <ForBoarding true
+						1  = no pick up			<ServiceJourney #trip_id> <Call #trip_id #order><Departure> <ForBoarding> false
+						2  = phone				<ServiceJourney #trip_id> <Call #trip_id #order><Departure> <Flexible> true
+						3  = driver					<ServiceJourney #trip_id> <Call #trip_id #order><RequestStop> true  
+drop_off_type,  	0  = regular drop off	<ServiceJourney #trip_id> <Call #trip_id #order><Arrival> <ForAlighting> true
+						1  = no drop off			<ServiceJourney #trip_id> <Call #trip_id #order><Arrival> <ForAlighting> false
+						2  = phone				<ServiceJourney #trip_id> <Call #trip_id #order><Arrival> <IsFlexible> true
+						3  = driver					<ServiceJourney #trip_id> <Call #trip_id #order><RequestStop> true 
+shape_dist_traveled  							<ServiceJourney #trip_id> <Call #trip_id #order> <OnwardServiceLinkView> <Distance> #shape_dist_traveled
+ 
+3. Notes
+
+ - NeTEx will normally always embed CALLS within a SERVICE JOURNEY
+     i.e. combine the Trips.txt and StopTimes.txt into a single file
+ 
+GTFS Data copyright Google Inc
+
+version 1.1 revised ids
+NeTEx (C) CEN Copyright 2010,2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2011-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2011-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Stop times data  (stop_times.txt file)</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<TimetableFrame version="any" id="mygtfsxm:DTA">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<vehicleJourneys>
+				<ServiceJourney version="any" id="mygtfsxm:STBA">
+					<calls>
+						<Call version="any" id="mygtfsxm:STBA" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:STAGECOACH"/>
+							<Arrival>
+								<Time>06:00:00</Time>
+								<ForAlighting>false</ForAlighting>
+							</Arrival>
+							<Departure>
+								<Time>06:00:00</Time>
+							</Departure>
+							<DestinationDisplayView>
+								<Name>Nye CountyAirport</Name>
+							</DestinationDisplayView>
+						</Call>
+						<Call version="any" id="mygtfsxm:STBA" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<OnwardServiceLinkView>
+								<Distance>5</Distance>
+							</OnwardServiceLinkView>
+							<Arrival>
+								<Time>06:20:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:20:00</Time>
+								<ForBoarding>false</ForBoarding>
+								<IsFlexible>true</IsFlexible>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:CITY1">
+					<calls>
+						<Call version="any" id="mygtfsxm:CITY1" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:STAGECOACH"/>
+							<Arrival>
+								<Time>06:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY1" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:NANAA"/>
+							<Arrival>
+								<Time>06:05:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:07:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY1" order="3">
+							<ScheduledStopPointRef ref="mygtfsxm:NADAV"/>
+							<Arrival>
+								<Time>06:12:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:14:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY1" order="4">
+							<ScheduledStopPointRef ref="mygtfsxm:DADAN"/>
+							<Arrival>
+								<Time>06:19:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:21:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY1" order="5">
+							<ScheduledStopPointRef ref="mygtfsxm:EMSI"/>
+							<Arrival>
+								<Time>06:26:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:28:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:CITY2">
+					<calls>
+						<Call version="any" id="mygtfsxm:CITY2" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:EMSI"/>
+							<Arrival>
+								<Time>06:28:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:30:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY2" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:DADAN"/>
+							<Arrival>
+								<Time>06:35:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:37:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY2" order="3">
+							<ScheduledStopPointRef ref="mygtfsxm:NADAV"/>
+							<Arrival>
+								<Time>06:42:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:44:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY2" order="4">
+							<ScheduledStopPointRef ref="mygtfsxm:NANAA"/>
+							<Arrival>
+								<Time>06:49:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:51:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:CITY2" order="5">
+							<ScheduledStopPointRef ref="mygtfsxm:STAGECOACH"/>
+							<Arrival>
+								<Time>06:56:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>06:58:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:AB1">
+					<calls>
+						<Call version="any" id="mygtfsxm:AB1" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<Arrival>
+								<Time>08:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>08:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:AB1" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:BULLFROG"/>
+							<Arrival>
+								<Time>08:10:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>08:15:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:AB2">
+					<calls>
+						<Call version="any" id="mygtfsxm:AB2" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:BULLFROG"/>
+							<Arrival>
+								<Time>12:05:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>12:05:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:AB2" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<Arrival>
+								<Time>12:15:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>12:15:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:BFC1">
+					<calls>
+						<Call version="any" id="mygtfsxm:BFC1" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:BULLFROG"/>
+							<Arrival>
+								<Time>08:20:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>08:20:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:BFC1" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:FUR_CREEK_RES"/>
+							<Arrival>
+								<Time>09:20:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>09:20:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:BFC2">
+					<calls>
+						<Call version="any" id="mygtfsxm:BFC2" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:FUR_CREEK_RES"/>
+							<Arrival>
+								<Time>11:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>11:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:BFC2" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:BULLFROG"/>
+							<Arrival>
+								<Time>12:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>12:00:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:AAMV1">
+					<calls>
+						<Call version="any" id="mygtfsxm:AAMV1" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<Arrival>
+								<Time>08:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>08:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:AAMV1" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:AMV"/>
+							<Arrival>
+								<Time>09:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>09:00:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:AAMV2">
+					<calls>
+						<Call version="any" id="mygtfsxm:AAMV2" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:AMV"/>
+							<Arrival>
+								<Time>10:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>10:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:AAMV2" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<Arrival>
+								<Time>11:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>11:00:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:AAMV3">
+					<calls>
+						<Call version="any" id="mygtfsxm:AAMV3" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<Arrival>
+								<Time>13:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>13:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:AAMV3" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:AMV"/>
+							<Arrival>
+								<Time>14:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>14:00:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+				<ServiceJourney version="any" id="mygtfsxm:AAMV4">
+					<calls>
+						<Call version="any" id="mygtfsxm:AAMV4" order="1">
+							<ScheduledStopPointRef ref="mygtfsxm:AMV"/>
+							<Arrival>
+								<Time>15:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>15:00:00</Time>
+							</Departure>
+						</Call>
+						<Call version="any" id="mygtfsxm:AAMV4" order="2">
+							<ScheduledStopPointRef ref="mygtfsxm:BEATTY_AIRPORT"/>
+							<Arrival>
+								<Time>16:00:00</Time>
+							</Arrival>
+							<Departure>
+								<Time>16:00:00</Time>
+							</Departure>
+						</Call>
+					</calls>
+				</ServiceJourney>
+			</vehicleJourneys>
+		</TimetableFrame>
+	</dataObjects>
+</PublicationDelivery>

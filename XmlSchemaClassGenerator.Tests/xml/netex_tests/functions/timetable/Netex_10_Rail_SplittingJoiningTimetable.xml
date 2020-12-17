@@ -1,0 +1,1973 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a simple split and join timetable in NeTEx XML  
+
+Based on example by Stefan Jugelt ERA
+
+Overview
+====
+1.1.  Train Ids & Routes
+=================
+
+									  Copenhagen 
+											/|\
+											40447 
+											 |
+Amsterdam -	447+ 457 + 40447	- Hanover -  447 + 457  - Berlin - 447   Warsaw
+																					|
+																				  457 
+																					+
+																				60457
+																				|  `\|/
+																				 Prague
+
+Thus there are four journeys Amsterdam to Copenhagen, Amsterdam to Warsaw, Amsterdam to Prague, and Berlin to Prague
+with  three joins at Hannover, a split at Hannover, and a split and a join at Berlin
+
+Givving three  COMPOUND TRAINs and two discrete TRAINS
+   (i) XX-447 = 447 + 457 + 40447
+   (ii) YY-447 = 447 + 457  
+   (iii) ZZ-457 =   457 + 60457
+   (a) 40447
+   (b) 447
+
+With Three TRAIN NUMBERS:   447 (Amsterdam - Warsaw),    40447 (Hannover - Copenhagen) and    457 (Berlin - Prague)
+
+1.2. Train Elements
+=============
+
+The trains have various carriages, for example
+  E = Engine
+  R = Restaurant Car
+  1 = First class carriage
+  2 = Second class carriage
+
+COMPOUND TRAIN XX-447 (Amsterdam - Hannover)
+   447							457               	   40447
+    E - 2 2 2 2 2 2 R 1 1 -    2  2  2  2  2  -   2  2  2  1 1 - E
+
+COMPOUND TRAIN YY-447 (Hannover - Berlin)
+   447							457               		
+    E- 2 2 2 2 2 2 R 1 1 -    2  2  2  2 2 -  E
+
+COMPOUND TRAIN ZZ-457 (Berlin - Prague)
+	457              60457	
+      2  2  2  2 2  -   R  2   2   2   2  - E
+
+TRAIN  Train 447 (Berlin - Warsaw)
+   447						          		
+    E - 2 2 2 2 2 2 R 1 1 -  E
+
+TRAIN 40447  (Hanover - Copenhagen)
+    	40447
+		2  2  2 1 1 E
+
+ 1.3. Blocks
+=============
+There are four parking points  and three blocks
+
+2. Representation
+=============
+
+2.1 Stops
+
+There are six SCHEDULE STOP POINTs
+
+      uic:nl_amsterdam
+      uic:de_hannover
+      uic:de_berlin
+      uic:dk_copenhagen
+      uic:pl_warsaw
+      uic:cz_prague
+
+2.2 Journeys & Journey Parts
+
+There are  four SERVICE JOURNEYS
+	  bbd:sj_447 Amsterdam - Warsaw
+			with three JOURNEY PARTs :
+				bbd:jpt_447_01   Amsterdam - Hannover
+				bbd:jpt_447_02   Hannover - Berlin
+				bbd:jpt_447_03   Berlin - Warsaw
+
+	  bbd:sj_40447 Amsterdam - Copenhagen
+			with two JOURNEY PARTs :
+				bbd:jpt_40447_01   Amsterdam - Hannover
+				bbd:jpt_40447_02   Hannover - Copenhagen 
+
+	  bbd:sj_457 Amsterdam - Prague
+			with three JOURNEY PARTs :
+				bbd:jpt_457_01   Amsterdam - Hannover
+				bbd:jpt_457_02   Hannover - Berlin
+				bbd:jpt_457_03   Berlin - Prague
+
+	  bbd:sj_60457 Berlin - Prague
+			with one JOURNEY PARTs : 
+				bbd:jpt_60457_01   Berlin - Prague
+
+2.3 Journey Couples and Train numbers
+
+There are three TRAIN NUMBERs 
+   bbd:tn_447 (Amsterdam - Warsaw)
+   bbd:tn_40447 (Hannover - Copenhagen)
+   bbd:tn_457 (Berlin - Prague)
+
+There are  three JOURNEY PART COUPLEs 
+     bbd:vjc_amsterdam-hannover
+			With three coupled JOURNEY PARTs :
+				bbd:jpt_447_01   Amsterdam - Hannover
+				bbd:jpt_40447_01   Amsterdam - Hannover
+				bbd:jpt_457_01   Amsterdam - Hannover
+
+     bbd:vjc_hannover-berlin
+			With two coupled JOURNEY PARTs :
+				bbd:jpt_447_02   Hannover - Berlin
+				bbd:jpt_457_02   Hannover - Berlin 
+
+     bbd:vjc_berlin-prague
+				bbd:jpt_457_03   Berlin - Prague
+				bbd:jpt_60457_01   Berlin - Prague
+
+
+					 
+There are  three COUPLED JORUNEYS  
+			bbd:CoupledJourney:jpt_447_01   Amsterdam - Hannover
+			  bbd:sj_447 Amsterdam - Warsaw
+		    bbd:sj_40447 Amsterdam - Copenhagen
+		    bbd:sj_457 Amsterdam - Prague
+ 
+	  	bbd:CoupledJourney:jpt_447_02   Hannover - Berlin
+			with two journeys coupled PARTs :
+				  bbd:sj_447 Amsterdam - Warsaw 
+				bbd:sj_457 Amsterdam - Prague
+ 
+
+	  	bbd:CoupledJourney:jpt_457_03   Berlin - Prague
+				 bbd:sj_457 Amsterdam - Prague
+			  bbd:sj_60457 Berlin - Prague
+		 
+
+There are four CONNECTION links where JOURNEY MEETINGs take place
+		uic:cx_de_hannover_01    amsterdam/berlin
+		uic:cx_de_hannover_02    amsterdam/copenhagen
+		uic:cx_de_berlin_01 		 hannover/warsaw
+		uic:cx_de_berlin_02         hannover/prague
+
+There are  six  JOURNEY MEETINGs 
+   bbd:jm_457_joinTo_447_dep_amsterdam    
+        Joining between VEHICLE JOURNEYS
+	        From:	bbd:jpt_457   01 Amsterdam - Hannover
+			To:		bbd:jpt_447   01 Amsterdam - Hannover 
+
+   bbd:jm_40447_jointo_477_dep_amsterdam   
+        Joining between VEHICLE JOURNEYS
+			From:	bbd:jpt_40447 01   Amsterdam - Hannover 
+			To:		bbd:jpt_447     01   Amsterdam - Hannover
+
+     bbd:jm_40447_splitFrom_447_arr_hannover     
+        Splitting between VEHICLE JOURNEYS
+			From:	bbd:jpt_40447  02   Hannover - Copenhagen 
+			To:		bbd:jpt_447	  02   Hannover - Berlin
+
+     bbd:bbd:jm_457_splitFrom_447_arr_berlin    
+        Splitting between VEHICLE JOURNEYS
+			From:	bbd:jpt_457     03   Berlin - Prague
+			To:		bbd:jpt_447 	   03   Berlin - Warsaw
+
+     bbd:jm_60457_joinTo_457_dep_berlin     
+        Joining between VEHICLE JOURNEYS
+			From:	bbd:jpt_60457 	01   Berlin - Prague
+			To:		bbd:jpt_457 	03   Berlin - Prague
+
+      bbd:jm_60457_splitFrom_457_arr_prague     
+        Splitting between VEHICLE JOURNEYS
+			From:	bbd:jpt_60457 	01   Berlin - Prague
+			To:		bbd:jpt_457 	03   Berlin - Prague
+
+
+2.4 Journey Facilities
+
+There are  three     SERVICE FACILITIEs SETs
+    
+	 SERVICE FACILITIEs SET:@ bbd:svcfc_general 
+			Used  on  VEHICLE JOURNEYs 447, 457, 40447
+			  bbd:sj_447 Amsterdam - Warsaw
+			  bbd:sj_40447 Amsterdam - Copenhagen
+		 	  bbd:sj_457 Amsterdam - Prague
+		 
+
+	 SERVICE FACILITIEs SET:@ bbd:svcfc_first
+		 Used  on VEHICLE JOURNEYs 447, 457, 40447
+			  bbd:sj_447 Amsterdam - Warsaw
+			  bbd:sj_40447 Amsterdam - Copenhagen
+		 	  bbd:sj_457 Amsterdam - Prague
+
+ SERVICE FACILITIEs SET:@ bbd:svcfc_60457
+		 Used  on  VEHICLE JOURNEY 
+		  bbd:sj_60457 Berlin - Prague
+
+
+2.4 Trains & Train elements
+
+There are three COMPOUND TRAINS  & Four simple TRAINS
+	COMPOUND TRAIN bbd:ctrn_XX-447 (Amsterdam - Hannover)  (TRAIN NUMBER - 447)		
+	   447							457               	   40447
+		E - 2 2 2 2 2 2 R 1 1 -    2  2  2  2  2  -   2  2  2  1 1 - E
+
+	COMPOUND TRAIN bbd:ctrn_YY-447 (Hannover - Berlin) (TRAIN NUMBER - 447)		
+	   bbd:trn_447							457               		
+		E- 2 2 2 2 2 2 R 1 1 -    2  2  2  2 2 -  E
+
+	COMPOUND TRAIN bbd:ctrn_ZZ-457 (Berlin - Prague)  (TRAIN NUMBER - 467)		
+		bbd:trn_457              60457	
+		  2  2  2  2 2  -   R  2   2   2   2  - E
+
+	TRAIN    bbd:trn_447 (Amsterdam - Warsaw)  (Used in TRAIN NUMBER - 447)		 
+		E - 2 2 2 2 2 2 R 1 1 -  E
+
+	TRAIN bbd:trn_40447  (Hannover - Copenhagen)  (Used TRAIN NUMBER - 40447)		
+			bbd:trn_40447
+			2  2  2 1 1 E
+
+	TRAIN    bbd:trn_457 (Amsterdam - Prague)  (Used in TRAIN NUMBER s - 447, 457)		
+		 bbd:trn_457
+		    2  2  2  2  2  -  
+
+	TRAIN    bbd:trn_447 (Amsterdam - Warsaw)  (Used in TRAIN NUMBER - 457)		
+	    bbd:trn_60457	 			          		
+		 R  2   2   2   2  - E
+
+For Each Simple TRAIN there is a TRAIN COmPONENT  for each & TRAIN  ELEMENT 
+For e xample  
+ 
+  TRAIN 40447 Hanover - Copenhagen 
+	 2  2  2 1 1 E 
+	TRAIN COMPONENTs
+		1. bbd:trncmp_40447_01  - -> TRAIN ELEMENT bbd:trne:0447_01 TYPE: Engine   	 
+		2. bbd:trncmp_40447_02  - -> TRAIN ELEMENT bbd:trne:0447_02 TYPE: carriage   firstClass			Carriage A 
+		3. bbd:trncmp_40447_03  - -> TRAIN ELEMENT bbd:trne:0447_03 TYPE: carriage   firstClass			Carriage B
+		4. bbd:trncmp_40447_04   - -> TRAIN ELEMENT bbd:trne:0447_04 TYPE: carriage   standardClass	Carriage C
+		5. bbd:trncmp_40447_05   - -> TRAIN ELEMENT bbd:trne:0447_05 TYPE: carriage   standardClass	Carriage D
+		6. bbd:trncmp_40447_06   - -> TRAIN ELEMENT bbd:trne:0447_06 TYPE: carriage   standardClass	Carriage E
+	 
+ 2.6 Blocks
+ 
+There are  three Simple BLOCKs for the end to end  working of trains 
+
+	BLOCK    ops:blk_447_amsterdam_warsaw (Amsterdam - Warsaw)    TRAIN bbd:trn_447 	
+	    with three BLOCK PARTS: 
+			1. ops:blkpt_447_01_amsterdam-hannover  COMPOUND TRAIN bbd:ctrn_XX-447
+		  : 2. ops:blkpt_447_02_hannover-berlin   COMPOUND TRAIN bbd:ctrn_YY-447
+		    3. ops:blkpt_447_03_hannover-berlin     TRAIN bbd:trn_447
+
+	BLOCK ops:blk_40447_amsterdam_copenhagen  (Amsterdam - Copenhagen)   TRAIN  bbd:trn_40447 
+	     with two BLOCK PARTS: 
+			1. ops:blkpt_40447_01_amsterdam-hannover  COMPOUND TRAIN bbd:ctrn_XX-447	
+			2. ops:blkpt_40447_02_hannover-copenhagen TRAIN bbd:trn_40447
+
+	BLOCK    ops:blk_457_amsterdam_prague (Amsterdam - Prague)  TRAIN bbd:trn_457)		  TRAIN bbd:trn_447 	
+	    with three BLOCK PARTS: 
+			1. ops:blkpt_457_01_amsterdam-hannover  COMPOUND TRAIN bbd:ctrn_XX-447
+		  : 2. ops:blkpt_457_02_hannover-berlin   		COMPOUND TRAIN bbd:ctrn_YY-447
+		    3. ops:blkpt_457_03_berlin-prague     		COMPOUND TRAIN bbd:ctrn_ZZ-457
+   
+
+There are three COMPOUND BLOCKs that show the block coupling between each change of coupling  
+
+	COMPOUND BLOCK bbd:ctrn_XX-447 (Amsterdam - Hannover)  (TRAIN NUMBER - 447)		
+		    with three BLOCK PARTS: 
+			1. ops:blkpt_XX-447_01_amsterdam-hannover   TRAIN bbd:trn_447
+			2. ops:blkpt_XX-447_02_amsterdam-hannover   TRAIN bbd:trn_457
+			3. ops:blkpt_XX-447_03_amsterdam-hannover   TRAIN bbd:trn_40447
+ 
+	COMPOUND BLOCK bbd:ctrn_YY-447 (Hannover - Berlin) (TRAIN NUMBER - 447)		
+	    with three BLOCK PARTS: 
+			1. ops:blkpt_XX-447_01_hannover-berlin   TRAIN bbd:trn_447
+			2. ops:blkpt_XX-447_02_hannover-berlin   TRAIN bbd:trn_457       
+
+	COMPOUND BLOCK bbd:ctrn_ZZ-457 (Berlin - Prague)  (TRAIN NUMBER - 467)		
+	    with three BLOCK PARTS: 
+			1. ops:blkpt_ZZ-457_01_ berlin-prague     TRAIN bbd:trn_457
+				2. ops:blkpt_ZZ-457_02_ berlin-prague     TRAIN bbd:trn_60457 
+
+
+2.7  Container
+
+A COMPOSITE  FRAME groups the other frames  elements
+
+The TIMETABLE FRAME groups the servicee  elements
+    bbd:TIM_23_O  
+   - It has a VALIDITY CONDITION  that specifes it is valid from Sept to Matrch
+ 
+	A VEHICLE SERVICE  FRAME is used to contain the BLOCK related
+    ops:VSF_23_O   
+
+	A COMPOSITE FRAME is used to group the TIMETABLE FRAME with a CALENDAR FRAME as a single version
+
+The TIMETABLE FRAME groups the servicee  elements
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="bbd:TIM_23_O">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="bbd:TIM_23_O"/>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple timetable frame with two journeys and service calendar</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="bbd:TIM_23_O">
+			<validityConditions>
+				<AvailabilityCondition version="any" id="bbd:Cnd001">
+					<Description>Sept  to March</Description>
+					<FromDate>2010-11-01T00:00:00Z</FromDate>
+					<ToDate>2011-03-31T00:00:00Z</ToDate>
+					<dayTypes>
+						<DayTypeRef version="any" ref="bbd:DT_01-MF-NH"/>
+						<DayTypeRef version="any" ref="bbd:DT_03-WE-NH"/>
+					</dayTypes>
+				</AvailabilityCondition>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="ops_data">
+					<Xmlns>ops</Xmlns>
+					<XmlnsUrl>http://www.erail.eu/ops</XmlnsUrl>
+					<Description>Operations buses</Description>
+				</Codespace>
+				<Codespace id="bbd_data">
+					<Xmlns>bbd</Xmlns>
+					<XmlnsUrl>http://www.borninabahn.de/</XmlnsUrl>
+					<Description>Train  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="ops_data"/>
+			</FrameDefaults>
+			<frames>
+				<!-- ======Timetable ======= -->
+				<TimetableFrame version="any" id="bbd:TIM_23_O">
+					<Name>Winter timetable for route 23 Outbound</Name>
+					<VehicleModes>rail</VehicleModes>
+					<vehicleJourneys>
+						<ServiceJourney version="any" id="bbd:sj_447">
+							<Description>447 Amsterdam to Warsaw</Description>
+							<DepartureTime>09:00:00Z</DepartureTime>
+							<ServiceJourneyPatternRef version="any" ref="bbd:JP_447_amsterdam_warsaw"/>
+							<TrainRef version="any" ref="bbd:trn_447"/>
+							<BlockRef version="any" ref="ops:blk_447_amsterdam-warsaw"/>
+							<LineView>
+								<PublicCode>447</PublicCode>
+								<Name>Amsterdam to Warsaw Express</Name>
+								<TransportMode>rail</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="myrail:RT_447"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="bbd:DST_warsaw"/>
+							</JourneyPatternView>
+							<parts>
+								<JourneyPart version="any" id="bbd:jpt_447_01">
+									<Description>Amsterdam to Hannover</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_447"/>
+									<MainPartRef version="any" ref="bbd:jpt_447_01"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_01_amsterdam-hannover"/>
+									<TrainNumberRef version="any" ref="bbd:tn_447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_447_01_amsterdam-hannover"/>
+									<FromStopPointRef version="any" ref="uic:nl_amsterdam"/>
+									<ToStopPointRef version="any" ref="uic:de_hannover"/>
+									<StartTime>09:00:00Z</StartTime>
+									<EndTime>12:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:coupling">coupling</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+								<JourneyPart version="any" id="bbd:jpt_447_02">
+									<Description>Hannover to Berlin</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_447"/>
+									<MainPartRef version="any" ref="bbd:jpt_447_02"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_02_hannover-berlin"/>
+									<TrainNumberRef version="any" ref="bbd:tn_447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_447_02_hannover-berlin"/>
+									<FromStopPointRef version="any" ref="uic:de_hannover"/>
+									<ToStopPointRef version="any" ref="uic:de_berlin"/>
+									<StartTime>12:00:00Z</StartTime>
+									<EndTime>15:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:coupling">coupling</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+								<JourneyPart version="any" id="bbd:jpt_447_03">
+									<Description>Berlin to Warsaw</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_447"/>
+									<MainPartRef version="any" ref="bbd:jpt_447_03"/>
+									<TrainNumberRef version="any" ref="bbd:tn_447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_447_03_berlin-warsaw"/>
+									<FromStopPointRef version="any" ref="uic:de_berlin"/>
+									<ToStopPointRef version="any" ref="uic:pl_warsaw"/>
+									<StartTime>15:10:00.0Z</StartTime>
+									<EndTime>19:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:coupling">coupling</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+							</parts>
+							<calls>
+								<Call id="bbd:sj_447_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="uic:nl_amsterdam"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>09:00:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_457_joinTo_447_dep_amsterdam"/>
+												<Description>Join with 457  </Description>
+												<EarliestTime>09:00:00Z</EarliestTime>
+												<Reason>joining</Reason>
+											</JourneyMeetingView>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_40447_joinTo_477_dep_amsterdam"/>
+												<Description>Join with 40447</Description>
+												<EarliestTime>09:00:00Z</EarliestTime>
+												<Reason>joining</Reason>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<!--
+<interchanges>
+											<ServiceJourneyInterchangeView>
+												<ServiceJourneyInterchangeRef version="any" ref="bbd:sji_sj_447_to_sj_457"/>
+												<Description>In Amsterdam Trains join  </Description>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_457"/>
+													<ConnectingVisitNumber>1</ConnectingVisitNumber>
+												</ConnectingJourneyView>
+ 
+												<StandardTransferTime>PT0M</StandardTransferTime>
+											</ServiceJourneyInterchangeView>
+										</interchanges>			-->
+										<QuayAssignmentView>
+											<StopPlaceRef version="any" ref="uic:nl_amsterdam"/>
+											<QuayRef version="any" ref="uic:nl_amsterdam_1"/>
+											<QuayName>Platform 1</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_hannover"/>
+								</Call>
+								<Call id="bbd:sj_447_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="uic:de_hannover"/>
+									<Arrival>
+										<Time>12:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_40447_splitFrom_447_arr_hannover"/>
+												<Description>Connection to Copenhagen </Description>
+												<EarliestTime>15:30:00.0Z</EarliestTime>
+												<LatestTime>15:40:00.0Z</LatestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT5M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_hannover_01"/>
+												<ConnectingStopPointRef version="any" ref="uic:de_hannover"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_40447"/>
+													<DepartureTime>12:15:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_40447_amsterdam-copenhagen"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>40447</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<!--						<interchanges>
+											<ServiceJourneyInterchange id="bbd:sji_sj_447_to_sj_40447"> 
+												<Description>In Amsterdam Carriages split to Copenhagen </Description>
+												 
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_457"/>
+													<ConnectingVisitNumber>1</ConnectingVisitNumber>
+												</ConnectingJourneyView>
+ 
+												<StandardTransferTime>PT0M</StandardTransferTime>
+											</ServiceJourneyInterchange>
+										</interchanges>		-->
+									</Arrival>
+									<Departure>
+										<Time>12:05:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<WaitTime>PT5M</WaitTime>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:de_hannover_5"/>
+											<QuayName>Platform 5</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_warsaw"/>
+								</Call>
+								<Call id="bbd:sj_447_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="uic:de_berlin"/>
+									<Arrival>
+										<Time>15:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_457_splitFrom_447_arr_berlin"/>
+												<Description>Connection at Berlin to Prague </Description>
+												<EarliestTime>14:40:00.0Z</EarliestTime>
+												<LatestTime>14:50:00.0Z</LatestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT10M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_berlin_01"/>
+												<ConnectingStopPointRef version="any" ref="uic:de_berlin"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_457"/>
+													<DepartureTime>14:50:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_457_amsterdam-prague"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>457</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+									</Arrival>
+									<Departure>
+										<Time>15:10:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<WaitTime>PT10M</WaitTime>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:de_berlin_3"/>
+											<QuayName>Platform 3</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_warsaw"/>
+								</Call>
+								<Call id="bbd:sj_447_004" version="any" order="4">
+									<ScheduledStopPointRef version="any" ref="uic:pl_warsaw"/>
+									<Arrival>
+										<Time>19:10:00.0Z</Time>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:pl_warsaw_8"/>
+											<QuayName>Platform 8</QuayName>
+										</QuayAssignmentView>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_first"/>
+							</facilities>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="bbd:sj_40447">
+							<Description>40447 Amsterdam to Copenhagen</Description>
+							<DepartureTime>09:00:00Z</DepartureTime>
+							<ServiceJourneyPatternRef version="any" ref="bbd:JP_40447_amsterdam-copenhagen"/>
+							<TrainRef version="any" ref="bbd:trn_40447"/>
+							<BlockRef version="any" ref="ops:blk_40447_amsterdam-copenhagen"/>
+							<LineView>
+								<PublicCode>40447</PublicCode>
+								<TransportMode>rail</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="myrail:RT_40447"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="bbd:DST_copenhagen"/>
+							</JourneyPatternView>
+							<parts>
+								<JourneyPart version="any" id="bbd:jpt_40447_01">
+									<Description>Amsterdam to Hannover</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_40447"/>
+									<MainPartRef version="any" ref="bbd:jpt_447_01"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_01_amsterdam-hannover"/>
+									<TrainNumberRef version="any" ref="bbd:tn_447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_447_01_amsterdam-hannover"/>
+									<FromStopPointRef version="any" ref="uic:nl_amsterdam"/>
+									<ToStopPointRef version="any" ref="uic:de_hannover"/>
+									<StartTime>09:00:00.0Z</StartTime>
+									<EndTime>12:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:coupling">coupling</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+								<JourneyPart version="any" id="bbd:jpt_40447_02">
+									<Description>Hannover to Copenhagen</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_40447"/>
+									<MainPartRef version="any" ref="bbd:jpt_40447_01"/>
+									<TrainNumberRef version="any" ref="bbd:tn_40447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_40447_02_hannover-copenhagen"/>
+									<FromStopPointRef version="any" ref="uic:de_hannover"/>
+									<ToStopPointRef version="any" ref="uic:dk_copenhagen"/>
+									<StartTime>12:10:00.0Z</StartTime>
+									<EndTime>16:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:standalone">standalone</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+							</parts>
+							<calls>
+								<Call id="bbd:sj_40447_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="uic:nl_amsterdam"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>09:00:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_40447_joinTo_477_dep_amsterdam"/>
+												<Description>Start at Amsterdam (train couples)</Description>
+												<EarliestTime>09:00:00Z</EarliestTime>
+												<Reason>joining</Reason>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<QuayAssignmentView>
+											<StopPlaceRef version="any" ref="uic:nl_amsterdam"/>
+											<QuayRef version="any" ref="uic:nl_amsterdam_1"/>
+											<QuayName>Platform 1</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_hannover"/>
+								</Call>
+								<Call id="bbd:sj_40447_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="uic:de_hannover"/>
+									<Arrival>
+										<Time>12:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_40447_splitFrom_447_arr_hannover"/>
+												<Description>Split connection at Hannover to Copenhagen </Description>
+												<EarliestTime>15:20:00.0Z</EarliestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT5M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_hannover_02"/>
+												<ConnectingStopPointRef version="any" ref="uic:de_hannover"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_40447"/>
+													<DepartureTime>12:15:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_40447_amsterdam-copenhagen"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>40447</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+									</Arrival>
+									<Departure>
+										<Time>12:04:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<WaitTime>PT5M</WaitTime>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:de_hannover_5"/>
+											<QuayName>Platform 5</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_copenhagen"/>
+								</Call>
+								<Call id="bbd:sj_40447_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="uic:dk_copenhagen"/>
+									<Arrival>
+										<Time>16:00:00.0Z</Time>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:dk_copenhagen_1"/>
+											<QuayName>Platform 1</QuayName>
+										</QuayAssignmentView>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_first"/>
+							</facilities>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="bbd:sj_457">
+							<Description>457 Amsterdam to Prague</Description>
+							<DepartureTime>09:00:00Z</DepartureTime>
+							<ServiceJourneyPatternRef version="any" ref="bbd:JP_457_amsterdam-prague"/>
+							<TrainRef version="any" ref="bbd:trn_457"/>
+							<BlockRef version="any" ref="ops:blk_40447_amsterdam-copenhagen"/>
+							<LineView>
+								<PublicCode>457</PublicCode>
+								<TransportMode>rail</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="myrail:RT_457"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="bbd:DST_prague"/>
+							</JourneyPatternView>
+							<parts>
+								<JourneyPart version="any" id="bbd:jpt_457_01">
+									<Description>Amsterdam to Hannover</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_457"/>
+									<MainPartRef version="any" ref="bbd:jpt_447_01"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_01_amsterdam-hannover"/>
+									<TrainNumberRef version="any" ref="bbd:tn_447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_447_01_amsterdam-hannover"/>
+									<FromStopPointRef version="any" ref="uic:nl_amsterdam"/>
+									<ToStopPointRef version="any" ref="uic:de_hannover"/>
+									<StartTime>09:00:00.0Z</StartTime>
+									<EndTime>12:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:coupling">coupling</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+								<JourneyPart version="any" id="bbd:jpt_457_02">
+									<Description>Hannover to Berlin</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_457"/>
+									<MainPartRef version="any" ref="bbd:jpt_447_02"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_02_hannover-berlin"/>
+									<TrainNumberRef version="any" ref="bbd:tn_447"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_447_02_hannover-berlin"/>
+									<FromStopPointRef version="any" ref="uic:de_hannover"/>
+									<ToStopPointRef version="any" ref="uic:de_berlin"/>
+									<StartTime>12:00:00.0Z</StartTime>
+									<EndTime>15:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:coupling">coupling</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+								<JourneyPart version="any" id="bbd:jpt_457_03">
+									<Description>Berlin to Prague</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_457"/>
+									<MainPartRef version="any" ref="bbd:jpt_457_03"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_03_berlin-prague"/>
+									<TrainNumberRef version="any" ref="bbd:tn_457"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_457_03_berlin-prague"/>
+									<FromStopPointRef version="any" ref="uic:de_berlin"/>
+									<ToStopPointRef version="any" ref="uic:cz_prague"/>
+									<StartTime>15:20:00Z</StartTime>
+									<EndTime>20:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:standalone">standalone</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+							</parts>
+							<calls>
+								<Call id="bbd:sj_457_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="uic:nl_amsterdam"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>09:00:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_457_joinTo_447_dep_amsterdam"/>
+												<Description>Start at Amsterdam (train couples)</Description>
+												<EarliestTime>09:00:00Z</EarliestTime>
+												<Reason>joining</Reason>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<QuayAssignmentView>
+											<StopPlaceRef version="any" ref="uic:nl_amsterdam"/>
+											<QuayRef version="any" ref="uic:nl_amsterdam_1"/>
+											<QuayName>Platform 1</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_hannover"/>
+								</Call>
+								<Call id="bbd:sj_457_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="uic:de_hannover"/>
+									<Arrival>
+										<Time>12:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_40447_splitFrom_447_arr_hannover"/>
+												<Description>Connection at Hannover to Copenhagen </Description>
+												<EarliestTime>15:20:00.0Z</EarliestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT5M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_hannover_01"/>
+												<ConnectingStopPointRef version="any" ref="uic:de_hannover"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_40447"/>
+													<DepartureTime>12:15:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_40447_amsterdam-copenhagen"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>40447</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+									</Arrival>
+									<Departure>
+										<Time>12:05:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<WaitTime>PT5M</WaitTime>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:de_hannover_5"/>
+											<QuayName>Platform 5</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_berlin"/>
+								</Call>
+								<Call id="bbd:sj_457_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="uic:de_berlin"/>
+									<Arrival>
+										<Time>15:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_457_splitFrom_447_arr_berlin"/>
+												<Description>Connection at Berlin to Warsaw on 447 (train splits)</Description>
+												<EarliestTime>14:40:00.0Z</EarliestTime>
+												<LatestTime>14:50:00.0Z</LatestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT10M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_berlin_01"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_447"/>
+													<DepartureTime>14:50:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_447_amsterdam_warsaw"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>447</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Guaranteed>true</Guaranteed>
+												<Advertised>true</Advertised>
+												<Controlled>true</Controlled>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+									</Arrival>
+									<Departure>
+										<Time>15:05:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<WaitTime>PT5M</WaitTime>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_60457_joinTo_457_dep_berlin"/>
+												<Description>Joining at Berlin with    60457 to Prague </Description>
+												<EarliestTime>15:20:00.0Z</EarliestTime>
+												<Reason>joining</Reason>
+												<MaximumWaitTime>PT10M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_berlin_02"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_60457"/>
+													<DepartureTime>15:20:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_60457_berlin-prague"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>60457</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Advertised>true</Advertised>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:de_berlin_3"/>
+											<QuayName>Platform 3</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_prague"/>
+								</Call>
+								<Call id="bbd:sj_457_004" version="any" order="4">
+									<ScheduledStopPointRef version="any" ref="uic:cz_prague"/>
+									<Arrival>
+										<Time>20:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_60457_splitFrom_457_arr_prague"/>
+												<Description>Splitting at Prague of    60457 from 457   </Description>
+												<EarliestTime>20:00:00Z</EarliestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT10M</MaximumWaitTime>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_60457"/>
+													<DepartureTime>15:20:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_60457_berlin-prague"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>60457</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Advertised>true</Advertised>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:cz_prague_2"/>
+											<QuayName>Platform 2</QuayName>
+										</QuayAssignmentView>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_first"/>
+							</facilities>
+							<TrainSize>
+								<NumberOfCars>22</NumberOfCars>
+								<TrainSizeType>long</TrainSizeType>
+							</TrainSize>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="bbd:sj_60457">
+							<Description>60457 Berlin to Prague</Description>
+							<DepartureTime>15:00:00Z</DepartureTime>
+							<ServiceJourneyPatternRef version="any" ref="bbd:JP_457_amsterdam-prague"/>
+							<TrainRef version="any" ref="bbd:trn_457"/>
+							<BlockRef version="any" ref="ops:blk_457_amsterdam-prague"/>
+							<LineView>
+								<PublicCode>457</PublicCode>
+								<TransportMode>rail</TransportMode>
+							</LineView>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="myrail:RT_60457"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="bbd:DST_prague"/>
+							</JourneyPatternView>
+							<parts>
+								<JourneyPart version="any" id="bbd:jpt_60457_01">
+									<Description>Berlin to Prague</Description>
+									<ParentJourneyRef version="any" ref="bbd:sj_60457"/>
+									<MainPartRef version="any" ref="bbd:jpt_457_03"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_03_berlin-prague"/>
+									<TrainNumberRef version="any" ref="bbd:tn_457"/>
+									<TrainBlockPartRef version="any" ref="ops:blkpt_457_03_berlin-prague"/>
+									<FromStopPointRef version="any" ref="uic:de_berlin"/>
+									<ToStopPointRef version="any" ref="uic:cz_prague"/>
+									<StartTime>15:20:00Z</StartTime>
+									<EndTime>20:00:00Z</EndTime>
+									<PurposeOfJourneyPartitionRef ref="bbd:standalone">standalone</PurposeOfJourneyPartitionRef>
+								</JourneyPart>
+							</parts>
+							<calls>
+								<Call id="bbd:sj_60457_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="uic:de_berlin"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>15:05:00.0Z</Time>
+										<ForBoarding>true</ForBoarding>
+										<WaitTime>PT5M</WaitTime>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_60457_joinTo_457_dep_berlin"/>
+												<Description>Joining at Berlin with    60457 to Prague </Description>
+												<EarliestTime>15:20:00.0Z</EarliestTime>
+												<Reason>joining</Reason>
+												<MaximumWaitTime>PT10M</MaximumWaitTime>
+												<ConnectionRef version="any" ref="uic:cx_de_berlin_02"/>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_60457"/>
+													<DepartureTime>15:20:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_60457_berlin-prague"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>60457</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Advertised>true</Advertised>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:de_berlin_3"/>
+											<QuayName>Platform 3</QuayName>
+										</QuayAssignmentView>
+									</Departure>
+									<DestinationDisplayRef version="any" ref="bbd:DST_prague"/>
+								</Call>
+								<Call id="bbd:sj_60457_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="uic:cz_prague"/>
+									<Arrival>
+										<Time>20:00:00.0Z</Time>
+										<journeyMeetings>
+											<JourneyMeetingView>
+												<JourneyMeetingRef version="any" ref="bbd:jm_60457_splitFrom_457_arr_prague"/>
+												<Description>Splitting at Prague of    60457 from 457   </Description>
+												<EarliestTime>20:00:00Z</EarliestTime>
+												<Reason>splitting</Reason>
+												<MaximumWaitTime>PT10M</MaximumWaitTime>
+												<ConnectingJourneyView>
+													<ServiceJourneyRef version="any" ref="bbd:sj_60457"/>
+													<DepartureTime>15:20:00Z</DepartureTime>
+													<ServiceJourneyPatternRef version="any" ref="bbd:JP_60457_berlin-prague"/>
+												</ConnectingJourneyView>
+												<ConnectingLineView>
+													<Name>60457</Name>
+													<TransportMode>rail</TransportMode>
+												</ConnectingLineView>
+												<StaySeated>true</StaySeated>
+												<Planned>true</Planned>
+												<Advertised>true</Advertised>
+												<TransferDuration>
+													<DefaultDuration>PT0M</DefaultDuration>
+												</TransferDuration>
+											</JourneyMeetingView>
+										</journeyMeetings>
+										<QuayAssignmentView>
+											<QuayRef version="any" ref="uic:cz_prague_2"/>
+											<QuayName>Platform 2</QuayName>
+										</QuayAssignmentView>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+							<facilities>
+								<ServiceFacilitySet version="any" id="bbd:svcfc_60457">
+									<Description>Second  class facilities only</Description>
+									<CateringFacilityList>buffet   </CateringFacilityList>
+									<FareClasses>secondClass </FareClasses>
+								</ServiceFacilitySet>
+							</facilities>
+						</ServiceJourney>
+					</vehicleJourneys>
+					<trainNumbers>
+						<TrainNumber version="any" id="bbd:tn_447">
+							<Description>Amsterdam - Warsaw</Description>
+							<ForAdvertisement>447</ForAdvertisement>
+							<ForProduction>447</ForProduction>
+						</TrainNumber>
+						<TrainNumber version="any" id="bbd:tn_40447">
+							<Description>Hannover - Copenhagen</Description>
+							<ForAdvertisement>40447</ForAdvertisement>
+							<ForProduction>40447</ForProduction>
+						</TrainNumber>
+						<TrainNumber version="any" id="bbd:tn_457">
+							<Description>Berlin - Prague</Description>
+							<ForAdvertisement>457</ForAdvertisement>
+							<ForProduction>457</ForProduction>
+						</TrainNumber>
+					</trainNumbers>
+					<!--  Journey Part Couples  === -->
+					<journeyPartCouples>
+						<JourneyPartCouple version="any" id="bbd:jpc_01_amsterdam-hannover" order="1">
+							<StartTime>09:00:00Z</StartTime>
+							<EndTime>12:00:00Z</EndTime>
+							<FromStopPointRef version="any" ref="uic:nl_amsterdam"/>
+							<ToStopPointRef version="any" ref="uic:de_hannover"/>
+							<MainPartRef version="any" ref="bbd:jpt_447_01"/>
+							<journeyParts>
+								<JourneyPartRef version="any" ref="bbd:jpt_447_01"/>
+								<JourneyPartRef version="any" ref="bbd:jpt_457_01"/>
+								<JourneyPartRef version="any" ref="bbd:jpt_40447_01"/>
+							</journeyParts>
+							<TrainNumberRef version="any" ref="bbd:tn_447"/>
+						</JourneyPartCouple>
+						<JourneyPartCouple version="any" id="bbd:jpc_02_hannover-berlin" order="2">
+							<Description>Hannover to Berlin</Description>
+							<StartTime>12:05:00Z</StartTime>
+							<EndTime>15:00:00Z</EndTime>
+							<FromStopPointRef version="any" ref="uic:de_hannover"/>
+							<ToStopPointRef version="any" ref="uic:de_berlin"/>
+							<MainPartRef version="any" ref="bbd:jpt_447_02"/>
+							<journeyParts>
+								<JourneyPartRef version="any" ref="bbd:jpt_447_02"/>
+								<JourneyPartRef version="any" ref="bbd:jpt_457_02"/>
+							</journeyParts>
+							<TrainNumberRef version="any" ref="bbd:tn_447"/>
+						</JourneyPartCouple>
+						<JourneyPartCouple version="any" id="bbd:jpc_03_berlin-prague" order="3">
+							<Description>Berlin to Prague</Description>
+							<StartTime>15:10:00Z</StartTime>
+							<EndTime>19:00:00Z</EndTime>
+							<FromStopPointRef version="any" ref="uic:de_berlin"/>
+							<ToStopPointRef version="any" ref="uic:cz_prague"/>
+							<MainPartRef version="any" ref="bbd:jpt_457_03"/>
+							<journeyParts>
+								<JourneyPartRef version="any" ref="bbd:jpt_60457_01"/>
+								<JourneyPartRef version="any" ref="bbd:jpt_457_03"/>
+							</journeyParts>
+							<TrainNumberRef version="any" ref="bbd:tn_457"/>
+						</JourneyPartCouple>
+					</journeyPartCouples>
+					<!-- ==== COUPLED JOURNEYs ==== -->
+					<coupledJourneys>
+						<CoupledJourney version="any" id="bbd:CoupledJourney:cj_447_01">
+							<Description>Amsterdamn to hannover</Description>
+							<TrainBlockRef version="any" ref="bbd:XX-447_amsterdam-hannover"/>
+							<journeys>
+								<VehicleJourneyRef version="any" ref="bbd:sj_447"/>
+								<VehicleJourneyRef version="any" ref="bbd:sj_40447"/>
+								<VehicleJourneyRef version="any" ref="bbd:sj_457"/>
+							</journeys>
+						</CoupledJourney>
+						<CoupledJourney version="any" id="bbd:CoupledJourney:cj_447_02">
+							<Description>Hannover - Berlin</Description>
+							<TrainBlockRef version="any" ref="bbd:YY-447_hannover-berlin"/>
+							<journeys>
+								<VehicleJourneyRef version="any" ref="bbd:sj_447"/>
+								<VehicleJourneyRef version="any" ref="bbd:sj_457"/>
+							</journeys>
+						</CoupledJourney>
+						<CoupledJourney version="any" id="bbd:CoupledJourney:sj_457_03">
+							<Description>Berlin  - Prague</Description>
+							<TrainBlockRef version="any" ref="bbd:cmpblk_ZZ-457_berlin-prague"/>
+							<journeys>
+								<VehicleJourneyRef version="any" ref="bbd:sj_60457"/>
+								<VehicleJourneyRef version="any" ref="bbd:sj_457"/>
+							</journeys>
+						</CoupledJourney>
+					</coupledJourneys>
+					<serviceFacilitySets>
+						<ServiceFacilitySet version="any" id="bbd:svcfc_general">
+							<Description>General facilities</Description>
+							<AssistanceFacilityList>boardingAssistance conductor wheechairAssistance</AssistanceFacilityList>
+							<CateringFacilityList> buffet</CateringFacilityList>
+							<FareClasses> firstClass standardClass</FareClasses>
+							<MobilityFacilityList> stepFreeAccess suitableForWheelchairs</MobilityFacilityList>
+							<NuisanceFacilityList> mobilePhoneFreeZone noSmoking 							</NuisanceFacilityList>
+							<PassengerCommsFacilityList>publicWifi </PassengerCommsFacilityList>
+							<PassengerInformationFacilityList>nextStopIndicator passengerInformationDisplay realTimeConnections stopAnnouncements</PassengerInformationFacilityList>
+							<SanitaryFacilityList> toilet wheelChairAccessToilet</SanitaryFacilityList>
+							<TicketingServiceFacilityList> purchase</TicketingServiceFacilityList>
+							<AccommodationAccessList> reservation</AccommodationAccessList>
+							<AccommodationFacilityList> couchette seating sleeper</AccommodationFacilityList>
+							<CouchetteFacilityList> C2 C4 C6 T2</CouchetteFacilityList>
+							<LuggageCarriageFacilityList> baggageStorage baggageVan cyclesAllowedWithReservation luggageRacks</LuggageCarriageFacilityList>
+						</ServiceFacilitySet>
+						<ServiceFacilitySet version="any" id="bbd:svcfc_first">
+							<Description>First class facilities</Description>
+							<CateringFacilityList>breakfastInCar   </CateringFacilityList>
+							<FareClasses> firstClass</FareClasses>
+							<PassengerCommsFacilityList> powerSupplySockets publicWifi </PassengerCommsFacilityList>
+							<AccommodationAccessList>reservation</AccommodationAccessList>
+							<AccommodationFacilityList> sleeper </AccommodationFacilityList>
+							<accommodations>
+								<Accommodation version="any" id="bbd:svcfc_firs@singleSleeper">
+									<FareClass>firstClass</FareClass>
+									<AccommodationFacility>singleCouchette</AccommodationFacility>
+									<BerthFacility>lower</BerthFacility>
+									<ShowerFacility>shower</ShowerFacility>
+									<ToiletFacility>toilet</ToiletFacility>
+									<NuisanceFacilityList>noSmoking mobilePhoneFreeZone</NuisanceFacilityList>
+									<PassengerCommsFacilityList>freeWifi</PassengerCommsFacilityList>
+								</Accommodation>
+								<Accommodation version="any" id="bbd:svcfc_firs@doubleSleeper">
+									<FareClass>firstClass</FareClass>
+									<AccommodationFacility>doubleSleeper</AccommodationFacility>
+									<CouchetteFacility>C2</CouchetteFacility>
+									<ShowerFacility>shower</ShowerFacility>
+									<ToiletFacility>toilet</ToiletFacility>
+									<PassengerCommsFacilityList>freeWifi</PassengerCommsFacilityList>
+								</Accommodation>
+								<Accommodation version="any" id="bbd:svcfc_firs@sleeper">
+									<FareClass>secondClass</FareClass>
+									<AccommodationFacility>couchette</AccommodationFacility>
+									<CouchetteFacility>C4</CouchetteFacility>
+									<PassengerCommsFacilityList>freeWifi</PassengerCommsFacilityList>
+								</Accommodation>
+							</accommodations>
+							<onboardStays>
+								<OnboardStay version="any" id="bbd:svcfc_firs@earlyBoardingPossibleBeforeDeparture">
+									<FareClass>firstClass</FareClass>
+									<BoardingPermission>earlyBoardingPossibleBeforeDeparture</BoardingPermission>
+									<Period>PT1H</Period>
+								</OnboardStay>
+								<OnboardStay version="any" id="bbd:svcfc_firs@overnightStayOnboardAllowed">
+									<FareClass>firstClass</FareClass>
+									<BoardingPermission>overnightStayOnboardAllowed</BoardingPermission>
+									<Period>PT9H</Period>
+								</OnboardStay>
+							</onboardStays>
+						</ServiceFacilitySet>
+					</serviceFacilitySets>
+					<!-- ==== JOURNEY MEETINGs ==== -->
+					<journeyMeetings>
+						<JourneyMeeting version="any" id="bbd:jm_457_joinTo_447_dep_amsterdam">
+							<AtStopPointRef version="any" ref="uic:nl_amsterdam"/>
+							<FromJourneyRef version="any" ref="bbd:sj_457"/>
+							<ToJourneyRef version="any" ref="bbd:sj_447"/>
+							<Description>Join 457 to 447 at Amsterdam</Description>
+							<EarliestTime>09:00:00Z</EarliestTime>
+							<Reason>joining</Reason>
+						</JourneyMeeting>
+						<JourneyMeeting version="any" id="bbd:jm_40447_joinTo_477_dep_amsterdam">
+							<AtStopPointRef version="any" ref="uic:nl_amsterdam"/>
+							<FromJourneyRef version="any" ref="bbd:sj_40447"/>
+							<ToJourneyRef version="any" ref="bbd:sj_447"/>
+							<Description>Join 40447 to 447 at Amsterdam</Description>
+							<EarliestTime>09:00:00Z</EarliestTime>
+							<Reason>joining</Reason>
+						</JourneyMeeting>
+						<JourneyMeeting version="any" id="bbd:jm_40447_splitFrom_447_arr_hannover">
+							<AtStopPointRef version="any" ref="uic:de_hannover"/>
+							<FromJourneyRef version="any" ref="bbd:sj_40447"/>
+							<ToJourneyRef version="any" ref="bbd:sj_447"/>
+							<Description>Split  40447 from 447 at Hannover</Description>
+							<EarliestTime>12:00:00Z</EarliestTime>
+							<Reason>joining</Reason>
+						</JourneyMeeting>
+						<JourneyMeeting version="any" id="bbd:jm_457_splitFrom_447_arr_berlin">
+							<AtStopPointRef version="any" ref="uic:de_berlin"/>
+							<FromJourneyRef version="any" ref="bbd:sj_457"/>
+							<ToJourneyRef version="any" ref="bbd:sj_447"/>
+							<Description>Split  457 from 447 at Hannover</Description>
+							<EarliestTime>15:00:00Z</EarliestTime>
+							<Reason>joining</Reason>
+						</JourneyMeeting>
+						<JourneyMeeting version="any" id="bbd:jm_60457_joinTo_457_dep_berlin">
+							<AtStopPointRef version="any" ref="uic:de_berlin"/>
+							<FromJourneyRef version="any" ref="bbd:sj_60457"/>
+							<ToJourneyRef version="any" ref="bbd:sj_457"/>
+							<Description>Join 60457 to 457 at Berlin</Description>
+							<EarliestTime>15:10:00Z</EarliestTime>
+							<Reason>joining</Reason>
+						</JourneyMeeting>
+						<JourneyMeeting version="any" id="bbd:jm_60457_splitFrom_457_arr_prague">
+							<AtStopPointRef version="any" ref="uic:cz_prague"/>
+							<FromJourneyRef version="any" ref="bbd:sj_60457"/>
+							<ToJourneyRef version="any" ref="bbd:sj_457"/>
+							<EarliestTime>20:10:00Z</EarliestTime>
+							<Reason>splitting</Reason>
+						</JourneyMeeting>
+					</journeyMeetings>
+					<!-- === Compound Trains =====  -->
+					<vehicleTypes>
+						<CompoundTrain version="any" id="bbd:ctrn_XX-447">
+							<Name>447 + 457 + 40447 Amsterdam - Hannover</Name>
+							<Description>E - 2 2 2 2 2 2 R 1 1 -    2  2  2  2  2  -   2  2  2  1 1 - E</Description>
+							<SelfPropelled> true</SelfPropelled>
+							<components>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_XX-447_40447" order="1">
+									<TrainRef version="any" ref="bbd:trn_40447"/>
+									<Label>40447</Label>
+								</TrainInCompoundTrain>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_XX-447_457" order="2">
+									<TrainRef version="any" ref="bbd:trn_457"/>
+									<Label>457</Label>
+								</TrainInCompoundTrain>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_XX-447_447" order="3">
+									<TrainRef version="any" ref="bbd:trn_447"/>
+									<Label>447</Label>
+								</TrainInCompoundTrain>
+							</components>
+						</CompoundTrain>
+						<CompoundTrain version="any" id="bbd:ctrn_YY-447">
+							<Name>447 + 457  Hannover - Berlin</Name>
+							<Description>E- 2 2 2 2 2 2 R 1 1 -    2  2  2  2 2 -  E</Description>
+							<SelfPropelled> true</SelfPropelled>
+							<components>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_YY-447_457" order="1">
+									<TrainRef version="any" ref="bbd:trn_457"/>
+									<Label>457</Label>
+								</TrainInCompoundTrain>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_YY-447_447" order="2">
+									<TrainRef version="any" ref="bbd:trn_447"/>
+									<Label>447</Label>
+								</TrainInCompoundTrain>
+							</components>
+						</CompoundTrain>
+						<CompoundTrain version="any" id="bbd:ctrn_ZZ-457">
+							<Name>457 + 60457  Berlin - Prague</Name>
+							<Description>2  2  2  2 2  -   R  2   2   2   2  - E</Description>
+							<SelfPropelled> true</SelfPropelled>
+							<components>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_ZZ-457_60457" order="1">
+									<TrainRef version="any" ref="bbd:trn_60457"/>
+									<Label>60457</Label>
+								</TrainInCompoundTrain>
+								<TrainInCompoundTrain version="any" id="bbd:trninctrn_ZZ-457_457" order="2">
+									<TrainRef version="any" ref="bbd:trn_457"/>
+									<Label>447</Label>
+								</TrainInCompoundTrain>
+							</components>
+						</CompoundTrain>
+						<!-- == Trains ==== -->
+						<Train version="any" id="bbd:trn_40447">
+							<Name>40447 Hanover - Copenhagen</Name>
+							<Description>2  2  2 1 1 E</Description>
+							<SelfPropelled> true</SelfPropelled>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_first"/>
+							</facilities>
+							<components>
+								<TrainComponent version="any" id="bbd:trncmp_40447_01" order="1">
+									<Label>Engine </Label>
+									<Description>Engine</Description>
+									<TrainElement version="any" id="bbd:trne_40447_01">
+										<Name/>
+										<TrainElementType>engine</TrainElementType>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_40447_02" order="2">
+									<Label>Carriage A</Label>
+									<Description>Front Carriage 1st Class</Description>
+									<TrainElement version="any" id="bbd:trne_40447_02">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses> firstClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_40447_03" order="3">
+									<Label>Carriage B</Label>
+									<Description>2nd Carriage 1st CLass</Description>
+									<TrainElement version="any" id="bbd:trne_40447_03">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses> firstClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_40447_04" order="3">
+									<Label>Carriage B</Label>
+									<Description>3rd Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_40447_04">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>firstClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_40447_05" order="4">
+									<Label>Carriage D</Label>
+									<Description>4th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_40447_05">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_40447_06" order="5">
+									<Label>Carriage E</Label>
+									<Description>5th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_40447_06">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+							</components>
+						</Train>
+						<Train version="any" id="bbd:trn_447">
+							<Name>447 Amsterdam - Warsaw </Name>
+							<Description>E 2 2 2 2 2 2 R 1 1   X</Description>
+							<SelfPropelled> true</SelfPropelled>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_first"/>
+							</facilities>
+							<components>
+								<TrainComponent version="any" id="bbd:trncmp_447_01" order="1">
+									<Label>Carriage K</Label>
+									<Description>Front Carriage 1st Class</Description>
+									<TrainElement version="any" id="bbd:trne_447_01">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses> firstClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_02" order="2">
+									<Label>Carriage L</Label>
+									<Description>2nd Carriage 1st CLass</Description>
+									<TrainElement version="any" id="bbd:trne_447_02">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses> firstClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_03" order="3">
+									<Label>Carriage M</Label>
+									<Description>3rd Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_447_03">
+										<Name/>
+										<TrainElementType>restaurantCarriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_04" order="4">
+									<Label>Carriage N</Label>
+									<Description>4th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_447_04">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_05" order="5">
+									<Label>Carriage O</Label>
+									<Description>5th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_447_05">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_06" order="6">
+									<Label>Carriage P</Label>
+									<Description>6th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_447_06">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_07" order="7">
+									<Label>Carriage Q</Label>
+									<Description>7th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_447_07">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_08" order="8">
+									<Label>Carriage R</Label>
+									<Description>8th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_447_08">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_447_09" order="1">
+									<Label/>
+									<Description>Engine</Description>
+									<TrainElement version="any" id="bbd:trne_447_09">
+										<Name/>
+										<TrainElementType>engine</TrainElementType>
+									</TrainElement>
+								</TrainComponent>
+							</components>
+						</Train>
+						<Train version="any" id="bbd:trn_457">
+							<Name>457  Amsterdam - Prague </Name>
+							<Description>-   2  2  2  2 2  -    </Description>
+							<SelfPropelled> false</SelfPropelled>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+							</facilities>
+							<components>
+								<TrainComponent version="any" id="bbd:trncmp_457_01" order="1">
+									<Label>Carriage F</Label>
+									<Description>Front Carriage </Description>
+									<TrainElement version="any" id="bbd:trne_457_01">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_457_02" order="2">
+									<Label>Carriage G</Label>
+									<Description>2nd Carriage  </Description>
+									<TrainElement version="any" id="bbd:trne_457_02">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_457_03" order="3">
+									<Label>Carriage H</Label>
+									<Description>3rd Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_457_03">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>firstClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_457_04" order="4">
+									<Label>Carriage I</Label>
+									<Description>4th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_457_04">
+										<Name/>
+										<TrainElementType>restaurantCarriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_457_05" order="5">
+									<Label>Carriage J</Label>
+									<Description>5th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_457_05">
+										<Name/>
+										<TrainElementType>restaurantCarriage</TrainElementType>
+										<FareClasses>standardClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+							</components>
+						</Train>
+						<Train version="any" id="bbd:trn_60457">
+							<Name>60457  Berlin - Prague </Name>
+							<Description>-  R  2   2   2   2  - E</Description>
+							<SelfPropelled>false</SelfPropelled>
+							<facilities>
+								<ServiceFacilitySetRef version="any" ref="bbd:svcfc_general"/>
+							</facilities>
+							<components>
+								<TrainComponent version="any" id="bbd:trncmp_60457_01" order="1">
+									<Label/>
+									<Description>Engine</Description>
+									<TrainElement version="any" id="bbd:trne_60457_01">
+										<Name/>
+										<TrainElementType>engine</TrainElementType>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_60457_02" order="2">
+									<Label>Carriage AA</Label>
+									<Description>Front Carriage </Description>
+									<TrainElement version="any" id="bbd:trne_60457_02">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_60457_03" order="3">
+									<Label>Carriage BB</Label>
+									<Description>2nd Carriage  </Description>
+									<TrainElement version="any" id="bbd:trne_60457_03">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_60457_04" order="4">
+									<Label>Carriage CC</Label>
+									<Description>3rd Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_60457_04">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_60457_05" order="5">
+									<Label>Carriage DD</Label>
+									<Description>4th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_60457_05">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+								<TrainComponent version="any" id="bbd:trncmp_60457_06" order="6">
+									<Label>Carriage EE</Label>
+									<Description>5th Carriage</Description>
+									<TrainElement version="any" id="bbd:trne_60457_06">
+										<Name/>
+										<TrainElementType>carriage</TrainElementType>
+										<FareClasses>secondClass</FareClasses>
+									</TrainElement>
+								</TrainComponent>
+							</components>
+						</Train>
+					</vehicleTypes>
+				</TimetableFrame>
+				<VehicleScheduleFrame version="any" id="ops:VSF_23_O">
+					<Name>BLOCKS Winter timetable for Asmterdam Example</Name>
+					<!--  === BLOCKs  ==== ======== 
+ 
+-->
+					<blocks>
+						<TrainBlock version="any" id="ops:blk_447_amsterdam-warsaw">
+							<Description>Amsterdam - Hannover - Berrlin  Warsaw</Description>
+							<PreparationDuration>PT10M</PreparationDuration>
+							<FinishingDuration>PT10H</FinishingDuration>
+							<!--- VehicleTypeRef    -->
+							<TrainRef version="any" ref="bbd:trn_447"/>
+							<StartPointRef ref="uic:nl_amsterdam"/>
+							<EndPointRef ref="uic:pl_warsaw"/>
+							<blockParts>
+								<TrainBlockPart version="any" id="ops:blkpt_447_01_amsterdam-hannover" order="1">
+									<Description>Amsterdam to Hannover (447+ 457 +40447)</Description>
+									<CompoundTrainRef version="any" ref="bbd:ctrn_XX-447"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_01_amsterdam-hannover"/>
+								</TrainBlockPart>
+								<TrainBlockPart version="any" id="ops:blkpt_447_02_hannover-berlin" order="2">
+									<Description>Hannover to Berlin (447+ 457)</Description>
+									<CompoundTrainRef version="any" ref="bbd:ctrn_YY-447"/>
+									<JourneyPartCoupleRef version="any" ref="bbd:jpc_02_hannover-berlin"/>
+								</TrainBlockPart>
+								<TrainBlockPart version="any" id="ops:blkpt_447_03_berlin-warsaw" order="3">
+									<Description>Berlin to Warsaw (447)</Description>
+									<TrainRef version="any" ref="bbd:trn_447"/>
+									<journeyParts>
+										<JourneyPartRef version="any" ref="bbd:jpt_447_03"/>
+									</journeyParts>
+								</TrainBlockPart>
+							</blockParts>
+						</TrainBlock>
+						<TrainBlock version="any" id="ops:blk_40447_amsterdam-copenhagen">
+							<Description>Amsterdam to  Copenhagen (40447)</Description>
+							<PreparationDuration>PT10M</PreparationDuration>
+							<FinishingDuration>PT7H</FinishingDuration>
+							<TrainRef version="any" ref="bbd:trn_40447"/>
+							<StartPointRef ref="uic:de_hannover"/>
+							<EndPointRef ref="uic:dk_copenhagen"/>
+							<blockParts>
+								<TrainBlockPartRef version="any" ref="ops:blkpt_447_01_amsterdam-hannover"/>
+								<TrainBlockPart version="any" id="ops:blkpt_40447_02_hannover-copenhagen" order="2">
+									<Description>Hannover to  Copenhagen</Description>
+									<TrainRef version="any" ref="bbd:trn_40447"/>
+									<journeyParts>
+										<JourneyPartRef version="any" ref="bbd:jpt_40447_02"/>
+									</journeyParts>
+								</TrainBlockPart>
+							</blockParts>
+						</TrainBlock>
+						<TrainBlock version="any" id="ops:blk_457_amsterdam-prague">
+							<Description>Amsterdam to Prague</Description>
+							<PreparationDuration>PT10M</PreparationDuration>
+							<FinishingDuration>PT10H</FinishingDuration>
+							<TrainRef version="any" ref="bbd:trn_457"/>
+							<StartPointRef ref="uic:de_berlin"/>
+							<EndPointRef ref="uic:cz_prague"/>
+							<blockParts>
+								<TrainBlockPartRef version="any" ref="ops:blkpt_447_01_amsterdam-hannover"/>
+								<TrainBlockPartRef version="any" ref="ops:blkpt_447_02_hannover-berlin"/>
+								<TrainBlockPart version="any" id="ops:blkpt_457_03_berlin-prague" order="3">
+									<Description>Berlin to Prague</Description>
+									<CompoundTrainRef version="any" ref="bbd:ctrn_ZZ-457"/>
+								</TrainBlockPart>
+							</blockParts>
+						</TrainBlock>
+						<CompoundBlock version="any" id="bbd:XX-447_amsterdam-hannover">
+							<Description>Amsterdam to Hannover</Description>
+							<CompoundTrainRef version="any" ref="bbd:ctrn_XX-447"/>
+							<parts>
+								<TrainBlockPartRef version="any" ref="ops:blkpt_447_01_amsterdam-hannover"/>
+							</parts>
+						</CompoundBlock>
+						<CompoundBlock version="any" id="bbd:YY-447_hannover-berlin">
+							<Description>Hannover to Berlin</Description>
+							<CompoundTrainRef version="any" ref="bbd:ctrn_YY-447"/>
+							<parts>
+								<TrainBlockPartRef version="any" ref="ops:blkpt_447_02_hannover-berlin"/>
+							</parts>
+						</CompoundBlock>
+						<CompoundBlock version="any" id="bbd:cmpblk_ZZ-457_berlin-prague">
+							<Description>Berlin to Prague</Description>
+							<CompoundTrainRef version="any" ref="bbd:ctrn_ZZ-457"/>
+							<parts>
+								<TrainBlockPartRef version="any" ref="ops:blkpt_457_03_berlin-prague"/>
+							</parts>
+						</CompoundBlock>
+					</blocks>
+				</VehicleScheduleFrame>
+				<ServiceFrame id="myrail:svf_12" version="any">
+					<Name>Stops for Winter timetable for Splitting timnetable  Amsterdamn to Warsaw  </Name>
+					<routes>
+						<Route version="any" id="myrail:RT_447">
+							<Name>amsterdam-warsaw</Name>
+							<ShortName>Route 447</ShortName>
+						</Route>
+						<Route version="any" id="myrail:RT_40447">
+							<Name>amsterdam-copenhagen</Name>
+							<ShortName>Route 40447</ShortName>
+						</Route>
+						<Route version="any" id="myrail:RT_457">
+							<Name>amsterdam-prague</Name>
+							<ShortName>Route 457</ShortName>
+						</Route>
+						<Route version="any" id="myrail:RT_60457">
+							<Name>berlin-prague</Name>
+							<ShortName>Route 60457</ShortName>
+						</Route>
+					</routes>
+					<lines>
+						<Line version="any" id="myrail:LN_nl_amsterdam-cz_prague">
+							<Name>LN_amsterdam-cz_prague</Name>
+							<ShortName>Line 24</ShortName>
+							<TransportMode>rail</TransportMode>
+						</Line>
+						<Line version="any" id="myrail:LN_nl_amsterdam-pl_warsaw">
+							<Name>LN_amsterdam-pl_warsaw</Name>
+							<ShortName>Line 25</ShortName>
+							<TransportMode>rail</TransportMode>
+						</Line>
+						<Line version="any" id="myrail:LN_nl_amsterdam-dk_copenhagen">
+							<Name>LN_amsterdam-pl_warsaw</Name>
+							<ShortName>Line 31</ShortName>
+							<TransportMode>rail</TransportMode>
+						</Line>
+					</lines>
+					<!-- === DESTINATIONs  ===== -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="bbd:DST_berlin">
+							<Name lang="de">Berlin  Hochbahnhof</Name>
+							<ShortName>Berlin HBF</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="bbd:DST_copenhagen">
+							<Name>Copenhagen Main Station</Name>
+							<ShortName>Hannover HBF</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="bbd:DST_hannover">
+							<Name lang="de">Hannover  Hochbahnhof</Name>
+							<ShortName>Hannover HBF</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="bbd:DST_prague">
+							<Name>Prague</Name>
+							<ShortName>Prague</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="bbd:DST_warsaw">
+							<Name>Warsaw</Name>
+							<ShortName>Warsaw</ShortName>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!-- === STOP POINTs =====  -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="uic:nl_amsterdam">
+							<Name>Amsterdamn</Name>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="uic:de_hannover">
+							<Name>Hannover</Name>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="uic:de_berlin">
+							<Name>Berlin</Name>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="uic:cz_prague">
+							<Name>Prague HBF</Name>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="uic:dk_copenhagen">
+							<Name>Copenhagen HBF</Name>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="uic:pl_warsaw">
+							<Name>Berlin</Name>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<connections>
+						<Connection version="any" id="uic:cx_de_hannover_01">
+							<Name>Connection at Hannover for berlin</Name>
+						</Connection>
+						<Connection version="any" id="uic:cx_de_hannover_02">
+							<Name>Connection at Hannover for Copenhagen</Name>
+						</Connection>
+						<Connection version="any" id="uic:cx_de_berlin_01">
+							<Name>Connection at Berlin for Warsaw</Name>
+						</Connection>
+						<Connection version="any" id="uic:cx_de_berlin_02">
+							<Name>Connection at Berlin for Prague</Name>
+						</Connection>
+					</connections>
+					<!--- ======JOURNEY PATTERNS=========== -->
+					<journeyPatterns>
+						<ServiceJourneyPattern version="any" id="bbd:JP_447_amsterdam_warsaw">
+							<Name>Amsterdam  to Warsaw</Name>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="bbd:JP_447_amsterdam_warsaw_01">
+									<ScheduledStopPointRef version="any" ref="uic:nl_amsterdam"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="bbd:JP_447_amsterdam_warsaw_02">
+									<ScheduledStopPointRef version="any" ref="uic:de_hannover"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="bbd:JP_447_amsterdam_warsaw_03">
+									<ScheduledStopPointRef version="any" ref="uic:de_berlin"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="bbd:JP_447_amsterdam_warsaw_04">
+									<ScheduledStopPointRef version="any" ref="uic:pl_warsaw"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="bbd:JP_40447_amsterdam-copenhagen">
+							<Name>Amsterdamn to Copenhagen</Name>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="bbd:JP_40447_amsterdam_copenhagen_01">
+									<ScheduledStopPointRef version="any" ref="uic:nl_amsterdam"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="bbd:JP_40447_amsterdam_copenhagen_02">
+									<ScheduledStopPointRef version="any" ref="uic:de_hannover"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="bbd:JP_40447_amsterdam_copenhagen_03">
+									<ScheduledStopPointRef version="any" ref="uic:dk_copenhagen"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="bbd:JP_457_amsterdam-prague">
+							<Name>Amsterdam to prague</Name>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="bbd:JP_457_amsterdam_prague_01">
+									<ScheduledStopPointRef version="any" ref="uic:nl_amsterdam"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="bbd:JP_457_amsterdam_prague_02">
+									<ScheduledStopPointRef version="any" ref="uic:de_hannover"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="bbd:JP_457_amsterdam_prague_03">
+									<ScheduledStopPointRef version="any" ref="uic:de_berlin"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="bbd:JP_457_amsterdam_prague_04">
+									<ScheduledStopPointRef version="any" ref="uic:cz_prague"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="bbd:JP_60457_berlin-prague">
+							<Name>Berlin to Prague</Name>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="3" id="bbd:JP_60457_berlin_prague_01">
+									<ScheduledStopPointRef version="any" ref="uic:de_berlin"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="bbd:JP_60457_berlin_prague_02">
+									<ScheduledStopPointRef version="any" ref="uic:cz_prague"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+					</journeyPatterns>
+				</ServiceFrame>
+				<SiteFrame version="any" id="mybus:svf_12">
+					<Name>Stop Places for Winter timetable for route 24 </Name>
+					<!-- === STOP POINTs =====  -->
+					<stopPlaces>
+						<StopPlace version="any" id="uic:nl_amsterdam">
+							<Name>Amsterdam</Name>
+							<quays>
+								<Quay version="any" id="uic:nl_amsterdam_1">
+									<Name>Platform 1</Name>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="uic:de_berlin">
+							<Name>Berlin HBF</Name>
+							<TransportMode>rail</TransportMode>
+							<quays>
+								<Quay version="any" id="uic:de_berlin_1">
+									<Name>Platform 1</Name>
+								</Quay>
+								<Quay version="any" id="uic:de_berlin_2">
+									<Name>Platform 2</Name>
+								</Quay>
+								<Quay version="any" id="uic:de_berlin_3">
+									<Name>Platform 3</Name>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="uic:dk_copenhagen">
+							<Name>Copenhagen HBF</Name>
+							<TransportMode>rail</TransportMode>
+							<quays>
+								<Quay version="any" id="uic:dk_copenhagen_1">
+									<Name>Platform 1</Name>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="uic:de_hannover">
+							<Name>Hannover HBF</Name>
+							<TransportMode>rail</TransportMode>
+							<quays>
+								<Quay version="any" id="uic:de_hannover_5">
+									<Name>Platform 5</Name>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="uic:cz_prague">
+							<Name>Warsaw HBF</Name>
+							<TransportMode>rail</TransportMode>
+							<quays>
+								<Quay version="any" id="uic:cz_prague_1">
+									<Name>Platform 1</Name>
+								</Quay>
+								<Quay version="any" id="uic:cz_prague_2">
+									<Name>Platform 2</Name>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="uic:pl_warsaw">
+							<Name>Warsaw HBF</Name>
+							<TransportMode>rail</TransportMode>
+							<quays>
+								<Quay version="any" id="uic:pl_warsaw_7">
+									<Name>Platform 1</Name>
+								</Quay>
+								<Quay version="any" id="uic:pl_warsaw_8">
+									<Name>Platform 1</Name>
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<ServiceCalendarFrame version="any" id="bbd:CAL_01">
+					<Name>Service Calendar Nov 2010 </Name>
+					<ServiceCalendar version="any" id="bbd:SC_01">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2010-11-14</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="bbd:DT_01-MF-NH">
+							<Name>Weekdays unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="bbd:DT_03-WE-NH">
+							<Name>Weekends unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Saturday Sunday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

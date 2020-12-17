@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====  GTFS Stops to NeTEx  Example ====== 
+This Example provides an example of mapping of a   GTFS Stops.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+ 
+Sept 2011 version add stop_code
+
+1. DATA
+
+Stops.txt
+stop_id,stope_code_stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url, location_type, parent_station
+FUR_CREEK_RES,121,Furnace Creek Resort (Demo),,36.425288,-117.133162,FareZone01,http://www.demoagency.org,0,
+BEATTY_AIRPORT,122,Nye County Airport (Demo),,36.868446,-116.784582,FareZone01,http://www.demoagency.org,0,
+BULLFROG,123,Bullfrog (Demo),,36.88108,-116.81797,FareZone01,http://www.demoagency.org,0,
+STAGECOACH,124,Stagecoach Hotel & Casino (Demo),,36.915682,-116.751677,FareZone01,http://www.demoagency.org,0,
+NADAV,125,North Ave / D Ave N (Demo),,36.914893,-116.76821,FareZone02,http://www.demoagency.org,0,
+NANAA,126,North Ave / N A Ave (Demo),,36.914944,-116.761472,FareZone02,http://www.demoagency.org,0,
+DADAN,127,Doing Ave / D Ave N (Demo),,36.909489,-116.768242,FareZone02,http://www.demoagency.org,0,
+EMSI,129,E Main St / S Irving St (Demo),,36.905697,-116.76218,FareZone02,http://www.demoagency.org,0,
+AMV,1231,Amargosa Valley (Demo),,36.641496,-116.40094,FareZone02,http://www.demoagency.org,0,
+
+2. MAPPING
+
+2.1 A GTFS stop as a point in a timetable maps to a NeTEx SCHEDULED STOP POINT
+
+GTFS										NeTEx
+stop_id,									<ScheduledStopPoint #stop_id> <@id
+stop_code									<ScheduledStopPoint #stop_id> <PublicCode> #stop_code
+stop_name,								<ScheduledStopPoint #stop_id> <Name> #stop_name
+stop_desc,								<ScheduledStopPoint #stop_id> <Description> #stop_desc
+stop_lat,									<ScheduledStopPoint #stop_id> <Location> <Latitude> #stop_lat
+stop_lon,									<ScheduledStopPoint #stop_id> <Location> <Longitude> #stop_lon
+zone_id,									<ScheduledStopPoint #stop_id> <tariffZones> <TariffZoneRef #zone_id> 
+stop_url,									<ScheduledStopPoint #stop_id>  <Url> #stop_url
+location_type, 	0 = Stop Point	<ScheduledStopPoint #stop_id> 	(<TypeOfPointRef 0 >)  <StopType>onStreetBus</StopType>
+						1 = Station		<ScheduledStopPoint #stop_id> 	(<TypeOfPointRef 1 >)  <StopType>railStation</StopType>
+parent_station							<ScheduledStopPoint #stop_id> <stopAreas> <StopAreaRef #parent_station> 
+
+
+2.1  A GTFS stop as a physical stop  can also be mapped to a NeTEx STOP PLACE (station) and/or QUAY (ie platform)  
+       
+
+2.1.1 If location type is *1" (Station)
+
+GTFS										NeTEx
+stop_id,									<StopPlace #stop_id> @id
+stop_code,								<StopPlace #stop_id> <PublicCode> #stop_code
+stop_name,								<StopPlace #stop_id> <Name> #stop_name
+stop_desc,								<StopPlace #stop_id> <Description> #stop_desc
+stop_lat,									<StopPlace #stop_id> <Centroid><Location> <Latitude> #stop_lat
+stop_lon,									<StopPlace #stop_id> <Centroid><Location> <Longitude> #stop_lon,
+zone_id,									<StopPlace #stop_id> <tariffZones> <TariffZoneRef #zone_id>@ref 
+														<TariffZone  #zone_id >
+stop_url,									<StopPlace #stop_id>  <Url> #stop_url
+location_type, 	1 = Station		<StopPlace #stop_id>  (<TypeOfStopPlaceRef  id= = 1>)  gtfs:1=Station
+																		<StopType>railStation</StopType>
+parent_station							<StopPlace #stop_id>  (<ParentSiteRef #parent_station>  NB NEsting allowed)
+
+2.1.1 If location type is *0" (Stop)
+
+GTFS										NeTEx
+stop_id,									<Quay #stop_id> @id
+stop_code,								<StopPlace #stop_id> <PublicCode>
+stop_name,								<Quay #stop_id> <Name> #stop_name
+stop_desc,								<Quay #stop_id> <Description> #stop_desc
+stop_lat,									<Quay #stop_id> <Centroid><Location> <Latitude> #stop_lat
+stop_lon,									<Quay #stop_id> <Centroid><Location> <Longitude> #stop_lon,
+zone_id,									<Quay #stop_id> <tariffZones> <TariffZoneRef #zone_id>@ref 
+stop_url,									<Quay #stop_id>  <Url>
+location_type, 	0 = Stop Point	<Quay  #stop_id>  (<TypeOfStopPlaceRef = "0">)  gtfs:0 = Stop Point
+
+parent_station							<Quay #stop_id>   <ParentSiteRef #parent_station> 
+
+
+3. NOTES
+   - You  can retain the Google Stop Type as    <TypeOfPointRef> e.g.	<TypeOfPointRef ref="gtfs:0"/>
+   - This example add  urls (http://www.demoagency.org,) to the stop data to illustrate their use
+   - This example adds two TARIFF ZONES to   the orignal example to illustrate their use  
+			 mygtfsxm:FareZone01   &   mygtfsxm:FareZone02 
+
+GTFS Data copyright Google Inc
+
+version 1.1 revised ids
+NeTEx (C) CEN Copyright 2010,2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<Description>Example of GTFS stop data</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="mygtfsxm:DTA">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+		 		<ServiceFrame version="any" id="mygtfsxm:DTA">
+					<!--- =====SCHEDULED STOP POINT======== -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mygtfsxm:FUR_CREEK_RES">
+							<Name>Furnace Creek Resort (Demo)</Name>
+							<Location>
+								<Longitude>-117.133162</Longitude>
+								<Latitude>36.425288</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>121</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:BEATTY_AIRPORT">
+							<Name>Nye County Airport (Demo)</Name>
+							<Location>
+								<Longitude>-116.784582</Longitude>
+								<Latitude>36.868446</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<!-- Stops.txt  -(google stop_code (google valuue) -->
+							<PublicCode>122</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:BULLFROG">
+							<Name>Bullfrog (Demo)</Name>
+							<Location>
+								<Longitude>-116.81797</Longitude>
+								<Latitude>36.88108</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>123</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:STAGECOACH">
+							<Name>Stagecoach Hotel &amp; Casino (Demo)</Name>
+							<Location>
+								<Longitude>-116.751677</Longitude>
+								<Latitude>36.915682</Latitude>
+							</Location>
+							<!-- Stops.txt.Location_type -(google value) -->
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>124</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:NADAV">
+							<Name>North Ave / D Ave N (Demo)</Name>
+							<Location>
+								<Longitude>-116.76821</Longitude>
+								<Latitude>36.914893</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>125</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:NANAA">
+							<Name>North Ave / N A Ave (Demo)</Name>
+							<Location>
+								<Longitude>-116.761472</Longitude>
+								<Latitude>36.914944</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>126</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:DADAN">
+							<Name>Doing Ave / D Ave N (Demo)</Name>
+							<Location>
+								<Longitude>-116.768242</Longitude>
+								<Latitude>36.909489</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>127</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:EMSI">
+							<Name>E Main St / S Irving St (Demo)</Name>
+							<Location>
+								<Longitude>-116.76218</Longitude>
+								<Latitude>36.905697</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>129</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:AMV">
+							<Name>Amargosa Valley (Demo)</Name>
+							<Location>
+								<Longitude>-116.40094</Longitude>
+								<Latitude>36.641496</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>131</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- ===Stops.txt==TARIFF ZONE======== -->
+					<tariffZones>
+						<TariffZone version="any" id="mygtfsxm:FareZone01">
+							<Name>Fare Zone 01</Name>
+							<members>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:FUR_CREEK_RES"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:BULLFROG"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:STAGECOACH"/>
+							</members>
+						</TariffZone>
+						<TariffZone version="any" id="mygtfsxm:FareZone02">
+							<Name>Fare Zone 02</Name>
+							<members>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:NADAV"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:NANAA"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:DADAN"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:EMSI"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:AMV"/>
+							</members>
+						</TariffZone>
+					</tariffZones>
+				</ServiceFrame>
+				<SiteFrame version="any" id="mygtfsxm:DTA">
+					<stopPlaces>
+						<!--- =====STOP PLACEs ========= -->
+						<StopPlace version="any" id="mygtfsxm:FUR_CREEK_RES">
+							<!-- Stops.txt.stop_id  -->
+							<!-- Stops.txt.stop_name  -->
+							<Name>Furnace Creek Resort (Demo)</Name>
+							<!-- Stops.txt.stop_description  -->
+							<Description>[Description goes here]</Description>
+							<Centroid>
+								<Location>
+									<!-- Stops.txt.stop_lat  -->
+									<Longitude>-117.133162</Longitude>
+									<!-- Stops.txt.stop_lon -->
+									<Latitude>36.425288</Latitude>
+								</Location>
+							</Centroid>
+							<!-- Stops.txt.Location_type -(google value) -->
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<!-- Stops.txt.stop_url -->
+							<Url>http://www.demoagency.org</Url>
+							<!-- Stops.txt  -(google stop_code (google valuue) -->
+							<PublicCode>121</PublicCode>
+							<!-- Stops.txt.parent_station -->
+							<!-- Can be derived from Location_type if MODE known -->
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:BEATTY_AIRPORT">
+							<Name>Nye County Airport (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.784582</Longitude>
+									<Latitude>36.868446</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>122</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:BULLFROG">
+							<Name>Bullfrog (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.81797</Longitude>
+									<Latitude>36.88108</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>123</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:STAGECOACH">
+							<Name>Stagecoach Hotel &amp; Casino (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.751677</Longitude>
+									<Latitude>36.915682</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>124</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:NADAV">
+							<Name>North Ave / D Ave N (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.76821</Longitude>
+									<Latitude>36.914893</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>125</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:NANAA">
+							<Name>North Ave / N A Ave (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.761472</Longitude>
+									<Latitude>36.914944</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>126</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:DADAN">
+							<Name>Doing Ave / D Ave N (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.768242</Longitude>
+									<Latitude>36.909489</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>127</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:EMSI">
+							<Name>E Main St / S Irving St (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.76218</Longitude>
+									<Latitude>36.905697</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>129</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:AMV">
+							<Name>Amargosa Valley (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.40094</Longitude>
+									<Latitude>36.641496</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<PublicCode>131</PublicCode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+			
+			<ResourceFrame version="gtfs:1.5" id="gtfs:GTFS">
+					<Name>GTFS Built in values</Name>
+					<typesOfValue>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS" classOfValues="TypeOfPlace">
+							<Name>GTFS Built in Stop Types:  Stop@location_type</Name>
+							<values>
+								<TypeOfPlace version="gtfs:1.5" id="gtfs:0">
+									<Name>GTFS Stop Type  for use on StopPlace</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="gtfs:1.5" id="gtfs:1">
+									<Name>GTFS Station Type for use on StopPlace</Name>
+								</TypeOfPlace>
+								<TypeOfPoint version="gtfs:1.5" id="gtfs:0">
+									<Name>GTFS Stop Type for use on Scheduled Stop Point</Name>
+								</TypeOfPoint>
+								<TypeOfPoint version="gtfs:1.5" id="gtfs:1">
+									<Name>GTFS Station Type for use on Scheduled Stop Point </Name>
+								</TypeOfPoint>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

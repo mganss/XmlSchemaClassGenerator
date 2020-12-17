@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====  GTFS Transfers to NeTEx  Example ====== 
+This Example provides an example of mapping of a   GTFS Transfers.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+ 
+ 
+This data is added as it was missing  the zip
+ 
+1. DATA
+Transfers.txt
+from_stop_id,to_stop_id, transfer_type,min_transfer_time,
+NADAV,BOONDOCK,0,360 
+STAGECOACH,HOLDUP,1,
+DADAN,DARAH,2,180
+BULLFROG,POND,3
+
+2. MAPPING
+
+A GTFS Transfer maps to a NeTEx CONNECTION + TRANSFER RESTRICTION or INTERCHANGE RULE
+
+GTFS															NeTEx
+from_stop_id,												<Connection #from_stop_id+to_stop_id> <From PointRef #from_stop_id>  @id
+to_stop_id,													<Connection #from_stop_id+to_stop_id> <To PointRef #to_stop_id>  @id
+transfer_type, 		0	Recommended transfer	 InterchangeRule #from_stop_id+to_stop_id> <Priority>  
+							1	Timed transfer, waits		<InterchangeRule #from_stop_id+to_stop_id> <Guaranteed>
+							2	min transfer time			<Connection #from_stop_id+to_stop_id> <TransferDuration> <DefaultDuration> #duration
+							3	No transfer					<TransferRestriction #from_stop_id+to_stop_id>   <RestrictionType>cannotTransfer
+min_transfer_time,	 										<Connection #from_stop_id+to_stop_id> <TransferDuration> #duration
+ 
+
+3. Notes
+
+     LinkSequenceProjection  (Added) Can be derived from projection of individual links and points
+
+GTFS Data copyright Google Inc
+
+version 1.1 revised ids
+NeTEx (C) CEN Copyright 2010,2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Service Journey data  (trips.txt file)</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="gtfs:GTFS_metadata">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<!--- =======ACTUAL DATA========== -->
+				<ServiceFrame id="mygtfsexm:DTA" version="any">
+					<connections>
+						<Connection version="any" id="mygtfsexm:NADAV+BOONDOCK">
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:0"/>
+							<!--  NADAV,BOONDOCK,0,360   -->
+							<TransferDuration>
+								<DefaultDuration>PT6M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:NADAV"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:BOONDOCK"/>
+							</To>
+						</Connection>
+						<!-- =============  -->
+						<Connection version="any" id="mygtfsexm:STAGECOACH+HOLDUP">
+							<!-- STAGECOACH,HOLDUP,1, -->
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:1"/>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:STAGECOACH"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:HOLDUP"/>
+							</To>
+						</Connection>
+						<!-- ============= -->
+						<Connection version="any" id="mygtfsexm:DADAN+DARAH">
+							<!-- 	DADAN,DARAH,2,180 -->
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:2"/>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:DADAN"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:DARAH"/>
+							</To>
+						</Connection>
+						<!-- ============= -->
+						<Connection version="any" id="mygtfsexm:BULLFROG+POND">
+							<!-- 	BULLFROG,POND,3 -->
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:3"/>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:BULLFROG"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:POND"/>
+							</To>
+						</Connection>
+					</connections>
+					<!--- ===Stops.txt==TRANSFER RESTRICTIONS======== -->
+					<transferRestrictions>
+						<TransferRestriction order="1" version="any" id="mygtfsexm:NADAV+BOONDOCK">
+							<Name>No Transfer</Name>
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:0"/>
+							<RestrictionType>cannotTransfer</RestrictionType>
+							<FromPointRef ref="mygtfsexm:NADAV"/>
+							<ToPointRef ref="mygtfsexm:BOONDOCK"/>
+						</TransferRestriction>
+						<TransferRestriction order="1" version="any" id="mygtfsexm:BULLFROG+POND">
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:3"/>
+							<BothWays>true</BothWays>
+							<RestrictionType>cannotTransfer</RestrictionType>
+							<FromPointRef ref="mygtfsexm:BULLFROG"/>
+							<ToPointRef ref="mygtfsexm:POND"/>
+						</TransferRestriction>
+					</transferRestrictions>
+				</ServiceFrame>
+				<TimetableFrame version="any" id="mygtfsexm:TimetableFrame:DTA">
+					<interchangeRules>
+						<InterchangeRule version="any" id="mygtfsexm:NADAV+BOONDOCK">
+							<!-- NADAV,BOONDOCK,0,360 -->
+							<ConnectionRef ref="mygtfsexm:NADAV+BOONDOCK"/>
+							<Priority>1</Priority>
+							<Advertised>true</Advertised>
+						</InterchangeRule>
+						<!-- =============  -->
+						<InterchangeRule version="any" id="mygtfsexm:DADAN+DARAH">
+							<!-- 	DADAN,DARAH,2,180 -->
+							<ConnectionRef ref="DADAN+DARAH"/>
+							<Priority>2</Priority>
+							<Guaranteed>true</Guaranteed>
+						</InterchangeRule>
+						<!-- ============= -->
+					</interchangeRules>
+				</TimetableFrame>
+						<ResourceFrame version="gtfs:1.5" id="gtfs:GTFS_BuiltIn_Codes">
+					<Name>GTFS Built in values: Metadata defining Google values:  Stop@Location_type,</Name>
+					<typesOfValue>
+						<ValueSet version="any" id="gtfs:GTFS_TransferTypes">
+							<Name>GTFS Built in Transfer Types transfer@transfer_type</Name>
+							<values>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:0">
+									<Name>0	Recommended transfer : GTFS Transfer Type  for use on Connection</Name>
+								</TypeOfTransfer>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:1">
+									<Name>1	Timed transfer, waits	GTFS Station Type for use on Connection</Name>
+								</TypeOfTransfer>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:2">
+									<Name>	2	min transfer tme GTFS Stop Type for use on Connection</Name>
+								</TypeOfTransfer>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:3">
+									<Name>3	No transfer	 GTFS Station Type for use on Connection </Name>
+								</TypeOfTransfer>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+		
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

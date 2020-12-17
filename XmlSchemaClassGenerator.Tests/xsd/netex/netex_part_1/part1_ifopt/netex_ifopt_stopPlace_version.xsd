@@ -1,0 +1,1497 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_stopPlace_version">
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gml_extract_all_objects_v_3_2_1.xsd"/>
+	<!--Actual dependency-->
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gmlBasic2d-extract-v3_2_1-.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Nicholas Knowles</Contributor>
+				<Contributor>Roger Slevin [Roger.Slevin@dft.gsi.gov.uk]</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>Created as W3C .xsd schema by Nicholas Knowles. as 1.0 XML schema </Creator>
+				<Date>
+					<Created>2006-08-10</Created>
+				</Date>
+				<Date>
+					<Modified>2006-09-21</Modified>
+				</Date>
+				<Date>
+					<Modified>2007-03-22</Modified>23 Add repeating name
+				</Date>
+				<Date>
+					<Modified>2017-03-28 CR0015 Add  Group Of Stop Places In Frame</Modified>
+				</Date>
+				<Date>
+					<Modified>2018-07-18   Add  Centroid to  Group Of Stop Places. Fix cardinality on GroupofStopPlacesInFrame</Modified>
+				</Date>
+				<Date>
+					<Modified>2019-03-25</Modified>CR055 CD Change #52 Add Add new attribute  StopPlaceWeight  to  StopPlace  with values _international, national, regional, local_. 
+				</Date>
+				<Date>
+					<Modified>2019-04-09  Add  MODE and SUBMODE to Group of Stop Places - in doc but missing from schema</Modified>
+				</Date>
+				<Date>
+					<Modified>2019-04-13 Fix add misisng elements from VEHICLE STOPPING POSITION, fix restricted attributes in StopPlaceEntrance etc</Modified>
+				</Date>
+				<Description>
+					<Title>NeTEx Network Exchange - STOP PLACE types.</Title>
+					<p>
+						<ul>
+							<li>STOP PLACE Model</li>
+							<li>POINT OF INTEREST Model</li>
+							<li>Topographic Model</li>
+							<li>Administrative Model</li>
+						</ul>
+					</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_ifopt}netex_Ifopt_stopPlace_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>CEN TC278 SG6 and Department for Transport, Great Minster House, 76 Marsham Street, London SW1P 4DR</Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/ifopt/netex_ifopt_stopPlace_support.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Evolved from NaPTAN, SIRI and other schemas.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange (IFOPT subset) - STOP PLACE Schema.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx IFOPT STOP PLACE Model.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_topographicPlace_support.xsd"/>
+	<xsd:include schemaLocation="../part1_networkDescription/netex_networkInfrastructure_support.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_stopPlace_support.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_vehicleStopping_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_address_version.xsd"/>
+	<xsd:include schemaLocation="../part1_networkDescription/netex_line_version.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_navigationPath_version.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_equipmentAccess_version.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_equipmentSigns_version.xsd"/>
+	<!-- ======================================================================= -->
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SITE FRAME)=================================================== -->
+	<xsd:complexType name="stopPlacesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="StopPlace" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="groupsOfStopPlacesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of GROUP OF STOP PLACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfStopPlaces" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="stopPlaces_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of STOP PLACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice>
+					<xsd:element ref="StopPlaceRef"/>
+					<xsd:element ref="StopPlace" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation>A STOP PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="StopPlace" substitutionGroup="Site">
+		<xsd:annotation>
+			<xsd:documentation>Version of a named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="StopPlace_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="StopPlaceIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of STOP PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="StopPlace_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a Version of a STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Site_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="StopPlaceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="StopPlaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="StopIdentifierGroup"/>
+			<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+			<xsd:group ref="StopPlacePropertyGroup"/>
+			<xsd:group ref="StopPlaceTopographicGroup" minOccurs="1"/>
+			<xsd:group ref="StopPlaceRoutingGroup" minOccurs="1"/>
+			<xsd:group ref="StopPlacePassengerGroup" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Group of Passenger related elements of a STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="SiteAccessGroup" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Group of Site Access related elements of a STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="StopPlaceVehicleGroup" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Group of Vehicle Place related elements of a STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StopPlacePropertyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Property Elements of an STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StopPlaceType" type="StopTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BorderCrossing" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether STOP PLACE is a border crossing, that is a point, at which an international boundary between two countries may be crossed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="unlocalisedEquipments" type="explicitEquipments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Items of EQUIPMENT associated with STOP PLACE but not assigned to a point within it. More Localized EQUIPMENT should be included in an EQUIPMENT place.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StopPlaceRoutingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of Default Routing Properties of an STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Weighting" type="InterchangeWeightingEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default rating of the STOP PLACE for making interchanges.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StopPlaceWeight" type="StopPlaceWeightEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of expected INTERCHANGE at a STOP PLACE for use in journey planners and also for possible legal classification. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StopPlaceTopographicGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of Topographic associations of a STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="servedPlaces" type="topographicPlaceRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TOPOGRAPHICAL PLACEs that the STOP PLACE serves.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="mainTerminusForPlaces" type="topographicPlaceRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TOPOGRAPHICAL PLACEs for which the STOP PLACE is a main terminus. Only certain stations will be deemed the main STOP PLACEs points. For example London has many rail stations but only some are main line terminii. Geographic containment is not necessarily implied For example London Gatwick and, London Stansted airports are not in London, but are designated airports for London. Norwich station is not in Norwich, etc.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LimitedUse" type="LimitedUseTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Further categorisation of stop as having topographic limitations.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StopPlacePassengerGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of Passenger related children of an STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="quays" type="quays_RelStructure">
+				<xsd:annotation>
+					<xsd:documentation>QUAYs within the STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="accessSpaces" type="accessSpaces_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ACCESS SPACEs within the STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StopPlaceVehicleGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of VEHICLE related children of an STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="vehicleStoppingPlaces" type="vehicleStoppingPlaces_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE STOPPING PLACEs within STOP PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="StopPlaceComponent" type="StopPlaceComponent_VersionStructure" abstract="true" substitutionGroup="SiteElement">
+		<xsd:annotation>
+			<xsd:documentation>An element of a STOP PLACE describing part of its structure.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="StopPlaceComponent_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a STOP PLACE COMPONENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="SiteComponent_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="StopPlaceComponentPropertyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Property Elements of a STOP PLACE COMPONENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Primary MODE of Vehicle transport associated by this component.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="PtSubmodeChoiceGroup" minOccurs="0"/>
+			<xsd:element name="OtherTransportModes" type="VehicleModeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Public transport MODES which may be accessed through associated place.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="tariffZones" type="tariffZoneRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TARIFF ZONEs into which component falls.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="StopPlaceSpace" type="StopPlaceSpace_VersionStructure" abstract="true" substitutionGroup="StopPlaceComponent">
+		<xsd:annotation>
+			<xsd:documentation>A physical area within a STOP PLACE, for example, a QUAY, BOARDING POSITION, ACCESS SPACE or EQUIPMENT PLACE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="StopPlaceSpace_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a STOP PLACE SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopPlaceComponent_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="StopPlaceSpaceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="StopPlaceSpaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a STOP PLACE SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="BoardingUse" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether space can be used for boarding or en route to boarding. Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AlightingUse" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether space can be used for alighting or en route to boarding. Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Label" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Label for SPACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="entrances" type="siteEntrances_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ENTRANCEs to SPACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StopPlaceComponentIdentifierGroup">
+		<xsd:annotation>
+			<xsd:documentation>Group of identifier Properties of a component of STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StopPlaceRef" type="StopPlaceRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>System identifier of a STOP PLACE. May be omitted if given by context.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="aliases" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Alternative Identifiers.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Alias" type="AliasStructure" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Alternative identifier for STOP PLACE.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="quays_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of QUAYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="QuayRef"/>
+					<xsd:element ref="Quay"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Quay" substitutionGroup="StopPlaceSpace">
+		<xsd:annotation>
+			<xsd:documentation>A place such as platform, stance, or quayside where passengers have access to PT vehicles, Taxi
+cars or other means of transportation. A QUAY may contain other sub QUAYs. A child QUAY must be physically
+contained within its parent QUAY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Quay_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceSpaceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="QuayGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="QuayIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of QUAY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Quay_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for QUAY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopPlaceSpace_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="QuayGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="QuayGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a QUAY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="QuayIdentifierGroup"/>
+			<xsd:group ref="QuayDescriptorGroup"/>
+			<xsd:element name="ParentQuayRef" type="QuayRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>if QUAY is a subzone of another QUAY, identifies parent.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="boardingPositions" type="boardingPositions_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BOARDING POSITIONs within QUAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="QuayDescriptorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the QUAY textually.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="destinations" type="destinationDisplayViews_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default Destination headings for QUAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CompassBearing" type="AbsoluteBearingType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Heading of QUAY relative to street.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CompassOctant" type="CompassBearing8Enumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Heading of QUAY relative to street in Octants.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="QuayType" type="QuayTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of QUAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="QuayIdentifierGroup">
+		<xsd:annotation>
+			<xsd:documentation>Alternative identifiers of a QUAY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Pubic identifier code of QUAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PlateCode" type="PlateCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Plate number for QUAY. An arbitrary asset number that may be placed on stop to identify it.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ShortCode" type="CleardownCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>A 20 bit number used for wireless cleardown of stop displays by some AVL systems.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="AlternativeQuayDescriptor">
+		<xsd:annotation>
+			<xsd:documentation>An element of a STOP PLACE describing part of its structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="AlternativeQuayDescriptor_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="NamedObjectRef" type="VersionOfObjectRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Object for which ALTERNATIVE NAME provides an alias. May be omitted if given by context.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Lang" type="xsd:language" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Language of the names.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="TypeOfName" type="xsd:normalizedString">
+								<xsd:annotation>
+									<xsd:documentation>Type of Name.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Name" type="MultilingualString">
+								<xsd:annotation>
+									<xsd:documentation>Name of the entity.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Short Name of the entity.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Abbreviation" type="MultilingualString" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Abbreviation of the entity.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="QualifierName" type="MultilingualString" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Additional Qualifier of the ENTITY name.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RelativeLocationGroup">
+								<xsd:annotation>
+									<xsd:documentation>Properties for naming element with respect to adjacent features.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AlternativeQuayDescriptor_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a STOP PLACE COMPONENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AlternativeName_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="RelativeLocationGroup">
+						<xsd:annotation>
+							<xsd:documentation>Properties for naming element with respect to adjacent features.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="accessSpaces_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ACCESS SPACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="AccessSpaceRef"/>
+					<xsd:element ref="AccessSpace"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="AccessSpace" substitutionGroup="StopPlaceSpace">
+		<xsd:annotation>
+			<xsd:documentation>An area within a STOP PLACE that does not give direct access to transport vehicles. May be connected to QUAYS by PATH LINKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="AccessSpace_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceSpaceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="AccessSpaceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="AccessSpaceIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ACCESS SPACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AccessSpace_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an ACCESS SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopPlaceSpace_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="AccessSpaceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AccessSpaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of an ACCESS SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="AccessSpaceDescriptorGroup"/>
+			<xsd:element name="ParentAccessSpaceRef" type="AccessSpaceRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>if ACCESS SPACE is a subzone of another ACCESS SPACE identifies parent,</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="AccessSpaceDescriptorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the ACCESS SPACE textually.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AccessSpaceType" type="AccessSpaceTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of ACCESS SPACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PassageType" type="PassageTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of ACCESS SPACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="boardingPositions_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of BOARDING POSITIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="BoardingPositionRef"/>
+					<xsd:element ref="BoardingPosition" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="BoardingPosition" substitutionGroup="StopPlaceSpace">
+		<xsd:annotation>
+			<xsd:documentation>A location within a QUAY from which passengers may directly board, or onto which passengers may directly alight from, a VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="BoardingPosition_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceSpaceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BoardingPositionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="BoardingPositionIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of BOARDING POSITION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BoardingPosition_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a BOARDING POSITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopPlaceSpace_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="BoardingPositionGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="BoardingPositionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a BOARDING POSITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Pubic identifier code of BOARDING POSITION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BoardingPositionType" type="BoardingPositionTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Classifier of BOARDING POSITION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="boardingPositionEntrances" type="entranceRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Entrances to BOARDING POSITION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:element name="StopPlaceEntrance" abstract="false" substitutionGroup="Entrance">
+		<xsd:annotation>
+			<xsd:documentation>Passenger Entrance to a STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="StopPlaceEntrance_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SiteEntranceGroup"/>
+							<xsd:group ref="ExternalEntranceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="StopPlaceEntranceIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of STOP PLACE ENTRANCE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="StopPlaceEntrance_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for Passenger STOP PLACE ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="SiteEntrance_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="stopPlaceVehicleEntrances_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of STOP PLACE VEHICLE ENTRANCEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="VehicleEntranceRef"/>
+					<xsd:element ref="StopPlaceVehicleEntrance"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="StopPlaceVehicleEntrance" abstract="false" substitutionGroup="Entrance">
+		<xsd:annotation>
+			<xsd:documentation>A physical entrance or exit to/from a SITE for a VEHICLE. May be a door, barrier, gate or other recognizable point of access.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="StopPlaceVehicleEntrance_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SiteEntranceGroup"/>
+							<xsd:group ref="ExternalEntranceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleEntranceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="StopPlaceVehicleEntranceIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of STOP PLACE ENTRANCE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="StopPlaceVehicleEntrance_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for STOP PLACE VEHICLE ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VehicleEntrance_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="vehicleStoppingPlaces_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLE STOPPING PLACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="VehicleStoppingPlaceRef"/>
+					<xsd:element ref="VehicleStoppingPlace" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehicleStoppingPlace" substitutionGroup="StopPlaceSpace">
+		<xsd:annotation>
+			<xsd:documentation>Designated PLACE within a STOP PLACE for a VEHICLE to stop.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleStoppingPlace_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressablePlaceGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="SiteElementGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceSpaceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleStoppingPlaceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleStoppingPositionIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of VEHICLE STOPPING POSITION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleStoppingPlace_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE STOPPING PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopPlaceSpace_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleStoppingPlaceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleStoppingPlaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a VEHICLE STOPPING PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="InfrastructureLinkRef" minOccurs="0"/>
+			<xsd:element ref="InfrastructurePointRef" minOccurs="0"/>
+			<xsd:element name="vehicleStoppingPositions" type="vehicleStoppingPositions_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Designated Positions within a VEHICLE STOPPING PLACE for a VEHICLE to stop.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="quayAlignments" type="vehicleQuayAlignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>QUAYs with which the VEHICLE STOPPING PLACE aligns.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="vehicleStoppingPositions_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLE STOPPING POSITIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="VehicleStoppingPositionRef"/>
+					<xsd:element ref="VehicleStoppingPosition"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehicleStoppingPosition" substitutionGroup="SiteComponent">
+		<xsd:annotation>
+			<xsd:documentation>Designated Position within a VEHICLE STOPPING PLACE for a Vehicle to stop.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleStoppingPosition_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="placeTypes" type="typeOfPlaceRefs_RelStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Classification of PLACE.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element ref="AccessibilityAssessment" minOccurs="0"/>
+							<xsd:element name="AccessModes" type="AccessModeListOfEnumerations" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Allowed MODEs to access SITE ELEMENT.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:group ref="SiteElementNamesGroup"/>
+							<xsd:group ref="RelativeLocationGroup">
+								<xsd:annotation>
+									<xsd:documentation>Properties for naming element with respect to adjacent features.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+							<xsd:group ref="SiteElementPropertiesGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements of a SITE ELEMENT.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SiteComponentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleStoppingPositionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleStoppingPositionIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of VEHICLE STOPPING POSITION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleStoppingPosition_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE STOPPING POSITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopPlaceComponent_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleStoppingPositionGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleStoppingPositionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a VEHICLE STOPPING POSITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="VehicleStoppingPlaceRef" minOccurs="0"/>
+			<xsd:element name="Label" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Additional Label of a VEHICLE STOPPING POSITION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RelationToVehicle" type="RelationToVehicleEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Relationship of position to VHEICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Bearing" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Bearing of vehicle in position in absolute degrees against North.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="vehiclePositionAlignments" type="vehiclePositionAlignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BOARDING POSITIONs with which VEHICLE STOPPING POSITION. aligns.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="vehicleQuayAlignments_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLE QUAY ALIGNMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehicleQuayAlignment" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehicleQuayAlignment" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Designated Position within a VEHICLE STOPPING PLACE for a Vehicle to stop.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleQuayAlignment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleQuayAlignmentGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleQuayAlignmentIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of VEHICLE QUAY ALIGNMENT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleQuayAlignment_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE QUAY ALIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleQuayAlignmentGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:nonNegativeInteger">
+					<xsd:annotation>
+						<xsd:documentation>Order of element.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleQuayAlignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a VEHICLE QUAY ALIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="VehicleStoppingPlaceRef" minOccurs="0"/>
+			<xsd:element ref="QuayRef"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="vehiclePositionAlignments_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLE POSTION ALIGNMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehiclePositionAlignment" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehiclePositionAlignment" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Designated Position within a VEHICLE STOPPING PLACE for a Vehicle to stop.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehiclePositionAlignment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehiclePositionAlignmentGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements of a VEHICLE POSITION ALIGNMENT.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehiclePositionAlignmentIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of VEHICLE POSTION ALIGNMENT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehiclePositionAlignment_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE POSTION ALIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehiclePositionAlignmentGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:nonNegativeInteger">
+					<xsd:annotation>
+						<xsd:documentation>Order of attribute</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehiclePositionAlignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a VEHICLE POSTION ALIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="VehicleStoppingPositionRef" minOccurs="0"/>
+			<xsd:element ref="BoardingPositionRef" minOccurs="0"/>
+			<xsd:element ref="StopPlaceEntranceRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="GroupOfStopPlaces">
+		<xsd:annotation>
+			<xsd:documentation>Group of STOP PLACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GroupOfStopPlacesStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfStopPlacesGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GroupOfStopPlacesIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of GROUP of STOP PLACEs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GroupOfStopPlacesStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for GROUP of STOP PLACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GroupOfStopPlacesGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GroupOfStopPlacesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a GROUP of STOP PLACEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0"/>
+			<xsd:element name="members" type="stopPlaceRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Stations and stops in GROUP of STOP PLACEs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="alternativeNames" type="alternativeNames_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Alternative names for the GROUP of STOP PLACEs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Centroid" type="SimplePoint_VersionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Centre Coordinates of GROUP of STOP PLACEs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="gml:Polygon" minOccurs="0"/>
+			<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Primary MODE of Vehicle transport associated by this component.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="PtSubmodeChoiceGroup" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="StopPlaceView" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified view of STOP PLACE. Contains.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="StopPlace_DerivedViewStructure">
+					<xsd:sequence>
+						<xsd:element ref="StopPlaceRef" minOccurs="0"/>
+						<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Name of STOP PLACE.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="placeTypes" type="typeOfPlaceRefs_RelStructure" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Classification of PLACE.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Name of STOP PLACE.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:group ref="StopIdentifierGroup"/>
+						<xsd:element name="StopPlaceType" type="StopTypeEnumeration" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="StopPlaceIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of Object of which this is a view.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="StopPlace_DerivedViewStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for STOP PLACE VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element ref="StopPlaceRef" minOccurs="0"/>
+					<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of STOP PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="placeTypes" type="typeOfPlaceRefs_RelStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Classification of PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of STOP PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="StopIdentifierGroup"/>
+					<xsd:element name="StopPlaceType" type="StopTypeEnumeration" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

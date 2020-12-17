@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_responsibility">
+	<xsd:include schemaLocation="netex_version_version.xsd"/>
+	<xsd:include schemaLocation="netex_responsibility_support.xsd"/>
+	<xsd:include schemaLocation="netex_validityCondition_version.xsd"/>
+	<xsd:include schemaLocation="netex_alternativeText_version.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles, Kizoom. mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-03-27   Add Alternative Text</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-11-11 Fix allow version of dereived view id</Modified>
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines RESPONSIBILITY types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_responsibility}netex_responsibility_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG6</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - RESPONSIBILITY types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>Data administration types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!--CLOSE COUPLED with netex_version_version-->
+	<!--CLOSE COUPLED with netex_validityCondition_version-->
+	<!-- === Data Managed Object============================================ -->
+	<xsd:element name="DataManagedObject" type="DataManagedObjectStructure" abstract="true" substitutionGroup="EntityInVersion">
+		<xsd:annotation>
+			<xsd:documentation>An ENTITY in VERSION that can be associated with a RESPONSIBILITY SET that describes who has responsibility for managing the data.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DataManagedObjectStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Abstract Type for a MANAGED OBJECT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="EntityInVersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="DataManagedObjectGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="responsibilitySetRef" type="ResponsibilitySetIdType">
+					<xsd:annotation>
+						<xsd:documentation>Reference to RESPONSIBILITY SET for managing the object. If absent, then responsibility is same as for containing context of this object.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DataManagedObjectGroup">
+		<xsd:annotation>
+			<xsd:documentation>Common Properties of an object managed by a responsible ORGANISATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="keyList" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>A list of alternative Key values for an element.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="Extensions" minOccurs="0"/>
+			<xsd:element ref="BrandingRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="VersionedChild" type="VersionedChildStructure" abstract="true" substitutionGroup="EntityInVersion">
+		<xsd:annotation>
+			<xsd:documentation>A child ENTIITY whose RESPONSIBILITY SET must be the same as its containing parent object, and which cannot exist independently of its parent.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for VERSIONED CHILD.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="EntityInVersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="VersionedChildGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VersionedChildGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a VERSIONED CHILD.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Extensions" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="DerivedView" type="DerivedViewStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Abstract derived view of a MANAGED OBJECT for general purpose use.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- ====Simple derived View============================================================== -->
+	<xsd:complexType name="DerivedViewStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for MANAGED OBJECT VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="DerivedViewGroup"/>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="ObjectIdType">
+			<xsd:annotation>
+				<xsd:documentation>Identifier of Object of which this is a view.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:group name="DerivedViewGroup">
+		<xsd:annotation>
+			<xsd:documentation>Common Properties of an object.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="BrandingRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="DataManagedObjectView" type="DataManagedObject_ViewStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Abstract derived view of a MANAGED OBJECT for general purpose use.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DataManagedObject_ViewStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for MANAGED OBJECT VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="keyList" type="KeyListStructure">
+		<xsd:annotation>
+			<xsd:documentation>A list of alternative Key values for an element.</xsd:documentation>
+		</xsd:annotation>
+		<!--  1.02 correction  ======================================= -->
+		<xsd:unique name="KeyValuePair">
+			<xsd:annotation>
+				<xsd:documentation>Every Key Value Pair must be unique.</xsd:documentation>
+			</xsd:annotation>
+			<xsd:selector xpath=".//netex:KeyValue"/>
+			<xsd:field xpath="netex:Key"/>
+			<xsd:field xpath="netex:Value"/>
+		</xsd:unique>
+		<!--	END correction  =======================================  -->
+	</xsd:element>
+	<xsd:complexType name="KeyListStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a Key List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="KeyValue" type="KeyValueStructure" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Key value pair for Entity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="KeyValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a Key List.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Key" type="xsd:normalizedString" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Identifier of value e.g. System.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Value" type="xsd:normalizedString" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Value for alternative key.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="typeOfKey" type="xsd:normalizedString">
+			<xsd:annotation>
+				<xsd:documentation>Identifier of type of key.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:attribute name="id" type="ObjectIdType">
+		<xsd:annotation>
+			<xsd:documentation>Identifier of Object of which this is a view.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
+</xsd:schema>

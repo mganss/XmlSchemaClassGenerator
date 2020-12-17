@@ -1,0 +1,2139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2011 rel. 2 sp1 (x64) (http://www.altova.com) by Christophe Duquesne (Dryade) -->
+<!-- ==== RATP simplified Line 7b Example ====== 
+This example shows the mapping of RATP Line 7 with real data from 2009
+In order to keep the file small, only 4 Vehicle Journeys were mapped (but the same mapping can be done with as many VJ as necessary.
+
+This mapping involves :
+    ResourceFrame
+	* organisations
+
+	ServiceFrame
+	* Network
+	* directions
+	* routePoints
+	* routeLinks
+	* routes
+	* lines
+	* scheduledStopPoints
+	* servicePatterns
+	* tariffZones
+	* stopAssignments
+
+	SiteFrame
+	* stopPlaces
+
+	ServiceCalendarFrame
+	* dayTypes
+	* dayTypeAssignments
+
+	TimetableFrame
+	* vehicleJourneys
+
+This higly commented XML file is 2111 lines long and 87 Ko, where the uncommented original NEPTUNE file is 1165 lines and 42 Ko.
+When compressed the NeTEx file is 8 Ko and NEPTUNE 4 Ko
+So the NeTEx File will probably be something like 50% bigger with the same level of comment.
+
+-->
+<PublicationDelivery xmlns:acsb="http://www.ifopt.org.uk/acsb" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" xmlns="http://www.netex.org.uk/netex" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2009-08-01T09:30:00Z</RequestTimestamp>
+		<ParticipantRef>RATP110</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<!-- NEPTUNE [local agreement:fixed] : Only the current data set is requested  -->
+				<Current/>
+				<!-- NEPTUNE [local agreement:variable] : a NEPTUNE Frame is named "operator":Neptune:ServiceAndTimetableFrame:"line Id"  -->
+				<CompositeFrameRef ref="RATP_PIVI:Neptune:ServiceAndTimetableFrame:100110107"/>
+			</NetworkFrameTopic>
+		</topics>
+		<RequestPolicy>
+			<!-- NEPTUNE [local agreement:fixed] : a NEPTUNE Frame is without Geometry -->
+			<RequestDetail>NoGeometry</RequestDetail>
+		</RequestPolicy>
+	</PublicationRequest>
+	<Description>RATP Line 7b NeTEx example - based on reall 2009 data</Description>
+	<!--   -->
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<!-- =========================================== -->
+		<!-- NEPTUNE [mapping:variable] : CompositeFrame.created mapped to NEPTUNE PTNetwork->versionDate -->
+		<CompositeFrame version="1" created="2009-12-02T00:00:00Z" id="RATP:Neptune:CompositeFrame:100110107">
+			<Name>NEPTUNE Mapping Frame</Name>
+			<!-- NEPTUNE [mapping:fixed] : This is a NEPTUNE to NeTEx mapping frame -->
+			<TypeOfFrameRef version="01" ref="Neptune:TypeOfFrame:CompositeFrame"/>
+			<codespaces>
+				<Codespace id="ratp_pivi_data">
+					<Xmlns>RATP_PIVI</Xmlns>
+					<XmlnsUrl>http://www.ratp.fr/ratp</XmlnsUrl>
+					<Description>RATP datas</Description>
+				</Codespace>
+			</codespaces>
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="ratp_pivi_data"/>
+				<!-- NEPTUNE [mapping:fixed] : NEPTUNE is in French ! -->
+				<DefaultLocale>
+					<TimeZoneOffset>-1</TimeZoneOffset>
+					<SummerTimeZoneOffset>-2</SummerTimeZoneOffset>
+					<DefaultLanguage>fr</DefaultLanguage>
+				</DefaultLocale>
+				<!-- NEPTUNE [mapping:fixed] : EPSG:4326 is WGS84 which is the only mandatory location system for NEPTUNE -->
+				<DefaultLocationSystem>EPSG:4326</DefaultLocationSystem>
+			</FrameDefaults>
+			<frames>
+				<!-- =========================================== -->
+				<!-- Resourceframe to map the Company NEPTUNE Object -->
+				<ResourceFrame version="any" id="Neptune:ResourceFrame:FrameProfile01">
+					<Name>RATP--Neptune-Line Profile </Name>
+					<codespaces>
+						<Codespace id="neptune_data">
+							<Xmlns>Neptune</Xmlns>
+							<XmlnsUrl>http://www.Neptune.fr/Neptune</XmlnsUrl>
+							<Description>Neptune data </Description>
+						</Codespace>
+					</codespaces>
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="neptune_data"/>
+					</FrameDefaults>
+					<typesOfValue>
+						<TypeOfValidity version="01" id="Neptune:TypeOfValidity:WeeklyPlanned">
+							<Name>Weekley export of Neptune  Planned data</Name>
+							<Periodicity>P7D</Periodicity>
+							<Nature>planned</Nature>
+						</TypeOfValidity>
+						<TypeOfFrame version="01" id="Neptune:TypeOfFrame:CompositeFrame">
+							<Name>Neptune Profile:  Composite Frame </Name>
+							<Description>RATP--Neptune-Line-xxxxxx  frames will be composite frame containing Service, Timetable (and Service Calendar) and Resource frames with all the usual NEPTUNE attributes filled in, for a given line xxxxx.</Description>
+							<TypeOfValidityRef version="01" ref="Neptune:TypeOfValidity:WeeklyPlanned"/>
+							<FrameClassRef nameOfClass="CompositeFrame"/>
+							<classes>
+								<ClassInFrameRef nameOfClass="AvailabilityCondition" classRefType="memberReferences"/>
+							</classes>
+							<includes>
+								<TypeOfFrame version="01" id="Neptune:TypeOfFrame:TimeTableFrame">
+									<Name>Neptune Profile:ServiceCalendar  Frame </Name>
+									<FrameClassRef nameOfClass="TimeTableFrame"/>
+									<classes>
+										<ClassInFrameRef classRefType="members" nameOfClass="TimeTableFrame"/>
+										<ClassInFrameRef classRefType="members" nameOfClass="ServiceJourney"/>
+										<ClassInFrameRef classRefType="members" nameOfClass="JourneyPart"/>
+									</classes>
+								</TypeOfFrame>
+								<TypeOfFrame version="01" id="Neptune:TypeOfFrame:ServiceFrame">
+									<Name>Neptune Profile:  Service  Frame </Name>
+									<FrameClassRef nameOfClass="ServiceFrame"/>
+									<classes>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="ScheduledStopPoint"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="ServicePattern"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="Network"/>
+										<ClassInFrame>
+											<attributes>
+												<ClassAttributeInFrame name="Name">
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+												<ClassAttributeInFrame name="lines">
+													<Mandatory>required</Mandatory>
+												</ClassAttributeInFrame>
+											</attributes>
+										</ClassInFrame>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="RoutePoint"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="RouteLink"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="Line"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="Route"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="Direction"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="TariffZone"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="PassengerStopAssignment"/>
+									</classes>
+								</TypeOfFrame>
+								<TypeOfFrame version="01" id="Neptune:TypeOfFrame:SiteFrame">
+									<Name>Neptune Profile:  Site  Frame </Name>
+									<FrameClassRef nameOfClass="SiteFrame"/>
+									<classes>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="StopPlace"/>
+									</classes>
+								</TypeOfFrame>
+								<TypeOfFrame version="01" id="Neptune:TypeOfFrame:ServiceCalendarFrame">
+									<Name>Neptune Profile:ServceCalendar  Frame </Name>
+									<FrameClassRef nameOfClass="ServiceCalendarFrame"/>
+									<classes>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="ServiceCalendar"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="DayType"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="DayTypeAssignment"/>
+									</classes>
+								</TypeOfFrame>
+								<TypeOfFrame version="01" id="Neptune:TypeOfFrame:ResourceFrame">
+									<Name>Neptune Profile:  Resource Frame </Name>
+									<FrameClassRef nameOfClass="ResourceFrame"/>
+									<classes>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="TypeOfFrame"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="Operator"/>
+										<ClassInFrameRef classRefType="memberReferences" nameOfClass="Authority"/>
+									</classes>
+								</TypeOfFrame>
+							</includes>
+						</TypeOfFrame>
+					</typesOfValue>
+					<organisations>
+						<!-- NEPTUNE [mapping:variable] : Operator.version mapped to NEPTUNE Company->ObjectVersion -->
+						<Operator version="1" id="RATP_PIVI:Company:100">
+							<!-- NEPTUNE [mapping:variable] : Operator->id mapped to NEPTUNE Company->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : Operator->name mapped to NEPTUNE Company->RegistrationNumber -->
+							<CompanyNumber>100</CompanyNumber>
+							<!-- NEPTUNE [mapping:variable] : Operator->name mapped to NEPTUNE Company->name -->
+							<Name>RATP</Name>
+						</Operator>
+					</organisations>
+				</ResourceFrame>
+				<!--   -->
+				<!-- =========================================== -->
+				<!-- ServiceFrame to map the PTNetwork  NEPTUNE Object -->
+				<ServiceFrame version="any" id="RATP_PIVI:ServiceFrame:100110107">
+					<!-- NEPTUNE PTNetwork Mappling =========================================== -->
+					<!-- NEPTUNE [mapping:variable] : Network.version mapped to NEPTUNE PTNetwork->ObjectVersion -->
+					<!-- NEPTUNE [mapping:variable] : Network.changed mapped to NEPTUNE PTNetwork->VersionDate -->
+					<Network version="1" changed="2009-12-02T00:00:00Z" id="RATP_PIVI:PTNetwork:110">
+						<!-- NEPTUNE [mapping:variable] : Network->Id mapped to NEPTUNE PTNetwork->ObjectId -->
+						<!-- NEPTUNE [mapping:variable] : Network->Name mapped to NEPTUNE PTNetwork->name -->
+						<Name>METRO</Name>
+						<Description>Réseau de métro de la RATP</Description>
+						<!-- NEPTUNE [mapping:variable] : Network->PrivateCode mapped to NEPTUNE PTNetwork->registration->registrationNumber -->
+						<PrivateCode>110</PrivateCode>
+					</Network>
+					<!--   -->
+					<!-- NEPTUNE Route Mapping (part 1 : directions ) =========================================== -->
+					<directions>
+						<Direction version="any" id="RATP_PIVI:Route:317452:Direction">
+							<!-- NEPTUNE [mapping:variable] : Direction->Id mapped to NEPTUNE Route->objectId + an additional ":Direction" -->
+							<!-- NEPTUNE [mapping:variable] : Direction->Name mapped to NEPTUNE Route->publishedName  -->
+							<!--In this Line 7B example, the right name for this direction should be "7B (PRE-SAINT-GERVAIS -> LOUIS BLANC)" -->
+							<Name>7B (PRE-SAINT-GERVAIS &lt;-&gt; LOUIS BLANC)</Name>
+							<!-- NEPTUNE [mapping:variable] : Direction->DirectionType mapped to NEPTUNE Route->RouteExtension->wayBack  -->
+							<!--							  In this field is "A" (standing for "Aller" being something like "foreward" which is obviously purely arbitrary) or "R" (standing for "Retour" being return)
+							      Therefore "A" is mapped to "outbound" and "R" is mapped to "inbound" -->
+							<DirectionType>outbound</DirectionType>
+						</Direction>
+						<Direction version="any" id="RATP_PIVI:Route:317453:Direction">
+							<!-- NEPTUNE [mapping:variable] : Direction->Id mapped to NEPTUNE Route->objectId + an additional ":Direction" -->
+							<!-- NEPTUNE [mapping:variable] : Direction->Name mapped to NEPTUNE Route->publishedName  -->
+							<!--In this Line 7B example, the right name for this direction should be "7B (LOUIS BLANC -> PRE-SAINT-GERVAIS)" -->
+							<Name>7B (PRE-SAINT-GERVAIS &lt;-&gt; LOUIS BLANC)</Name>
+							<!-- NEPTUNE [mapping:variable] : Direction->DirectionType mapped to NEPTUNE Route->RouteExtension->wayBack  -->
+							<!--							  In this field is "A" (standing for "Aller" being something like "foreward" which is obviously purely arbitrary) or "R" (standing for "Retour" being return)
+							      Therefore "A" is mapped to "outbound" and "R" is mapped to "inbound" -->
+							<DirectionType>inbound</DirectionType>
+						</Direction>
+					</directions>
+					<!--   -->
+					<!-- NEPTUNE StopPoint (RoutePoint)  mapping=========================================== -->
+					<routePoints>
+						<!-- NEPTUNE [mapping:variable] : RoutePoint.version mapped to NEPTUNE StopPoint->ObjectVersion -->
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A0A5246063">
+							<!-- NEPTUNE [mapping:variable] : RoutePoint->Id mapped to NEPTUNE StopPoint->ObjectId  -->
+							<!-- NEPTUNE [mapping:variable] : RoutePoint->Name mapped to NEPTUNE StopPoint->publishedName  -->
+							<Name>Pré-Saint-Gervais</Name>
+							<Location>
+								<!-- NEPTUNE [mapping:variable] : RoutePoint->Location->Longitude & Latitude mapped to NEPTUNE StopPoint->longitude & latitude  -->
+								<Longitude>2.3985600000000000</Longitude>
+								<Latitude>48.8803670000000000</Latitude>
+							</Location>
+							<!-- NEPTUNE [mapping:variable] : RoutePoint->projections->PointProjection->ProjectedPointRef mapped to NEPTUNE StopPoint->containedIn  -->
+							<!-- In NEPTUNE the StopAreas referenced by this containedIn are of type Quay or BorbingPosition (not StopPlace or CommercialStop)-->
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A0A5246063">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246063"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<!--   -->
+						<!-- NEPTUNE same mapping for all the other RoutePoint  -->
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A1A5246062">
+							<Name>Danube</Name>
+							<Location>
+								<Longitude>2.3930700000000000</Longitude>
+								<Latitude>48.8820050000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A1A5246062">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246062"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A2A5246067">
+							<Name>Botzaris</Name>
+							<Location>
+								<Longitude>2.3891290000000000</Longitude>
+								<Latitude>48.8792840000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A2A5246067">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246067"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A3A5246068">
+							<Name>Buttes-Chaumont</Name>
+							<Location>
+								<Longitude>2.3812380000000000</Longitude>
+								<Latitude>48.8774980000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A3A5246068">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246068"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A4A5246069">
+							<Name>Bolivar</Name>
+							<Location>
+								<Longitude>2.3739370000000000</Longitude>
+								<Latitude>48.8808080000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A4A5246069">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246069"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A5A5246066">
+							<Name>Jaurès</Name>
+							<Location>
+								<Longitude>2.3703270000000000</Longitude>
+								<Latitude>48.8824990000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A5A5246066">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246066"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317452A6A5246065">
+							<Name>Louis Blanc</Name>
+							<Location>
+								<Longitude>2.3654890000000000</Longitude>
+								<Latitude>48.8812240000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317452A6A5246065">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246065"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A0A5246074">
+							<Name>Louis Blanc</Name>
+							<Location>
+								<Longitude>2.3654890000000000</Longitude>
+								<Latitude>48.8812240000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A0A5246074">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246074"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A1A5246073">
+							<Name>Jaurès</Name>
+							<Location>
+								<Longitude>2.3703270000000000</Longitude>
+								<Latitude>48.8824990000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A1A5246073">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246073"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A2A5246070">
+							<Name>Bolivar</Name>
+							<Location>
+								<Longitude>2.3739370000000000</Longitude>
+								<Latitude>48.8808080000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A2A5246070">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246070"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A3A5246071">
+							<Name>Buttes-Chaumont</Name>
+							<Location>
+								<Longitude>2.3812380000000000</Longitude>
+								<Latitude>48.8774980000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A3A5246071">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246071"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A4A5246072">
+							<Name>Botzaris</Name>
+							<Location>
+								<Longitude>2.3891290000000000</Longitude>
+								<Latitude>48.8792840000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A4A5246072">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246072"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A5A5246064">
+							<Name>Place des Fêtes</Name>
+							<Location>
+								<Longitude>2.3929560000000000</Longitude>
+								<Latitude>48.8772240000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A5A5246064">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246064"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="1" id="RATP_PIVI:RoutePoint:317453A6A5246075">
+							<Name>Pré-Saint-Gervais</Name>
+							<Location>
+								<Longitude>2.3985600000000000</Longitude>
+								<Latitude>48.8803670000000000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="RATP_PIVI:PointProjection:317453A6A5246075">
+									<ProjectedPointRef version="1" ref="RATP_PIVI:StopPoint:5246075"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+					</routePoints>
+					<!--   -->
+					<!-- NEPTUNE PTLink Mapping =========================================== -->
+					<routeLinks>
+						<!-- NEPTUNE [mapping:fixed] : RouteLink to NEPTUNE PtLink -->
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:363A367">
+							<!-- NEPTUNE [mapping:variable] : RouteLink->Id mapped to NEPTUNE PtLink->objectId -->
+							<!-- NEPTUNE [mapping:variable] : RouteLink->FromPointRef mapped to NEPTUNE PtLink->startOfLink -->
+							<!--	Note: NEPTUNE doesn't make a clear difference between all the diiferent Transmodel kind s of points. The only point used here is the StopPoint which is at the same time a SCHEDULED STOP POINT, a POINT ON ROUTE, and a TIMING POINT 
+To make it clean inside the mapping, the Link Id is now RATP_PIVI:RouteLink:xxxxxxx  instead of RATP_PIVI:PtLink:xxxxxxx , and the point Id is RATP_PIVI:RoutePoint:xxxxxxx  instead of RATP_PIVI:StopPoint:xxxxxxx -->
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A1A5246062"/>
+							<!-- NEPTUNE [mapping:variable] : RouteLink->ToPointRef mapped to NEPTUNE PtLink->endOfLink -->
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A2A5246067"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:375A369">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A4A5246072"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A5A5246064"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:362A368">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A0A5246074"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A1A5246073"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:371A375">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A3A5246071"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A4A5246072"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:374A366">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A3A5246068"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A4A5246069"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:369A370">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A5A5246064"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A6A5246075"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:367A374">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A2A5246067"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A3A5246068"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:373A364">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A5A5246066"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A6A5246065"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:372A363">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A0A5246063"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A1A5246062"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:366A373">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A4A5246069"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317452A5A5246066"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:368A365">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A1A5246073"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A2A5246070"/>
+						</RouteLink>
+						<RouteLink version="any" id="RATP_PIVI:RouteLink:365A371">
+							<FromPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A2A5246070"/>
+							<ToPointRef version="1" ref="RATP_PIVI:RoutePoint:317453A3A5246071"/>
+						</RouteLink>
+					</routeLinks>
+					<!--   -->
+					<!-- NEPTUNE Route Mapping (part 2 : routes ) =========================================== -->
+					<routes>
+						<!-- NEPTUNE [mapping:variable] : Route.version mapped to NEPTUNE Route->ObjectVersion -->
+						<Route version="1" id="RATP_PIVI:Route:317452">
+							<!-- NEPTUNE [mapping:variable] : Route->Id to NEPTUNE Route->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : Route->Name to NEPTUNE Route->name -->
+							<Name>1001101070001</Name>
+							<!-- NEPTUNE [mapping:variable] : Route->DirectionRef reference o Drirection object mapping to NEPTUNE Route->publishedName and Route->RouteExtension->wayBack -->
+							<DirectionRef version="any" ref="RATP_PIVI:Route:317452:Direction"/>
+							<!-- NeTEx (Transmodel) defines ROUTE POINT and POINT ON ROUTE;  POINT ON ROUTE are not available in NEPTUNE, so to be consistent with NeTEx model, the POINT ON ROUTE (refering ROUTE POINT) is defined below -->
+							<pointsInSequence>
+								<PointOnRoute version="any" id="RATP_PIVI:Route:317452-01" order="1">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A0A5246063"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317452-02" order="2">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A1A5246062"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317452-03" order="3">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A2A5246067"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317452-04" order="4">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A3A5246068"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317452-05" order="5">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A4A5246069"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317452-06" order="6">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A5A5246066"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317452-07" order="7">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A6A5246065"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+						<!-- NEPTUNE [mapping:variable] : Route.version mapped to NEPTUNE Route->ObjectVersion -->
+						<Route version="1" id="RATP_PIVI:Route:317453">
+							<!-- NEPTUNE [mapping:variable] : Route->Id to NEPTUNE Route->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : Route->Name to NEPTUNE Route->name -->
+							<Name>1001101070001</Name>
+							<!-- NEPTUNE [mapping:variable] : Route->DirectionRef reference o Drirection object mapping to NEPTUNE Route->publishedName and Route->RouteExtension->wayBack -->
+							<DirectionRef version="any" ref="RATP_PIVI:Route:317453:Direction"/>
+							<!-- NeTEx (Transmodel) defines ROUTE POINT and POINT ON ROUTE;  POINT ON ROUTE are not available in NEPTUNE, so to be consistent with NeTEx model, the POINT ON ROUTE (refering ROUTE POINT) is defined below -->
+							<pointsInSequence>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-01" order="1">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A0A5246074"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-02" order="2">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A1A5246073"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-03" order="3">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A2A5246070"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-04" order="4">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A3A5246071"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-05" order="5">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A4A5246072"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-06" order="6">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A5A5246064"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="RATP_PIVI:PointOnRoute:317453-07" order="7">
+									<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A6A5246075"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+					</routes>
+					<!--   -->
+					<!-- NEPTUNE Line Mapping =========================================== -->
+					<lines>
+						<!-- NEPTUNE [mapping:variable] : Line.version mapped to NEPTUNE ChouetteLineDescription->Line->ObjectVersion -->
+						<Line version="1" id="RATP_PIVI:Line:100110107">
+							<!-- NEPTUNE [mapping:variable] : Line->Id to NEPTUNE ChouetteLineDescription->Line->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : Line->Name to NEPTUNE ChouetteLineDescription->Line->name -->
+							<Name>7B</Name>
+							<!-- NEPTUNE [mapping:variable] : Line->TransportMode to NEPTUNE ChouetteLineDescription->Line->transportModeName -->
+							<TransportMode>metro</TransportMode>
+							<!-- NEPTUNE [mapping:variable] : Line->PublicCode to NEPTUNE ChouetteLineDescription->Line->registration->registrationNumber -->
+							<PublicCode>100110107</PublicCode>
+							<!-- NEPTUNE [mapping:variable] : Line->routeRefs->RouteRef to NEPTUNE ChouetteLineDescription->Line->routeId -->
+							<routes>
+								<RouteRef version="1" ref="RATP_PIVI:Route:317452"/>
+								<RouteRef version="1" ref="RATP_PIVI:Route:317453"/>
+							</routes>
+						</Line>
+					</lines>
+					<!--   -->
+					<!-- NEPTUNE Stop Area with "Quay" type  =========================================== -->
+					<!-- NEPTUNE Quays (or Bording position) are mapped to ScheduledStopPoint in order to keep the NEPTUNE JOURNEY PATTERN consistency -->
+					<!-- A Passenger Stop Assignment is then needed to connect all this to the Stop Place -->
+					<scheduledStopPoints>
+						<!-- NEPTUNE [mapping:variable] : ScheduledStopPoint.version mapped to NEPTUNE StopArea[type Quay]->ObjectVersion -->
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246069">
+							<!-- NEPTUNE [mapping:variable] : ScheduledStopPoint-Name to NEPTUNE StopArea[type Quay]->name -->
+							<Name>Bolivar</Name>
+							<!-- NEPTUNE makes no difference between Timing Points a Stop Points ... So the best way to map it is to say thay each ScheduledStopPoint is also a TimingPoint -->
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<!-- NEPTUNE same thing for all the others.... -->
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:317453A1A5246073">
+							<Name>MISSING POINT.</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246072">
+							<Name>Botzaris</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246067">
+							<Name>Botzaris</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246070">
+							<Name>MISSING</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246071">
+							<Name>Buttes-Chaumont</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246068">
+							<Name>Buttes-Chaumont</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246062">
+							<Name>Danube</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246066">
+							<Name>Jaurès</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246073">
+							<Name>Jaurès</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246074">
+							<Name>Louis Blanc</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246065">
+							<Name>Louis Blanc</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246064">
+							<Name>Place des Fêtes</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246075">
+							<Name>Pré-Saint-Gervais</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="1" id="RATP_PIVI:StopPoint:5246063">
+							<Name>Pré-Saint-Gervais</Name>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--   -->
+					<!--  SERVICE PATTERN : Service Links are not mapped (they are not mandatory in NeTeEx), the sequence of Scheduled Stop Point is used instead -->
+					<servicePatterns>
+						<!-- NEPTUNE [mapping:variable] : ServicePattern.version mapped to NEPTUNE JourneyPattern->ObjectVersion -->
+						<ServicePattern version="1" id="RATP_PIVI:ServicePattern:514339">
+							<!-- NEPTUNE [mapping:variable] : ServicePattern->Id mapped to NEPTUNE JourneyPattern->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : ServicePattern->Name mapped to NEPTUNE JourneyPattern->name -->
+							<Name>101</Name>
+							<!-- NEPTUNE [mapping:variable] : ServicePattern->RouteRef mapped to NEPTUNE JourneyPattern->routeId -->
+							<RouteRef version="1" ref="RATP_PIVI:Route:317452"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-1" order="1">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246063"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-2" order="2">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246062"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-3" order="3">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246067"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-4" order="4">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246068"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-5" order="5">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246069"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-6" order="6">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246066"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:317452-7" order="7">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246065"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServicePattern>
+						<!-- NEPTUNE [mapping:variable] : ServicePattern.version mapped to NEPTUNE JourneyPattern->ObjectVersion -->
+						<ServicePattern version="1" id="RATP_PIVI:ServicePattern:514340">
+							<!-- NEPTUNE [mapping:variable] : ServicePattern->Id mapped to NEPTUNE JourneyPattern->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : ServicePattern->Name mapped to NEPTUNE JourneyPattern->name -->
+							<Name>201</Name>
+							<!-- NEPTUNE [mapping:variable] : ServicePattern->RouteRef mapped to NEPTUNE JourneyPattern->routeId -->
+							<RouteRef version="1" ref="RATP_PIVI:Route:317453"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-1" order="1">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A0A5246074"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-2" order="2">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A1A5246073"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-3" order="3">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A2A5246070"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-4" order="4">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A3A5246071"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-5" order="5">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A4A5246072"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-6" order="6">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A5A5246064"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="1" id="RATP_PIVI:Route:514340-7" order="7">
+									<!-- MISSING AS STOP PONT f version="1" -->
+									<ScheduledStopPointRef ref="RATP_PIVI:RoutePoint:317453A6A5246075"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServicePattern>
+					</servicePatterns>
+					<!--   -->
+					<!-- Tarif zone  : Not really available in NEPTUNE, but there is a need to map Tariff Zone 1 (which is an attribute in NEPTUNE -->
+					<!-- This object needs to be created inside the mapping mechanism -->
+					<tariffZones>
+						<TariffZone version="any" id="RATP_PIVI:TariffZone:1">
+							<Name>Zone 1</Name>
+							<members>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A0A5246063"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A1A5246062"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A2A5246067"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A3A5246068"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A4A5246069"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A5A5246066"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317452A6A5246065"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A0A5246074"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A1A5246073"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A2A5246070"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A3A5246071"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A4A5246072"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A5A5246064"/>
+								<RoutePointRef version="1" ref="RATP_PIVI:RoutePoint:317453A6A5246075"/>
+							</members>
+						</TariffZone>
+					</tariffZones>
+					<!--   -->
+					<!-- Assignments of Schedules Stop Points to Stop Places -->
+					<stopAssignments>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246067">
+							<!-- NEPTUNE [mapping:variable] : The assignement is done from the Scheduled Stop Point to the Quay, and also references the Stop Place including the Quay -->
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246067"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430399"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246067"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246072">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246072"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430399"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246072"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246069">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246069"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430398"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246069"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246070">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246070"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430398"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246070"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246068">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246068"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430397"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246068"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246071">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246071"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430397"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246071"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246062">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246062"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430396"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246062"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246063">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246063"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430395"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246063"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246075">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246075"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:430395"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246075"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246065">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246065"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:5988"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246065"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246074">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246074"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:5988"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246074"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246066">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246066"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:5766"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246066"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246073">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246073"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:5766"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246073"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="RATP_PIVI:PassengerStopAssignment:5246064">
+							<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246064"/>
+							<StopPlaceRef version="1" ref="RATP_PIVI:StopArea:768"/>
+							<QuayRef version="1" ref="RATP_PIVI:Quay:5246064"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+				</ServiceFrame>
+				<!-- =========================================== -->
+				<!-- IFOPT Stop Places, Bording positions and quays -->
+				<!-- NEPTUNE StopPlaces (StopArea of type StopPlace) are mapped to NeTEx StopPlace -->
+				<!-- These StopPlaces contains the quays used un the previous assignment -->
+				<!-- Note : having addresses at Quay level may seem strange (and it is), but is is also at quay level in the original file... and so does the mapping -->
+				<SiteFrame version="any" id="RATP_PIVI:SiteFrame:SF01">
+					<stopPlaces>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:430399">
+							<TopographicPlaceView>
+								<Name>Botzaris</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246072">
+									<Centroid>
+										<Location id="GML_Quay_5246072">
+											<Longitude>2.3891290000000000</Longitude>
+											<Latitude>48.8792840000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												 603862.00 2431221.00 
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246072">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Botzaris (80 rue)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Botzaris</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+								<Quay version="1" id="RATP_PIVI:Quay:5246067">
+									<Centroid>
+										<Location id="GML_Quay_5246067">
+											<Longitude>2.3891290000000000</Longitude>
+											<Latitude>48.8792840000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												603862.00 2431221.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246067">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Botzaris (80 rue)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Botzaris</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:430398">
+							<TopographicPlaceView>
+								<Name>Bolivar</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246069">
+									<Centroid>
+										<Location id="GML_Quay_5246069">
+											<Longitude>2.3739370000000000</Longitude>
+											<Latitude>48.8808080000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												602747.00 2431390.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246069">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Simon Bolivar (125 avenue)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<!-- NEPTUNE Use the Line transport mode (at Quay Leve, only one mode is OK) -->
+									<Label>Bolivar</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+								<Quay version="1" id="RATP_PIVI:Quay:5246070">
+									<Centroid>
+										<Location id="GML_Quay_5246070">
+											<Longitude>2.3739370000000000</Longitude>
+											<Latitude>48.8808080000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												602747.00 2431390.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246070">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Simon Bolivar (125 avenue)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Bolivar</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:430397">
+							<TopographicPlaceView>
+								<Name>Buttes-Chaumont</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246071">
+									<Centroid>
+										<Location id="GML_Quay_5246071">
+											<Longitude>2.3812380000000000</Longitude>
+											<Latitude>48.8774980000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												603283.00 2431022.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246071">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Botzaris (28 rue)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Buttes-Chaumont</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+								<Quay version="1" id="RATP_PIVI:Quay:5246068">
+									<Centroid>
+										<Location id="GML_Quay_5246068">
+											<Longitude>2.3812380000000000</Longitude>
+											<Latitude>48.8774980000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												603283.00 2431022.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246068">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Botzaris (28 rue)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Buttes-Chaumont</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:430396">
+							<TopographicPlaceView>
+								<Name>Danube</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246062">
+									<Centroid>
+										<Location id="GML_Quay_5246062">
+											<Longitude>2.3930700000000000</Longitude>
+											<Latitude>48.8820050000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												604151.00 2431524.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246062">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Rhin et Danube (9 place de)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Danube</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:430395">
+							<TopographicPlaceView>
+								<Name>Pré-Saint-Gervais</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246075">
+									<Centroid>
+										<Location id="GML_Quay_5246075">
+											<Longitude>2.3985600000000000</Longitude>
+											<Latitude>48.8803670000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												604554.00 2431342.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246075">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Serrurier (52 boulevard)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Pré-Saint-Gervais</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+								<Quay version="1" id="RATP_PIVI:Quay:5246063">
+									<Centroid>
+										<Location id="GML_Quay_5246063">
+											<Longitude>2.3985600000000000</Longitude>
+											<Latitude>48.8803670000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												604554.00 2431342.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246063">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Serrurier (52 boulevard)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Pré-Saint-Gervais</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:5988">
+							<TopographicPlaceView>
+								<Name>Louis Blanc</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246074">
+									<Centroid>
+										<Location id="GML_Quay_5246074">
+											<Longitude>2.3654890000000000</Longitude>
+											<Latitude>48.8812240000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												602127.00 2431436.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246074">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Faubourg Saint-Martin (234 rue du)</AddressLine1>
+										<PostCode>75110</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Louis Blanc</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+								<Quay version="1" id="RATP_PIVI:Quay:5246065">
+									<Centroid>
+										<Location id="GML_Quay_5246065">
+											<Longitude>2.3654890000000000</Longitude>
+											<Latitude>48.8812240000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												602127.00 2431436.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246065">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Faubourg Saint-Martin (234 rue du)</AddressLine1>
+										<PostCode>75110</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Louis Blanc</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:5766">
+							<TopographicPlaceView>
+								<Name>Jaurès</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246066">
+									<Centroid>
+										<Location id="GML_Quay_5246066">
+											<Longitude>2.3703270000000000</Longitude>
+											<Latitude>48.8824990000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												602482.00 2431578.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246066">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Villette (entrée sous viaduc face au 196 boulevard de la)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<!-- NEPTUNE Use the Line transport mode (at Quay Level, only one mode is OK) -->
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Jaurès</Label>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+									<QuayType>metroPlatform</QuayType>
+								</Quay>
+								<Quay version="1" id="RATP_PIVI:Quay:5246073">
+									<Centroid>
+										<Location id="GML_Quay_5246073">
+											<Longitude>2.3703270000000000</Longitude>
+											<Latitude>48.8824990000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												602482.00 2431578.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246073">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Villette (entrée sous viaduc face au 196 boulevard de la)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Jaurès</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="1" id="RATP_PIVI:StopArea:768">
+							<TopographicPlaceView>
+								<Name>Place des Fêtes</Name>
+							</TopographicPlaceView>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+							</tariffZones>
+							<quays>
+								<Quay version="1" id="RATP_PIVI:Quay:5246064">
+									<Centroid>
+										<Location id="GML_Quay_5246064">
+											<Longitude>2.3929560000000000</Longitude>
+											<Latitude>48.8772240000000000</Latitude>
+											<gml:pos srsName="EPSG:9801">
+												604143.00 2430992.00
+											</gml:pos>
+										</Location>
+									</Centroid>
+									<PostalAddress version="any" id="RATP_PIVI:PostalAddress:5246064">
+										<CountryRef ref="fr"/>
+										<AddressLine1>Fêtes (place des, rue Compans)</AddressLine1>
+										<PostCode>75119</PostCode>
+									</PostalAddress>
+									<TransportMode>metro</TransportMode>
+									<tariffZones>
+										<TariffZoneRef version="any" ref="RATP_PIVI:TariffZone:1"/>
+									</tariffZones>
+									<Label>Place des Fêtes</Label>
+									<QuayType>metroPlatform</QuayType>
+									<!-- NEPTUNE Use metroPlatform for Metro Lines .... -->
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<!--   -->
+				<!-- Calendars : NeTEx Day Types and Day Type Assignment mapped to NEPTUNE Timetable -->
+				<!-- Each NEPTUNE Timetable is mapped to a separate ServiceCalendarFrame  -->
+				<ServiceCalendarFrame version="any" id="RATP_PIVI:ServiceCalendarFrame:SFC01">
+					<ServiceCalendar version="any" id="RATP_PIVI:ServiceCalendar:SFC01">
+						<!-- NEPTUNE [mapping:variable] : ServiceCalendarFrame  FromDate & ToDate are computed from all NEPTUNE Timetable->startOfPeriod & endOfPeriod -->
+						<FromDate>2009-08-31</FromDate>
+						<ToDate>2009-12-17</ToDate>
+					</ServiceCalendar>
+					<!--- === Day Types ==== -->
+					<dayTypes>
+						<!-- NEPTUNE [mapping:variable] : DayType.version mapped to NEPTUNE Timetable->ObjectVersion -->
+						<DayType version="1" id="RATP_PIVI:DayType:385159">
+							<!-- NEPTUNE [mapping:variable] : DayType->Id mapped to NEPTUNE Timetable->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : DayType->Name this is an additional information not available in the used mapped file, but helping understanding -->
+							<Name>Monday to Thursday</Name>
+							<!-- NEPTUNE [mapping:variable] : DayType->ShortName mapped to NEPTUNE Timetable->Comment (there is no Timetable name  NEPTUNE) -->
+							<ShortName>7bJO05W215 hiver</ShortName>
+						</DayType>
+					</dayTypes>
+					<!--- === Day assignments ==== -->
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090831">
+							<Date>2009-08-31</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090901">
+							<Date>2009-09-01</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090902">
+							<Date>2009-09-02</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090903">
+							<Date>2009-09-03</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090907">
+							<Date>2009-09-07</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090908">
+							<Date>2009-09-08</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090909">
+							<Date>2009-09-09</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090910">
+							<Date>2009-09-10</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090914">
+							<Date>2009-09-14</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090915">
+							<Date>2009-09-15</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090916">
+							<Date>2009-09-16</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090917">
+							<Date>2009-09-17</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090921">
+							<Date>2009-09-21</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090922">
+							<Date>2009-09-22</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090923">
+							<Date>2009-09-23</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090924">
+							<Date>2009-09-24</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090928">
+							<Date>2009-09-28</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090929">
+							<Date>2009-09-29</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20090930">
+							<Date>2009-09-30</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091001">
+							<Date>2009-10-01</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091005">
+							<Date>2009-10-05</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091006">
+							<Date>2009-10-06</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091007">
+							<Date>2009-10-07</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091008">
+							<Date>2009-10-08</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091012">
+							<Date>2009-10-12</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091013">
+							<Date>2009-10-13</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091014">
+							<Date>2009-10-14</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091015">
+							<Date>2009-10-15</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091019">
+							<Date>2009-10-19</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091020">
+							<Date>2009-10-20</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091021">
+							<Date>2009-10-21</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091022">
+							<Date>2009-10-22</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091026">
+							<Date>2009-10-26</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091027">
+							<Date>2009-10-27</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091028">
+							<Date>2009-10-28</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091029">
+							<Date>2009-10-29</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091102">
+							<Date>2009-11-02</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091103">
+							<Date>2009-11-03</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091104">
+							<Date>2009-11-04</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091105">
+							<Date>2009-11-05</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091109">
+							<Date>2009-11-09</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091112">
+							<Date>2009-11-12</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091116">
+							<Date>2009-11-16</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091117">
+							<Date>2009-11-17</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091118">
+							<Date>2009-11-18</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091119">
+							<Date>2009-11-19</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091123">
+							<Date>2009-11-23</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091124">
+							<Date>2009-11-24</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091125">
+							<Date>2009-11-25</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091126">
+							<Date>2009-11-26</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091130">
+							<Date>2009-11-30</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091201">
+							<Date>2009-12-01</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091202">
+							<Date>2009-12-02</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091203">
+							<Date>2009-12-03</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091207">
+							<Date>2009-12-07</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091208">
+							<Date>2009-12-08</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091209">
+							<Date>2009-12-09</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091210">
+							<Date>2009-12-10</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091214">
+							<Date>2009-12-14</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091215">
+							<Date>2009-12-15</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091216">
+							<Date>2009-12-16</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:DayType:385159" order="20091217">
+							<Date>2009-12-17</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+				<ServiceCalendarFrame version="any" id="RATP_PIVI:ServiceCalendarFrame:SFC02">
+					<ServiceCalendar version="any" id="RATP_PIVI:ServiceCalendar:SFC02">
+						<!-- NEPTUNE [mapping:variable] : ServiceCalendarFrame  FromDate & ToDate are computed from all NEPTUNE Timetable->startOfPeriod & endOfPeriod -->
+						<FromDate>2009-09-13</FromDate>
+						<ToDate>2009-12-27</ToDate>
+					</ServiceCalendar>
+					<!--- === Day Types ==== -->
+					<dayTypes>
+						<!-- NEPTUNE [mapping:variable] : DayType.version mapped to NEPTUNE Timetable->ObjectVersion -->
+						<DayType version="1" id="RATP_PIVI:Timetable:385160">
+							<!-- NEPTUNE [mapping:variable] : DayType->Id mapped to NEPTUNE Timetable->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : DayType->Name this is an additional information not available in the used mapped file, but helping understanding -->
+							<Name>Sundays</Name>
+							<!-- NEPTUNE [mapping:variable] : DayType->ShortName mapped to NEPTUNE Timetable->Comment (there is no Timetable name  NEPTUNE) -->
+							<ShortName>7bDI04M160 hiver</ShortName>
+						</DayType>
+					</dayTypes>
+					<!--- === Day assignments ==== -->
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20090913">
+							<Date>2009-09-13</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20090920">
+							<Date>2009-09-20</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20090927">
+							<Date>2009-09-27</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091004">
+							<Date>2009-10-04</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091011">
+							<Date>2009-10-11</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091018">
+							<Date>2009-10-18</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091025">
+							<Date>2009-10-25</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091101">
+							<Date>2009-11-01</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091108">
+							<Date>2009-11-08</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091111">
+							<Date>2009-11-11</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091115">
+							<Date>2009-11-15</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091122">
+							<Date>2009-11-22</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091129">
+							<Date>2009-11-29</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091206">
+							<Date>2009-12-06</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091213">
+							<Date>2009-12-13</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091220">
+							<Date>2009-12-20</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385160" order="20091227">
+							<Date>2009-12-27</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385160"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+				<ServiceCalendarFrame version="any" id="RATP_PIVI:ServiceCalendarFrame:SCF03">
+					<ServiceCalendar version="any" id="RATP_PIVI:ServiceCalendar:SCF03">
+						<!-- NEPTUNE [mapping:variable] : ServiceCalendarFrame  FromDate & ToDate are computed from all NEPTUNE Timetable->startOfPeriod & endOfPeriod -->
+						<FromDate>2010-01-01</FromDate>
+						<ToDate>2010-12-18</ToDate>
+					</ServiceCalendar>
+					<!--- === Day Types ==== -->
+					<dayTypes>
+						<!-- NEPTUNE [mapping:variable] : DayType.version mapped to NEPTUNE Timetable->ObjectVersion -->
+						<DayType version="1" id="RATP_PIVI:Timetable:385170">
+							<!-- NEPTUNE [mapping:variable] : DayType->Id mapped to NEPTUNE Timetable->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : DayType->Name this is an additional information not available in the used mapped file, but helping understanding -->
+							<Name>Saturdays and public holidays</Name>
+							<!-- NEPTUNE [mapping:variable] : DayType->ShortName mapped to NEPTUNE Timetable->Comment (there is no Timetable name  NEPTUNE) -->
+							<ShortName>7bSA04S176 hiverr</ShortName>
+						</DayType>
+					</dayTypes>
+					<!--- === Day assignments ==== -->
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100101">
+							<Date>2010-01-01</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100102">
+							<Date>2010-01-02</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100109">
+							<Date>2010-01-09</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100116">
+							<Date>2010-01-16</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100123">
+							<Date>2010-01-23</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100130">
+							<Date>2010-01-30</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100206">
+							<Date>2010-02-06</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100213">
+							<Date>2010-02-13</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100220">
+							<Date>2010-02-20</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100227">
+							<Date>2010-02-27</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100306">
+							<Date>2010-03-06</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100313">
+							<Date>2010-03-13</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100320">
+							<Date>2010-03-20</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100327">
+							<Date>2010-03-27</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100403">
+							<Date>2010-04-03</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100404">
+							<Date>2010-04-04</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100410">
+							<Date>2010-04-10</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100417">
+							<Date>2010-04-17</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100424">
+							<Date>2010-04-24</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100501">
+							<Date>2010-05-01</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100508">
+							<Date>2010-05-08</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100515">
+							<Date>2010-05-15</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100522">
+							<Date>2010-05-22</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100529">
+							<Date>2010-05-29</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100605">
+							<Date>2010-06-05</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100612">
+							<Date>2010-06-12</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100619">
+							<Date>2010-06-19</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100626">
+							<Date>2010-06-26</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100703">
+							<Date>2010-07-03</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100710">
+							<Date>2010-07-10</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100714">
+							<Date>2010-07-14</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100717">
+							<Date>2010-07-17</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100724">
+							<Date>2010-07-24</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100731">
+							<Date>2010-07-31</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100807">
+							<Date>2010-08-07</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100814">
+							<Date>2010-08-14</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100821">
+							<Date>2010-08-21</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100828">
+							<Date>2010-08-28</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100904">
+							<Date>2010-09-04</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100911">
+							<Date>2010-09-11</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100918">
+							<Date>2010-09-18</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20100925">
+							<Date>2010-09-25</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101002">
+							<Date>2010-10-02</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101009">
+							<Date>2010-10-09</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101016">
+							<Date>2010-10-16</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101023">
+							<Date>2010-10-23</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101030">
+							<Date>2010-10-30</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101106">
+							<Date>2010-11-06</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101113">
+							<Date>2010-11-13</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101120">
+							<Date>2010-11-20</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101127">
+							<Date>2010-11-27</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101204">
+							<Date>2010-12-04</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101211">
+							<Date>2010-12-11</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" id="RATP_PIVI:Timetable:385170" order="20101218">
+							<Date>2010-12-18</Date>
+							<DayTypeRef version="1" ref="RATP_PIVI:Timetable:385170"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+				<!-- =========================================== -->
+				<TimetableFrame version="any" id="RATP_PIVI:TimetableFrame:TF02">
+					<vehicleJourneys>
+						<!-- NEPTUNE [mapping:variable] : ServiceJourney.version mapped to NEPTUNE VehicleJourney->ObjectVersion -->
+						<ServiceJourney version="1" id="RATP_PIVI:VehicleJourney:18798666">
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Id mapped to NEPTUNE VehicleJourney->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Name mapped to NEPTUNE VehicleJourney->number -->
+							<Name>1</Name>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->dayTypes->DayTypeRef processed from to NEPTUNE Timetable (containing references to there affiliated VehicleJourney, the relation behing in the opposite way of the one used in NeTEx) -->
+							<dayTypes>
+								<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+							</dayTypes>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->RouteRef mapped to NEPTUNE VehicleJourney->routeId -->
+							<RouteRef version="1" ref="RATP_PIVI:Route:317452"/>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->JourneyPatternRef mapped to NEPTUNE VehicleJourney->journeyPatternId -->
+							<ServiceJourneyPatternRef ref="RATP_PIVI:ServiceJourneyPattern:514339">EXTERNAL</ServiceJourneyPatternRef>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->calls->Call mapped to NEPTUNE VehicleJourney->vehicleJourneyAtStop -->
+							<calls>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="1">
+									<!-- NEPTUNE [mapping:variable] : Call->ScheduledStopPointRef mapped to NEPTUNE vehicleJourneyAtStop->stopPointId -->
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246063"/>
+									<!-- NEPTUNE [mapping:variable] : Call->Arrival->Time mapped to NEPTUNE vehicleJourneyAtStop->arrivalTime -->
+									<Arrival>
+										<Time>05:31:00</Time>
+									</Arrival>
+									<!-- NEPTUNE [mapping:variable] : Call->Departure->Time mapped to NEPTUNE vehicleJourneyAtStop->departureTime -->
+									<Departure>
+										<Time>05:31:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="2">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246062"/>
+									<Arrival>
+										<Time>05:32:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:32:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="3">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246067"/>
+									<Arrival>
+										<Time>05:33:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:33:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="4">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246068"/>
+									<Arrival>
+										<Time>05:34:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:34:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="5">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246069"/>
+									<Arrival>
+										<Time>05:36:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:36:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="6">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246066"/>
+									<Arrival>
+										<Time>05:37:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:37:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798666" order="7">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246065"/>
+									<Arrival>
+										<Time>05:38:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:38:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<!--7-->
+						<ServiceJourney version="1" id="RATP_PIVI:VehicleJourney:18798667">
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Id mapped to NEPTUNE VehicleJourney->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Name mapped to NEPTUNE VehicleJourney->number -->
+							<Name>1</Name>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->dayTypes->DayTypeRef processed from to NEPTUNE Timetable (containing references to there affiliated VehicleJourney, the relation behing in the opposite way of the one used in NeTEx) -->
+							<dayTypes>
+								<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+							</dayTypes>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->RouteRef mapped to NEPTUNE VehicleJourney->routeId -->
+							<RouteRef version="1" ref="RATP_PIVI:Route:317453"/>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->JourneyPatternRef mapped to NEPTUNE VehicleJourney->journeyPatternId -->
+							<ServiceJourneyPatternRef ref="RATP_PIVI:ServiceJourneyPattern:514340">EXTERNAL</ServiceJourneyPatternRef>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->calls->Call mapped to NEPTUNE VehicleJourney->vehicleJourneyAtStop -->
+							<calls>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="1">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246074"/>
+									<Arrival>
+										<Time>05:43:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:43:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="2">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246073"/>
+									<Arrival>
+										<Time>05:44:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:44:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="3">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246070"/>
+									<Arrival>
+										<Time>05:45:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:45:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="4">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246071"/>
+									<Arrival>
+										<Time>05:46:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:46:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="5">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246072"/>
+									<Arrival>
+										<Time>05:48:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:48:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="6">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246064"/>
+									<Arrival>
+										<Time>05:49:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:49:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798667" order="7">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246075"/>
+									<Arrival>
+										<Time>05:51:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:51:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<!-- NEPTUNE [mapping:variable] : ServiceJourney.version mapped to NEPTUNE VehicleJourney->ObjectVersion -->
+						<ServiceJourney version="1" id="RATP_PIVI:VehicleJourney:18798668">
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Id mapped to NEPTUNE VehicleJourney->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Name mapped to NEPTUNE VehicleJourney->number -->
+							<Name>1</Name>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->dayTypes->DayTypeRef processed from to NEPTUNE Timetable (containing references to there affiliated VehicleJourney, the relation behing in the opposite way of the one used in NeTEx) -->
+							<dayTypes>
+								<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+							</dayTypes>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->RouteRef mapped to NEPTUNE VehicleJourney->routeId -->
+							<RouteRef version="1" ref="RATP_PIVI:Route:317452"/>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->JourneyPatternRef mapped to NEPTUNE VehicleJourney->journeyPatternId -->
+							<ServiceJourneyPatternRef ref="RATP_PIVI:ServiceJourneyPattern:514339">EXTRENAL</ServiceJourneyPatternRef>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->calls->Call mapped to NEPTUNE VehicleJourney->vehicleJourneyAtStop -->
+							<calls>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="1">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246063"/>
+									<Arrival>
+										<Time>05:31:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:31:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="2">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246062"/>
+									<Arrival>
+										<Time>05:32:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:32:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="3">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246067"/>
+									<Arrival>
+										<Time>05:33:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:33:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="4">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246068"/>
+									<Arrival>
+										<Time>05:34:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:34:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="5">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246069"/>
+									<Arrival>
+										<Time>05:36:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:36:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="6">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246066"/>
+									<Arrival>
+										<Time>05:37:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:37:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798668" order="7">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246065"/>
+									<Arrival>
+										<Time>05:38:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:38:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<!-- NEPTUNE [mapping:variable] : ServiceJourney.version mapped to NEPTUNE VehicleJourney->ObjectVersion -->
+						<ServiceJourney version="1" id="RATP_PIVI:VehicleJourney:18798689">
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Id mapped to NEPTUNE VehicleJourney->ObjectId -->
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->Name mapped to NEPTUNE VehicleJourney->number -->
+							<Name>1</Name>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->dayTypes->DayTypeRef processed from to NEPTUNE Timetable (containing references to there affiliated VehicleJourney, the relation behing in the opposite way of the one used in NeTEx) -->
+							<dayTypes>
+								<DayTypeRef version="1" ref="RATP_PIVI:DayType:385159"/>
+							</dayTypes>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->RouteRef mapped to NEPTUNE VehicleJourney->routeId -->
+							<RouteRef version="1" ref="RATP_PIVI:Route:317453"/>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->JourneyPatternRef mapped to NEPTUNE VehicleJourney->journeyPatternId -->
+							<ServiceJourneyPatternRef ref="RATP_PIVI:ServiceJourneyPattern:514340">EXTERNAL</ServiceJourneyPatternRef>
+							<!-- NEPTUNE [mapping:variable] : ServiceJourney->calls->Call mapped to NEPTUNE VehicleJourney->vehicleJourneyAtStop -->
+							<calls>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="1">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246074"/>
+									<Arrival>
+										<Time>05:47:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:47:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="2">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246073"/>
+									<Arrival>
+										<Time>05:48:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:48:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="3">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246070"/>
+									<Arrival>
+										<Time>05:49:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:49:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="4">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246071"/>
+									<Arrival>
+										<Time>05:50:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:50:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="5">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246072"/>
+									<Arrival>
+										<Time>05:51:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:51:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="6">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246064"/>
+									<Arrival>
+										<Time>05:53:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:53:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="RATP_PIVI:VehicleJourney:18798689" order="7">
+									<ScheduledStopPointRef version="1" ref="RATP_PIVI:StopPoint:5246075"/>
+									<Arrival>
+										<Time>05:54:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>05:54:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+					</vehicleJourneys>
+				</TimetableFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Network Example ====== 
+This Example provides an example of a pair of stops on a street , as a general delivery 
+ 
+    It comprises
+       (i)  A  STOP PLACE  mybus:SSP_0751A   : -  Museumstrasse
+       (ii) A  QUAY           mybus:Q_SSP_0751A_1  - East side
+       (iii) A  QUAY           mybus:Q_SSP_0751A_1  - West side
+
+In Addition we provide elements to handle the assignment where the timetable stop reference is different from syop id in the the stop database
+       
+      (i) A SCHEDULED STOP POINT  - jqx:SSP0042A Museum
+      (ii) STOP ASSIGNMENTs 
+            jqx:PSA_20012_A    maps  jqx:SSA0021 - jqx:SSP0042A  ==> mybus:SSP0751A      - STOP PLACE 
+            jqx:PSA_20012_A1  maps  jqx:SSA0021 - jqx:SSP0042A  ==> mybus:Q_SSP_0751A - Quay 1 
+            jqx:PSA_20012_A2  maps  jqx:SSA0021 - jqx:SSP0042A  ==> mybus:Q_SSP_0751A_2  - Quay 2
+
+Two different RESPONSIBILITY SETs are assumed (These do not have to be declared in this file but are include for clarity)
+    myBus:RS_10,    Physical stop data
+    jqx:RS_22          Timetable stop datea
+
+A single TOPOGRAPHIC PLACE is defined - normally this would be referenceded externally 
+
+B. Frames and grouping
+    A RESOURCE FRAME is used to hold the RESPONSIBILITY SETs.
+	A SITE FRAME is used to hold the STOP PLACEs.
+	A SERVICE FRAME is used to hold the SCHEDULED STOP POINTs and STOP ASSIGNMENTs .
+	A COMPOSITE FRAME is used to hold the other FRAMEs as a coherent version.
+
+(C) CEN Copyright 2010
+-->
+<PublicationDelivery xmlns:gml="http://www.opengis.net/gml/3.2" xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<Description>Filter used to reest these contnets Get all STOP PLACEs, STOP ASSIGNMENTs and reponsib ilitySets  for Network TNET1 in topgraphic area    :TP_0032A.
+				Also get details for 
+				</Description>
+		<topics>
+			<NetworkFrameTopic>
+				<Current/>
+				<NetworkFilterByValue>
+					<objectReferences>
+						<TopographicPlaceRef ref="detop:TP_0032A"/>
+					</objectReferences>
+					<places>
+						<TopographicPlaceRef version="any" ref="detop:TP_0032A"/>
+					</places>
+				</NetworkFilterByValue>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Simple Stop pair On street example</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="mybus:CF002">
+			<validityConditions>
+				<AvailabilityCondition version="any" id="jqx:CF002">
+					<FromDate>2010-12-17T09:30:47.0Z</FromDate>
+					<ToDate>2011-12-17T09:30:47.0Z</ToDate>
+				</AvailabilityCondition>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="jqx">
+					<Xmlns>jqx</Xmlns>
+					<XmlnsUrl>http://www.VKWzn.de/</XmlnsUrl>
+					<Description>Bus data  namesapce</Description>
+				</Codespace>
+				<Codespace id="detop">
+					<Xmlns>detop</Xmlns>
+					<XmlnsUrl>http://www.pttopog.de</XmlnsUrl>
+					<Description>German locality data</Description>
+				</Codespace>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.busfahrt.de</XmlnsUrl>
+					<Description>German locality data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="jqx"/>
+			</FrameDefaults>
+			<frames>
+				<SiteFrame version="any" id="detop:SF00121">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="detop:RS_24">EXTERNAL</DefaultResponsibilitySetRef>
+					</FrameDefaults>
+					<topographicPlaces>
+						<TopographicPlace version="any" id="detop:TP_0032A">
+							<Name lang="de">Keinstadt</Name>
+							<Descriptor>
+								<Name lang="de">Keinstadt auf dem Fluss</Name>
+								<ShortName lang="de">Keinstadt</ShortName>
+								<Qualify>
+									<QualifierName lang="de">Mittleland</QualifierName>
+									<TopographicPlaceRef version="any" ref="detop:TP_0100"/>
+								</Qualify>
+							</Descriptor>
+						</TopographicPlace>
+						<TopographicPlace version="any" id="detop:TP_0100">
+							<Name lang="de">Mittleland</Name>
+							<Descriptor>
+								<Name lang="de">Mittleland</Name>
+							</Descriptor>
+						</TopographicPlace>
+					</topographicPlaces>
+					<stopPlaces>
+						<!--- =====Stops=========== -->
+						<StopPlace version="01" created="2006-09-11T15:42:00" responsibilitySetRef="mybus:RS_10" id="mybus:SP_0751A">
+							<Name lang="de">Stadtmuseum</Name>
+							<ShortName lang="de">Museum </ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="DEGrid">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<AccessibilityAssessment version="any" id="mybus:SP_0751A">
+								<MobilityImpairedAccess>true</MobilityImpairedAccess>
+								<limitations>
+									<AccessibilityLimitation>
+										<WheelchairAccess>true</WheelchairAccess>
+										<StepFreeAccess>true</StepFreeAccess>
+									</AccessibilityLimitation>
+								</limitations>
+							</AccessibilityAssessment>
+							<TopographicPlaceView>
+								<TopographicPlaceRef version="any" ref="detop:TP_0032A"/>
+							</TopographicPlaceView>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="01" created="2010-04-17T09:30:47Z" id="mybus:Q_SP_0751A_1">
+									<Name lang="de">Stadtmuseum Haltstelle A</Name>
+									<Description lang="de">Zum Ecke Museum Strasse und Kohlstrasse - 50 m nach Museum eingang .</Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<RoadAddress version="any" id="mybus:Rad_SP001A_01">
+										<RoadName>Museumstrasse</RoadName>
+									</RoadAddress>
+									<CrossRoad lang="de">Kohlstrasse</CrossRoad>
+									<Landmark lang="de">Stadtmuseum</Landmark>
+									<Covered>outdoors</Covered>
+									<Lighting>wellLit</Lighting>
+									<placeEquipments>
+										<PassengerInformationEquipment version="any" id="mybus:Rad_SP001A_01">
+											<AccessibilityInfoFacilityList>audioForHearingImpaired visualDisplays</AccessibilityInfoFacilityList>
+										</PassengerInformationEquipment>
+									</placeEquipments>
+									<BoardingUse>true</BoardingUse>
+									<AlightingUse>true</AlightingUse>
+									<Label lang="de">A</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>S</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+								<Quay version="01" created="2010-04-17T09:30:47Z" id="mybus:Q_SP_0751A_2">
+									<Name lang="de">Stadtmuseum Haltstelle B</Name>
+									<Description lang="de">Zum Ecke Museum Strasse und Kohlstrasse - 50 m nach Museum eingang am anderen seit .</Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397148</Longitude>
+											<Latitude>51.4217482063</Latitude>
+										</Location>
+									</Centroid>
+									<RoadAddress version="any" id="mybus:Rad_Q_SP_0751A_2">
+										<RoadName>Museumstrasse</RoadName>
+									</RoadAddress>
+									<CrossRoad lang="de">Kohlstrasse</CrossRoad>
+									<Landmark lang="de">Stadtmuseum</Landmark>
+									<Covered>outdoors</Covered>
+									<Lighting>wellLit</Lighting>
+									<placeEquipments>
+										<PassengerInformationEquipment version="any" id="mybus:Q_SP_0751A_2">
+											<AccessibilityInfoFacilityList>audioForHearingImpaired visualDisplays</AccessibilityInfoFacilityList>
+										</PassengerInformationEquipment>
+									</placeEquipments>
+									<BoardingUse>true</BoardingUse>
+									<AlightingUse>true</AlightingUse>
+									<Label lang="de">B</Label>
+									<PublicCode>1-3455 </PublicCode>
+									<CompassOctant>N</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<ServiceFrame version="any" id="jqx:SV0021">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="jqx:RS_22">EXTERNAL</DefaultResponsibilitySetRef>
+					</FrameDefaults>
+					<scheduledStopPoints>
+						<!--- =====SCHEDULED STOP POINT ====== -->
+						<ScheduledStopPoint version="032" created="2000-12-17T09:30:47.0Z" changed="2002-12-17T09:30:47.0Z" id="jqx:SSP0021A">
+							<Name>Stadtmuseum</Name>
+							<Label>Stadmuseum Zum Bahnhof</Label>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<stopAssignments>
+						<PassengerStopAssignment order="1" version="any" id="jqx:PSA_20012_A">
+							<Description lang="en">Assigns Museum timetable ref to physical stop - regardless of quay </Description>
+							<ScheduledStopPointRef version="032" ref="jqx:SSP0021A"/>
+							<StopPlaceRef version="01" ref="mybus:SP_0751A"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="2" version="any" id="jqx:PSA_20012_A1">
+							<Description lang="en">Assigns Eastbound Museum timetable ref to physical stop</Description>
+							<ScheduledStopPointRef version="032" ref="jqx:SSP0021A"/>
+							<StopPlaceRef version="01" ref="mybus:SP_0751A"/>
+							<QuayRef version="01" ref="mybus:Q_SP_0751A_1"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="3" version="any" id="jqx:PSA_20012_A2">
+							<Description lang="en">Assigns Westbound Museum timetable ref to physical stop</Description>
+							<ScheduledStopPointRef version="032" ref="jqx:SSP0021A"/>
+							<StopPlaceRef version="01" ref="mybus:SP_0751A"/>
+							<QuayRef version="01" ref="mybus:Q_SP_0751A_2"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+				</ServiceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

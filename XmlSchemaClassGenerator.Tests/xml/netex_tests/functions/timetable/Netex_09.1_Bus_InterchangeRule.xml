@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a feeder and DIstributor rule at a main station
+		Bus_SimpleTimetable_JourneysOnly example to see LINKS & PATTERNs
+ 
+It shows just the SERVICE JOURNEYS with CALLS with computed passing times; it omits all the underlying timing information on run times and wait times.
+As such it is similar to a GTFS timetable
+ 
+  
+1. OVERVIEW
+============  
+ 
+	Line 1 :	  Lake: 	 		02  -     03 -	 25    -			-		 Forest
+	Line 2 :	  MarketHall:		 -	 		-	 25    -			-		 Museum 
+	Line 3 :	  Tower				 -	 		-	 25    -			-		 Town Hall
+ 	Line 4 :	  Outskirts:		 -	 		-	 25    -			-		 Opera 
+	Line 5 :	  IndustriePark	 -	 		-	 25    -			-		 Car Park
+	Line 6 :	  Stadium	:		 -	 		-	 25    -	11	-	12 Hospital  
+  
+==================================
+2. DETAILS
+
+See earlier example 
+ There are SCHEDULED STOP POINTs in this file   for 
+		the station mybus:SSP_025
+		The Origin and  Previous stop on Line 1 : mybus:SSP_002, SSP_003
+		The Destination  and  next stop on Line 6 : mybus:SSP_011, SSP_012
+
+There is a CONNECTION mybus:CX_02
+
+
+There are twelve DESTINATIONs , one for each end of each LINE
+
+There are six LINEs   
+
+There are two incoming  rules with feeddeed filters and two outgoing rules with distrbutor filters
+
+     (i)  INTERCHANGE RULE  hde:Interchange:ir_25_all_f 
+		   all LINEs incoming, 
+		  Priority 5
+
+     i(i)  INTERCHANGE RULE  hde:Interchange::ir_25_LN1_f 
+
+		   LINE1   incoming, if the journey is came from previous stop SSP_003 with origin SSP_002
+		  Priority 1
+
+     (iii)  INTERCHANGE RULE  hde:Interchange:ir_25_all_d 
+		   all LINEs outgoing
+		  Priority 5
+     (iv)  INTERCHANGE RULE  hde:Interchange::ir_25_LN6_d
+		   LINE 6   outgoing, if the journey is goint on to th next stop SSP_011 with destination SSP_012
+		  Priority1
+
+
+A COMPOSITE FRAME  v.2 is used to group the component FRAMEs
+ 
+   - It has a VALIDITY CONDITION  that specifies it is valid from Sept to Matrch
+
+		A SERVICE  FRAME  v.1 is used to contain  the STOP POINT  elements   LINE, etc
+		A TIMETABLE FRAME  v.2 is used to contain  theINTERCHANGE RULE    elements 
+ 
+		  a SERVICE CALENDAR FRAME  v.1	A SERVICE CALENDAR FRAME is used to contain the DAY TYPEs etc 
+
+The Calendar is shown coded as
+      Compact : OPERATING DAYs are assumed for each calendar date within the period of the calendar 
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="hde:TimetableFrameTIM_23_O">REQUEST</TimetableFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple intyerchange rulkes</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="2" id="hde:CAL_02">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Stop data  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<ServiceFrame version="1" id="mybus:svf_12">
+					<Name>Stops for Winter timetable for route 24 </Name>
+					<!--- =========Direction  ============ -->
+					<directions>
+						<Direction version="any" id="mybus:DR_hbf">
+							<Name>Main Station</Name>
+							<ShortName>HBFd</ShortName>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Lake">
+							<Name>Lake</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Forest">
+							<Name>Forest</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_MarketHall">
+							<Name>Market Hall</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Museum">
+							<Name>Museum</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Tower">
+							<Name>Tower</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_TownHall">
+							<Name>Town Hall</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Outskirts">
+							<Name>Outskirts</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Opera">
+							<Name>Opera</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_IndustrieparkWest">
+							<Name>Industriepark West</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_CarPArk">
+							<Name>Car Park</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Stadium">
+							<Name>Stadium</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Hospital">
+							<Name>Hospital</Name>
+						</Direction>
+					</directions>
+					<!--- =========LINEs=========== -->
+					<lines>
+						<Line version="any" id="mybus:LN_1">
+							<Name>Line 1  Lake to Forest</Name>
+							<ShortName>Line 1</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>1</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_2">
+							<Name>Line 2  Market hall to Museum</Name>
+							<ShortName>Line 2</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>2</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_3">
+							<Name>Line 3 Tower to Town Hall</Name>
+							<ShortName>Line 3</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>3</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_4">
+							<Name>Line 4  Outskirts to Opera</Name>
+							<ShortName>Line 5</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>5</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_5">
+							<Name>Line 5 IndustriePark West  to Carparkl</Name>
+							<ShortName>Line 5</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>5</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_6">
+							<Name>Line 6 Stadium to Hospitall</Name>
+							<ShortName>Line 6</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>6</PublicCode>
+						</Line>
+					</lines>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_025">
+							<Name>Main Station</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Main Station</ShortName>
+							<StopType>railStation</StopType>
+							<VehicleModes>rail bus bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo Street</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo</ShortName>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_003">
+							<Name>Charley Crescent</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Charley</ShortName>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_011">
+							<Name>Park Lane</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Park Lane</ShortName>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_012">
+							<Name>Hospital</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Hospital   </ShortName>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<connections>
+						<Connection version="any" id="mybus:CX_25">
+							<Name>Connect at Main station</Name>
+							<TransferDuration>
+								<DefaultDuration>PT5M</DefaultDuration>
+							</TransferDuration>
+							<BothWays> true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_025"/>
+							</From>
+							<To>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_025"/>
+							</To>
+						</Connection>
+					</connections>
+				</ServiceFrame>
+				<!-- ======Timetable ======= -->
+				<TimetableFrame version="2" id="hde:TIM_23_O">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="hde:Cnd001">
+							<Description>Sept  to March</Description>
+							<FromDate>2010-11-01T00:00:00Z</FromDate>
+							<ToDate>2011-03-31T00:00:00Z</ToDate>
+						</AvailabilityCondition>
+					</validityConditions>
+					<Name>Winter timetable for route 23 outbound</Name>
+					<BaselineVersionFrameRef nameOfRefClass="TimetableFrame" ref="hde:1"/>
+					<!-- ======INTERCHANGE RUKES====== -->
+					<interchangeRules>
+						<InterchangeRule version="any" id="hde:IR_25_all_f">
+							<Name>Main Station - All  inbound</Name>
+							<ConnectionRef version="any" ref="mybus:CX_25"/>
+							<Priority>5</Priority>
+							<Planned>true</Planned>
+							<Guaranteed>false</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>true</Controlled>
+							<MaximumWaitTime>PT2M</MaximumWaitTime>
+							<MaximumAutomaticWaitTime>PT2M</MaximumAutomaticWaitTime>
+							<StandardTransferTime>PT5M</StandardTransferTime>
+							<MinimumTransferTime>PT3M</MinimumTransferTime>
+							<MaximumTransferTime>PT8M</MaximumTransferTime>
+							<ControlCentreRef version="101" ref="hde:123"/>
+							<FeederFilter>
+								<TransportMode>bus</TransportMode>
+								<AllLines/>
+								<MaximumInterchangeWindow>PT5M</MaximumInterchangeWindow>
+							</FeederFilter>
+						</InterchangeRule>
+						<InterchangeRule version="any" id="hde:IR_25_LN1_f">
+							<Name>Main Station - Line 1 inbound Special rule</Name>
+							<ConnectionRef version="any" ref="mybus:CX_25"/>
+							<Priority>1</Priority>
+							<Planned>true</Planned>
+							<Guaranteed>true</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>true</Controlled>
+							<StandardWaitTime>PT3M</StandardWaitTime>
+							<MaximumWaitTime>PT3M</MaximumWaitTime>
+							<MaximumAutomaticWaitTime>PT1M</MaximumAutomaticWaitTime>
+							<ControlCentreRef version="101" ref="hde:123"/>
+							<FeederFilter>
+								<TransportMode>bus</TransportMode>
+								<LineInDirectionRef>
+									<LineRef version="any" ref="mybus:LN_1"/>
+									<DirectionRef version="any" ref="mybus:DR_hbf"/>
+								</LineInDirectionRef>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_025"/>
+								<AdjacentStopPointRef version="any" ref="mybus:SSP_003"/>
+								<EndStopPointRef version="any" ref="mybus:SSP_002"/>
+								<MaximumInterchangeWindow>PT4M</MaximumInterchangeWindow>
+							</FeederFilter>
+						</InterchangeRule>
+						<InterchangeRule version="any" id="hde:IR_25_all_d">
+							<Name>Main Station - All lines outboundv </Name>
+							<ConnectionRef version="any" ref="mybus:CX_25"/>
+							<Priority>5</Priority>
+							<Planned>true</Planned>
+							<Guaranteed>false</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>true</Controlled>
+							<StandardWaitTime>PT2M</StandardWaitTime>
+							<MaximumWaitTime>PT2M</MaximumWaitTime>
+							<MaximumAutomaticWaitTime>PT2M</MaximumAutomaticWaitTime>
+							<StandardTransferTime>PT5M</StandardTransferTime>
+							<MinimumTransferTime>PT3M</MinimumTransferTime>
+							<MaximumTransferTime>PT8M</MaximumTransferTime>
+							<ControlCentreRef version="101" ref="hde:123"/>
+							<DistributorFilter>
+								<TransportMode>bus</TransportMode>
+								<AllLines/>
+								<MaximumInterchangeWindow>PT5M</MaximumInterchangeWindow>
+							</DistributorFilter>
+						</InterchangeRule>
+						<InterchangeRule version="any" id="hde:IR_25_LN6_d">
+							<Name>Main Station - Line 6 outbound </Name>
+							<ConnectionRef version="any" ref="mybus:CX_25"/>
+							<Priority>5</Priority>
+							<Planned>true</Planned>
+							<Guaranteed>true</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>true</Controlled>
+							<StandardWaitTime>PT4M</StandardWaitTime>
+							<MaximumWaitTime>PT4M</MaximumWaitTime>
+							<MaximumAutomaticWaitTime>PT4M</MaximumAutomaticWaitTime>
+							<StandardTransferTime>PT5M</StandardTransferTime>
+							<MinimumTransferTime>PT3M</MinimumTransferTime>
+							<MaximumTransferTime>PT8M</MaximumTransferTime>
+							<ControlCentreRef version="101" ref="hde:123"/>
+							<DistributorFilter>
+								<TransportMode>bus</TransportMode>
+								<LineInDirectionRef>
+									<LineRef version="any" ref="mybus:LN_6"/>
+									<DirectionRef version="any" ref="mybus:DR_Hospital"/>
+								</LineInDirectionRef>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_025"/>
+								<AdjacentStopPointRef version="any" ref="mybus:SSP_011"/>
+								<EndStopPointRef version="any" ref="mybus:SSP_012"/>
+								<MaximumInterchangeWindow>PT5M</MaximumInterchangeWindow>
+							</DistributorFilter>
+						</InterchangeRule>
+					</interchangeRules>
+				</TimetableFrame>
+				<!-- ======Timetable ======= -->
+				<ResourceFrame version="2" id="hde:RS_23_O">
+					<Name>Resoucres</Name>
+					<BaselineVersionFrameRef nameOfRefClass="ResourceFrame" ref="hde:1"/>
+					<organisations>
+						<Authority version="101" id="hde:TFO">
+							<Name>Mission Central</Name>
+						</Authority>
+					</organisations>
+					<controlCentres>
+						<ControlCentre version="101" id="hde:123">
+							<Name>Mission Central</Name>
+							<AuthorityRef version="101" ref="hde:TFO"/>
+						</ControlCentre>
+					</controlCentres>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

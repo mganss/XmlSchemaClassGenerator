@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== Simple Unt Zone Fare  Example ====== 
+This example shows the encoding of a unit distance tariff or a simple bus timetable for a linear route in NeTex XML  
+
+There is a complex honecomb zone structure with fares based on the number of zones crossed
+ 
+
+Data is Fictional 
+
+(C) CEN & Crown Copyright 2018, 2019 
+Free to use under a Creative Commons license.
+
+v1.1 Revised & corrected to use Tariff and simpler ids
+
+===================================================
+
+1. OVERVIEW
+============
+
+   The Fare structure  has a complex zonal matrix with fares based on the number of zones traversed . 
+The zones are as follows
+
+	P - - Q
+  /  \   /   \  \
+ A - B - C - D
+  \  /   /	\	/
+    X - - - Y 
+
+The TARIFF is defined in terms of   number of units  between  zones 
+
+Zone  to Zone  Fare matrix as number of zones counted 
+    
+         A		B		C		D	  P	Q		X		Y
+	A   1      2      3     4    2		3		2		4
+	B   -      1      2     3     2		2		2		3
+	C   -      -    	1     2     3		2		2		2
+	D   -      -    	 -      1    3	2		4		2
+	P   -      -    	 -      -     1	2		3		4
+	Q   -      -    	 -      -     -		1		3 		3
+	X   -      -    	 -      -     -		-		1 		2
+	Y   -      -    	 -      -     -		-		- 		1 
+
+There are separate FARE PRICEs for a one, zone two zone and three zone units, 
+
+==================================
+2. DETAILS
+
+There are TARIFF ZONES zones for the NETWORK  mybus:DTA  and OPERATOR  mybus:DTA 
+
+ZONEs
+	    A)   mybus:A  Alpha						 
+		B)  mybus:B    Bravo							 
+		C)  mybus:C  Charley
+		D)  mybus:D  Delta
+		P)  mybus:D  Papa
+		Q)  mybus:D  Quebec
+		X)  mybus:X    Xray
+		Y)  mybus:Y   Yankee
+ 
+
+There are DISTANCE  MATRIX ELEMENTs for   each zone to zone  to point transition,  giving the number of units encountered  e.g.
+
+A  DISTANCE  MATRIX ELEMENT: myfares:A+A 
+			GEOGRAPHICAL INTERVAL: myfares:gi_1zone
+				Starts at TARIFF ZONE mybus:A 
+				Ends at TARIFF mybus:B"/>
+				GeographicalStructureFactor 	 GEOGRAPHICAL INTERVAL myfares:gi_1zone
+	AB  DISTANCE  MATRIX ELEMENT: myfares:A+B"
+			GEOGRAPHICAL INTERVAL: myfares:gi_2zone
+				Starts at TARIFF ZONE mybus:A 
+				Ends at TARIFF mybus:B"/>
+				GeographicalStructureFactor 	 GEOGRAPHICAL INTERVAL myfares:gi_2zone
+	AC  DISTANCE  MATRIX ELEMENT: myfares:A+C"
+			GEOGRAPHICAL INTERVAL: myfares:gi_2zone
+				Starts at TARIFF ZONE mybus:A 
+				Ends at TARIFF mybus:C"/>
+				GeographicalStructureFactor 	 GEOGRAPHICAL INTERVAL myfares:gi_3zone					 
+
+     ETc Etc   
+  
+
+There is a TARIFF   myfares:Stage it has
+
+      (a) GEOGRAPHIC INTERVALS fro 1,2 and 3 stages
+
+	GEOGRAPHICAL INTERVALS are associated with TARIFF ZONES using GEOGRAPHICAL STRUCTURE FACTORs
+
+	GEOGRAPHICAL STRUCTURE FACTOR GeographicalStructureFactor:1zone  :  
+			GEOGRAPHICAL INTERVALmyfares:gi_1zone 
+			GEOGRAPHICAL I UNIT myfares:1Zone   
+	GEOGRAPHICAL STRUCTURE FACTOR GeographicalStructureFactor:2zone  :  
+			GEOGRAPHICAL INTERVALmyfares:gi_2zone 
+			GEOGRAPHICAL I UNIT myfares:1Zone   
+	GEOGRAPHICAL STRUCTURE FACTOR GeographicalStructureFactor:3zone  :  
+			GEOGRAPHICAL INTERVALmyfares:gi_3zone 
+			GEOGRAPHICAL I UNIT myfares:1Zone   
+	GEOGRAPHICAL STRUCTURE FACTOR GeographicalStructureFactor:4zone  :  
+			GEOGRAPHICAL INTERVAL myfares:gi_4zone 
+			GEOGRAPHICAL I UNIT myfares:1Zone   
+
+
+      (b) FARE STRUCTURE ELEMENTs f 
+
+		  (i) Access FARE STRUCTURE ELEMENTs for  GEOGRAPHICLA INTERVALs Unit_Distance@access
+
+		(ii) Eligibility  FARE STRUCTURE ELEMENT myfares:Unit_Distance@Eligibility
+		USER PROFLE - Adults 17 or over 
+		USER PROFLE - Child  16 or under  , discounted  
+
+			(iii) Conditions of Travel ARE STRUCTURE ELEMENT myfares:Unit_Distance@conditions_of_travel
+ 		FREQUENCY OF USE one trip unlimited myfares:FrequencyOfUse:oneTrip
+  		ROUND TRIP OF USE single
+
+There is a SINGLE FARE PRODUCT  
+    It has  a VALIDABLE ELEMENT to make a trip using the specified FARE STRUCTURE ELEMENTs
+  
+There are is a PRICE GROUP with three GEOGRAPHIC INTERVAL PRICes S, each with a price
+   (i)   GEOGRAPHICAL INTERVAL  myfares:gi_1zone
+		GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_1 
+				AMOUNT 1.00 
+	   GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_child
+				AMOUNT 50%
+
+   (ii) GEOGRAPHICAL INTERVAL  myfares:gi_2zone
+		GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_2 
+				AMOUNT 1.50 
+	GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_child
+				AMOUNT 50%
+
+   (iii) GEOGRAPHICAL INTERVAL  myfares:gi_3zone
+		GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_3 
+				AMOUNT 3.00 
+		GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_3_child 
+				AMOUNT 50%
+
+   (iv) GEOGRAPHICAL INTERVAL  myfares:gi_4zone
+		GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_4 
+				AMOUNT 4.00
+		GEOGRAPHICAL INTERVAL PRICE : myfares:GeographicalIntervalPrice:gip_4_child 
+				AMOUNT 50%
+
+
+A COMPOSITE FRAME is used to group the component FRAMEs 
+
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A FARE FRAME is used to contain  the FARE product  elements 
+		A separate FARE FRAME is used to contain  the FARE prices
+ 		A RESOURCE is used to contain the GEOGRAPHICAL UNITs, etc
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:range">
+						<FromDate>2011-01-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<FareFrameRef ref="myfares:any">REQUEST</FareFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple point to point fares</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1.0" id="myfares:DTA@Unit_zone">
+			<validityConditions>
+				<ValidBetween>
+					<FromDate>2011-01-01T00:00:00Z</FromDate>
+					<ToDate>2011-07-01T00:00:00Z</ToDate>
+				</ValidBetween>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="myfares">
+					<Xmlns>myfares</Xmlns>
+					<XmlnsUrl>http://www.myfares,com/fares</XmlnsUrl>
+					<Description>Fare  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="myfares"/>
+				<DefaultCurrency>EUR</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<ServiceFrame version="1.0" id="mybus:DTA@Unit_zone@network">
+					<Name>Zones for Fare network </Name>
+					<prerequisites>
+						<ResourceFrameRef version="1.0" ref="mybus:DTA@Common_Resources"/>
+					</prerequisites>
+					<Network version="any" id="mybus:DTA">
+						<OperatorRef version="1.0" ref="mybus:DTA"/>
+						<tariffZones>
+							<TariffZoneRef version="any" ref="mybus:A"/>
+							<TariffZoneRef version="any" ref="mybus:B"/>
+							<TariffZoneRef version="any" ref="mybus:C"/>
+							<TariffZoneRef version="any" ref="mybus:D"/>
+							<TariffZoneRef version="any" ref="mybus:P"/>
+							<TariffZoneRef version="any" ref="mybus:Q"/>
+							<TariffZoneRef version="any" ref="mybus:X"/>
+							<TariffZoneRef version="any" ref="mybus:Y"/>
+						</tariffZones>
+					</Network>
+					<!--- =========STOP POINTs============ -->
+					<tariffZones>
+						<TariffZone version="any" id="mybus:A">
+							<Name>Alpha &amp; Castle</Name>
+							<ShortName>Alpha</ShortName>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:B">
+							<Name>Bravo Street</Name>
+							<ShortName>Bravo</ShortName>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:C">
+							<Name>Charley Crescent</Name>
+							<ShortName>Charley</ShortName>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:D">
+							<Name>Delta </Name>
+							<ShortName>Delta</ShortName>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:P">
+							<Name>Papa </Name>
+							<ShortName>Papa</ShortName>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:Q">
+							<Name>Quebec </Name>
+							<ShortName>Quebec</ShortName>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:X">
+							<Name>X Ray </Name>
+						</TariffZone>
+						<TariffZone version="any" id="mybus:Y">
+							<Name>Yankee </Name>
+						</TariffZone>
+					</tariffZones>
+				</ServiceFrame>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="1.0" id="myfares:DTA@Unit_zone@products">
+					<prerequisites>
+						<ServiceFrameRef version="1.0" ref="mybus:DTA@Unit_zone@network"/>
+					</prerequisites>
+					<!--- ====GeographicalU nit======== -->
+					<geographicalUnits>
+						<GeographicalUnit version="1.0" id="myfares:1Zone">
+							<Name>Arbitrary Quantized Unit of Transport Usage - One zone to zone hop</Name>
+						</GeographicalUnit>
+					</geographicalUnits>
+					<tariffs>
+						<Tariff version="1.0" id="myfares:Unit_zone">
+							<Name>Unit fare zones</Name>
+							
+							<OperatorRef version="1.0" ref="mybus:DTA"/>
+							<TypeOfTariffRef version="ntx:v1.0" ref="ntx:unit_distance"/>
+							<GeographicalUnitRef version="1.0" ref="myfares:1Zone"/>
+							<!--- ====Intervals======= -->
+							<geographicalIntervals>
+								<GeographicalInterval version="1.0" id="myfares:gi_1zone">
+									<Name>Same zone</Name>
+									<NumberOfUnits>1</NumberOfUnits>
+									<IntervalType>tariffZone</IntervalType>
+									<prices>
+										<GeographicalIntervalPriceRef version="1.0" ref="myfares:Unit_zone@gi_1"/>
+									</prices>
+								</GeographicalInterval>
+								<GeographicalInterval version="1.0" id="myfares:gi_2zone">
+									<Name>Two Zones</Name>
+									<NumberOfUnits>2</NumberOfUnits>
+									<IntervalType>tariffZone</IntervalType>
+									<prices>
+										<GeographicalIntervalPriceRef version="1.0" ref="myfares:Unit_zone@gi_2"/>
+									</prices>
+								</GeographicalInterval>
+								<GeographicalInterval version="1.0" id="myfares:gi_3zone">
+									<Name>Three zones</Name>
+									<NumberOfUnits>3</NumberOfUnits>
+									<IntervalType>tariffZone</IntervalType>
+									<prices>
+										<GeographicalIntervalPriceRef version="1.0" ref="myfares:Unit_zone@gi_3"/>
+									</prices>
+								</GeographicalInterval>
+								<GeographicalInterval version="1.0" id="myfares:gi_4zone">
+									<Name>Four Zones</Name>
+									<NumberOfUnits>4</NumberOfUnits>
+									<IntervalType>tariffZone</IntervalType>
+									<prices>
+										<GeographicalIntervalPriceRef version="1.0" ref="myfares:Unit_zone@gi_4"/>
+									</prices>
+								</GeographicalInterval>
+							</geographicalIntervals>
+							<!--- ===GEOGRAPHICAL STRUCTURE FACTORS==== -->
+							<geographicalStructureFactors>
+								<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+								<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+								<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+								<GeographicalStructureFactorRef version="any" ref="myfares:4zone"/>
+							</geographicalStructureFactors>
+							<!--- ===FARE STRUCTURE ELEMENTS==== -->
+							<fareStructureElements>
+								<FareStructureElement version="1.0" id="myfares:Unit_zone@access">
+									<geographicalStructureFactors>
+										<GeographicalStructureFactor version="any" id="myfares:1zone">
+											<GeographicalIntervalRef version="1.0" ref="myfares:gi_1zone"/>
+											<GeographicalUnitRef version="1.0" ref="myfares:1Zone"/>
+										</GeographicalStructureFactor>
+										<GeographicalStructureFactor version="any" id="myfares:2zone">
+											<GeographicalIntervalRef version="1.0" ref="myfares:gi_2zone"/>
+											<GeographicalUnitRef version="1.0" ref="myfares:1Zone"/>
+										</GeographicalStructureFactor>
+										<GeographicalStructureFactor version="any" id="myfares:3zone">
+											<GeographicalIntervalRef version="1.0" ref="myfares:gi_3zone"/>
+											<GeographicalUnitRef version="1.0" ref="myfares:1Zone"/>
+										</GeographicalStructureFactor>
+										<GeographicalStructureFactor version="any" id="myfares:4zone">
+											<GeographicalIntervalRef version="1.0" ref="myfares:gi_4zone"/>
+											<GeographicalUnitRef version="1.0" ref="myfares:1Zone"/>
+										</GeographicalStructureFactor>
+									</geographicalStructureFactors>
+									<GenericParameterAssignment order="1" id="myfares:Unit_zone@access" version="1.0">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+										<validityParameters>
+											<OperatorRef version="1.0" ref="mybus:DTA"/>
+											<NetworkRef version="any" ref="mybus:DTA"/>
+										</validityParameters>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="myfares:Unit_zone@eligibility">
+									<Name>Eligible user types</Name>
+									<GenericParameterAssignment order="1" id="myfares:Unit_zone@eligibility" version="1.0">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+										<LimitationGroupingType>XOR</LimitationGroupingType>
+										<limitations>
+											<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+											<UserProfile version="any" id="myfares:adult">
+												<Name>Child Fare</Name>
+												<TypeOfConcessionRef version="any" ref="myfares:adult"/>
+												<MaximumAge>16</MaximumAge>
+											</UserProfile>
+											<UserProfile version="any" id="myfares:child">
+												<Name>Child Fare</Name>
+												<TypeOfConcessionRef version="any" ref="myfares:child"/>
+												<MaximumAge>16</MaximumAge>
+											</UserProfile>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:Unit_zone@conditions_of_travel" version="1.0">
+									<Name>eligible user types</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:Unit_zone@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="1.0" id="myfares:Unit_zone@conditions_of_travel@trip">
+												<Name>Single Trip</Name>
+												<TripType>single</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="myfares:Unit_zone@conditions_of_travel@frequency">
+												<Name>One trip  </Name>
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MinimalFrequency>1</MinimalFrequency>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="myfares:Unit_zone@conditions_of_travel@interchanging">
+												<CanInterchange>true</CanInterchange>
+												<CanBreakJourney>false</CanBreakJourney>
+											</Interchanging>
+											<UsageValidityPeriod version="any" id="myfares:Unit_zone@conditions_of_travel@until">
+												<Name>Valid untile ride complete</Name>
+												<UsageEnd>endOfRide</UsageEnd>
+											</UsageValidityPeriod>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<!--- ====DistanceMatrix======= -->
+							<distanceMatrixElements>
+								<!--
+         A		B		C		D	  P	Q		X		Y
+	A   1      2     3      4     2	3		2		4
+-->
+								<DistanceMatrixElement version="any" id="myfares:A+A">
+									<Name>Alpha to Alpha</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:A"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+B">
+									<Name>Alpha to Bravo</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:B"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+C">
+									<Name>Alpha to Charley</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:C"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+D">
+									<Name>Alpha to Delta</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:D"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:4zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+P">
+									<Name>Alpha to Papa</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:P"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+Q">
+									<Name>Alpha to Quebec</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:Q"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+X">
+									<Name>Alpha to Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:A+Y">
+									<Name>Alpha to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:4zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--
+         A		B		C		D	  P	Q		X		Y
+	B   -      1      2      3     2	2		2		3	
+-->
+								<DistanceMatrixElement version="any" id="myfares:B+B">
+									<Name>Bravo to Charley</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:B"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:B+C">
+									<Name>Bravo to Charley</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:C"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:B+D">
+									<Name>Bravo to Delta</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:D"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:B+P">
+									<Name>Bravo to Papa</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:P"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:B+Q">
+									<Name>Bravo to Quebec</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:Q"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:B+X">
+									<Name>Bravo to Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:B+Y">
+									<Name>Bravo to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:B"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--
+         A		B		C		D	  P	Q		X		Y
+	C   -      -    	 1      2     2	2		2		2	 
+-->
+								<DistanceMatrixElement version="any" id="myfares:C+C">
+									<Name>Charley to Charley</Name>
+									<StartTariffZoneRef version="any" ref="mybus:C"/>
+									<EndTariffZoneRef version="any" ref="mybus:C"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:C+D">
+									<Name>Charley to Delta</Name>
+									<StartTariffZoneRef version="any" ref="mybus:C"/>
+									<EndTariffZoneRef version="any" ref="mybus:D"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:C+P">
+									<Name>Charley to Papa</Name>
+									<StartTariffZoneRef version="any" ref="mybus:C"/>
+									<EndTariffZoneRef version="any" ref="mybus:P"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:C+Q">
+									<Name>Charley to Quebec</Name>
+									<StartTariffZoneRef version="any" ref="mybus:C"/>
+									<EndTariffZoneRef version="any" ref="mybus:Q"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:C+X">
+									<Name>Charley to Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:C"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:C+Y">
+									<Name>Charley to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:C"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--
+         A		B		C		D	  P	Q		X		Y 
+	D   -      -    	 -      1     3	2		4		2 
+-->
+								<DistanceMatrixElement version="any" id="myfares:D+D">
+									<Name>Delta to Delta</Name>
+									<StartTariffZoneRef version="any" ref="mybus:D"/>
+									<EndTariffZoneRef version="any" ref="mybus:D"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:D+P">
+									<Name>Delta to Papa</Name>
+									<StartTariffZoneRef version="any" ref="mybus:D"/>
+									<EndTariffZoneRef version="any" ref="mybus:P"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:D+Q">
+									<Name>Delta to Quebec</Name>
+									<StartTariffZoneRef version="any" ref="mybus:D"/>
+									<EndTariffZoneRef version="any" ref="mybus:Q"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:D+X">
+									<Name>Delta to Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:D"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:4zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:D+Y">
+									<Name>Delta to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:D"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--						 								
+         A		B		C		D	  P	Q		X		Y  
+	P   -      -    	 -      -     1	2		3		4  
+-->
+								<DistanceMatrixElement version="any" id="myfares:P+P">
+									<Name>Papa to Papa</Name>
+									<StartTariffZoneRef version="any" ref="mybus:P"/>
+									<EndTariffZoneRef version="any" ref="mybus:P"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:P+Q">
+									<Name>Papa to Quebec</Name>
+									<StartTariffZoneRef version="any" ref="mybus:P"/>
+									<EndTariffZoneRef version="any" ref="mybus:Q"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:P+X">
+									<Name>Papato Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:A"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:P+Y">
+									<Name>Papa to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:P"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:4zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--						 								
+         A		B		C		D	  P	Q		X		Y   
+	Q   -      -    	 -      -     -		1		3 		3 
+-->
+								<DistanceMatrixElement version="any" id="myfares:Q+Q">
+									<Name>Quebec to Quebec</Name>
+									<StartTariffZoneRef version="any" ref="mybus:Q"/>
+									<EndTariffZoneRef version="any" ref="mybus:Q"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Q+X">
+									<Name>Quebec to Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:Q"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Q+Y">
+									<Name>Quebec to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:Q"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:3zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--						 								
+         A		B		C		D	  P	Q		X		Y    
+	X   -      -    	 -      -     -		-		1 		2
+-->
+								<DistanceMatrixElement version="any" id="myfares:X+X">
+									<Name>Xray to  Xray</Name>
+									<StartTariffZoneRef version="any" ref="mybus:X"/>
+									<EndTariffZoneRef version="any" ref="mybus:X"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:X+Y">
+									<Name>Xray   to Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:X"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:2zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+								<!--						 								
+         A		B		C		D	  P	Q		X		Y    
+	X   -      -    	 -      -     -		-		- 		2
+-->
+								<DistanceMatrixElement version="any" id="myfares:Y+Y">
+									<Name>Yankee  to  Yankee</Name>
+									<StartTariffZoneRef version="any" ref="mybus:Y"/>
+									<EndTariffZoneRef version="any" ref="mybus:Y"/>
+									<structureFactors>
+										<GeographicalStructureFactorRef version="any" ref="myfares:1zone"/>
+									</structureFactors>
+								</DistanceMatrixElement>
+							</distanceMatrixElements>
+							<!-- === PRICES ==== -->
+							<priceGroups>
+								<PriceGroupRef version="1.0" ref="myfares:Unit_zone"/>
+							</priceGroups>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<!--- ====ADULT fares==== -->
+						<PreassignedFareProduct version="1.0" id="myfares:Trip">
+							<Name>Zone Unit Trip  </Name>
+							<TypeOfFareProductRef version="ntx:v1.0" ref="ntx:trip"/>
+							<OperatorRef version="1.0" ref="mybus:DTA"/>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="1.0" id="myfares:Trip@travel">
+									<Name>Single  ride</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="myfares:Unit_zone@access"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Unit_zone@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Unit_zone@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTs======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct version="1.0" id="myfares:Trip@travel" order="1">
+									<Name>Travel in zones</Name>
+									<ValidableElementRef version="1.0" ref="myfares:Trip@travel"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+				</FareFrame>
+				<FareFrame version="1.0" id="myfares:DTA@Unit_zone@prices">
+					<Name>Prices for unit zone </Name>
+					<prerequisites>
+						<FareFrameRef version="1.0" ref="myfares:DTA@Unit_zone@products"/>
+					</prerequisites>
+					<!--- ====Pricing Parameters======= -->
+					<PricingParameterSet version="1.0" id="myfares:Unit_zone@pp">
+						<PriceUnitRef version="any" ref="myfares:pu"/>
+						<priceUnits>
+							<PriceUnit version="any" id="myfares:pu">
+								<Name>Arbitrary Quanitized Unit of Transport Usage - </Name>
+							</PriceUnit>
+						</priceUnits>
+						<pricingRules>
+							<DiscountingRule version="any" id="myfares:0%">
+								<DiscountAsPercentage>0</DiscountAsPercentage>
+							</DiscountingRule>
+							<DiscountingRule version="any" id="myfares:50%">
+								<DiscountAsPercentage>50</DiscountAsPercentage>
+							</DiscountingRule>
+						</pricingRules>
+					</PricingParameterSet>
+					<priceGroups>
+						<PriceGroup version="1.0" id="myfares:Unit_zone">
+							<Name>Unit fare zones</Name>
+							<!--- ====Intervals======= -->
+							<members>
+								<GeographicalIntervalPrice version="1.0" id="myfares:Unit_zone@gi_1">
+									<Amount>1.00</Amount>
+									<Units>1</Units>
+									<GeographicalIntervalRef version="1.0" ref="myfares:gi_1zone"/>
+								</GeographicalIntervalPrice>
+								<GeographicalIntervalPrice version="1.0" id="myfares:Unit_zone@gi_2">
+									<Amount>1.50</Amount>
+									<Units>2</Units>
+									<GeographicalIntervalRef version="1.0" ref="myfares:gi_2zone"/>
+								</GeographicalIntervalPrice>
+								<GeographicalIntervalPrice version="1.0" id="myfares:Unit_zone@gi_3">
+									<Amount>3.00</Amount>
+									<Units>3</Units>
+									<GeographicalIntervalRef version="1.0" ref="myfares:gi_3zone"/>
+								</GeographicalIntervalPrice>
+								<GeographicalIntervalPrice version="1.0" id="myfares:Unit_zone@gi_4">
+									<Amount>4.00</Amount>
+									<Units>4</Units>
+									<GeographicalIntervalRef version="1.0" ref="myfares:gi_4zone"/>
+								</GeographicalIntervalPrice>
+							</members>
+						</PriceGroup>
+					</priceGroups>
+				</FareFrame>
+				<!--- ====RESOURCE FRAME===== -->
+				<ResourceFrame version="1.0" id="mybus:DTA@Common_Resources">
+					<codespaces>
+						<Codespace id="ntx">
+							<Xmlns>ntx</Xmlns>
+							<XmlnsUrl>http://netex.org.uk/</XmlnsUrl>
+							<Description>Netex built in value</Description>
+						</Codespace>
+					</codespaces>
+					<typesOfValue>
+						<ValueSet version="ntx:v1.0" id="ntx:Types_of_Tariff" classOfValues="TypeOfTariff">
+							<Name>Types of Tariff</Name>
+							<values>
+								<!--- ====Types OfTariff ========= -->
+								<TypeOfTariff version="ntx:v1.0" id="ntx:Distance_kilometers">
+									<Name>Kilometer Distance Kilometers</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:flat">
+									<Name>Flat</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:point_to_point">
+									<Name>Point to point</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:zone_to_zone">
+									<Name>Zone to Zone</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:zonal">
+									<Name>Zonal</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:unit_distance">
+									<Name>Unit distance (count of stops, sections, zones)</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:section">
+									<Name>Section</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:banded">
+									<Name>Section</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:stored_value">
+									<Name>Stored value</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:discount">
+									<Name>Discount value</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:multitrip">
+									<Name>Multitrip carnet</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="ntx:v1.0" id="ntx:identity_card">
+									<Name>SIdentity</Name>
+								</TypeOfTariff>
+							</values>
+						</ValueSet>
+						<ValueSet version="ntx:v1.0" id="ntx:Types_of_FareProduct" classOfValues="TypeOfFareProduct">
+							<Name>Types of Fare Product</Name>
+							<values>
+								<TypeOfFareProduct version="ntx:v1.0" id="ntx:trip">
+									<Name>Trip product</Name>
+								</TypeOfFareProduct>
+								<TypeOfFareProduct version="ntx:v1.0" id="ntx:multi_trip">
+									<Name>Multitrip / carnet  product</Name>
+								</TypeOfFareProduct>
+								<TypeOfFareProduct version="ntx:v1.0" id="ntx:period_pass">
+									<Name>Peroid pass product</Name>
+								</TypeOfFareProduct>
+								<TypeOfFareProduct version="ntx:v1.0" id="ntx:day_pass">
+									<Name>Day pass product</Name>
+								</TypeOfFareProduct>
+								<TypeOfFareProduct version="ntx:v1.0" id="ntx:discount_card">
+									<Name>Discount  product</Name>
+								</TypeOfFareProduct>
+							</values>
+						</ValueSet>
+						<ValueSet version="any" id="myfares:Types_of_Concession" classOfValues="TypeOfConcession">
+							<Name>Types of concession</Name>
+							<values>
+								<!--- ====TypeOfConcession method========= -->
+								<TypeOfConcession version="any" id="myfares:adult">
+									<Name>Adult</Name>
+								</TypeOfConcession>
+								<TypeOfConcession version="any" id="myfares:child">
+									<Name>Student</Name>
+								</TypeOfConcession>
+							</values>
+						</ValueSet>
+						<ValueSet version="ntx:v1.0" id="ntx:Types_of_AccessRightAssignment" classOfValues="TypeOfAccessRightAssignment">
+							<Name>Types of Access Right Assignment</Name>
+							<values>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:eligible">
+									<Name>Eligible for a product or discount</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access">
+									<Name>Grants access rights to use or travel on</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:condition_of_use">
+									<Name>Defines a condition or restriction on use</Name>
+								</TypeOfAccessRightAssignment>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+					<organisations>
+						<!--- =====Agency========= -->
+						<Operator version="1.0" id="mybus:DTA">
+							<Name>Demo Transit Authority</Name>
+						</Operator>
+					</organisations>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

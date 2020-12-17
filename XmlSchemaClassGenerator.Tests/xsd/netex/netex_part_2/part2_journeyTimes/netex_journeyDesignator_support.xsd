@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_journeyDesignator_support">
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_dayType_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_transportOrganisation_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_line_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_route_support.xsd"/>
+	<xsd:include schemaLocation="netex_vehicleJourney_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes  
+				</Date>
+				<Date>
+					<Modified>2018-06-01</Modified>Designator  FromPoint should be optional 
+				</Date>
+				<Date>
+					<Modified>2019-04-18</Modified>Fix: Add Transport Organisation to designator, also add grousp so as to make usage clearer.
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the VEHICLE JOURNEY Designatro identifier types These allow a journey to be identified by means otehr than the ID. .</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_tacticalPlanning}netex_journeyDesignator_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/2.0/xsd/netex_framework/netex_reusableComponents/netex_dayType_support.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the VDV, RTIG XML and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx VEHICLE JOURNEY Designator  types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEX JOURNEy DESIGNATOR types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="journeyRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="JourneyRef"/>
+					<xsd:element ref="JourneyDesignator">
+						<xsd:annotation>
+							<xsd:documentation>Value reference to a JOURNEY or DEAD RUN. Provides an alternative way of identifying a Journey.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="ServiceDesignator"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- JOURNEY====================================================== -->
+	<!-- ======================================================================= -->
+	<xsd:element name="JourneyDesignator" type="JourneyDesignatorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Value reference to a JOURNEY. Provides an alternative way of identifying a Journey between TIMING POINTS</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="JourneyDesignatorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a value reference to a JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FromPointRef" type="TimingPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Origin of Journey.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToPointRef" type="TimingPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Destination of Journey.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="DesignatorGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="DesignatorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a Designator.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="DesignatorTimeGroup"/>
+			<xsd:group ref="DesignatorNetworkGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DesignatorTimeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Time Elements for a Designator.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Date" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Date of JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DepartureTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time of departure of JOURNEY from POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DepartureDayOffset" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Daya offset if Time of departure of JOURNEY from origin  POINT from current  OPERATING DAY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ArrivalTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time of arrival of JOURNEY at destination POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ArrivalDayOffset" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Daya offset if Time of arrival of JOURNEY at destination POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="DayTypeRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DesignatorNetworkGroup">
+		<xsd:annotation>
+			<xsd:documentation>Network Elements for a Designator.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TransportOrganisationRef" minOccurs="0"/>
+			<xsd:element ref="LineRef" minOccurs="0"/>
+			<xsd:element ref="DirectionRef" minOccurs="0"/>
+			<xsd:element name="AlternativeJourneyRef" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Alternative ID for journey.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="ServiceDesignator" type="ServiceDesignatorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Value reference to a SERVICE JOURNEY. Provides an alternative way of identifying a Journey between SCHEDULED STOP POINTS</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceDesignatorStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a value reference to a SERVICE JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FromPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Origin of Journey.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Destination of Journey.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="DesignatorGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

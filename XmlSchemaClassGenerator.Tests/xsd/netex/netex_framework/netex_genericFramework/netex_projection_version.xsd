@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:core="http://www.govtalk.gov.uk/core" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="01." id="netex_projection_version">
+	<xsd:include schemaLocation="../netex_responsibility/netex_typeOfValue_version.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLinkSequence_support.xsd"/>
+	<xsd:include schemaLocation="../netex_utility/netex_location_types.xsd"/>
+	<xsd:include schemaLocation="netex_projection_support.xsd"/>
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gml_extract_all_objects_v_3_2_1.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2010-11-05</Modified>
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines PROJECTION types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_projection_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - PROJECTION types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>PROJECTION elements for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="projections_RelStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of PROJECTIONS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="ProjectionRef"/>
+					<xsd:element ref="Projection" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="Projection" type="Projection_VersionStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>An oriented correspondence - of the shape of an ENTITY on a source layer, - onto a ENTITY in a target layer: e.g. POINT, LINK, LINK SEQUENCE, COMPLEX FEATURE, - within a defined TYPE OF PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Projection_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="ProjectionGroup">
+						<xsd:annotation>
+							<xsd:documentation>Common Properties of a PROJECTION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger">
+					<xsd:annotation>
+						<xsd:documentation>
+					Order of Order in which to process PROJECTION.
+				</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ProjectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TypeOfProjectionRef" type="TypeOfProjectionRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of PROJECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of PROJECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="SpatialFeatureRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="PointProjection" abstract="false" substitutionGroup="Projection">
+		<xsd:annotation>
+			<xsd:documentation>An oriented correspondence from one POINT of a source layer, onto a entity in a target layer:  e.g. POINT, LINK, LINK SEQUENCE, COMPLEX FEATURE, within a defined TYPE OF PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PointProjection_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ProjectionGroup">
+								<xsd:annotation>
+									<xsd:documentation>Common Properties of a PROJECTION.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="ProjectedPointRef" type="PointRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Reference to point that is being projected. May be limited if given by Context.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ProjectToPointRef" type="PointRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Reference to point onto which projected point is being projected.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ProjectToLinkRef" type="LinkRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Link to onto which point projects.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Distance" type="LengthType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Distance along link to which point p[projects.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PointProjectionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PointProjection_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a POINT PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Projection_VersionStructure">
+				<xsd:sequence>
+					<xsd:element name="ProjectedPointRef" type="PointRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Reference to point that is being projected. May be limited if given by Context.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ProjectToPointRef" type="PointRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Reference to point onto which projected point is being projected.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ProjectToLinkRef" type="LinkRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Link to on which point projects.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Distance" type="LengthType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Distance along link to which point projects.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="LinkProjection" abstract="false" substitutionGroup="Projection">
+		<xsd:annotation>
+			<xsd:documentation>An oriented correspondence from one LINK of a source layer, onto an entity in a target layer: e.g. LINK SEQUENCE, COMPLEX FEATURE, within a defined TYPE OF PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LinkProjection_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ProjectionGroup">
+								<xsd:annotation>
+									<xsd:documentation>Common Properties of a PROJECTION.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkProjectionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LinkProjectionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LinkProjection_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LINK PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Projection_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="LinkProjectionGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LinkProjectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a LINK PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ProjectedLinkRef" type="LinkRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Link that is being projected. Can be omitted if given by context.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ProjectToLinkRef" type="LinkRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Link onto which projected LINK is being projected.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="StartPointOnLinkRef" type="PointOnLinkRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Start POINT of PROJECTION on link  . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="StartPointOnLinkByValue" type="PointOnLinkByValueStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Start of PROJECTION given as a distance . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:choice>
+				<xsd:element name="EndPointOnLinkRef" type="PointOnLinkRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>End POINTof PROJECTION on link  . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="EndPointOnLinkByValue" type="PointOnLinkByValueStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>End of PROJECTION given as a distance . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="LinkSequenceProjection" abstract="false" substitutionGroup="Projection">
+		<xsd:annotation>
+			<xsd:documentation>A Projection of a whole LINK SEQUENCE as an ordered series of POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LinkSequenceProjection_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ProjectionGroup">
+								<xsd:annotation>
+									<xsd:documentation>Common Properties of a PROJECTION.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="ProjectedLinkSequenceRef" type="LinkSequenceRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>LINK SEQUENCE that is being projected. Can be omitted if given by context.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Distance" type="DistanceType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Distance Travelled.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:group ref="LinkSequenceProjectionGroup" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LinkSequenceProjectionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LinkSequenceProjection_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LINK SEQUENCE PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Projection_VersionStructure">
+				<xsd:sequence>
+					<xsd:element name="ProjectedLinkSequenceRef" type="LinkSequenceRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>LINK SEQUENCE that is being projected. Can be omitted if given by context.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Distance" type="DistanceType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Distance Travelled.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="LinkSequenceProjectionGroup" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LinkSequenceProjectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a LINK SEQUENCE PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="points" type="pointRefs_RelStructure" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>POINTs in PROJECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="gml:LineString" maxOccurs="1"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="ComplexFeatureProjection" abstract="false" substitutionGroup="Projection">
+		<xsd:annotation>
+			<xsd:documentation>An oriented correspondence:  from one COMPLEX FEATURE in the source layer, onto an entity in a target layer: e.g. POINT, COMPLEX FEATURE,  within a defined TYPE OF PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="ComplexFeatureProjection_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ProjectionGroup">
+								<xsd:annotation>
+									<xsd:documentation>Common Properties of a PROJECTION.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ComplexFeatureProjectionGroup" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ComplexFeatureProjectionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ComplexFeatureProjection_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a COMPLEX FEATURE PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Projection_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="ComplexFeatureProjectionGroup" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ComplexFeatureProjectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a COMPLEX FEATURE PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ProjectedFeartureRef" type="ComplexFeatureRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>COMPLEX FEATURE which is being projetced.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OntoFeatureRef" type="ComplexFeatureRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>COMPLEX FEATURE onto which projection is being made.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PointRef" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="features" type="complexFeatureRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>COMPLEX FEATURES in PROJECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="LineShape" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>The graphical shape of a LINK obtained from a formula or other means, using the LOCATION of its limiting POINTs and depending on the LOCATING SYSTEM used for the graphical representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LineShapeStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="Formula" type="xsd:Name" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Formula for calculating line.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Name of LINE SHAPE.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element ref="LinkRef" minOccurs="0"/>
+							<xsd:element name="LocatingSystemRef" type="SrsNameType" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Name of locating system under which line is specified.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LineShapeIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LineShapeStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LINE SHAPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:element name="Formula" type="xsd:Name" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Formula for calculating line.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of LINE SHAPE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="LinkRef" minOccurs="0"/>
+					<xsd:element name="LocatingSystemRef" type="SrsNameType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of locating system under which line is specified.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="TypeOfProjection" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>Classification of a PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfProjection_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfProjectionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfProjection_ValueStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF PROJECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

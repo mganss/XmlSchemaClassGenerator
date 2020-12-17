@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Carrier  Example ====== 
+This example provides an example of encodeing tap TCVS Series data, &  TCVP Price data  for route & set based fares      in NeTEx XML
+ 
+ The example covers a small number of 
+
+
+Two tariffs are defined  - oen for indviduals, one for groups
+
+ 
+ 
+(C) ERA  Copyright 2013, 2018, 2019
+-->
+<PublicationDelivery version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../../xsd/NeTEx_publication.xsd" xmlns="http://www.netex.org.uk/netex" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<Description>Simple Series example</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="tap:NRT_Example">
+			<TypeOfFrameRef ref="uic:B1" version="any"/>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="tap:tap">
+					<Xmlns>zbt</Xmlns>
+					<XmlnsUrl>http://www.era.eu/b1</XmlnsUrl>
+					<Description>TAP TSI location </Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="tap:tap"/>
+				<DefaultCurrency>EUR</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<!--   === PRODUCTS e  =====-->
+				<FareFrame id="tap:NRT_Example@products" version="1.0" modification="revise">
+					<prerequisites>
+						<ResourceFrameRef version="1.0" ref="tap:Common_resources"/>
+					</prerequisites>
+					<!--  === STOP POINTS  ===  -->
+					<fareScheduledStopPoints>
+						<FareScheduledStopPoint id="tap:213001" version="1.0">
+							<Name>Lille</Name>
+						</FareScheduledStopPoint>
+						<FareScheduledStopPoint id="tap:213002" version="1.0">
+							<Name>Valenciennes</Name>
+						</FareScheduledStopPoint>
+					</fareScheduledStopPoints>
+					<!--  === TARIFFS  ===  -->
+					<tariffs>
+						<Tariff id="tap:NRT_Standard" version="1.0">
+						 
+								<ValidBetween id="tap:Tariff01" version="1.0">
+									<FromDate>2011-01-01T00:00:00Z</FromDate>
+									<ToDate>2014-01-01T00:00:00Z</ToDate>
+								</ValidBetween>
+					 
+							<Name>Standard route based Fare table 1</Name>
+							<alternativeNames>
+								<AlternativeName order="1" id="tap:Tariff01@of" version="1.0">
+									<Name lang="en">My Standard  Fare table    description in the Offical Language</Name>
+								</AlternativeName>
+								<AlternativeName order="2" id="tap:Tariff01@fr" version="1.0">
+									<Name lang="fr">My  Standard Fare tabledescription in the French</Name>
+								</AlternativeName>
+								<AlternativeName order="3" id="tap:Tariff01@de" version="1.0">
+									<Name lang="de">My Standard Fare table description in German</Name>
+								</AlternativeName>
+								<AlternativeName order="4" id="tap:Tariff01@en" version="1.0">
+									<Name lang="de">My Standard Fare table description in English</Name>
+								</AlternativeName>
+							</alternativeNames>
+							<OperatorRef ref="tap:0105" version="any"/>
+							<TypeOfTariffRef ref="tap:B.1.1:01" version="any"/>
+							<TariffBasis>route</TariffBasis>
+							<ReturnFareTwiceSingle>true</ReturnFareTwiceSingle>
+							<!-- === Fare Structure elements ====   -->
+							<fareStructureElements>
+								<FareStructureElement version="1.0" id="tap:NRT_Standard@access">
+									<GenericParameterAssignment order="1" id="tap:NRT_Standard@access" version="1.0">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>rail</VehicleModes>
+										</validityParameters>
+										<includes>
+											<GenericParameterAssignment order="1" id="tap:NRT_Standard@access@series" version="1.0">
+												<Name>Series</Name>
+												<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+												<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+												<validityParameters>
+												<!-- ==== SPECIFY SERIES OR OTHER  SCOPE HERE -->
+													<SeriesConstraintRef ref="tap:Lille+Valenciennes" order="1" version="1.0"/>
+													<Directions>both</Directions>
+												</validityParameters>
+											</GenericParameterAssignment>
+										</includes>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="tap:NRT_Standard@eligibility">
+									<Name>Eligible user types</Name>
+									<GenericParameterAssignment order="1" id="tap:NRT_Standard@eligibility" version="1.0">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:eligible"/>
+										<LimitationGroupingType>XOR</LimitationGroupingType>
+										<limitations>
+											<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+											<UserProfile version="any" id="tap:adult">
+												<Name>Adult Fare - 17 or over</Name>
+												<TypeOfConcessionRef version="any" ref="tap:adult"/>
+												<MinimumAge>17</MinimumAge>
+											</UserProfile>
+											<UserProfile version="any" id="tap:child">
+												<Name>Child Fare</Name>
+												<TypeOfConcessionRef version="any" ref="tap:child"/>
+												<MaximumAge>12</MaximumAge>
+											</UserProfile>
+											<UserProfile version="any" id="tap:senior_profile">
+												<Name>Senior fare over 60</Name>
+												<TypeOfConcessionRef version="any" ref="tap:adult"/>
+												<MinimumAge>61</MinimumAge>
+											</UserProfile>
+											<UserProfile version="any" id="tap:fip_profile">
+												<Name>FIP member</Name>
+												<TypeOfConcessionRef version="any" ref="tap:staff"/>
+											</UserProfile>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="tap:NRT_Standard@classes_of_use">
+									<Name>Available classes of use</Name>
+									<GenericParameterAssignment order="1" id="tap:NRT_Standard@classes_of_use" version="1.0">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+										<validityParameters>
+											<ClassOfUseRef version="any" ref="tap:second"/>
+											<ClassOfUseRef version="any" ref="tap:first"/>
+										</validityParameters>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="tap:NRT_Standard@conditions_of_travel@single">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="tap:NRT_Standard@conditions_of_travel@single">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="1.0" id="tap:NRT_Standard@conditions_of_travel@single">
+												<Name>Single Trip</Name>
+												<TripType>single</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="tap:NRT_Standard@conditions_of_travel@single">
+												<Name>One trip no transfers</Name>
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="tap:NRT_Standard@conditions_of_travel@single">
+												<CanInterchange>true</CanInterchange>
+												<CanBreakJourney>false</CanBreakJourney>
+												<CrossBorder>false</CrossBorder>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_out">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="tap:NRT_Standard@conditions_of_travel@return_out">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_out">
+												<Name>Return Trip</Name>
+												<TripType>return</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_out">
+												<Name>One trip no transfers</Name>
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_out">
+												<CanInterchange>true</CanInterchange>
+												<CanBreakJourney>false</CanBreakJourney>
+												<CrossBorder>false</CrossBorder>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_back">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="tap:NRT_Standard@conditions_of_travel@return_back">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_back">
+												<Name>Return Trip</Name>
+												<TripType>return</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_back">
+												<Name>One trip no transfers</Name>
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="tap:NRT_Standard@conditions_of_travel@return_back">
+												<CanInterchange>true</CanInterchange>
+												<CanBreakJourney>false</CanBreakJourney>
+												<CrossBorder>false</CrossBorder>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<!-- ===== SERIES ELEMENTS ======== -->
+							<groupsOfDistanceMatrixElements>
+								<GroupOfDistanceMatrixElements id="tap:series" version="1.0">
+									<members>
+										<DistanceMatrixElement id="tap:Lille+Valenciennes" version="1.0">
+											<validityConditions>
+												<AvailabilityCondition id="tap:Lille+Valenciennes" version="1.0">
+													<FromDate>2011-01-01T00:00:00Z</FromDate>
+													<ToDate>2014-01-01T00:00:00Z</ToDate>
+													<IsAvailable>true</IsAvailable>
+												</AvailabilityCondition>
+											</validityConditions>
+											<StartStopPointView>
+												<FareScheduledStopPointRef ref="tap:999123"/>
+												<Name lang="de">Lille</Name>
+												<ShortName lang="de">Lille</ShortName>
+											</StartStopPointView>
+											<EndStopPointView>
+												<FareScheduledStopPointRef ref="tap:99234"/>
+												<Name lang="de">Valenciennes</Name>
+												<ShortName lang="de">Valenciennes</ShortName>
+											</EndStopPointView>
+											<seriesConstraints>
+												<SeriesConstraint id="tap:Lille+Valenciennes" order="1" version="1.0">
+													<PricingRuleRef version="any" ref="tap:route"/>
+													<Itinerary>Lille * Valenciennes</Itinerary>
+													<SeriesType>stationToStation</SeriesType>
+													<FirstClassDistance>19</FirstClassDistance>
+													<SecondClassDistance>20</SecondClassDistance>
+												</SeriesConstraint>
+											</seriesConstraints>
+											<tariffs>
+													<TariffRef ref="tap:NRT_Standard" version="1.0"/>
+												<TariffRef ref="tap:NRT_Group" version="1.0"/>
+											</tariffs>
+										 
+										</DistanceMatrixElement>
+									</members>
+								</GroupOfDistanceMatrixElements>
+							</groupsOfDistanceMatrixElements>
+							<fareTables>
+								<StandardFareTableRef ref="tap:Lille+Valenciennes@Individual" version="1.0"/>
+							</fareTables>
+						</Tariff>
+						<Tariff id="tap:NRT_Group" version="1.0">
+							<Name>Fare table 2</Name>
+							<OperatorRef ref="tap:0105" version="any"/>
+							<TypeOfTariffRef ref="tap:B.1.1:04" version="any"/>
+							<TariffBasis>group</TariffBasis>
+							<ReturnFareTwiceSingle>true</ReturnFareTwiceSingle>
+							<fareStructureElements>
+								<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@access"/>
+								<FareStructureElement version="1.0" id="tap:NRT_Group@eligibility">
+									<Name>Eligible user types</Name>
+									<GenericParameterAssignment order="1" id="tap:NRT_Group@eligibility" version="1.0">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:eligible"/>
+										<LimitationGroupingType>XOR</LimitationGroupingType>
+										<limitations>
+											<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+											<GroupTicket version="any" id="tap:group">
+												<Name>Group ticket</Name>
+												<prices>
+													<UsageParameterPrice version="any" id="tap:group">
+														<DiscountingRuleRef version="any" ref="tap:20%"/>
+													</UsageParameterPrice>
+												</prices>
+												<MinimumNumberOfPersons>3</MinimumNumberOfPersons>
+												<MaximumNumberOfPersons>10</MaximumNumberOfPersons>
+											</GroupTicket>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@classes_of_use"/>
+								<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@conditions_of_travel@single"/>
+								<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@conditions_of_travel@return_out"/>
+								<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@conditions_of_travel@return_back"/>
+							</fareStructureElements>
+							<groupsOfDistanceMatrixElements>
+								<GroupOfDistanceMatrixElementsRef ref="tap:series" version="1.0"/>
+							</groupsOfDistanceMatrixElements>
+							<fareTables>
+						 
+									<StandardFareTableRef ref="tap:Lille+Valenciennes@Group" version="1.0"/>
+							</fareTables>
+						</Tariff>
+					</tariffs>
+					<!--  === FARE PRODUCTs  ===  -->
+					<fareProducts>
+						<PreassignedFareProduct id="tap:Nrt_Product@Single_trip" version="1.0">
+							<Name>Standard Single  </Name>
+							<validableElements>
+								<ValidableElement id="tap:NRT_Product@single_trip@travel" version="1.0">
+									<Name>Ride on a train</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@access"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Group@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@classes_of_use"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@conditions_of_travel@single"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" id="tap:NRT_Product@single_trip@domestic_train_ride" version="1.0">
+									<Name>Product covers domestic trips</Name>
+									<IsFirstInSequence>true</IsFirstInSequence>
+									<IsLastInSequence>true</IsLastInSequence>
+									<ValidableElementRef ref="tap:NRT_Product@single_trip@travel" version="1.0"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+						<PreassignedFareProduct id="tap:Nrt_Product@Return_trip" version="1.0">
+							<Name>Standard Return</Name>
+							<validableElements>
+								<ValidableElement id="tap:NRT_Product@Return_trip@travel@out" version="1.0">
+									<Name>Ride on a train</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@access"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Group@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@classes_of_use"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@conditions_of_travel@return_out"/>
+									</fareStructureElements>
+								</ValidableElement>
+								<ValidableElement id="tap:NRT_Product@Return_trip@travel@back" version="1.0">
+									<Name>Ride on a train</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@access"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@classes_of_use"/>
+										<FareStructureElementRef version="1.0" ref="tap:NRT_Standard@conditions_of_travel@return_back"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" id="tap:NRT_Product@single_trip@travel@out" version="1.0">
+									<Name>Product covers domestic trips</Name>
+									<IsFirstInSequence>true</IsFirstInSequence>
+									<IsLastInSequence>false</IsLastInSequence>
+									<ValidableElementRef ref="tap:NRT_Product@Return_trip@travel@out" version="1.0"/>
+								</AccessRightInProduct>
+								<AccessRightInProduct order="2" id="tap:NRT_Product@single_trip@travel@back" version="1.0">
+									<Name>Product covers domestic trips</Name>
+									<IsFirstInSequence>false</IsFirstInSequence>
+									<IsLastInSequence>true</IsLastInSequence>
+									<ValidableElementRef ref="tap:NRT_Product@Return_trip@travel@back" version="1.0"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!-- ====SALES OFFER PACKAGE ========   SHould there be one of these for each series? -->
+					<salesOfferPackages>
+						<SalesOfferPackage id="tap:Nrt_Product@Single_trip-SOP" version="1.0">
+							<Name>Standard Fare</Name>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement order="1" id="tap:Nrt_Product@Single_trip-SOP" version="1.0">
+									<PreassignedFareProductRef ref="tap:Nrt_Product@Single_trip" version="1.0"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+						<SalesOfferPackage id="tap:Nrt_Product@Return_trip-SOP" version="1.0">
+							<Name>Standard Fare</Name>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement order="1" id="tap:Nrt_Product@Return_trip-SOP" version="1.0">
+									<PreassignedFareProductRef ref="tap:Nrt_Product@Return_trip" version="1.0"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+					</salesOfferPackages>
+				</FareFrame>
+				<!--   === PRICES  =====-->
+				<FareFrame id="tap:NRT_Example@prices" version="1.0" modification="revise">
+					<prerequisites>
+						<FareFrameRef version="1.0" ref="tap:NRT_Example@products"/>
+					</prerequisites>
+					<!--- ====Pricing Parmaters======= -->
+					<PricingParameterSet version="any" id="tap:tap">
+						<pricingRules>
+							<PricingRule version="any" id="tap:route">
+								<Name>Tap Route based pricing</Name>
+							</PricingRule>
+							<PricingRule version="any" id="tap:distance">
+								<Name>Tap Distance based pricing</Name>
+							</PricingRule>
+							<DiscountingRule version="any" id="tap:20%">
+								<DiscountAsPercentage>20</DiscountAsPercentage>
+							</DiscountingRule>
+							<DiscountingRule version="any" id="tap:25%">
+								<DiscountAsPercentage>25</DiscountAsPercentage>
+							</DiscountingRule>
+						</pricingRules>
+					</PricingParameterSet>
+					<!--  === Prices  ===  -->
+					<fareTables>
+						<FareTable id="tap:NRT_Tariff" version="1.0">
+							<Name>NRT Fares </Name>
+							<PurposeOfGroupingRef ref="tap:route" version="any"/>
+							<pricesFor>
+								<PreassignedFareProductRef ref="tap:Nrt_Product@Single_trip" version="1.0"/>
+								<PreassignedFareProductRef ref="tap:Nrt_Product@Return_trip" version="1.0"/>
+							</pricesFor>
+						 
+							<includes>
+								<!--  This is a compacter optimized formt with fied options -->
+								<StandardFareTable id="tap:Lille+Valenciennes@Individual" version="1.0">
+									<Name>Standard point to point Fares for  Lille to Valenciennce </Name>
+									<pricesFor>
+										<UserProfileRef ref="tap:adult" version="any"/>
+										<DistanceMatrixElementRef ref="tap:Lille+Valenciennes" version="1.0"/>
+									</pricesFor>
+									<usedIn>
+										<TariffRef version="1.0" ref="tap:NRT_Standard"/>
+									</usedIn>
+									<FirstClassSingle>15.00</FirstClassSingle>
+									<SecondClassSingle>10.00</SecondClassSingle>
+									<FirstClassReturn>22.00</FirstClassReturn>
+									<SecondClassReturn>15.00</SecondClassReturn>
+								</StandardFareTable>
+								<StandardFareTable id="tap:Lille+Valenciennes@Group" version="1.0">
+									<Name>Group point to point Fares for  Lille to Valenciennes </Name>
+									<pricesFor>
+										<GroupTicketRef ref="tap:group" version="any"/>
+										<DistanceMatrixElementRef ref="tap:Lille+Valenciennes" version="1.0"/>
+										 
+									</pricesFor>
+									<usedIn>
+										<TariffRef version="1.0" ref="tap:NRT_Group"/>
+									</usedIn>
+									<FirstClassSingle>15.00</FirstClassSingle>
+									<SecondClassSingle>10.00</SecondClassSingle>
+									<FirstClassReturn>22.00</FirstClassReturn>
+									<SecondClassReturn>15.00</SecondClassReturn>
+								</StandardFareTable>
+							</includes>
+						</FareTable>
+					</fareTables>
+				</FareFrame>
+				<!-- ====RESOURCE FRAME======== -->
+				<ResourceFrame version="1.0" id="tap:Common_resources">
+					<typesOfValue>
+						<TypeOfFrame version="any" id="uic:B1">
+							<Name>NRT Fares</Name>
+						</TypeOfFrame>
+						<ValueSet version="any" id="tap:Purposes_of_Grouping" classOfValues="PurposeOfGrouping">
+							<Name>Fare Table Types </Name>
+							<values>
+								<!--- ====Type of Fare Table  method========= -->
+								<PurposeOfGrouping version="any" id="tap:distance">
+									<Name>H DistanceRoute Fare Price Table</Name>
+								</PurposeOfGrouping>
+								<PurposeOfGrouping version="any" id="tap:route">
+									<Name>I Route Fare Price Table</Name>
+								</PurposeOfGrouping>
+								<PurposeOfGrouping version="any" id="tap:set">
+									<Name>J Set  Fare Price Table</Name>
+								</PurposeOfGrouping>
+							</values>
+						</ValueSet>
+						<ValueSet version="any" id="tap:Types_of_Concession" classOfValues="TypeOfConcession">
+							<Name>Types of concession</Name>
+							<values>
+								<!--- ====TypeOfConcession method========= -->
+								<TypeOfConcession version="any" id="tap:adult">
+									<Name>Adult</Name>
+								</TypeOfConcession>
+								<TypeOfConcession version="any" id="tap:child">
+									<Name>Child</Name>
+								</TypeOfConcession>
+								<TypeOfConcession version="any" id="tap:staff">
+									<Name>Staff</Name>
+								</TypeOfConcession>
+								<TypeOfConcession version="any" id="tap:student">
+									<Name>Student</Name>
+								</TypeOfConcession>
+							</values>
+						</ValueSet>
+						<ValueSet version="any" id="tap:Types_of_Tariff" classOfValues="TypeOfTariff">
+							<Name>Types of concession</Name>
+							<values>
+								<!--- ====TypeOTariff Tap method========= -->
+								<TypeOfTariff version="any" id="tap:B.1.1:01">
+									<Name>TCV Full Fare</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="any" id="tap:B.1.1:02">
+									<Name>Distance based Fare</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="any" id="tap:B.1.1:03">
+									<Name>MarketFare</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="any" id="tap:B.1.1:04">
+									<Name>Group Fare</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="any" id="tap:B.1.1:05">
+									<Name>Surcharges</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="any" id="tap:B.1.1:06">
+									<Name>Supplements</Name>
+								</TypeOfTariff>
+							</values>
+						</ValueSet>
+						<ValueSet version="any" id="tap:Classes_of_Use" classOfValues="ClassOfUse">
+							<Name>Classes of Use</Name>
+							<values>
+								<ClassOfUse version="any" id="tap:first">
+									<Name>Firt calss</Name>
+								</ClassOfUse>
+								<ClassOfUse version="any" id="tap:second">
+									<Name>Second </Name>
+								</ClassOfUse>
+							</values>
+						</ValueSet>
+						<ValueSet version="any" id="tap:Types_of_AccessRightAssignment" classOfValues="TypeOfAccessRightAssignment">
+							<Name>Types of  Access right Assignment</Name>
+							<values>
+								<TypeOfAccessRightAssignment version="any" id="tap:eligible">
+									<Name>Eligible for  a product or discount</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="any" id="tap:can_access">
+									<Name>Grants access rights  to use or travel on</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="any" id="tap:can_access_if_purchased">
+									<Name>Right defines a property that may be Accesssed if pourchased</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="any" id="tap:condition_of_use">
+									<Name>Defines a condition or restriction on use</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="any" id="tap:condition_of_sale">
+									<Name>Defines a condition or restriction on purchase</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="any" id="tap:can_purchase">
+									<Name>Gives right to purchase</Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="any" id="tap:can_use+pay_for">
+									<Name>Givesability  to purchase automatically using smartcard</Name>
+								</TypeOfAccessRightAssignment>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+					<!-- ========Operators ========== -->
+					<organisations>
+						<!--- =====Data owners ========= -->
+						<Operator version="any" id="tap:0003">
+							<PublicCode>UIC</PublicCode>
+							<Name>International Union of Railways</Name>
+							<ShortName>UIC</ShortName>
+							<ValidityPeriod>
+								<FromDate>2001-01-01T00:00:00Z</FromDate>
+								<ToDate>2020-01-01T00:00:00Z</ToDate>
+							</ValidityPeriod>
+						</Operator>
+						<Operator version="any" id="tap:0105">
+							<PublicCode>SNCF</PublicCode>
+							<Name>Societe Nationale des chemins de fer</Name>
+						</Operator>
+					</organisations>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

@@ -102,7 +102,7 @@ namespace XmlSchemaClassGenerator
                             var cls = (ClassModel)prop.OwningType;
                             var schema = substitute.Element.GetSchema();
                             var source = CodeUtilities.CreateUri(schema.SourceUri);
-                            var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, elems, substitute, order);
+                            var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, new[] { prop.Particle }, substitute, order);
 
                             cls.Properties.AddRange(props);
 
@@ -805,6 +805,7 @@ namespace XmlSchemaClassGenerator
                             ? effectiveElement.QualifiedName.Namespace : null,
                         XmlParticle = item.XmlParticle,
                         XmlParent = item.XmlParent,
+                        Particle = item
                     };
 
                     if (property.IsArray && !_configuration.GenerateComplexTypesForCollections)
@@ -826,6 +827,7 @@ namespace XmlSchemaClassGenerator
                             IsAny = true,
                             XmlParticle = item.XmlParticle,
                             XmlParent = item.XmlParent,
+                            Particle = item
                         };
                     }
                     else

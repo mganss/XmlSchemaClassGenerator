@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== Gtfs to NeTEx Example: Flat Fare, Unlimited Transfer ====== 
+This Example provides an example of mapping of a GTFS FareRule.txt file to NeTEx 
+http://code.google.com/p/googletransitdatafeed/wiki/FareExamples
+
+September 2011  
+================
+
+EXAMPLE 1: All trips have the same fare, unlimited transfers
+
+Suppose Demo Transit Agency has the following fare structure: 
+
+	* riders pay $1.00 on boarding (price='1.00', currency='USD', payment_method='0') 
+
+	* a ticket is good for all vehicles and doesn't expire (transfers='') 
+
+	* passengers can ride as long as they like. (transfer_duration is omitted)  
+
+1.1 Example Data
+
+Since all trips have the same fare, Demo Transit can omit fare_rules.txt. 
+fare_rules.txt¶
+	fare_id,route_id,origin_id,destination_id,contains_id
+
+fare_attributes.txt¶
+	fare_id  price  currency_type  payment_method  transfers  
+	only_fare,  1.00,  USD,  0   
+
+1.2 Calculating an adult fare
+
+The trip planner calculates a fare of $1 for each leg of the itinerary that includes a change of vehicle. However, unlimited transfers are permitted, so the trip planner only displays the lowest charge. Adult fare: $1  
+
+NOTE GTFS example is not clear on when fare day ends : 24 hours after purchase or or end or day?
+
+2. MAPPING TO NETEX
+ 
+Mapping is complex depending on fare structure. (E.g. different for flat fare, point-to-point fare, etc
+NeTEx may be augmented with further distinctions not covered by GTFS
+
+A GTFS Fare_Attribute  maps to a NeTEx FARE  PRICE of some specific sort (FARE PRODUCT PRICE,  TIME INTERVAL PRICE, DISTANCE MATRIX ELEMENT PRICE, etc)
+
+A GTFS FareRule maps to a NeTEx  FARE PRODUCT + VALIDABLE ELEMENT + TARIFF + FARE STRUCTURE   ELEMENTs
+  
+2.1 Fare Rules 
+
+GTFS					NeTEx
+fare_id,					<PreassignedFareProduct #fare_id > 
+route_id,				<PreassignedFareProduct #fare_id> <accessRightsInProduct> <AcccessRightInProduct #fare_id> <ValidibleElement #fare_id>
+									==> 	<PreassignedFareProduct #fare_id><validableElements><ValidityParameter #fare_id> <fareStructureElements>
+									==><Tariff><FareStructureElement #fare_id@access"> <GenericParameterAssignment #fare_id@access_details>	<validityParameters>  
+									   <LineRef #route_id>
+origin_id,				- 
+destination_id,		- 
+contains_id	,		-
+ 
+2.2 Fare Attributes
+
+GTFS						NeTEx
+fare_id,						<PriceGroup><members><FarePrice  #fare_id >
+price,						<FarePrice #fare_id><Amount>
+currency_type,			<FarePrice #fare_id><Currency>
+payment_method,		<Tariff><FareStructureElement id="#fare_id@conditions_of_travel"> <GenericParameterAssignment  #fare_id@conditions_of_travel>	<limitations>   
+		0 =Pay on Boarding                                       <PurchaseWindow  #fare_id><PurchaseMoment> (#onBoarding)
+		1 = Fare must be paid before boarding 			<PurchaseWindow  #fare_id><PurchaseMoment> (#beforeBoarding)
+transfers,					<PreassignedFareProduct #fare_id> <accessRightsInProduct> <AcccessRightInProduct #fare_id> <ValidibleElement #fare_id>
+									==> 	<PreassignedFareProduct #fare_id><validableElements><ValidityParameter #fare_id> <fareStructureElements>
+									==><Tariff  #fare_id><FareStructureElement id="#fare_id@conditions_of_travel"> <GenericParameterAssignment  #fare_id@conditions_of_travel>	<limitations>  
+										 <Interchanging  #fare_id@conditions_of_travel@interchanging><MaximumNumberOfInterchanges>1</MaximumNumberOfInterchanges>
+										 <FrequencyOfUse  #fare_id@conditions_of_travel@frequency><FrequencyOfUseType>unlimited | none | single
+transfer_duration		<PreassignedFareProduct #fare_id> <accessRightsInProduct> <AcccessRightInProduct #fare_id> <ValidibleElement #fare_id>
+									==> 	<PreassignedFareProduct #fare_id><validableElements><ValidityParameter #fare_id> <fareStructureElements>
+									==><Tariff><FareStructureElement id="#fare_id@conditions_of_travel"> <GenericParameterAssignment  #fare_id@conditions_of_travel>	<limitations>   
+											<UsageValidityPeriod  #fare_id@conditions_of_travel@validity><StandardDuration>
+											<UsageValidityPeriod  #fare_id@conditions_of_travel@validity> <UsageEnd> endoOfDay | endOfRide |endOfPeriod |etc
+
+GTFS Data copyright Google Inc
+
+v1.1 Revised to use Tarifff
+ NeTEx (C) CEN Copyright 2010, 2011,2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example  1 of GTFS    Fare data</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="mygtfsxm:DTA">
+			<validityConditions>
+				<ValidBetween>
+					<FromDate>2011-12-30T00:00:00Z</FromDate>
+				</ValidBetween>
+			</validityConditions>
+			<Name>GTFS Example 1 : Flat Fare, Unlimited Transfers</Name>
+			<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_profile@composite"/>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="any" id="mygtfsxm:p">
+					<!--- ====Fare USAGE PARAMETERS======= -->
+					<tariffs>
+						<Tariff version="any" id="mygtfsxm:p">
+							<TypeOfTariffRef version="gtfs:1.5" ref="gtfs:flat"/>
+							<fareStructureElements>
+								<FareStructureElement version="any" id="mygtfsxm:p@access">
+									<GenericParameterAssignment order="1" id="mygtfsxm:p@access" version="any">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>bus</VehicleModes>
+											<AuthorityRef ref="mygtfsxm:DTA"/>
+										</validityParameters>
+										<includes>
+											<GenericParameterAssignment order="1" id="mygtfsxm:p@access@details" version="any">
+												<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+												<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+												<validityParameters>
+													<LineRef versionRef="routes.txt" ref="mygtfsxm:AB">gtfs:route_id</LineRef>
+													<LineRef versionRef="routes.txt" ref="mygtfsxm:STBA">gtfs:route_id</LineRef>
+													<LineRef versionRef="routes.txt" ref="mygtfsxm:BFC">gtfs:route_id</LineRef>
+												</validityParameters>
+											</GenericParameterAssignment>
+										</includes>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="mygtfsxm:p@conditions_of_travel" version="any">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="any" order="1" id="mygtfsxm:p@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<UsageValidityPeriod version="any" id="mygtfsxm:p@validity">
+												<UsageEnd>standardDuration</UsageEnd>
+												<StandardDuration>PT60M</StandardDuration>
+											</UsageValidityPeriod>
+											<Interchanging version="any" id="mygtfsxm:p@interchanging">
+												<CanInterchange>true</CanInterchange>
+												<MaximumNumberOfInterchanges>1</MaximumNumberOfInterchanges>
+											</Interchanging>
+											<PurchaseWindow version="any" id="mygtfsxm:p@purchase">
+												<PurchaseMoment>beforeBoarding</PurchaseMoment>
+											</PurchaseWindow>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<priceGroups>
+								<PriceGroupRef version="any" ref="mygtfsxm:p"/>
+							</priceGroups>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="any" id="mygtfsxm:p">
+							<Name>Single flat fare to ride as long as you like on the DTA</Name>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="any" id="mygtfsxm:p">
+									<fareStructureElements>
+										<FareStructureElementRef version="any" ref="mygtfsxm:p@access"/>
+										<FareStructureElementRef version="any" ref="mygtfsxm:p@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTS======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" version="any" id="mygtfsxm:p">
+									<ValidableElementRef version="any" ref="mygtfsxm:p"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!--- ====PRICEs====== -->
+					<priceGroups>
+						<PriceGroup version="any" id="mygtfsxm:p">
+							<members>
+								<FareProductPrice version="any" id="mygtfsxm:p">
+									<Amount>1.25</Amount>
+									<Currency>USD</Currency>
+									<PreassignedFareProductRef version="any" ref="mygtfsxm:p"/>
+								</FareProductPrice>
+							</members>
+						</PriceGroup>
+					</priceGroups>
+				</FareFrame>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="any" id="mygtfsxm:a">
+					<!--- ====Fare USAGE PARAMETERS======= -->
+					<tariffs>
+						<Tariff version="any" id="mygtfsxm:a">
+							<TypeOfTariffRef version="gtfs:1.5" ref="gtfs:flat"/>
+							<fareStructureElements>
+								<FareStructureElement version="any" id="mygtfsxm:a@access">
+									<GenericParameterAssignment order="1" id="mygtfsxm:a@access" version="any">
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>bus</VehicleModes>
+											<AuthorityRef ref="mygtfsxm:DTA"/>
+										</validityParameters>
+										<includes>
+											<GenericParameterAssignment order="1" id="mygtfsxm:a@access@details" version="any">
+												<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:can_access"/>
+												<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+												<validityParameters>
+													<LineRef versionRef="routes.txt" ref="mygtfsxm:AAMV">gtfs:route_id</LineRef>
+												</validityParameters>
+											</GenericParameterAssignment>
+										</includes>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="mygtfsxm:a@conditions_of_travel" version="any">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="any" order="1" id="mygtfsxm:a@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef versionRef="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<UsageValidityPeriod version="any" id="mygtfsxm:a@validity">
+												<UsageEnd>endOfFareDay</UsageEnd>
+											</UsageValidityPeriod>
+											<Interchanging version="any" id="mygtfsxm:a@interchanging">
+												<CanInterchange>false</CanInterchange>
+												<MaximumNumberOfInterchanges>0</MaximumNumberOfInterchanges>
+											</Interchanging>
+											<PurchaseWindow version="any" id="mygtfsxm:a@purchase">
+												<PurchaseMoment>beforeBoarding</PurchaseMoment>
+											</PurchaseWindow>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<priceGroups>
+								<PriceGroupRef version="any" ref="mygtfsxm:a"/>
+							</priceGroups>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="any" id="mygtfsxm:a">
+							<Name>Single flat fare to ride as long as you like on the DTA</Name>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="any" id="mygtfsxm:a">
+									<fareStructureElements>
+										<FareStructureElementRef version="any" ref="mygtfsxm:a@access"/>
+										<FareStructureElementRef version="any" ref="mygtfsxm:a@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTS======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" version="any" id="mygtfsxm:a">
+									<ValidableElementRef version="any" ref="mygtfsxm:a"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!--- ====PRICEs====== -->
+					<priceGroups>
+						<PriceGroup version="any" id="mygtfsxm:a">
+							<members>
+								<FareProductPrice version="any" id="mygtfsxm:a">
+									<Amount>5.25</Amount>
+									<Currency>USD</Currency>
+									<PreassignedFareProductRef version="any" ref="mygtfsxm:a"/>
+								</FareProductPrice>
+							</members>
+						</PriceGroup>
+					</priceGroups>
+				</FareFrame>
+				<ResourceFrame version="any" id="mygtfsxm:DTA@agency">
+					<organisations>
+						<!--- =====Agency========= -->
+						<Authority version="any" id="mygtfsxm:DTA">
+							<Name>Demo Transit Authority</Name>
+							<ContactDetails>
+								<Url>http://code.google.com/p/googletransitdatafeed/wiki/FareExamples</Url>
+							</ContactDetails>
+						</Authority>
+					</organisations>
+				</ResourceFrame>
+				<!--- === BUILT IN === -->
+				<ResourceFrame version="gtfs:1.5" id="gtfs:GTFS">
+					<Name>Built-in GTFS Code Values</Name>
+					<!--- ======= CODESPACEs======== -->
+					<codespaces>
+						<Codespace id="gtfs">
+							<Xmlns>gtfs</Xmlns>
+							<XmlnsUrl>http://www.google.com/transit/gtfs</XmlnsUrl>
+							<Description>GTFS code values</Description>
+						</Codespace>
+					</codespaces>
+					<!--- =======FRAME DEFAULTS======== -->
+					<FrameDefaults>
+						<DefaultCodespaceRef ref="gtfs"/>
+					</FrameDefaults>
+					<typesOfValue>
+						<ValueSet version="gtfs:1.5" id="gtfs:Charging_Moments" classOfValues="ChargingMoment">
+							<Name>GTFS Built in  Charging Methods: FareAttribute@payment_method</Name>
+							<values>
+								<!--- ====Charging method========= -->
+								<ChargingMoment version="gtfs:1.5" id="gtfs:0">
+									<Name>Pay on Boarding</Name>
+								</ChargingMoment>
+								<ChargingMoment version="gtfs:1.5" id="gtfs:1">
+									<Name>Fare must be paid before boarding</Name>
+								</ChargingMoment>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Types_of_Frame" classOfValues="TypeOfFrame">
+							<Name>GTFS Built in Types of Frame</Name>
+							<values>
+								<TypeOfFrame version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:GTFS_profile@composite">
+									<Name>GTFS Built in Types of Frame - flat fare structure</Name>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Types_of_Tariff" classOfValues="TypeOfTariff">
+							<Name>GTFS Built in Types of Frame</Name>
+							<values>
+								<TypeOfTariff version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:flat">
+									<Name>GTFS Built in Types of Tariff - flat fare  </Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:point_to_point">
+									<Name>GTFS Built in Types of Tariff - fpoint to point</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="gtfs:1.5" changed="2011-01-20T00:00:00" id="gtfs:zone_sequence">
+									<Name>GTFS Built in Types of Tariff - zone sequence </Name>
+								</TypeOfTariff>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

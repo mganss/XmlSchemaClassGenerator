@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_vehicleJourneyFrequency_version">
+	<xsd:include schemaLocation="netex_vehicleJourneyFrequency_support.xsd"/>
+	<xsd:include schemaLocation="netex_vehicleJourneyTimes_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_journeyTiming_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_grouping_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Date><Modified>2011-02-05</Modified> Correct definition on HeadwayJourneyGroup. doc change only
+				</Date>
+				<Date><Modified>2017-12-05</Modified> 	CR0030 and CR0019  add fist and last day offset
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the VEHICLE JOURNEY FREQUENCY types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_2/part2_journeyTimes}netex_vehicleJourneyFrequency_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx VEHICLE JOURNEY  FREQUENCY types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: VEHICLE JOURNEY FREQUENCY  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="frequencyGroupsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  OURNEY FREQUENCY GROUPs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="HeadwayJourneyGroup"/>
+					<xsd:element ref="RhythmicalJourneyGroup"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- =================================================== -->
+	<xsd:complexType name="FrequencyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a HEADWAY INTERVAL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="HeadwayIntervalGroup"/>
+			<xsd:element name="HeadwayDisplay" type="HeadwayUseEnumeration" default="DisplayInsteadOfPassingTimes" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Use to be made of Headway information when displaying to public. Default is Display Instead of Passing Times.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FrequencyRegulated" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether service falls under regulations for frequency service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Descriptive phrase to use for frequency. e.g. "Every x minus"  If not specified generate from individual elements.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- =================================================== -->
+	<!-- ===VehicleJourney Frequency=================================================== -->
+	<xsd:complexType name="vehicleJourneyHeadways_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of a VEHICLE JOURNEY FREQUENCies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehicleJourneyHeadway" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>VEHICLE JOURNEY FREQUENCY for a specified TIME DEMAND TYPE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehicleJourneyHeadway" abstract="false" substitutionGroup="JourneyTiming">
+		<xsd:annotation>
+			<xsd:documentation>Headway interval information that is available for a VEHICLE JOURNEY (to be understood as the delay between the previous and the next VEHICLE JOURNEY). This information must be consistent with HEADWAY JOURNEY GROUP if available (HEADWAY JOURNEY GROUP being a more detailed way of describing headway services).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleJourneyHeadway_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyTimingGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="HeadwayIntervalGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleJourneyHeadwayGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleJourneyHeadwayIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleJourneyHeadway_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE JOURNEY FREQUENCY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyHeadway_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleJourneyHeadwayGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleJourneyHeadwayGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a VEHICLE JOURNEY FREQUENCY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="VehicleJourneyRef" minOccurs="0"/>
+			<xsd:element ref="TimingPointInJourneyPatternRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="frequencyGroups_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of a VEHICLE JOURNEY FREQUENCies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="HeadwayJourneyGroupRef" maxOccurs="1"/>
+					<xsd:element ref="HeadwayJourneyGroup" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation>A group of VEHICLE JOURNEYs following the same JOURNEY PATTERN having the same HEADWAY INTERVAL between a specified start and end time (for example, every 10 min). This is especially useful for passenger information.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="RhythmicalJourneyGroupRef"/>
+					<xsd:element ref="RhythmicalJourneyGroup" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyFrequencyGroup" type="JourneyFrequencyGroup_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A group of JOURNEYs defined in order to describe special behaviour like frequency based services or rhythmical services (runs all xxh10, xxh25 and xxh45... for example; this is especially useful for passenger information).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="JourneyFrequencyGroup_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for   JOURNEY FREQUENCY GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:group ref="JourneyFrequencyGroupGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyFrequencyGroupGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a JOURNEY FREQUENCY GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FirstDepartureTime" type="xsd:time">
+				<xsd:annotation>
+					<xsd:documentation>Time of first departure in JOURNEY FREQUENCY GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FirstDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Offset days for end time. Number of days after the starting operational day if journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LastDepartureTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time of last departure in JOURNEY FREQUENCY GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LastDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Offset days for end time. Number of days after the starting departure time of the journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="timeDemandTypes" type="timeDemandTypeRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIME DEMAND TYPES associated with JOURNEY FREQUENCY GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="journeys" type="explicitJourneyRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIME DEMAND TYPES associated with JOURNEY FREQUENCY GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="HeadwayJourneyGroup" abstract="false" substitutionGroup="JourneyFrequencyGroup">
+		<xsd:annotation>
+			<xsd:documentation>A group of VEHICLE JOURNEYs following the same JOURNEY PATTERN and having the same headway interval between a specified start and end time (for example, ‘every 10 minutes’). This is especially useful for presenting passenger information.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="HeadwayJourneyGroup_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="JourneyFrequencyGroupGroup"/>
+						<xsd:group ref="HeadwayJourneyGroupGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="HeadwayJourneyGroupIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="HeadwayJourneyGroup_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for   HEADWAY JOURNEY GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyFrequencyGroup_VersionStructure">
+				<xsd:group ref="HeadwayJourneyGroupGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="HeadwayJourneyGroupGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a HEADWAY JOURNEY GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="HeadwayIntervalGroup"/>
+			<xsd:element name="HeadwayDisplay" type="HeadwayUseEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How headway value should be displayed to public.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Text to describe interval.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="RhythmicalJourneyGroup" abstract="false" substitutionGroup="JourneyFrequencyGroup">
+		<xsd:annotation>
+			<xsd:documentation>A group of VEHICLE JOURNEYS following  the same JOURNEY PATTERN having the same "rhythm" every hour (for example runs all xxh10, xxh25 and xxh45... e) between a specified start and end time.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="RhythmicalJourneyGroup_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="JourneyFrequencyGroupGroup"/>
+						<xsd:group ref="RhythmicalJourneyGroupGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="RhythmicalJourneyGroupIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="RhythmicalJourneyGroup_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for   Rhythmical JOURNEY GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="JourneyFrequencyGroup_VersionStructure">
+				<xsd:group ref="RhythmicalJourneyGroupGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RhythmicalJourneyGroupGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a Rhythmical JOURNEY GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="timebands" type="timebandRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIMEBANDS associated with JOURNEY FREQUENCY GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>

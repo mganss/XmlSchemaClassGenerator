@@ -1,0 +1,825 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_interchange_version">
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_servicePattern_support.xsd"/>
+	<xsd:include schemaLocation="netex_interchange_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_noticeAssignment_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_place_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_line_version.xsd"/>
+	<xsd:include schemaLocation="netex_vehicleJourneyFrequency_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes 
+				</Date>
+				<Date>
+					<Modified>2017-12-04</Modified>Add day Offsets
+				</Date>
+				<Date>
+					<Modified>2019-04-04</Modified>NJSK Fix: Add missing ConnectionCertainty element that is in doc
+				</Date>
+								<Date>
+					<Modified>2019-04-12</Modified>NJSK Fix: Add missing FrompPointInPattern and ToPointInPattern  element that are in doc
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the INTERCHANGE. types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_2/part2_journeyTimes}netex_interchange_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+						 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx INTERCHANGE. types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEX INTERCHANGE  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="journeyMeetingsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  JOURNEY MEETINGs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyMeeting" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="journeyInterchangesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  JOURNEY  INTERCHANGEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="ServiceJourneyPatternInterchange"/>
+					<xsd:element ref="ServiceJourneyInterchange"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="defaultInterchangseInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  DEFAULT INTERCHANGEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="DefaultInterchange" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="JourneyMeeting" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A time constraint for one or several SERVICE JOURNEYs fixing interchanges between them and/or an external event (e.g. arrival or departure of a feeder line, opening time of the theatre, etc.).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyMeeting_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyMeetingGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyMeetingIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyMeeting_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY MEETING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyMeetingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyMeetingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for JOURNEY MEETING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of Journey meeting.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AtStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SCHEDULED STOP POINT at which JOURNEY MEETING takes place.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FromJourneyRef" type="VehicleJourneyRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEY that feeds JOURNEY MEETING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToJourneyRef" type="VehicleJourneyRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEY  that distributes from JOURNEY MEETING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FromPointInJourneyPatternRef" type="PointInJourneyPatternRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>POINT IN JOURNEY PATTERN ofr  feeder  journey JOURNEY PATTERN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToPointInJourneyPatternRef" type="PointInJourneyPatternRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>POINT IN JOURNEY PATTERN ofr  distributorjourney JOURNEY PATTERN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="JourneyMeetingPropertiesGroup"/>
+			<xsd:group ref="JourneyMeetingConnectionGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="JourneyMeetingPropertiesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for JOURNEY MEETING describing detailed properties.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of JOURNEY MEETING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EarliestTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Earliest time for JOURNEY MEETING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EarliestTimeDayOffset" type="DayOffsetType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Earliest time Day Offset from start of FROM JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LatestTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Latest time for JOURNEY MEETING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LatestTimeDayOffset" type="DayOffsetType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Latest time Day Offset from start of FROM JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Reason" type="ReasonForMeetingEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reason for JOURNEY MEETING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="JourneyMeetingConnectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Connection Elements for JOURNEY MEETING describing the connecting JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ConnectionRef" type="ConnectionRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to CONNECTION at which JOURNEY MEETING takes place.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConnectingStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>SCHEDULED STOP POINT  to which JOURNEY MEETING connects if different from current stop interchange.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConnectingStopPointName" type="MultilingualString" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Name of CONNETCING STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element ref="JourneyRef" minOccurs="0"/>
+				<xsd:element ref="ConnectingJourneyView" minOccurs="0"/>
+			</xsd:choice>
+			<xsd:choice>
+				<xsd:annotation>
+					<xsd:documentation>LINE that is being met.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element ref="LineRef" minOccurs="0"/>
+				<xsd:element name="ConnectingLineView" type="Line_DerivedViewStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Simplified view of connecting LINE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:group name="InterchangeTimesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Time Elements for SERVICE JOURNEY INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="InterchangeWaitTimeGroup">
+				<xsd:annotation>
+					<xsd:documentation>Elements for INTERCHANGE WAIT TIME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="InterchangeTransferDurationGroup"/>
+			<xsd:element name="ControlCentreNotifyThreshold" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Interval before CONTROL CENTRE should be notified associated with  SERVICE JOURNEY INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="InterchangeTransferDurationGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for INTERCHANGE TRANSFER duration.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StandardTransferTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Standard transfer  duration for INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MinimumTransferTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum transfer duration for INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumTransferTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum transfer duration for INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="InterchangeWaitTimeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for INTERCHANGE WAIT TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StandardWaitTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Standard wait time for INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumWaitTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum wait time for INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumAutomaticWaitTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum automatic wait time for INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="DefaultInterchange" abstract="false" substitutionGroup="Interchange_">
+		<xsd:annotation>
+			<xsd:documentation>A quality parameter fixing the acceptable duration (standard and maximum) for an INTERCHANGE to be planned between two SCHEDULED STOP POINTs. This parameter will be used to control whether any two VEHICLE JOURNEYs serving those points may be in connection.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DefaultInterchange_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DefaultInterchangeGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DefaultInterchangeIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DefaultInterchange_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DEFAULT INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="DefaultInterchangeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DefaultInterchangeGroup">
+		<xsd:sequence>
+			<xsd:element name="FromStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SCHEDULED STOP POINT feeding INTERCHANGE. If absent apply to all STOP POINTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SCHEDULED STOP POINT distributing from INTERCHANGE. If absent apply to all STOP POINTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="InterchangeWaitTimeGroup">
+				<xsd:annotation>
+					<xsd:documentation>Elements for INTERCHANGE WAIT TIME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="InterchangeTransferDurationGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="Interchange_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy supertype for INTERCHANGe.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Interchange" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>The scheduled possibility for transfer of passengers between two SERVICE JOURNEYs at the same or different STOP POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="Interchange_VersionStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Interchange_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="InterchangeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="InterchangeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of INTERCHANGE RULE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of SCHEDULED STOP POINT feeding INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element name="ExternalInterchangeRef" type="ExternalObjectRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>An alternative  code that uniquely identifies the INTERCHANGE. Specifically for use in AVMS systems. For VDV compatibility.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConnectionRef" type="ConnectionRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a CONNECTION Link over which the INTERCHANEG takes place.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Priority" type="InterchangePriorityType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Priority to assign to this INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="InterchangePropertyGroup"/>
+			<xsd:group ref="InterchangeTimesGroup"/>
+			<xsd:element name="transferModes" type="AccessModeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ACCESS MODES by which the transfer can be made.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="noticeAssignments" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICEs of an interchange.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="noticeAssignments_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="InterchangeEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FromPointRef" type="ScheduledStopPointRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>SCHEDULED STOP POINT feeding INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FromVisitNumber" type="xsd:nonNegativeInteger" default="1" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Visit number to distinguish which visit to FROM SCHEDULED STOP POINT this is. Default is one. Only needed for circular routes with connections at the same stop on different visits.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToPointRef" type="ScheduledStopPointRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>SCHEDULED STOP POINT distributing from INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToVisitNumber" type="xsd:nonNegativeInteger" default="1" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Visit number to distinguish which visit to TO SCHEDULED STOP POINT  this is. Default is one. Only needed for circular routes with connections at the same stop on different visits.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="InterchangePropertyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for INTERCHANGE - detailed properties.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StaySeated" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the passenger can remain in vehicle (i.e. block linking). Default is false: the passenger must change vehicles for this INTERCHANGE.
+Default is false.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CrossBorder" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether INTERCHANGE  involves crossing an international border.
+ Default is false.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="InterchangeManagementGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="InterchangeManagementGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for INTERCHANGE management - detailed properties.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Planned" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether INTERCHANGE is planned in a timetable. Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Guaranteed" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether INTERCHANGE is guaranteed. Default is false.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Advertised" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether INTERCHANGE is advertised as an interchange. Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Controlled" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether INTERCHANGE  is controlled in real-time. Default is true.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConnectionCertainty" type="ConnectionCertaintyEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Nature of gurantee to  conenction.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:simpleType name="InterchangePriorityType">
+		<xsd:annotation>
+			<xsd:documentation>INTERCHANGE priority.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="serviceJourneyInterchanges_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of SERVICE JOURNEY INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="ServiceJourneyInterchangeRef"/>
+					<xsd:element ref="ServiceJourneyInterchange"/>
+					<xsd:element ref="ServiceJourneyInterchangeView"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ServiceJourneyInterchange" abstract="false" substitutionGroup="Interchange_">
+		<xsd:annotation>
+			<xsd:documentation>The scheduled possibility for transfer of passengers between two SERVICE JOURNEYs at the same or different STOP POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="ServiceJourneyInterchange_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="InterchangeGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ServiceJourneyInterchangeGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ServiceJourneyInterchangeIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ServiceJourneyInterchange_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for SERVICE JOURNEY INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Interchange_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="ServiceJourneyInterchangeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ServiceJourneyInterchangeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for SERVICE JOURNEY INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="InterchangeEndpointGroup" minOccurs="0"/>
+			<xsd:element name="FromJourneyRef" type="VehicleJourneyRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEY that feeds the INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToJourneyRef" type="VehicleJourneyRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEY that distributes from the INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ServiceJourneyPatternInterchangeRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="ServiceJourneyPatternInterchange" abstract="false" substitutionGroup="Interchange_">
+		<xsd:annotation>
+			<xsd:documentation>A recognised/organised possibility for passengers to change public transport vehicles using two STOP POINTs (which may be identical) on two particular SERVICE JOURNEY PATTERNs, including the maximum wait duration allowed and the standard to be aimed at. These may supersede the times given for the DEFAULT INTERCHANGE. Schedulers may use this entity for synchronisation of journeys.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="ServiceJourneyPatternInterchange_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="InterchangeGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="ServiceJourneyPatternInterchangeGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ServiceJourneyPatternInterchangeIdType" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="ServiceJourneyPatternInterchange_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for SERVICE JOURNEY PATTERN INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Interchange_VersionStructure">
+				<xsd:group ref="ServiceJourneyPatternInterchangeGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ServiceJourneyPatternInterchangeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for SERVICE JOURNEY PATTERN INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="InterchangeEndpointGroup"/>
+			<xsd:element name="FromJourneyPatternRef" type="JourneyPatternRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEY PATTERN that feeds INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToJourneyPatternRef" type="JourneyPatternRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEY PATTERN that distributes from INTERCHANGE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="journeyMeetingViews_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of  JOURNEY MEETING VIEWs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="JourneyMeetingRef"/>
+					<xsd:element ref="JourneyMeetingView"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyMeetingView" type="JourneyMeeting_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified  view of JOURNEY MEETING.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="JourneyMeeting_DerivedViewStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY MEETING VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyMeetingRef" minOccurs="0"/>
+					<xsd:group ref="JourneyMeetingPropertiesGroup"/>
+					<xsd:sequence>
+						<xsd:element name="MaximumWaitTime" type="xsd:duration" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Maximum wait time for JOURNEY MEETING.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:group ref="JourneyMeetingConnectionGroup"/>
+					<xsd:group ref="InterchangePropertyGroup"/>
+					<xsd:element name="TransferDuration" type="TransferDurationStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Timings for the transfer.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="ServiceJourneyInterchangeView" type="ServiceJourneyInterchange_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified  view of SERVICE JOURNEY INTERCHANGE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceJourneyInterchange_DerivedViewStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for SERVICE JOURNEY INTERCHANGE VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element ref="ServiceJourneyInterchangeRef" minOccurs="0"/>
+					<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Description of SCHEDULED STOP POINT feeding INTERCHANGE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="InterchangePropertyGroup"/>
+					<xsd:element name="noticeAssignments" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>NOTICEs of an interchange.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:extension base="noticeAssignments_RelStructure"/>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:choice>
+						<xsd:element name="ConnectingJourneyRef" type="VehicleJourneyRefStructure">
+							<xsd:annotation>
+								<xsd:documentation>VEHICLE JOURNEY that feeds the INTERCHANGE.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="ConnectingJourneyView"/>
+					</xsd:choice>
+					<xsd:element name="ConnectingLineView" type="Line_DerivedViewStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Simplified view of connecting LINE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:group ref="InterchangeTimesGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="ConnectingJourneyView" type="ConnectingJourney_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified  view of CONNECTING JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ConnectingJourney_DerivedViewStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for CONNECTING JOURNEY VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element name="ServiceJourneyRef" type="ServiceJourneyRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>Service Journey to which srevice connects.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:choice minOccurs="0">
+						<xsd:element name="DepartureTime" type="xsd:time">
+							<xsd:annotation>
+								<xsd:documentation>Time of Departure.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="Frequency" type="FrequencyStructure" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Frequency of departure.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:choice>
+					<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of journey.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="DestinationDisplayView" minOccurs="0"/>
+					<xsd:element ref="DayTypeRef" minOccurs="0"/>
+					<xsd:element ref="JourneyPatternRef" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Reference to a JOURNEY PATTERN.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ConnectingOrder" type="xsd:positiveInteger" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Order of Point within Connecting journey as an absolute number.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ConnectingVisitNumber" type="xsd:positiveInteger" default="1" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Order of Point within Connecting as number of visits to the same stop.  Default is 1.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

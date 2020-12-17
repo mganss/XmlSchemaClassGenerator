@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 using Xunit;
 
 namespace XmlSchemaClassGenerator.Tests
@@ -78,7 +79,16 @@ namespace XmlSchemaClassGenerator.Tests
                     var val1 = prop.GetValue(o1);
                     var val2 = prop.GetValue(o2);
 
-                    Equal(val1, val2);
+                    if (prop.PropertyType == typeof(DateTime)
+                        && val1 is DateTime dt1 && val2 is DateTime dt2
+                        && prop.GetCustomAttributes<XmlElementAttribute>().All(a => a.DataType == "time"))
+                    {
+                        Equal(dt1.TimeOfDay, dt1.TimeOfDay);
+                    }
+                    else
+                    {
+                        Equal(val1, val2);
+                    }
                 }
             }
         }

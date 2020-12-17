@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_section_version">
+	<xsd:include schemaLocation="netex_section_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="netex_pointAndLink_version.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLinkSequence_version.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2010-11-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-06-28</Modified>  Cr0040  Add GENERAL SECTION and Revise Section Structure.  
+					            Add generic SECTION supertype 
+								Add PointOnSection  for list of points (RetainCommonSectionMember for backwards compatibility)
+								AddLinkOnSection  for list of just links.  
+								Add nameOfLinkClass attribute to help implementors. 
+								Add used to be just a list of LinkSequences.  
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines SECTION types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_section_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Steam Intellect, London N1 1JS</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - SECTION types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>SECTION  types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="generalSectionsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of GENERAL SECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="GeneralSection" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<!-- ==COMMON SECTION=========================================================== -->
+	<xsd:element name="Section_" type="LinkSequence_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Dummy Supertype for SECTION  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Section" abstract="true" substitutionGroup="Section_">
+		<xsd:annotation>
+			<xsd:documentation>A shared sequence of LINKS or POINTs.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="Section_VersionStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Section_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for  SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LinkSequence_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="SectionGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="nameOfLinkClass" type="NameOfClass">
+					<xsd:annotation>
+						<xsd:documentation>Name of Link Cass of COMMON SECTION</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a SECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PurposeOfGroupingRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a PURPOSE OF GROUPING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="usedIn" type="linkSequenceRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation> LINK SEQUENCES using SECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="GeneralSection" abstract="false" substitutionGroup="Section_">
+		<xsd:annotation>
+			<xsd:documentation>A  resuable sequence of LINKS or POINTs.   +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GeneralSection_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SectionGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GeneralSectionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GeneralSectionIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of GENERAL SECTION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GeneralSection_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for GENERAL SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Section_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GeneralSectionGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GeneralSectionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a GENERAL SECTION. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="pointsOnSection" type="pointsOnSection_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Ordered collection of POINTS used in the GENERAL SECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="linksOnSection" type="linksOnSection_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Ordered collection of LINKSused in the GENERAL SECTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====DEPRECATED============================================================ -->
+	<xsd:complexType name="commonSectionPointMembers_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>DEPRECATED - Type for a list of COMMON SECTION POINT MEMBERs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="CommonSectionPointMember" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CommonSectionPointMember" type="PointOnSection_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>DEPRECATED - Kept for backwards compatibility POINT  Member of a COMMON SECTION.]</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="pointsOnSection_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of  POINTS on SECTION POINT   +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PointOnSection_" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PointOnSection_" type="PointInLinkSequence_VersionedChildStructure" abstract="true" substitutionGroup="PointInLinkSequence">
+		<xsd:annotation>
+			<xsd:documentation>DUmmy Supertype for Point On SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PointOnSection" substitutionGroup="PointOnSection_">
+		<xsd:annotation>
+			<xsd:documentation>POINT  on a SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PointOnSection_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PointInLinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:choice>
+								<xsd:element ref="PointRef">
+									<xsd:annotation>
+										<xsd:documentation>Reference to a POINT.</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element ref="Point"/>
+							</xsd:choice>
+							<xsd:element ref="LinkRef" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Reference to a LINK.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Reverse" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether link is navigated in to / from, i.e. reverse direction . Default is false, i.e. from to.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PointOnSectionIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of POINT ON SECTION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PointOnSection_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a POINT on a SECTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="PointInLinkSequence_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:choice>
+						<xsd:element ref="PointRef">
+							<xsd:annotation>
+								<xsd:documentation>Reference to a POINT.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="Point"/>
+					</xsd:choice>
+					<xsd:element ref="LinkRef" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Reference to a LINK.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Reverse" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether link is navigated in to / from, i.e. reverse direction . Default is false, i.e. from to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="linksOnSection_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of LINKS on SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="LinkOnSection" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="LinkOnSection" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>LINK on a SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LinkOnSection_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkInLinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:choice>
+								<xsd:element ref="LinkRef">
+									<xsd:annotation>
+										<xsd:documentation>Reference to a Link.</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+								<xsd:element ref="Link"/>
+							</xsd:choice>
+							<xsd:element name="Reverse" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether link is navigated in to / from, i.e. reverse direction . Default is false, i.e. from to.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LinkOnSectionIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LinkOnSection_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LINK on a SECTION.  +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LinkInLinkSequence_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:choice>
+						<xsd:element ref="LinkRef">
+							<xsd:annotation>
+								<xsd:documentation>Reference to a Link.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element ref="Link"/>
+					</xsd:choice>
+					<xsd:element name="Reverse" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether link is navigated in to / from, i.e. reverse direction . Default is false, i.e. from to.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="sectionsInSequence_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of  SECTIONS in sequence</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="SectionInSequence" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>A SECTION in SEQUENCE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="SectionInSequence" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>A SECTION in Sequence</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="SectionInSequence_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkInLinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SectionInSequenceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="SectionInSequence_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a SECTION IN SEQUENCE </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LinkInLinkSequence_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="SectionInSequenceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SectionInSequenceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a  SECTION IN SEQUENCE </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element ref="SectionRef">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a LINK SEQUENCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element ref="Section_"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+</xsd:schema>

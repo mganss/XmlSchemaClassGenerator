@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple GTFS Calendar Dates / NeTEx Validity condition Example ====== 
+This Example provides an example of mapping of a GTFS CalendarDates.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+
+
+ 1. DATA
+    It comprises
+	service_id,date,exception_type
+	FULLW,20070604,2
+	FULLW,20070608,1
+
+2. MAPPING
+
+A CALENDAR DATE maps to a VALIDITY CONDITION  
+The condition can be included as part of a SERVICE CALENDAR FRAME alonfg with the calendar.txts
+
+GTFS									NeTEx
+service_id,								<ServiceCalendarFrame #service_id>@id
+date,										<ServiceCalendarFrame #service_id> <contentValidityConditions> <AvailabilityCondition #date> <FromDate> & <ToDate #date>			
+exception_type,	 1 added		<ServiceCalendarFrame #service_id> <contentValidityConditions> <AvailabilityCondition #date> <IsAvailable> true
+						 2 removed	<ServiceCalendarFrame #service_id> <contentValidityConditions> <AvailabilityCondition #date> <IsAvailable> false
+ 
+ 
+3. Notes
+
+   Alternative would be to use DAY TYPE ASSIGNMENTs for each valid date
+
+ GTFS Data copyright Google Inc
+
+version 1.1 revised ids
+ NeTEx (C) CEN Copyright 2010-2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Trip data  (CalendarDates.txt file)</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<ServiceCalendarFrame version="any" id="mygtfsxm:FULLW">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+			</FrameDefaults>
+			<contentValidityConditions>
+				<AvailabilityCondition version="any" id="FULLW-2007-06-04">
+					<FromDate>2007-06-04T00:00:00</FromDate>
+					<ToDate>2007-06-04T23:59:59</ToDate>
+					<IsAvailable>false</IsAvailable>
+				</AvailabilityCondition>
+				<AvailabilityCondition version="any" id="FULLW-2007-06-08">
+					<FromDate>2007-06-08T00:00:00</FromDate>
+					<ToDate>2007-06-08T23:59:59</ToDate>
+					<IsAvailable>true</IsAvailable>
+				</AvailabilityCondition>
+			</contentValidityConditions>
+		</ServiceCalendarFrame>
+	</dataObjects>
+</PublicationDelivery>

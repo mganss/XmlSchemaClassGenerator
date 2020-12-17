@@ -1,0 +1,1918 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a Vehicle Schedule with DEAD RUNS  in blocks   in NeTeX XML  
+
+The VEHICLE SERVICE has two VEHICLE SERVICE PARTs, one for day, one for night
+	 For the Day service, Ten SERVICE JOURNEYs and six DEAD RUNs   are combined to  make up  three BLOCKs 
+	 For the Night  service, two SERVICE JOURNEYs and ywo DEAD RUNs   are combined to  make up  one BLOCK
+
+See the    VEHICLE SCHEDULE  FRAME for the main contents   . Other frames define elements used tin the vehicle SCHEDULE FRAME.
+
+The schedule shows how a number of journeys are  completed
+(C) 2011 CEN NeTEx
+
+Overview 
+=======
+
+There is a simple route with three stops    A - B  - C 
+
+traversed in both directions  ABC, CBA
+
+Outbound timetable
+		Day															Night
+		VJ_1o	VJ_3o	VJ_5o	VJ_7o	VJ_9o	       VJ_11o	 
+A     	11.10	12:20	 13:45	15:55	17:30			20:10
+B	    11: 20	12:30	 13:55	16:05	17:40			20:20			
+C		11:40	12:50	 14:15	16:25	18:00			20:40
+
+Inbound timetable
+		Day															Night
+		VJ_2o	VJ_4o	VJ_6o	VJ_8o	VJ_10o		VJ_12o	 	
+C		11:45	13:10   	14:20	16:55 	 18:05			20:45	
+B	    12:05	13:30	14:40	17:15	 18:25			21:05				
+A     	12:15	13:40	14:50	17:25     18:35			21:15	
+
+		
+
+
+The BLOCK starts and ends at at a garage G1, and goes to a parking P1 between blocks so  the runs are
+	GA, ABC, CBA, ABC, CP, PC, CBA, ABC, BCA, ABC, CP, PC,CBA, ABC, CBA,AG
+
+   <=VS1===================================================================><==VS2=============>
+     <==   blk_L24_1===========><=BLK_2	==================><==BLK_3============><==   blk_L24_2===========>
+		DR_1o  																											DR_10i					DR_11o  		DR_12o 
+G		11.00  																											18:45					 		20:00  	 21:25
+   10M    | 																													/|\								   | 				/|\
+			 \|/																												 |							  	 \|/				 |				
+	 
+		VJ_1o			VJ_2i	VJ_3o	VJ_4i	 VJ_5o	VJ_6i   VJ_7o		VJ_8i	VJ_9o	VJ_10i					VJ_11o	 	VJ_11o	 
+	  outbound	inbound outbound	inbound outbound	inbound outbound	inbound	outbound	inbound				outbound	inbound	 
+	W5M
+A     	11.10		12:15- - ->12:20	 13:40- - ->13:45	14:50 - ->15:55	 17:25 - ->17:30   18:35					  	20:10   21:15			
+   10M    | 				/|\			 | 			/|\				 | 			/|\			 | 			/|\			 | 			/|\							 | 			/|\		
+			 \|/			 | 			\|/		  	 | 				\|/			 |			\|/		     | 			\|/			 |							\|/			 |
+B	    11: 20		12:05	12:30	  13:30 		 13:55	14:40	16:05	  17:15 	  17:40 	  18:25		 			  20:20  	21:05				
+   20M    | 				/|\			 | 			/|\				 | 			/|\			 | 			/|\			 | 			/|\							 | 			/|\	
+			 \|/			 | 			\|/		  	 | 				\|/			 |			\|/		     | 			\|/			 |							\|/			 |
+C		11:40 - - -> 11:45	12:50		13:10   	14:15- - ->14:20	16:25	16:55 	  18:00- - ->18:05				  20:40 - - ->20:45	
+	W5M							DR_3o		DR_4i							DR_7o	DR_8o
+   5M    . 				...			 |			 | 				...			...			 |			 | 				...			 
+		   . 				...			\|/			/|\				....		...			\|/			/|\				....		 
+P1    ...				....		12:55- - ->13:05			....		....	16:30- - ->16:40	...			...		 
+	W10M																					RELIEF POINT
+   <=DP01===========================================><==DP02=============>
+
+ 
+1. SERVICE PATTERN
+ 
+ This has just  three SCHEDULED STOP POINTs      
+		A  :  mybus:ssp_001  	Alpha
+		B  :  mybus:ssp_002	 Bravo
+		C  :  mybus:ssp_077 	Charley
+
+	There is a GARAGE  G1  mybus:Garage:grg1 
+			with  GARAGE POINT    G1pt 	mybus:grgpt1
+	 There is a PARKING POINT   P1 		mybus:pkgpt1
+
+2. Vehicle Service
+
+There is one VEHICLE SERVICE  xj:vs_L24_1
+	 With two VEHiCLE SERVICE PARTs
+		xj:VehicleService:vs_L24_1_01	Day Service
+		xj:VehicleService:vs_L24N_1_02  Night Service
+
+There are three BLOCKS
+       ops:blk_L24_01   VEHiCLE SERVICE PART : xj:vs_L24_01_01	Day
+       ops:blk_L24_02	VEHiCLE SERVICE PART : xj:vs_L24_02_01 	Day
+       ops:blk_L24_03	VEHiCLE SERVICE PART : xj:vs_L24_03_01 	Day
+      ops:blk_L24N_04	VEHiCLE SERVICE PART : xj:vs_L24_04_01 	Night
+
+There are eight DEAD RUNs :-
+
+	 One at the beginning of the day service to go from     the GARAGE
+     (a)  	xj:DeadRun:dr_1o	 11.00		outbound       BLOCK:  ops:blk_L24_01   		DEAD RUN JP :  kx:drjp_L24_01o
+
+	 Four to  go to  the PARKING POINTs at the intermediate BLOCK s
+     (b)  	xj:DeadRun:dr_3o	 	12.50		outbound       BLOCK:  ops:blk_L24_01     	DEAD RUN JP :  kx:drjp_L24_02o
+     (c)  	xj:DeadRun:dr_4i	 	13.05		inbound         BLOCK:  ops:blk_L24_02 		DEAD RUN JP :  kx:drjp_L24_03i
+     (d)  	xj:DeadRun:dr_7o		 16.25		outbound       BLOCK:  ops:blk_L24_01 		DEAD RUN JP :  kx:drjp_L24_04o
+     (e)  	xj:DeadRun:dr_8i	 	16.40		inbound         BLOCK:  ops:blk_L24_02  		DEAD RUN JP :  kx:drjp_L24_05i
+
+	 One in  the  end of the day  VEHICLE SERVICE PART to go to     the GARAGE
+      (f)  	xj:DeadRun:dr_10i	 18.35		inbound         BLOCK:  ops:blk_L24_03  		DEAD RUN JP :  kx:drjp_L24_06i
+
+
+ One at the  start of the night  VEHICLE SERVICE PART to go from     the GARAGE
+      (f)  	xj:DeadRun:dr_10i	 18.35		inbound         BLOCK:  ops:blk_L24N_04  		DEAD RUN JP :  kx:drjp_L24N_07i
+ One at the  end of the night    VEHICLE SERVICE PART to go to     the GARAGE
+      (f)  	xj:DeadRun:dr_10i	 18.35		inbound         BLOCK:  ops:blk_L24N_04  		DEAD RUN JP :  kx:drjp_L24N_08i
+
+There are   twelve  SERVICE JOURNEYs in the timetable  
+     (1)  	xj:vj_1o	 11.10		outbound       BLOCK:   ops:blk_L24_01  		JOURNEY PATTERN :  kx:sjp_L24o
+     (2)  	xj:vj_2i	 11.45		inbound  	    BLOCK:   ops:blk_L24_01		JOURNEY PATTERN :  kx:sjp_L24i
+     (3) 	xj:vj_3o	 12:20		outbound       BLOCK:   ops:blk_L24_01		JOURNEY PATTERN :  kx:sjp_L24o
+
+     (4) 	xj:vj_4i	 13:10		inbound         BLOCK:  ops:blk_L24_02		JOURNEY PATTERN :  kx:sjp_L24i         
+     (5) 	xj:vj_5o	 13:45		outbound       BLOCK:  ops:blk_L24_02		JOURNEY PATTERN :  kx:sjp_L24o
+     (6) 	xj:vj_6i	 13:45		inbound         BLOCK:  ops:blk_L24_02		JOURNEY PATTERN :  kx:sjp_L24i     
+	 (7)  	xj:vj_7o	 15.55		outbound       BLOCK:  ops:blk_L24_02		JOURNEY PATTERN :  kx:sjp_L24o  
+
+     (8)  	xj:vj_8i	 16.55		inbound         BLOCK:  ops:blk_L24_03		JOURNEY PATTERN :  kx:sjp_L24i      
+     (9) 	xj:vj_9o	 17:30		outbound       BLOCK:  ops:blk_L24_03		JOURNEY PATTERN :  kx:sjp_L24o     
+     (10) xj:vj_10i	 18:05		inbound         BLOCK:  ops:blk_L24_03  	JOURNEY PATTERN :  kx:sjp_L24i     
+
+  (11) 	xj:vj_11o	 17:30		outbound       BLOCK:  ops:blk_L24_03		JOURNEY PATTERN :  kx:sjp_L24o     
+     (12) xj:vj_12i	 18:05		inbound         BLOCK:  ops:blk_L24_03  	JOURNEY PATTERN :  kx:sjp_L24i     
+
+There are three COURSE OF JOURNEYs (Runs)
+	1.  ops:coj_L24_01  Block 1 JOURNEYS : 		 xj:vj_L24_01o , xj:vj_L24_02i, xj:vj_L24_03o 
+	3.  ops:coj_L24_02  Block 2 JOURNEYS : 		 xj:vj_L24_04i , xj:vj_L24_05o, xj:vj_L24_06i, xj:vj_L24_07o 
+	3.  ops:coj_L24_03  Block 3 JOURNEYS : 		 xj:vj_L24_08i , xj:vj_L24_09o, xj:vj_L24_10i
+3.  Further details 
+
+There is one LINE  mybus:LN_24
+
+There   are two ROUTEs  
+	outbound:  kx:rt_24o
+	inbound: kx:rt_24i
+
+There are eight ROUTE LINKS
+	 Used in Outbound
+		G1-A : kx:rl_grg1-ssp_001  
+		A-B	: kx:rl_ssp_001-ssp_002  
+		B-C 	: kx:rl_ssp_002-ssp_077
+		C-P1 : kx:rl_ssp_077-pkg1
+   Used in Inbound
+		P1-C 	: kx:rl_pkg1-ssp_077
+		C-B		: kx:rl_ssp_077-ssp_002  
+		B-A		: kx:rl_ssp_002-ssp_001  
+		A-G1	 :kx:rl_ssp_001-grg1  
+
+There are ten  TIMING LINKS  * + 2 summary)
+  Used in Outbound
+		G1-A : kx:tl_grg1_to_ssp_001    		==> 	With associated JOURNEY RUN TIME  kx:JJourneyRunTime:jprt_drjp_L24o_grg1-ssp_001_tdt_45   10 Minutes
+		A-B	: kx:tl_ssp_001_to_ssp_002  	==> 	With associated TIME DEMAND  RUN TIME  kx:JJourneyRunTime:jprt_sjp_L24o_ssp_001-ssp_002_tdt_45   10 Minutes
+		B-C 	: kx:tl_ssp_002_to_ssp_077  	==> 	With associated TIME DEMAND  RUN TIME  kx:JJourneyRunTime:jprt_sjp_L24o_ssp_002-ssp_077_tdt_45   20 Minutes
+		C-P1 : kx:tl_ssp_077_to_pkg1   		==> 	With associated TIME DEMAND  RUN TIME  kx:JJourneyRunTime:jprt_drjp_L24o_ssp_077-pkg1_tdt_45   5 Minutes
+
+		A-C : kx:tl_ssp_001_to_ssp_077   		==> 	With associated JOURNEY PATTERN RUN TIME  kx:jprt_drjp_L24o_ssp_00-ssp_077_tdt_45   30 Minutes
+
+   Used in Inbound
+		P1-C 	: kx:tl_pkg1_to_ssp_077   	 ==> 	With associated JOURNEY PATTERN RUN TIME  kx:JJourneyRunTime:jprt_drjp_L24i_pkg1-ssp_077_tdt_45   10 Minutes
+		C-B		: kx:tl_ssp_077_to_ssp_002   ==> 	With associated JOURNEY PATTERN RUN TIME  kx:JJourneyRunTime:jprt_sjp_L24i_ssp_077-ssp_002_tdt_45   20 Minutes
+		B-A		: kx:tl_ssp_002_to_ssp_001   ==> 	With associated JOURNEY PATTERN RUN TIME  kx:JJourneyRunTime:jprt_sjp_L24i_ssp_002-ssp_001_tdt_45   10 Minutes
+		A-G1	 :kx:tl_ssp_001_to_grg1         ==> 	With associated JOURNEY PATTERN RUN TIME  kx:JJourneyRunTime:jprt_drjp_L24i_ssp_001-grg1_tdt_45   10 Minutes
+
+		C-A : kx:tl_ssp_077_to_ssp_001   		==> 	With associated JOURNEY PATTERN RUN TIME  kx:jprt_drjp_L24o_ssp_077-ssp_001_tdt_45   30 Minutes
+
+There are two TIMING PATTERNs  shared by the SERVICE JOURNEYS
+	outbound: kx:tpt_12o
+		 With POINTs IN TIMING PATTERN
+			1. kx:tpijp_sjp_L24o_001  ==> SCHEDULED STOP POINT mybus:ssp_001  Alpha
+			2. kx:tpijp_sjp_L24o_002 ==> SCHEDULED STOP POINT  mybus:ssp_002	 Bravo
+			3. kx:tpijp_sjp_L24o_003  ==> SCHEDULED STOP POINTmybus:ssp_077 Charley
+ 	inbound: kx:tpt_12i
+		 With POINTs IN TIMING PATTERN
+			1. kx:tpijp_sjp_L24i_001  ==> SCHEDULED STOP POINTmybus:ssp_077 Charley
+			2. kx:tpijp_sjp_L24i_002 ==> SCHEDULED STOP POINT  mybus:ssp_002 Bravo
+			3. kx:tpijp_sjp_L24i_003  ==> SCHEDULED STOP POINT mybus:ssp_001  Alpha
+
+There is one TIME DEMAND TYPE  tdt_45
+    with 8 JOURNEY RUN TIMES - See  TIMING PATTERN
+
+There are Four SERVICE LINKs    
+  Outwards  A - B - C
+	A-B : kx:sl_ssp_001_to_ssp_002  
+	B-C : kx:sl_ssp_002_to_ssp_077    
+  Back  C - B - A
+	C-B : kx:sl_ssp_0017-ssp_002  
+	B-A : kx:sl_ssp_002_to_ssp_001    
+
+There are two SERVICE JOURNEY PATTERNs shared by the SERVICE JOURNEYS
+	outbound: kx:sjp_L24o  A - B - C
+		 With POINTs IN JOURNEY PATTERN
+			1. kx:pijp_sjp_L24o_001  ==> SCHEDULED STOP POINT mybus:ssp_001  Alpha
+			2. kx:pijp_sjp_L24o_002 ==> SCHEDULED STOP POINT  mybus:ssp_002	 Bravo
+			3. kx:pijp_sjp_L24o_003  ==> SCHEDULED STOP POINT mybus:ssp_077 Charley
+ 	inbound: kx:sjp_L24i  C - B - A
+		 With POINTs IN JOURNEY PATTERN
+			1. kx:pijp_sjp_L24i_001  ==> SCHEDULED STOP POINT mybus:ssp_077 Charley
+			2. kx:pijp_sjp_L24i_002 ==> SCHEDULED STOP POINT  mybus:ssp_002	 Bravo
+			3. kx:pijp_sjp_L24i_003  ==> SCHEDULED STOP POINT mybus:ssp_001  Alpha
+
+There are four DEAD RUN JOURNEY PATTERNs  shared by the DEAD RUNs
+	outbound: kx:drjp_L24_01o    G1 - A 
+		 With POINTs IN JOURNEY PATTERN
+			1. kx:pijp_drjp_L24_01o_001  ==> GARAGE POINT mybus:grgpt1
+			2. kx:pijp_drjp_L24_01o_002 ==> SCHEDULED STOP POINT mybus:ssp_001  Alpha
+	outbound: kx:drjp_L24_02o
+		 With POINTs IN JOURNEY PATTERN
+			1. kx:pijp_drjp_L24_02o_001  ==>SCHEDULED STOP POINT mybus:ssp_077 Charley
+			2. kx:pijp_drjp_L24_02o_002 ==> PARKING POINT mybus:pkgpt1
+	inbound: kx:drjp_L24_03i
+		 With POINTs IN JOURNEY PATTERN
+			1. kx:pijp_drjp_L24_03i_001 ==> PARKING POINT mybus:pkgpt1
+			2. kx:pijp_drjp_L24_03i_002  ==>SCHEDULED STOP POINT mybus:ssp_077 Charley
+ 	inbound: kx:drjp_L24_04i
+		 With POINTs IN JOURNEY PATTERN
+			1. kx:pijp_drjp_L24_04i_001  ==> SCHEDULED STOP POINT mybus:ssp_001  Alpha
+			2. kx:pijp_drjp_L24_04i_002  ==> GARAGE POINT mybus:grgpt1
+
+4. Duties
+
+There is one DUTY ops:Duty:dty_01 with TWO DUTY PARTS
+	ops:DutyPart:dtypt_01   From G1 a RELIEF POINT at the second visit to the Parking Point
+	ops:DutyPart:dtypt_02  From  RELIEF POINT Back to G1
+	 
+5. Frames
+
+	A VEHICLE SCHEDULE  FRAME  xj:vsf_12  is used to contain  the block  elements
+
+	A TIMETABLE FRAME xj:ttf_12 is used to contain the service journey  elements
+
+	A SERVICE FRAME kx:svf_12 is used to contain the SERVICE PATTERN  elements
+
+	A SERVICE CALENDAR FRAME is used to contain the DAY TYPEs etc
+
+	A COMPOSITE FRAME xj:cf_12 is used to group the frames
+  
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="xj:cf_12">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TypeOfFrameRef ref="xj:MyVsFrame">REQUEST</TypeOfFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple vehicle schedule  frame with tblocks</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="xj:cf_12">
+			<validityConditions>
+				<AvailabilityCondition version="any" id="xj:Cnd001">
+					<Description>Sept  to March</Description>
+					<FromDate>2010-11-01T00:00:00Z</FromDate>
+					<ToDate>2011-03-31T00:00:00Z</ToDate>
+					<dayTypes>
+						<DayTypeRef version="any" ref="xj:DT_01"/>
+					</dayTypes>
+				</AvailabilityCondition>
+			</validityConditions>
+			<TypeOfFrameRef ref="xj:TypeOfFrame:MyVsFrame"/>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="xj">
+					<Xmlns>xj</Xmlns>
+					<XmlnsUrl>http://www.borninabahn.de</XmlnsUrl>
+					<Description> OtherStop data  data</Description>
+				</Codespace>
+				<Codespace id="kx">
+					<Xmlns>kx</Xmlns>
+					<XmlnsUrl>http://www.ksx.com</XmlnsUrl>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="kx"/>
+			</FrameDefaults>
+			<frames>
+				<!-- =====Service Calendar frame===== -->
+				<ServiceCalendarFrame version="any" id="xj:scf_01">
+					<Name>Servicie calendar  01  to 03 2011</Name>
+					<ServiceCalendar version="any" id="xj:sc_01">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2011-03-31</ToDate>
+						<dayTypes>
+							<DayType version="any" id="xj:DT_01">
+								<alternativeTexts>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="Name" useForLanguage="fr">
+										<Text lang="fr">Tous les jours sauf pour les jours fériés</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="Name" useForLanguage="de">
+										<Text lang="de">Jeden Tag außer an Feiertagen</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="Name" useForLanguage="it">
+										<Text lang="it">Tutti i giorni eccetto i giorni festivi</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="Name" useForLanguage="se">
+										<Text lang="se">Varje dag utom helgdagar</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="ShortName" useForLanguage="fr">
+										<Text lang="fr">Tous les jours</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="ShortName" useForLanguage="de">
+										<Text lang="de">Jeden Tag</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="ShortName" useForLanguage="it">
+										<Text lang="it">Ogni giorno</Text>
+									</AlternativeText>
+									<AlternativeText version="any" id="xj:DT_01" attributeName="ShortName" useForLanguage="se">
+										<Text lang="se">Varje dag</Text>
+									</AlternativeText>
+								</alternativeTexts>
+								<!---    Values  -->
+								<Name lang="en">Everyday except for public holidays</Name>
+								<ShortName lang="en">Every day</ShortName>
+								<EarliestTime>00:00:00Z</EarliestTime>
+								<DayLength>PT24H</DayLength>
+								<properties>
+									<PropertyOfDay>
+										<DaysOfWeek>Everyday</DaysOfWeek>
+										<HolidayTypes>NotHoliday</HolidayTypes>
+									</PropertyOfDay>
+								</properties>
+							</DayType>
+						</dayTypes>
+					</ServiceCalendar>
+				</ServiceCalendarFrame>
+				<!-- =====Service====== -->
+				<ServiceFrame id="kx:svf_12" version="any">
+					<Name>Winter timetable for route 12  </Name>
+					<routeLinks>
+						<RouteLink version="any" id="kx:rl_grg1-ssp_001">
+							<Name>G1 to Alpha </Name>
+							<FromPointRef version="any" ref="mybus:grgpt1"/>
+							<ToPointRef version="any" ref="mybus:ssp_001"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_ssp_001-ssp_002">
+							<Name>Alpha to Bravo</Name>
+							<FromPointRef version="any" ref="mybus:ssp_001"/>
+							<ToPointRef version="any" ref="mybus:ssp_002"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_ssp_002-ssp_077">
+							<Name>Bravo to Charley</Name>
+							<FromPointRef version="any" ref="mybus:ssp_002"/>
+							<ToPointRef version="any" ref="mybus:ssp_077"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_ssp_077-pkg1">
+							<Name>Charley to P1 </Name>
+							<FromPointRef version="any" ref="mybus:ssp_077"/>
+							<ToPointRef version="any" ref="mybus:pkgpt1"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_pkg1-ssp_077">
+							<Name>P1 to Charley</Name>
+							<FromPointRef version="any" ref="mybus:pkgpt1"/>
+							<ToPointRef version="any" ref="mybus:ssp_077"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_ssp_077-ssp_002">
+							<Name>Charley to Bravo </Name>
+							<FromPointRef version="any" ref="mybus:ssp_077"/>
+							<ToPointRef version="any" ref="mybus:ssp_002"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_ssp_002-ssp_001">
+							<Name>Bravo to Alpha </Name>
+							<FromPointRef version="any" ref="mybus:ssp_002"/>
+							<ToPointRef version="any" ref="mybus:ssp_001"/>
+						</RouteLink>
+						<RouteLink version="any" id="kx:rl_ssp_001-grg1">
+							<Name>Alpha to G1 </Name>
+							<FromPointRef version="any" ref="mybus:ssp_001"/>
+							<ToPointRef version="any" ref="mybus:grgpt1"/>
+						</RouteLink>
+					</routeLinks>
+					<routes>
+						<!--- ===Routes ========= -->
+						<Route version="any" id="kx:rt_24o">
+							<Name>Route 12  outbound</Name>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<PointOnRoute version="any" id="kx:por_RT_L24o_001" order="1">
+									<GaragePointRef version="any" ref="mybus:grgpt1"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_grg1-ssp_001"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24o_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_ssp_001-ssp_002"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24o_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_ssp_002-ssp_077"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24o_004" order="4">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_ssp_077-pkg1"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24o_005" order="5">
+									<ParkingPointRef version="any" ref="mybus:pkgpt1"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+						<Route version="any" id="kx:rt_24i">
+							<Name>Route 12  inbound</Name>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>inbound</DirectionType>
+							<pointsInSequence>
+								<PointOnRoute version="any" id="kx:por_RT_L24i_001" order="1">
+									<ParkingPointRef version="any" ref="mybus:pkgpt1"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_pkg1-ssp_077"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24i_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_ssp_077-ssp_002"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24i_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_ssp_002-ssp_001"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24i_004" order="4">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<OnwardRouteLinkRef version="any" ref="kx:rl_ssp_001-grg1"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="kx:por_RT_L24i_005" order="5">
+									<GaragePointRef version="any" ref="mybus:grgpt1"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+					</routes>
+					<lines>
+						<Line version="any" id="mybus:LN_24">
+							<Name>Line 12</Name>
+							<TransportMode>bus</TransportMode>
+						</Line>
+						<Line version="any" id="mybus:LN_24N">
+							<Name>Line 12 Night</Name>
+							<TransportMode>bus</TransportMode>
+						</Line>
+					</lines>
+					<!--- =========DISPLAYS============ -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="mybus:dst_31_charley">
+							<Name>Charley</Name>
+							<ShortName>Charley G</ShortName>
+							<PublicCode>Charley</PublicCode>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:dst_45_alpha">
+							<Name>Alpha &amp; Castle</Name>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>Alpha</PublicCode>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:ssp_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>ALPH</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:ssp_002">
+							<Name>Bravo</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo</ShortName>
+							<PublicCode>BRV</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:ssp_077">
+							<Name>Charley</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Charley</ShortName>
+							<PublicCode>CHAS</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- SERVICE LINKs======== -->
+					<serviceLinks>
+						<ServiceLink version="any" id="kx:sl_ssp_001_to_ssp_002">
+							<Name>Alpha to Bravo</Name>
+							<FromPointRef version="any" ref="mybus:ssp_001"/>
+							<ToPointRef version="any" ref="mybus:ssp_002"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="kx:sl_ssp_002_to_ssp_077">
+							<Name>Bravo to Charley</Name>
+							<FromPointRef version="any" ref="mybus:ssp_002"/>
+							<ToPointRef version="any" ref="mybus:ssp_077"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="kx:sl_ssp_002_to_ssp_001">
+							<Name>Bravo to Alpha </Name>
+							<FromPointRef version="any" ref="mybus:ssp_002"/>
+							<ToPointRef version="any" ref="mybus:ssp_001"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="kx:sl_ssp_077_to_ssp_002">
+							<Name>Charley to Bravo </Name>
+							<FromPointRef version="any" ref="mybus:ssp_077"/>
+							<ToPointRef version="any" ref="mybus:ssp_002"/>
+						</ServiceLink>
+					</serviceLinks>
+					<!--- =========SERVICE PATTERNs=========== -->
+					<servicePatterns>
+						<ServicePattern version="any" id="kx:svp_24o">
+							<Name>Alpha to Charley</Name>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="kx:spijp_24o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="kx:spijp_24o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="kx:spijp_24o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="kx:slijp_24o_01">
+									<ServiceLinkRef version="any" ref="kx:sl_ssp_001_to_ssp_002"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="kx:slijp_24o_02">
+									<ServiceLinkRef version="any" ref="kx:sl_ssp_002_to_ssp_077"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+						<ServicePattern version="any" id="kx:svp_24i">
+							<Name>Charley to ALpha</Name>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="kx:spijp_24i_01">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="kx:spijp_24i_02">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="kx:spijp_24i_03">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="kx:slijp_24i_01">
+									<ServiceLinkRef version="any" ref="kx:sl_ssp_077_to_ssp_002"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="kx:slijp_24i_02">
+									<ServiceLinkRef version="any" ref="kx:sl_ssp_002_to_ssp_001"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+					</servicePatterns>
+					<!--- TIMING LINKs======== -->
+					<timingLinks>
+						<TimingLink version="any" id="kx:tl_ssp_001_to_ssp_077">
+							<Name>Overalll Stop A to Stop C </Name>
+							<FromPointRef version="any" ref="mybus:ssp_001"/>
+							<ToPointRef version="any" ref="mybus:ssp_077"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_grg1_to_ssp_001">
+							<Name>G1 to A</Name>
+							<FromPointRef version="any" ref="mybus:grgpt1"/>
+							<ToPointRef version="any" ref="mybus:ssp_001"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_001_to_ssp_002">
+							<Name>A to B</Name>
+							<FromPointRef version="any" ref="mybus:ssp_001"/>
+							<ToPointRef version="any" ref="mybus:ssp_002"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_002_to_ssp_077">
+							<Name>B to  C</Name>
+							<FromPointRef version="any" ref="mybus:ssp_002"/>
+							<ToPointRef version="any" ref="mybus:ssp_077"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_077_to_ssp_001">
+							<Name>Overall Stop C  to Stop A</Name>
+							<FromPointRef version="any" ref="mybus:ssp_077"/>
+							<ToPointRef version="any" ref="mybus:ssp_001"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_077_to_pkg1">
+							<Name>C to P1</Name>
+							<FromPointRef version="any" ref="mybus:ssp_077"/>
+							<ToPointRef version="any" ref="mybus:pkgpt1"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_pkg1_to_ssp_077">
+							<Name>P1 to  C</Name>
+							<FromPointRef version="any" ref="mybus:pkgpt1"/>
+							<ToPointRef version="any" ref="mybus:ssp_077"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_077_to_ssp_002">
+							<Name>C to B</Name>
+							<FromPointRef version="any" ref="mybus:ssp_077"/>
+							<ToPointRef version="any" ref="mybus:ssp_002"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_002_to_ssp_001">
+							<Name>B to  A</Name>
+							<FromPointRef version="any" ref="mybus:ssp_002"/>
+							<ToPointRef version="any" ref="mybus:ssp_001"/>
+						</TimingLink>
+						<TimingLink version="any" id="kx:tl_ssp_001_to_grg1">
+							<Name>A to G1</Name>
+							<FromPointRef version="any" ref="mybus:ssp_001"/>
+							<ToPointRef version="any" ref="mybus:grgpt1"/>
+						</TimingLink>
+					</timingLinks>
+					<timingPatterns>
+						<!--- TIMING PATTERN======== -->
+						<TimingPattern version="any" id="kx:tp_12o">
+							<Name>Line 12 outbound TIMING PATTERN</Name>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" id="kx:tpijp_tp_L24o_001" order="1">
+									<TimingPointRef version="any" ref="mybus:ssp_001"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_001_to_ssp_002"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" id="kx:tpijp_tp_L24o_002" order="2">
+									<TimingPointRef version="any" ref="mybus:ssp_002"> </TimingPointRef>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_002_to_ssp_077"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" id="kx:tpijp_tp_L24o_003" order="3">
+									<TimingPointRef version="any" ref="mybus:ssp_077"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="kx:tp_12i">
+							<Name>Line 12 inbound TIMING PATTERN</Name>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" id="kx:tpijp_tp_L24i_001" order="1">
+									<TimingPointRef version="any" ref="mybus:ssp_077"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_077_to_ssp_002"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" id="kx:tpijp_tp_L24i_002" order="2">
+									<TimingPointRef version="any" ref="mybus:ssp_002"> </TimingPointRef>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_002_to_ssp_001"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" id="kx:tpijp_tp_L24i_003" order="3">
+									<TimingPointRef version="any" ref="mybus:ssp_001"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+					</timingPatterns>
+					<journeyPatterns>
+						<ServiceJourneyPattern version="any" id="kx:sjp_L24o">
+							<Name>Line 12 outbound</Name>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="kx:jprt_sjp_L24o_ssp_001-ssp_002_tdt_45">
+									<Name>Ov erall Run Time from 001 to 077:  30 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_001_to_ssp_077"/>
+									<RunTime>PT30M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<layovers>
+								<JourneyPatternLayover version="any" id="kx:JourneyPatternLayover:jply_sjp_L24o_001">
+									<Name>Wait at Stop C</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<Layover>PT5M</Layover>
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+								</JourneyPatternLayover>
+							</layovers>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_sjp_L24o_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_001_to_ssp_002"/>
+									<IsWaitPoint>true</IsWaitPoint>
+									<OnwardServiceLinkRef version="any" ref="kx:sl_ssp_001_to_ssp_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_sjp_L24o_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_002_to_ssp_077"/>
+									<OnwardServiceLinkRef version="any" ref="kx:sl_ssp_002_to_ssp_077"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_sjp_L24o_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<ServiceJourneyPatternType>passenger</ServiceJourneyPatternType>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="kx:sjp_L24i">
+							<Name>Line 12 inbound</Name>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="kx:jprt_sjp_L24o_ssp_077-ssp_002_tdt_45">
+									<Name>Overall Time from 077 to 001:  30 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_077_to_ssp_001"/>
+									<RunTime>PT30M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<layovers>
+								<JourneyPatternLayover version="any" id="xj:jply_sjp_L24i_001">
+									<Name>Wait at Stop A</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<Layover>PT5M</Layover>
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+								</JourneyPatternLayover>
+							</layovers>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_sjp_L24i_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_077_to_ssp_002"/>
+									<IsWaitPoint>true</IsWaitPoint>
+									<OnwardServiceLinkRef version="any" ref="kx:sl_ssp_077_to_ssp_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_sjp_L24i_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_002_to_ssp_001"/>
+									<OnwardServiceLinkRef version="any" ref="kx:sl_ssp_002_to_ssp_001"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_sjp_L24i_077" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<ServiceJourneyPatternType>passenger</ServiceJourneyPatternType>
+						</ServiceJourneyPattern>
+						<DeadRunJourneyPattern version="any" id="kx:drjp_L24_01o">
+							<Name>G1 to Start of Line 12</Name>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="kx:jprt_drjp_L24o_grg1-ssp_001_tdt_45">
+									<Name>Run Out Time from G1 to 001:  10 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_grg1_to_ssp_001"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_01o_001" order="1">
+									<GaragePointRef version="any" ref="mybus:grgpt1"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_grg1_to_ssp_001"/>
+								</TimingPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_01o_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</DeadRunJourneyPattern>
+						<DeadRunJourneyPattern version="any" id="kx:drjp_L24_02o">
+							<Name>Stop C to P1</Name>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="kx:jprt_drjp_L24o_ssp_077-pkg1_tdt_45">
+									<Name>Run Time from 077 to P1:  5 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_077_to_pkg1"> </TimingLinkRef>
+									<RunTime>PT5M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_02o_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_077_to_pkg1"/>
+								</StopPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_02o_002" order="2">
+									<ParkingPointRef version="any" ref="mybus:pkgpt1"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</DeadRunJourneyPattern>
+						<DeadRunJourneyPattern version="any" id="kx:drjp_L24_03i">
+							<Name>P1 to Stop C  </Name>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="kx:jprt_sjp_L24i_pkg1-ssp_077_tdt_45">
+									<Name>Run Time from P1 to 077:  5 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_pkg1_to_ssp_077"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_03i_001" order="1">
+									<ParkingPointRef version="any" ref="mybus:pkgpt1"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_pkg1_to_ssp_077"/>
+								</TimingPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_03i_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</DeadRunJourneyPattern>
+						<DeadRunJourneyPattern version="any" id="kx:drjp_L24_04i">
+							<Name>Stop A back to garage  </Name>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="kx:jprt_sjp_L24i_ssp_001-grg1_tdt_45">
+									<Name>Run Time from 001 to G1:  10 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_001_to_grg1"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_04i_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<OnwardTimingLinkRef version="any" ref="kx:tl_ssp_001_to_grg1"/>
+								</StopPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" id="kx:pijp_drjp_L24_04i_002" order="2">
+									<GaragePointRef version="any" ref="mybus:grgpt1"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</DeadRunJourneyPattern>
+					</journeyPatterns>
+					<timeDemandTypes>
+						<TimeDemandType version="any" id="kx:tdt_45_Day">
+							<Name>Normal Time demand </Name>
+							<runTimes>
+								<!--- =====Outbound=== -->
+								<JourneyRunTime version="any" id="kx:jprt_sjp_L24o_ssp_001-ssp_002_tdt_45">
+									<Name>Run Time from 001 to 002:  10 minutes</Name>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_001_to_ssp_002"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="kx:jprt_sjp_L24o_ssp_002-ssp_077_tdt_45">
+									<Name>Run Time from 002 to 007: 20 minutes</Name>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_002_to_ssp_077"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="kx:jprt_sjp_L24o_ssp_077-ssp_002_tdt_45">
+									<Name>Time from 077 to 002:  20 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_077_to_ssp_002"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="kx:jprt_sjp_L24o_ssp_002-ssp_001_tdt_45">
+									<Name>Time from 002 to 001: 10 minutes</Name>
+									<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+									<TimingLinkRef version="any" ref="kx:tl_ssp_002_to_ssp_001"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+							</runTimes>
+						</TimeDemandType>
+						<TimeDemandType version="any" id="kx:tdt_46_Night">
+							<Name>Night Time demand </Name>
+						</TimeDemandType>
+					</timeDemandTypes>
+				</ServiceFrame>
+				<!-- ======Timetable ======= -->
+				<TimetableFrame version="any" id="xj:ttf_12">
+					<Name>Winter timetable for route 12  </Name>
+					<VehicleModes>bus</VehicleModes>
+					<vehicleJourneys>
+						<!--  ============= SERVICE JOURNEYS ============== -->
+						<DeadRun version="any" id="xj:DeadRun:dr_L24_01o">
+							<Name>1st Dead Run out from Garage in Day  service</Name>
+							<DepartureTime>11:00:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_01o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_01"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_01o_001">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_01o_001"/>
+									<DepartureTime>11:00:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_01o_002">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_01o_002"/>
+									<ArrivalTime>11:10:00.0Z</ArrivalTime>
+									<WaitingTime>PT5M</WaitingTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>outbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:grgpt1"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<DeadRunType>garageRunOut</DeadRunType>
+						</DeadRun>
+						<ServiceJourney version="any" id="xj:vj_L24_01o">
+							<DepartureTime>11:10:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_01o_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+										<DutyPartRef version="any" ref="ops:DutyPart:dtypt_01_01"/>
+									</Arrival>
+									<Departure>
+										<Time>11:10:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_01o_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>11:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_01o_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<Time>11:40:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_02i">
+							<DepartureTime>11:45:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>inbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24i"/>
+								<DirectionType>inbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_02i_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>11:45:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_02i_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>12:05:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_02i_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<Time>12:15:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_03o">
+							<DepartureTime>12:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_03o_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>12:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_03o_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>12:30:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_03o_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<Time>12:50:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24_03o">
+							<Name>Drive to Parking for first wait  service</Name>
+							<DepartureTime>12:50:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_02o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_01"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_03o_001">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_02o_001"/>
+									<DepartureTime>12:50:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_03o_002">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_02o_002"/>
+									<ArrivalTime>12:55:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>outbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:pkgpt1"/>
+							</Destination>
+							<DeadRunType>other</DeadRunType>
+						</DeadRun>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24_04i">
+							<Name>Return from Parking after first wait  service</Name>
+							<DepartureTime>11:00:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_03i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_02"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_04i_001">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_03i_001"/>
+									<DepartureTime>13:00:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_04i_002">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_03i_002"/>
+									<ArrivalTime>13:05:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>inbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:pkgpt1"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<DeadRunType>other</DeadRunType>
+						</DeadRun>
+						<ServiceJourney version="any" id="xj:vj_L24_04i">
+							<DepartureTime>13:10:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_02"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>inbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24i"/>
+								<DirectionType>inbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_04i_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>13:10:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_04i_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>13:30:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_04i_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<Time>13:40:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_05o">
+							<DepartureTime>13:45:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_02"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_05o_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>13:45:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_05o_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>13:55:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_05o_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<Time>14:15:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_06i">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_02"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>inbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24i"/>
+								<DirectionType>inbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_06i_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>14:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_06i_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>14:40:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_06i_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<Time>14:50:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_07o">
+							<DepartureTime>15:55:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_02"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_07o_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>15:55:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_07o_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>16:05:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_07o_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<Time>16:25:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24_07o">
+							<Name>Drive to Parking for 2nd  wait  with Relief</Name>
+							<DepartureTime>16:25:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_02o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_02"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_07o_001">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_02o_001"/>
+									<DepartureTime>16:25:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_07o_002">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_02o_002"/>
+									<ArrivalTime>16:30:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>outbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:pkgpt1"/>
+							</Destination>
+							<DeadRunType>other</DeadRunType>
+						</DeadRun>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24_08i">
+							<Name>Return from Parking after 2nd  wait  with Relief</Name>
+							<DepartureTime>16:50:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_03i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_03"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_08i_001">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_03i_001"/>
+									<DepartureTime>16:50:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_08i_002">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_03i_002"/>
+									<ArrivalTime>16:55:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>inbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:pkgpt1"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<DeadRunType>other</DeadRunType>
+						</DeadRun>
+						<ServiceJourney version="any" id="xj:vj_L24_08i">
+							<DepartureTime>16:55:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_03"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>inbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24i"/>
+								<DirectionType>inbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_08i_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+										<DutyPartRef version="any" ref="ops:DutyPart:dtypt_01_01"/>
+									</Arrival>
+									<Departure>
+										<Time>16:55:00.0Z</Time>
+										<DutyPartRef version="any" ref="ops:DutyPart:dtypt_01_02"/>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_08i_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>17:15:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_08i_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<Time>17:25:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_09o">
+							<DepartureTime>17:30:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_03"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_09o_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>17:30:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_09o_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>17:40:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_09o_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<Time>18:00:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24_10i">
+							<DepartureTime>18:05:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_03"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<DirectionType>inbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24i"/>
+								<DirectionType>inbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24_10i_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>18:05:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_10i_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>18:25:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24_10i_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<Time>18:35:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24_10i">
+							<Name>Return to Garage after Day Service</Name>
+							<DepartureTime>11:00:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_04i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_45_Day"/>
+							<BlockRef version="any" ref="ops:blk_L24_03"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_10i_001">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_04i_001"/>
+									<DepartureTime>16:35:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_10i_002">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_04i_002"/>
+									<ArrivalTime>16:45:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>inbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:grgpt1"/>
+							</Destination>
+							<DeadRunType>garageRunIn</DeadRunType>
+						</DeadRun>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24N_11o">
+							<Name>1st Dead Run out from Garage to start Night   service</Name>
+							<DepartureTime>20:00:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24o"/>
+							<DeadRunJourneyPatternRef version="any" ref="kx:drjp_L24_01o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_46_Night"/>
+							<BlockRef version="any" ref="ops:blk_L24N_04"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24N_11o_001">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_01o_001"/>
+									<DepartureTime>16:25:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24N_11o_002">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_01o_002"/>
+									<ArrivalTime>16:30:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>outbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:grgpt1"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<DeadRunType>other</DeadRunType>
+						</DeadRun>
+						<ServiceJourney version="any" id="xj:vj_L24N_11o">
+							<DepartureTime>20:10:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24o"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_46_Night"/>
+							<BlockRef version="any" ref="ops:blk_L24N_04"/>
+							<LineRef version="any" ref="mybus:LN_24N"/>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_31_charley"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24N_11o_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+										<DutyPartRef version="any" ref="ops:DutyPart:dtypt_01_03"/>
+									</Arrival>
+									<Departure>
+										<Time>20:10:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24N_11o_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>20:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24N_11o_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<Time>20:40:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="xj:vj_L24N_12i">
+							<DepartureTime>20:50:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<ServiceJourneyPatternRef version="any" ref="kx:sjp_L24i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_46_Night"/>
+							<BlockRef version="any" ref="ops:blk_L24N_04"/>
+							<LineRef version="any" ref="mybus:LN_24N"/>
+							<DirectionType>inbound</DirectionType>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="kx:rt_24i"/>
+								<DirectionType>inbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:dst_45_alpha"/>
+							</JourneyPatternView>
+							<Origin>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+							</Origin>
+							<Destination>
+								<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+							</Destination>
+							<calls>
+								<Call id="xj:vj_L24N_L24i_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>20:50:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24N_L24i_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_002"/>
+									<Departure>
+										<Time>21:05:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="xj:vj_L24N_L24i_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:ssp_001"/>
+									<Arrival>
+										<Time>21:15:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<DeadRun version="any" id="xj:DeadRun:dr_L24N_12i">
+							<Name>Last Dead Run back from Garage in Night  service</Name>
+							<DepartureTime>21:15:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="xj:DT_01"/>
+							</dayTypes>
+							<RouteRef version="any" ref="kx:rt_24i"/>
+							<JourneyPatternRef version="any" ref="kx:drjp_L24_04i"/>
+							<TimeDemandTypeRef version="any" ref="kx:tdt_46_Night"/>
+							<BlockRef version="any" ref="ops:blk_L24N_04"/>
+							<passingTimes>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_10i_001">
+									<StopPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_04i_001"/>
+									<DepartureTime>21:15:00.0Z</DepartureTime>
+								</TimetabledPassingTime>
+								<TimetabledPassingTime id="kx:tpt_dr_L24_10i_002">
+									<TimingPointInJourneyPatternRef version="any" ref="kx:pijp_drjp_L24_04i_002"/>
+									<ArrivalTime>21:25:00.0Z</ArrivalTime>
+								</TimetabledPassingTime>
+							</passingTimes>
+							<DirectionType>inbound</DirectionType>
+							<Origin>
+								<PointRef version="any" ref="mybus:ssp_001"/>
+							</Origin>
+							<Destination>
+								<PointRef version="any" ref="mybus:grgpt1"/>
+							</Destination>
+							<DeadRunType>garageRunIn</DeadRunType>
+						</DeadRun>
+					</vehicleJourneys>
+				</TimetableFrame>
+				<!--  ============= VEHICLE SCHEDULES  ============== -->
+				<VehicleScheduleFrame version="any" id="ops:VSF_23_O">
+					<Name>BLOCKS Winter timetable for VS Line 12 Example</Name>
+					<!-- === BLOCKs  ==== ========  -->
+					<blocks>
+						<Block version="any" id="ops:blk_L24_01">
+							<Description>First Block G1 out to  P1</Description>
+							<PreparationDuration>PT10M</PreparationDuration>
+							<FinishingDuration>PT10H</FinishingDuration>
+							<!--- VehicleTypeRef    -->
+							<VehicleTypeRef version="any" ref="xj:vt-447"/>
+							<StartPointRef ref="mybus:grgpt1"/>
+							<EndPointRef ref="mybus:pkgpt1"/>
+							<coursesOfJourneys>
+								<CourseOfJourneys version="any" id="ops:coj_L24_01">
+									<Description>&gt;Run for Block 1  3 journeys  </Description>
+									<PreparationDuration>PT10M</PreparationDuration>
+									<StartTimeInBlock>11:10:00</StartTimeInBlock>
+									<FinishingDuration>PT0M</FinishingDuration>
+									<BlockRef version="any" ref="ops:blk_L24_01"/>
+									<LineRef version="any" ref="mybus:LN_24"/>
+									<journeys>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_01o"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_02i"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_03o"/>
+									</journeys>
+								</CourseOfJourneys>
+							</coursesOfJourneys>
+							<blockParts>
+								<BlockPart version="any" id="ops:BlockPart:blkpt_L24_01_01" order="1">
+									<Description>Block Part</Description>
+									<VehicleTypeRef version="any" ref="xj:vt-447"/>
+								</BlockPart>
+							</blockParts>
+						</Block>
+						<Block version="any" id="ops:blk_L24_02">
+							<Description>Parking to Parking</Description>
+							<PreparationDuration>PT0M</PreparationDuration>
+							<FinishingDuration>PT0M</FinishingDuration>
+							<VehicleTypeRef version="any" ref="xj:vt-447"/>
+							<StartPointRef ref="mybus:pkgpt1"/>
+							<EndPointRef ref="mybus:pkgpt1"/>
+							<coursesOfJourneys>
+								<CourseOfJourneys version="any" id="ops:coj_L24_02">
+									<Description>Run for Block 2  + 4 journeys   </Description>
+									<PreparationDuration>PT20M</PreparationDuration>
+									<StartTimeInBlock>13:10:00</StartTimeInBlock>
+									<FinishingDuration>PT0M</FinishingDuration>
+									<BlockRef version="any" ref="ops:blk_L24_02"/>
+									<LineRef version="any" ref="mybus:LN_24"/>
+									<journeys>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_04i"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_05o"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_06i"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_07o"/>
+									</journeys>
+								</CourseOfJourneys>
+							</coursesOfJourneys>
+							<blockParts>
+								<BlockPart version="any" id="ops:BlockPart:blkpt_L24_02_01r" order="1">
+									<Description>P1 to P1</Description>
+									<VehicleTypeRef version="any" ref="xj:vt-447"/>
+								</BlockPart>
+							</blockParts>
+						</Block>
+						<Block version="any" id="ops:blk_L24_03">
+							<Description>Parking back to G1</Description>
+							<PreparationDuration>PT10M</PreparationDuration>
+							<FinishingDuration>PT0M</FinishingDuration>
+							<VehicleTypeRef version="any" ref="xj:vt-447"/>
+							<StartPointRef ref="mybus:pkgpt1"/>
+							<EndPointRef ref="mybus:grgpt1"/>
+							<coursesOfJourneys>
+								<CourseOfJourneys version="any" id="ops:coj_L24_03">
+									<Description>Run for Block 3 + 3 journeys </Description>
+									<PreparationDuration>PT0M</PreparationDuration>
+									<StartTimeInBlock>16:55:00</StartTimeInBlock>
+									<FinishingDuration>PT10M</FinishingDuration>
+									<BlockRef version="any" ref="ops:blk_L24_03"/>
+									<LineRef version="any" ref="mybus:LN_24"/>
+									<journeys>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_08i"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_09o"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24_10i"/>
+									</journeys>
+								</CourseOfJourneys>
+							</coursesOfJourneys>
+							<blockParts>
+								<BlockPart version="any" id="ops:BlockPart:blkpt_L24_03_01r" order="1">
+									<Description>P1  back to to G1</Description>
+									<VehicleTypeRef version="any" ref="xj:vt-447"/>
+								</BlockPart>
+							</blockParts>
+						</Block>
+						<Block version="any" id="ops:blk_L24N_04">
+							<Description>G1 Night back to G1</Description>
+							<PreparationDuration>PT10M</PreparationDuration>
+							<FinishingDuration>PT0M</FinishingDuration>
+							<VehicleTypeRef version="any" ref="xj:vt-447"/>
+							<StartPointRef ref="mybus:grgpt1"/>
+							<EndPointRef ref="mybus:grgpt1"/>
+							<coursesOfJourneys>
+								<CourseOfJourneys version="any" id="ops:coj_L24N_04">
+									<Description>Run for Block 4 +2  journeys </Description>
+									<PreparationDuration>PT0M</PreparationDuration>
+									<StartTimeInBlock>20:00:00</StartTimeInBlock>
+									<FinishingDuration>PT10M</FinishingDuration>
+									<BlockRef version="any" ref="ops:blk_L24N_04"/>
+									<LineRef version="any" ref="mybus:LN_24N"/>
+									<journeys>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24N_11o"/>
+										<VehicleJourneyRef version="any" ref="xj:vj_L24N_12i"/>
+									</journeys>
+								</CourseOfJourneys>
+							</coursesOfJourneys>
+							<blockParts>
+								<BlockPart version="any" id="ops:BlockPart:blkpt_L24_04_01r" order="1">
+									<Description>G1 Night   back to to G1</Description>
+									<VehicleTypeRef version="any" ref="xj:vt-450"/>
+								</BlockPart>
+							</blockParts>
+						</Block>
+					</blocks>
+					<vehicleServices>
+						<VehicleService version="any" id="ops:VehicleService:VS_L24_1">
+							<Description>Line 12 Vehicle service</Description>
+							<vehicleServiceParts>
+								<VehicleServicePart version="any" id="ops:VehicleService:VS_L24_1_01">
+									<Description>Vehicle service for  Line 12 Part 1 (Blocks 1 &amp; 2 )</Description>
+									<StartPointRef ref="mybus:grgpt1"/>
+									<EndPointRef ref="mybus:grgpt1"/>
+								</VehicleServicePart>
+								<VehicleServicePart version="any" id="ops:VehicleService:VS_L24_1_02">
+									<Description>Night Vehicle service for Line 12 Part 2 ( Block 4) </Description>
+									<StartPointRef ref="mybus:grgpt1"/>
+									<EndPointRef ref="mybus:grgpt1"/>
+								</VehicleServicePart>
+							</vehicleServiceParts>
+						</VehicleService>
+					</vehicleServices>
+				</VehicleScheduleFrame>
+				<DriverScheduleFrame version="any" id="xj:dtf_01">
+					<Name>Driver Scheudles for Line 1</Name>
+					<duties>
+						<Duty version="any" id="ops:Duty:dty_01">
+							<Description/>
+							<dutyParts>
+								<DutyPart version="any" id="ops:DutyPart:dtypt_01_01">
+									<StartTime>06:00:00Z</StartTime>
+									<EndTime>16:30:00Z</EndTime>
+									<StartPointRef version="any" ref="mybus:grgpt1"/>
+									<EndPointRef version="any" ref="mybus:pkgpt1"/>
+								</DutyPart>
+								<DutyPart version="any" id="ops:DutyPart:dtypt_01_02">
+									<StartTime>16:30:00Z</StartTime>
+									<EndTime>18:00:00Z</EndTime>
+									<StartPointRef version="any" ref="mybus:pkgpt1"/>
+									<EndPointRef version="any" ref="mybus:grgpt1"/>
+								</DutyPart>
+								<DutyPart version="any" id="ops:DutyPart:dtypt_01_03">
+									<StartTime>19:00:00Z</StartTime>
+									<EndTime>22:00:00Z</EndTime>
+									<StartPointRef version="any" ref="mybus:grgpt1"/>
+									<EndPointRef version="any" ref="mybus:grgpt1"/>
+								</DutyPart>
+							</dutyParts>
+						</Duty>
+					</duties>
+				</DriverScheduleFrame>
+				<InfrastructureFrame version="any" id="xif:InfrastructureFrame:iff_01">
+					<Name>Infra  Frame with garage def</Name>
+					<garages>
+						<Garage version="any" id="mybus:Garage:grg1">
+							<Name>Garage G1 </Name>
+							<Description/>
+							<members>
+								<GaragePointRef version="any" ref="mybus:grgpt1"/>
+							</members>
+						</Garage>
+					</garages>
+					<vehicleAndCrewPoints>
+						<GaragePoint version="any" id="mybus:grgpt1">
+							<Name>Garage Point in G1 (also a parking and relief point)</Name>
+						</GaragePoint>
+						<ParkingPoint version="any" id="mybus:pkgpt1">
+							<Name>Parking Point P1 (Also a relief point)</Name>
+						</ParkingPoint>
+					</vehicleAndCrewPoints>
+					<vehicleTypes>
+						<VehicleType version="any" created="2010-12-17T09:30:47.0Z" id="xj:vt-447">
+							<Name>Big red bus</Name>
+							<PassengerCapacity>
+								<SeatingCapacity>50</SeatingCapacity>
+								<StandingCapacity>20</StandingCapacity>
+								<WheelchairPlaceCapacity>2</WheelchairPlaceCapacity>
+							</PassengerCapacity>
+							<Length>30</Length>
+						</VehicleType>
+						<VehicleType version="any" created="2010-12-17T09:30:47.0Z" id="xj:vt-450">
+							<Name>Small blue red bus</Name>
+							<PassengerCapacity>
+								<SeatingCapacity>20</SeatingCapacity>
+								<StandingCapacity>120</StandingCapacity>
+								<WheelchairPlaceCapacity>0</WheelchairPlaceCapacity>
+							</PassengerCapacity>
+							<Length>20</Length>
+						</VehicleType>
+					</vehicleTypes>
+				</InfrastructureFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

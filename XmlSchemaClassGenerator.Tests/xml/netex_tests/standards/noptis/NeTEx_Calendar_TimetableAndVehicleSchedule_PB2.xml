@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Ulf Bjersing (Hogia Public Transport Systems AB) -->
+<!-- ==== Condensed Timetable, VehicleSchedule and ServiceCalendar Example ====== 
+This example shows: 
+
+1) The definition of a ServiceCalendarFrame, a VehicleScheduleFrame and a TimetableFrame in a form that 
+is relevant for supplying an Integrator with partial data from multiple sources.
+
+2) Three different types of InterchangeRule with a number of required and optional values
+
+3) Concept of version batch where all included versions from different version frames are applied as one atomic operation
+
+4) Attributes for accounting and advertisement
+
+5) Using combination of time and day offset to express times after midnight
+
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<Current/>
+				<TimetableFrameRef ref="noptis:9010001000000000:Timetable201"/>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P7D</PublicationRefreshInterval>
+	<Description>Simple NOPTIS timetable example </Description>
+	<dataObjects>
+		<!--- =============="Version batch"==========  -->
+		<CompositeFrame version="any" id="noptis:CF01">
+			<validityConditions>
+				<ValidBetween>
+					<FromDate>2011-01-23T00:00:00Z</FromDate>
+					<ToDate>2011-03-25T00:00:00Z</ToDate>
+				</ValidBetween>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="noptis">
+					<Xmlns>noptis</Xmlns>
+					<XmlnsUrl> http://www.noptis.org/noptis</XmlnsUrl>
+					<Description>Noptis codespace</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="noptis"/>
+			</FrameDefaults>
+			<frames>
+				<!-- =========================================== -->
+				<ServiceCalendarFrame version="any" id="noptis:9010001000000000:ServiceCalendar1" dataSourceRef="BL_HASTUS" changed="2010-12-23T23:05:12">
+					<validityConditions>
+						<ValidBetween>
+							<FromDate>2011-01-23T00:00:00Z</FromDate>
+							<ToDate>2011-03-25T00:00:00Z</ToDate>
+						</ValidBetween>
+					</validityConditions>
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="noptis:9010001000000000:BL"/>
+					</FrameDefaults>
+					<ServiceCalendar version="any" id="noptis:CF01">
+						<dayTypes>
+							<DayType version="any" id="D_V2207C060500_6"/>
+							<DayType version="any" id="D_V2205T150000_1"/>
+							<DayType version="any" id="D_V2207C060500_8"/>
+							<DayType version="any" id="D_V2205T150000_2"/>
+						</dayTypes>
+						<!--- === Day assignments ==== -->
+						<dayTypeAssignments>
+							<DayTypeAssignment id="D_V2205T150000_1" version="any" order="1">
+								<Date>2011-01-23</Date>
+								<DayTypeRef version="any" ref="D_V2205T150000_1"/>
+							</DayTypeAssignment>
+							<DayTypeAssignment id="D_V2207C060500_6" version="any" order="1">
+								<Date>2011-01-24</Date>
+								<DayTypeRef version="any" ref="D_V2207C060500_6"/>
+							</DayTypeAssignment>
+							<DayTypeAssignment id="D_V2207C060500_6" version="any" order="2">
+								<Date>2011-01-25</Date>
+								<DayTypeRef version="any" ref="D_V2207C060500_6"/>
+							</DayTypeAssignment>
+						</dayTypeAssignments>
+					</ServiceCalendar>
+				</ServiceCalendarFrame>
+				<!-- =========================================== -->
+				<TimetableFrame version="any" id="noptis:9010001000000000:Timetable201" dataSourceRef="BL_HASTUS" changed="2010-12-23T23:05:12">
+					<validityConditions>
+						<ValidBetween>
+							<FromDate>2011-01-23T00:00:00Z</FromDate>
+							<ToDate>2011-03-25T00:00:00Z</ToDate>
+						</ValidBetween>
+					</validityConditions>
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="noptis:9010001000000000:BL"/>
+					</FrameDefaults>
+					<ServiceCalendarFrameRef ref="noptis:9010001000000000:ServiceCalendar1"/>
+					<vehicleJourneys>
+						<DeadRun version="any" id="noptis:9016002003400001" responsibilitySetRef="noptis:9010001000000000:BX">
+							<validityConditions>
+								<AvailabilityCondition version="any" id="any2">
+									<FromDate>2011-01-25T00:00:00Z</FromDate>
+									<ToDate>2011-01-26T00:00:00Z</ToDate>
+									<IsAvailable>false</IsAvailable>
+								</AvailabilityCondition>
+								<AvailabilityCondition version="any" id="any3">
+									<FromDate>2011-01-27T00:00:00Z</FromDate>
+									<ToDate>2011-01-28T00:00:00Z</ToDate>
+									<IsAvailable>false</IsAvailable>
+								</AvailabilityCondition>
+							</validityConditions>
+							<TransportMode>bus</TransportMode>
+							<journeyAccountings>
+								<JourneyAccounting version="any" id="noptis:9016002003400001">
+									<SupplyContractRef ref="noptis:SL:264"/>
+									<AccountingCode>BB</AccountingCode>
+									<AccountingType> contract</AccountingType>
+									<Distance>4496</Distance>
+									<Duration>PT19M</Duration>
+								</JourneyAccounting>
+							</journeyAccountings>
+							<dayTypes>
+								<DayTypeRef version="any" ref="D_V2207C060500_6"/>
+								<DayTypeRef version="any" ref="D_V2205T150000_2"/>
+							</dayTypes>
+							<OperatorRef ref="noptis:9010001000000000:BX"/>
+							<Origin>
+								<PointRef ref="noptis:9025002001520450"/>
+							</Origin>
+							<Destination>
+								<PointRef ref="noptis:9025002001520456"/>
+							</Destination>
+							<DeadRunType>other</DeadRunType>
+							<calls>
+								<DeadRunCall>
+									<PointInJourneyPatternRef ref="noptis:9025002001520458"/>
+									<Departure>
+										<Time>23:02:00</Time>
+									</Departure>
+								</DeadRunCall>
+								<DeadRunCall>
+									<PointInJourneyPatternRef ref="noptis:9025002001520457"/>
+									<Arrival>
+										<Time>00:55:00</Time>
+										<DayOffset>1</DayOffset>
+									</Arrival>
+									<Departure>
+										<Time>01:02:00</Time>
+										<DayOffset>1</DayOffset>
+										<WaitTime>PT30S</WaitTime>
+									</Departure>
+								</DeadRunCall>
+								<DeadRunCall>
+									<ScheduledStopPointRef ref="noptis:9025002001520456"/>
+									<Arrival>
+										<Time>01:12:00</Time>
+										<DayOffset>1</DayOffset>
+									</Arrival>
+								</DeadRunCall>
+							</calls>
+						</DeadRun>
+						<ServiceJourney version="any" id="noptis:9015002020100001">
+							<TransportMode>bus</TransportMode>
+							<journeyAccountings>
+								<JourneyAccounting version="any" id="noptis:9015002020100001">
+									<SupplyContractRef ref="noptis:SL:264"/>
+									<AccountingCode>BB</AccountingCode>
+									<AccountingType> contract</AccountingType>
+									<Distance>44496</Distance>
+									<Duration>PT89M</Duration>
+								</JourneyAccounting>
+							</journeyAccountings>
+							<!-- In scope of referred ServiceCalendar-->
+							<noticeAssignments>
+								<NoticeAssignmentView>
+									<NoticeRef ref="xxx"/>
+									<PublicityChannel> dynamicMedia</PublicityChannel>
+									<Advertised>true</Advertised>
+									<Text>Special conditions apply for payment.</Text>
+								</NoticeAssignmentView>
+								<NoticeAssignmentView>
+									<NoticeRef ref="xxx"/>
+									<Advertised>true</Advertised>
+									<Text>Another note.</Text>
+								</NoticeAssignmentView>
+							</noticeAssignments>
+							<DepartureTime>23:33:00</DepartureTime>
+							<JourneyDuration>PT61M</JourneyDuration>
+							<dayTypes>
+								<DayTypeRef version="any" ref="D_V2207C060500_6"/>
+								<DayTypeRef version="any" ref="D_V2205T150000_2"/>
+							</dayTypes>
+							<OperatorRef ref="noptis:9010001000000000:BX"/>
+							<LineView>
+								<LineRef ref="noptis:9012002020100000"/>
+								<PublicCode>Röd</PublicCode>
+								<Name>Red express</Name>
+								<TransportMode>bus</TransportMode>
+							</LineView>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteView>
+									<DirectionView>
+										<DirectionRef ref="noptis:ODD"/>
+										<Name>Name of ODD direction</Name>
+									</DirectionView>
+								</RouteView>
+								<DestinationDisplayView>
+									<keyList>
+										<KeyValue>
+											<Key>HeadSign_MORILEC_V43</Key>
+											<Value>3347</Value>
+										</KeyValue>
+										<KeyValue>
+											<Key>HeadSign_INOR</Key>
+											<Value>R_THvG</Value>
+										</KeyValue>
+									</keyList>
+									<DestinationDisplayRef ref="noptis:201"/>
+									<Name>Tahult via Göteborg</Name>
+									<ShortName>Tahult</ShortName>
+									<FrontText>Tahult via Göteborg</FrontText>
+									<PublicCode>Röd</PublicCode>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<Origin>
+								<Name>Kolhättan</Name>
+							</Origin>
+							<Print>true</Print>
+							<Dynamic>onlyIfSignedOn</Dynamic>
+							<calls>
+								<Call id="noptis:9015002020100001" order="1" version="any">
+									<ScheduledStopPointRef ref="noptis:9025002001520702"/>
+									<TimingPointStatus>timingPoint</TimingPointStatus>
+									<Departure>
+										<Time>23:33:00</Time>
+										<ForBoarding>true</ForBoarding>
+										<IsFlexible>false</IsFlexible>
+										<noticeAssignments>
+											<NoticeAssignmentView>
+												<NoticeRef ref="xxx"/>
+												<Advertised>true</Advertised>
+												<Text>A Departure note.</Text>
+											</NoticeAssignmentView>
+										</noticeAssignments>
+									</Departure>
+									<noticeAssignments>
+										<NoticeAssignmentView>
+											<NoticeRef ref="xxx"/>
+											<Advertised>true</Advertised>
+											<Text>A Call note.</Text>
+										</NoticeAssignmentView>
+									</noticeAssignments>
+									<RequestStop>false</RequestStop>
+									<TrainSize>
+										<TrainSizeType>long</TrainSizeType>
+									</TrainSize>
+								</Call>
+								<Call id="noptis:9015002020100001" order="2" version="any">
+									<ScheduledStopPointRef ref="noptis:9025002001520456"/>
+									<TimingPointStatus>timingPoint</TimingPointStatus>
+									<Arrival>
+										<Time>23:55:00</Time>
+										<ForAlighting>true</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>00:02:00</Time>
+										<DayOffset>1</DayOffset>
+										<ForBoarding>true</ForBoarding>
+										<interchangeRules>
+											<InterchangeRule version="any" id="noptis:9021002015010000-01">
+												<StaySeated>true</StaySeated>
+												<!--Optional, default is false-->
+												<Guaranteed>false</Guaranteed>
+												<!--Optional, default is true  -->
+												<Advertised>false</Advertised>
+												<!--Optional, default is true-->
+												<MaximumWaitTime>PT6M</MaximumWaitTime>
+												<MinimumTransferTime>PT1M</MinimumTransferTime>
+												<!--Optional, if stated will override Connection (link) time-->
+												<FeederFilter>
+													<StopAreaRef ref="noptis:9021002015010000"/>
+													<LineInDirectionRef>
+														<LineRef ref="noptis:9012002033300000"/>
+														<DirectionRef ref="noptis:ODD"/>
+													</LineInDirectionRef>
+													<MaximumInterchangeWindow>PT6M</MaximumInterchangeWindow>
+												</FeederFilter>
+											</InterchangeRule>
+										</interchangeRules>
+									</Departure>
+									<DestinationDisplayView>
+										<keyList>
+											<KeyValue>
+												<Key>HeadSign_MORILEC_V43</Key>
+												<Value>1122</Value>
+											</KeyValue>
+											<KeyValue>
+												<Key>HeadSign_INOR</Key>
+												<Value>R_TH</Value>
+											</KeyValue>
+										</keyList>
+										<DestinationDisplayRef ref="noptis:201"/>
+										<Name>Tahult Central</Name>
+										<ShortName>Tahult</ShortName>
+										<FrontText>Tahult</FrontText>
+										<PublicCode>Röd</PublicCode>
+									</DestinationDisplayView>
+									<TrainSize>
+										<TrainSizeType>short</TrainSizeType>
+									</TrainSize>
+								</Call>
+								<Call id="noptis:9015002020100001" order="3" version="any">
+									<Arrival>
+										<Time>01:55:00</Time>
+										<DayOffset>1</DayOffset>
+										<ForAlighting>true</ForAlighting>
+									</Arrival>
+									<RequestStop>true</RequestStop>
+								</Call>
+							</calls>
+							<PassengerCarryingRequirementsView>
+								<PassengerCapacity>
+									<TotalCapacity>90</TotalCapacity>
+									<SeatingCapacity>50</SeatingCapacity>
+									<PushchairCapacity>1</PushchairCapacity>
+									<WheelchairPlaceCapacity>2</WheelchairPlaceCapacity>
+								</PassengerCapacity>
+								<LowFloor>true</LowFloor>
+								<HasLiftOrRamp>true</HasLiftOrRamp>
+							</PassengerCarryingRequirementsView>
+							<FlexibleServiceProperties>
+								<BookingAccess>public</BookingAccess>
+								<LatestBookingTime>10:00:00</LatestBookingTime>
+								<MinimumBookingPeriod>PT1H</MinimumBookingPeriod>
+								<BookingNote>
+										 Public note content 
+									 
+								</BookingNote>
+							</FlexibleServiceProperties>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="noptis:9015002020100003">
+							<validityConditions>
+								<AvailabilityCondition version="any" id="any22">
+									<FromDate>2011-01-25T00:00:00Z</FromDate>
+									<ToDate>2011-01-26T00:00:00Z</ToDate>
+									<IsAvailable>false</IsAvailable>
+								</AvailabilityCondition>
+								<AvailabilityCondition version="any" id="any32">
+									<FromDate>2011-01-27T00:00:00Z</FromDate>
+									<ToDate>2011-01-28T00:00:00Z</ToDate>
+									<IsAvailable>false</IsAvailable>
+								</AvailabilityCondition>
+							</validityConditions>
+							<TransportMode>bus</TransportMode>
+							<journeyAccountings>
+								<JourneyAccounting version="any" id="noptis:9015002020100003">
+									<SupplyContractRef ref="noptis:SL:264"/>
+									<AccountingCode>BB</AccountingCode>
+									<AccountingType> contract</AccountingType>
+									<Distance>44496</Distance>
+									<Duration>PT89M</Duration>
+								</JourneyAccounting>
+							</journeyAccountings>
+							<DepartureTime>23:43:00</DepartureTime>
+							<JourneyDuration>PT61M</JourneyDuration>
+							<dayTypes>
+								<DayTypeRef ref="noptis:9086002000100005"/>
+							</dayTypes>
+							<OperatorRef ref="noptis:9010001000000000:BX"/>
+							<LineView>
+								<LineRef ref="noptis:9012002020100000"/>
+								<Name>Red express</Name>
+								<TransportMode>bus</TransportMode>
+							</LineView>
+							<DirectionType>outbound</DirectionType>
+							<JourneyPatternView>
+								<RouteView>
+									<DirectionView>
+										<DirectionRef ref="noptis:ODD"/>
+										<Name>Name of ODD direction</Name>
+									</DirectionView>
+								</RouteView>
+								<DestinationDisplayView>
+									<keyList>
+										<KeyValue>
+											<Key>HeadSign_MORILEC_V43</Key>
+											<Value>3347</Value>
+										</KeyValue>
+										<KeyValue>
+											<Key>HeadSign_INOR</Key>
+											<Value>R_THvG</Value>
+										</KeyValue>
+									</keyList>
+									<DestinationDisplayRef ref="noptis:201"/>
+									<Name>Tahult via Göteborg</Name>
+									<ShortName>Tahult</ShortName>
+									<FrontText>Tahult via Göteborg</FrontText>
+									<PublicCode>Röd</PublicCode>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<Origin>
+								<PlaceRef ref="noptis:9091002000002712"/>
+							</Origin>
+							<calls>
+								<Call id="noptis:9015002020100003" order="1" version="any">
+									<ScheduledStopPointRef ref="noptis:9025002001520702"/>
+									<TimingPointStatus>timingPoint</TimingPointStatus>
+									<Departure>
+										<Time>23:43:00</Time>
+										<ForBoarding>true</ForBoarding>
+										<IsFlexible>false</IsFlexible>
+										<noticeAssignments>
+											<NoticeAssignmentView>
+												<NoticeRef ref="xxx"/>
+												<Advertised>true</Advertised>
+												<Text>A Call note.</Text>
+											</NoticeAssignmentView>
+										</noticeAssignments>
+									</Departure>
+									<RequestStop>false</RequestStop>
+								</Call>
+								<Call id="noptis:9015002020100003" order="2" version="any">
+									<ScheduledStopPointRef ref="noptis:9025002001520456"/>
+									<TimingPointStatus>timingPoint</TimingPointStatus>
+									<Arrival>
+										<Time>00:05:00</Time>
+										<DayOffset>1</DayOffset>
+										<ForAlighting>true</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>00:12:00</Time>
+										<DayOffset>1</DayOffset>
+										<ForBoarding>true</ForBoarding>
+										<interchangeRules>
+											<InterchangeRule version="any" id="noptis:9021002015010000-02">
+												<StaySeated>true</StaySeated>
+												<Guaranteed>true</Guaranteed>
+												<MaximumWaitTime>PT60M</MaximumWaitTime>
+												<FeederFilter>
+													<StopAreaRef ref="noptis:9021002015010000"/>
+													<AllLines/>
+													<ServiceJourneyRef ref="noptis:9015002000100023"/>
+													<MaximumInterchangeWindow>PT6M</MaximumInterchangeWindow>
+												</FeederFilter>
+											</InterchangeRule>
+											<InterchangeRule version="any" id="noptis:9021002015010000-03">
+												<MaximumWaitTime>PT5M</MaximumWaitTime>
+												<MinimumTransferTime>PT2M</MinimumTransferTime>
+												<FeederFilter>
+													<StopAreaRef ref="noptis:9021002015010000"/>
+													<LineInDirectionRef>
+														<LineRef ref="noptis:9011001002300000"/>
+														<DirectionRef ref="ODD"/>
+													</LineInDirectionRef>
+													<ServiceDesignator>
+														<FromPointRef ref="noptis:9025002003330453"/>
+														<ToPointRef ref="noptis:9025002009920458"/>
+														<DepartureTime>23:30:00</DepartureTime>
+													</ServiceDesignator>
+													<MaximumInterchangeWindow>PT6M</MaximumInterchangeWindow>
+												</FeederFilter>
+											</InterchangeRule>
+										</interchangeRules>
+									</Departure>
+								</Call>
+								<Call id="noptis:9015002020100003" order="3" version="any">
+									<Arrival>
+										<Time>01:55:00</Time>
+										<DayOffset>1</DayOffset>
+										<ForAlighting>true</ForAlighting>
+									</Arrival>
+									<RequestStop>true</RequestStop>
+								</Call>
+							</calls>
+						</ServiceJourney>
+					</vehicleJourneys>
+				</TimetableFrame>
+				<!-- =========================================== -->
+				<VehicleScheduleFrame version="any" id="noptis:9010001000000000:BL25" dataSourceRef="BL_HASTUS" changed="2010-12-23T23:05:12">
+					<validityConditions>
+						<ValidBetween>
+							<FromDate>2011-01-23T00:00:00Z</FromDate>
+							<ToDate>2011-03-25T00:00:00Z</ToDate>
+						</ValidBetween>
+					</validityConditions>
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="noptis:9010001000000000:BL"/>
+					</FrameDefaults>
+					<ServiceCalendarFrameRef ref="noptis:9010001000000000:ServiceCalendar1"/>
+					<blocks>
+						<Block version="any" id="noptis:904100100510012">
+							<validityConditions>
+								<AvailabilityCondition version="any" id="any221">
+									<FromDate>2011-01-25T00:00:00Z</FromDate>
+									<ToDate>2011-01-26T00:00:00Z</ToDate>
+									<IsAvailable>false</IsAvailable>
+								</AvailabilityCondition>
+								<AvailabilityCondition version="any" id="any321">
+									<FromDate>2011-01-27T00:00:00Z</FromDate>
+									<ToDate>2011-01-28T00:00:00Z</ToDate>
+									<IsAvailable>false</IsAvailable>
+								</AvailabilityCondition>
+							</validityConditions>
+							<Description>&gt;Run for Block 1  3 journeys  </Description>
+							<StartTime>08:00:00</StartTime>
+							<EndTime>17:00:00</EndTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="D_V2207C060500_6"/>
+								<DayTypeRef version="any" ref="D_V2205T150000_2"/>
+							</dayTypes>
+							<StartPointRef ref="noptis:9025002003330453"/>
+							<EndPointRef ref="noptis:9025002003330453"/>
+							<journeys>
+								<DeadRunRef ref="noptis:9016002005103001"/>
+								<ServiceJourneyRef ref="noptis:9015001003400011"/>
+								<ServiceJourneyRef ref="noptis:9015001003400014"/>
+								<JourneyDesignator>
+									<FromPointRef ref="noptis:9025002003330453"/>
+									<ToPointRef ref="noptis:9025002009920458"/>
+									<DepartureTime>00:40:00</DepartureTime>
+									<ArrivalTime>00:30:00</ArrivalTime>
+									<ArrivalDayOffset>1</ArrivalDayOffset>
+									<LineRef ref="noptis:9011001002300000"/>
+									<DirectionRef ref="ODD"/>
+								</JourneyDesignator>
+								<DeadRunRef ref="noptis:9016002005103002"/>
+							</journeys>
+						</Block>
+						<Block version="any" id="noptis:904100100510013">
+							<dayTypes>
+								<DayTypeRef version="any" ref="D_V2207C060500_6"/>
+								<DayTypeRef version="any" ref="D_V2205T150000_2"/>
+							</dayTypes>
+							<journeys>
+								<DeadRunRef ref="noptis:9016002005103005"/>
+								<ServiceJourneyRef ref="noptis:9015001003400023"/>
+								<DeadRunRef ref="noptis:9016002005103008"/>
+							</journeys>
+						</Block>
+					</blocks>
+				</VehicleScheduleFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

@@ -1,0 +1,1076 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.siri.org.uk/siri" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="siri_requests">
+	<!-- ===Dependencies ======================================= -->
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="../siri_utility/siri_utility-v1.1.xsd"/>
+	<xsd:include schemaLocation="../siri_utility/siri_location-v2.0.xsd"/>
+	<xsd:include schemaLocation="siri_request_errorConditions-v2.0.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>CEN TC278 WG3 SG7 Team</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG7 Editor Nicholas Knowles, Kizoom. mailto:schemer@siri.org.uk</Creator>
+				<Date>
+					<Created>2004-09-29</Created>
+				</Date>
+				<Date>
+					<Modified>2004-10-01</Modified>
+				</Date>
+				<Date>
+					<Modified>2005-02-14</Modified>
+				</Date>
+				<Date>
+					<Modified>2005-02-20</Modified>
+				</Date>
+				<Date>
+					<Modified>2005-05-11</Modified>
+				</Date>
+				<Date>
+					<Modified>2005-11-20</Modified>
+				</Date>
+				<Date>
+					<Modified>2007-03-29</Modified>
+				</Date>
+				<Date><Modified>2008-11-11</Modified>
+					 -- add substitution groups for 
+     AbstractRequest
+     AbstractResponse
+     AbstractFunctionalServiceRequest
+     AbstractFunctionalServiceSubscriptionRequest
+     AbstractFunctionalServiceDelivery
+     AbstractFunctionalServiceCapabilityRequest
+     AbstractFunctionalServiceCapabilityDelivery
+     AbstractDiscoveryDelivery
+     ErrorCode
+     
+				</Date>
+				<Date><Modified>2008-11-13</Modified>
+					 Move abstract discovery deliveries to here from siri_discoveries 
+				</Date>
+				<Date><Modified>2008-11-17</Modified>
+					 -- Add abstract discovery request 
+       Make request and response descendent of Request and Response Types 
+				</Date>
+				<Date><Modified>2009-03-31</Modified>
+					 - Add ErrorConditionelement to enable WSDL axis binding 
+				</Date>
+				<Date><Modified>2011-04-18</Modified>
+					 - ErrorConditionStructure Line 841 should not be abstract. Fix from RV ixxi.biz
+						 Also Add ServiceConditionErrorConditionElement 
+				</Date>
+				<Date><Modified>2012-03-23</Modified>
+					 +SIRI v2.0
+					  Add error number to Error structure
+					  factor out base identifier defintiiosn so can be share dwith error codes
+					  Factor out error codes
+					  Factor our Permission model to separate package siri_permissions
+				</Date>
+				<Date><Modified>2012-06-17</Modified>
+					 +SIRI v2.0 x
+					  Add delegator endpoint group to ServceRequest and FunctionalServcieResponse
+				</Date>
+				<Date><Modified>2013-02-11</Modified>
+					Added AbstractRequiredIdentifiedItemStructure
+					Added AbstractRequiredReferencingItemStructure
+				</Date>
+				<Date><Modified>2014-07-12</Modified>
+					Structure
+					Added AbstractRequiredReferencingItemStructure
+				</Date>
+				<Date><Modified>2018-04-12</Modified>
+					AbstractDiscoveryRequestStructure extends AuthenticatedRequestStructure instead of RequestStructure to avoid duplicates of RequestorEndpointGroup
+				</Date>
+				<Description>
+					<p>SIRI is a European CEN standard for the exchange of real-time information. This subschema defines common request processing elements</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.siri.org.uk/schema/2.0/xsd/siri/}siri_requests-v2.0.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.siri.org.uk/schema/2.0/xsd/siri_utility/siri_types-v2.0.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+
+        <Copyright>CEN, VDV, RTIG 2004-2012</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the VDV, RTIGXML and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 2.0 Draft</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport, Ports and maritime transport, Public transport,
+Rail transport, Roads and road transport
+</Category>
+					<Project>CEN TC278 WG3 SG7</Project>
+				</Subject>
+				<Title>SIRI XML schema. Common Request elements. </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>SIRI Common Request Framework.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractRequest" type="AbstractRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a timestamped SIRI request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for General SIRI Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="RequestTimestamp"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="AuthenticatedRequest" type="AuthenticatedRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for an authenticated request Authenticated.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AuthenticatedRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for Authticated SIRI Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestStructure">
+				<xsd:group ref="AuthenticatedRequestGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AuthenticatedRequestGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for authentication. +SIRI v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="AccountId" type="xsd:NMTOKEN" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Account Identifier. May be used to attribute requests to a particular application provider and authentication key. The account  may be common to all users of an application, or to an individual user. Note that to identify an individual user the  RequestorRef can be used with an anonymised token.  .     +SIRI v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccountKey" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Authentication key for request. May be used to authenticate requests from a particular account. +SIRI v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="RequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for General SIRI Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AuthenticatedRequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="RequestorEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking information relating to the original requestor. This allows the aggregation to be stateless. +SIRI 2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RequestorEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements relating to system that sent request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Address" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which response is to be sent. This may also be determined from RequestorRef and preconfigured data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="RequestorRef"/>
+			<xsd:element name="MessageIdentifier" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arbitrary unique identifier that can be used to reference this message in subsequent interactions.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="DelegatorEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking informattion relating to the original requestor. This allows the aggregation to be stateless.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DelegatorAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address of original Consumer, i.e. requesting system to which delegating response is to be  returned. +SIRI 2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DelegatorRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Identifier of delegating system that originated message. +SIRI 2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractTrackedRequest" type="RequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI request with requestor dteials tracked.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractServiceRequest" type="AbstractServiceRequestStructure" abstract="true" substitutionGroup="AbstractRequest">
+		<xsd:annotation>
+			<xsd:documentation>Substitutable type for a SIRI Functional Service request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractServiceRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Abstract Service Request for SIRI Service request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractRequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="ContextualisedRequestEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>Unique reference to request: participant and SIRI service type are given by context. Used on requests that are embedded in the context of another request. Only a message identfiier may be needed.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ContextualisedRequestEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to request: participant and SIRI service type are given by context. Used on requests that are embedded in the context of another request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MessageIdentifier" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arbitrary unique reference to this message.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="AbstractFunctionalServiceRequest" type="AbstractFunctionalServiceRequestStructure" abstract="true" substitutionGroup="AbstractServiceRequest">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI Functional Service request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractFunctionalServiceRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Abstract Service Request for SIRI Service request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractServiceRequestStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===Request Context================================================================== -->
+	<xsd:complexType name="AbstractSubscriptionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for SIRI Service subscriptions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="SubscriptionIdentityGroup"/>
+			<xsd:element name="InitialTerminationTime" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Requested end time for subscription.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="AbstractFunctionalServiceSubscriptionRequest" type="AbstractSubscriptionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI Functional Service subscription request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:group name="SubscriptionIdentityGroup">
+		<xsd:annotation>
+			<xsd:documentation>Type for unique identifier of a subscription.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SubscriberRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Participant identifier of Subscriber. Normally this will be given by context, i.e. be the same as on the Subscription Request.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriptionIdentifier" type="SubscriptionQualifierStructure">
+				<xsd:annotation>
+					<xsd:documentation>Identifier to be given to Subscription.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="SubscriptionContextStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Subscription context - Configuration parameters which may be evrriden.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="HeartbeatInterval" type="PositiveDurationType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Interval for heartbeat.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractSubscriptionRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for COmmon Subscription Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="RequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="SubscriberEndpointGroup"/>
+					<xsd:element name="SubscriptionContext" type="SubscriptionContextStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>General values that apply to subscription. Usually set by configuration.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractResponse" type="ResponseStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI response.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ResponseStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>General Type for General SIRI Response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ResponseTimestamp"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="ServiceDeliveryRequestStatusGroup">
+		<xsd:annotation>
+			<xsd:documentation>Status Information for overall request. Specific error conditions will be given on each individual request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Status" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the complerte request could be processed successfully or not. Default is 'true'. If any of the individual requests within the delivery failed, should be set to ' false'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ErrorCondition" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of any error or warning conditions that appluy to the overall request. More Specific error conditions should be included on each request that fails.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:choice>
+							<xsd:element ref="CapabilityNotSupportedError"/>
+							<xsd:element ref="OtherError"/>
+						</xsd:choice>
+						<xsd:element name="Description" type="ErrorDescriptionStructure" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Text description of error.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="ProducerResponse" type="ProducerResponseStructure" abstract="true" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI r Producer esponse.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ProducerResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for General SIRI Producer Response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="ProducerResponseEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking information relating to the original requestor. This allows the aggregation to be stateless. +SIRI 2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DeliveryStatusGroup">
+		<xsd:annotation>
+			<xsd:documentation>Status Information for individual request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Status" minOccurs="0"/>
+			<xsd:element name="ErrorCondition" type="ServiceDeliveryErrorConditionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of any error or warning condition.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="SuccessInfoGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="AbstractNotificationStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for Notification Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ProducerRequestEndpointStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractFunctionalServiceDelivery" type="AbstractServiceDeliveryStructure" abstract="true" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI Functional Service Deivery.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractServiceDeliveryStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for Common elementd for a SIRI service delivery of the Form xxxDelivery.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:choice>
+						<xsd:group ref="ContextualisedResponseEndpointGroup"/>
+						<xsd:group ref="SubscriptionIdentifierResourcePropertyGroup"/>
+					</xsd:choice>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregting system, trackng informattion relating to the original requestor. This allows the aggregation to be stateless.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+					<xsd:group ref="DeliveryStatusGroup"/>
+					<xsd:group ref="DeliveryDefaultGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DeliveryDefaultGroup">
+		<xsd:annotation>
+			<xsd:documentation>Common defaults.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DefaultLanguage" type="xsd:language" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default language for text elements.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="SubscriberEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to request. May be used to reference request in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ConsumerAddress" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which data is to be sent, if different from Address. This may also be determined from RequestorRef and preconfigured data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriptionFilterIdentifier" type="xsd:NMTOKEN" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a Subscription Filter with which this subscription is to be aggregated for purposes of notification and delivery. If absent, use the default filter. If present, use any existing filter with that identifier, if none found, create a new one. Optional SIRI feature.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="SubscriptionIdentifierResourcePropertyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to subscription May be used to reference subscription in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SubscriberRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Unique identifier of Subscriber - reference to a Participant.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriptionFilterRef" type="SubscriptionFilterRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Unique identifier of Subscription filter to which this subscription is assigned. If there is onlya single filter, then can be omitted.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriptionRef" type="SubscriptionQualifierStructure">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a service subscription: unique within Service and Subscriber.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="OptionalSubscriberEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to subscription May be used to reference subscription in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="SubscriberRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>If Delivery is for a Subscription, Participant reference of Subscriber.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriptionRef" type="SubscriptionQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>If Delivery is for a Subscription, unique identifier of service subscription request within Service and subscriber - a Timestamp.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ContextualisedResponseEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Endpoint reference proprerties for response message: participant and SIRI service type are given by context.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RequestMessageRef" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arbitrary unique reference to the request which gave rise to this message.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="Status" type="xsd:boolean" default="true">
+		<xsd:annotation>
+			<xsd:documentation>Whether the request was processed successfully or not. Default is 'true'.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- ============WSDL========================================================= -->
+	<xsd:complexType name="ConsumerRequestEndpointStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Unique reference to this request, created by Consumer. May be used to reference the request in subsequent interactions. Used by WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AuthenticatedRequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="ConsumerRequestEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking information relating to the original requestor. This allows the aggregation to be stateless. +SIRI 2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ConsumerRequestEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to this request, created by Consumer. May be used to reference the request in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Address" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which response is to be sent. This may also be determined from RequestorRef and preconfigured data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ConsumerRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Unique identifier of Consumer - a Participant reference.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MessageIdentifier" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arbitrary unique reference to this message. Some systems may use just timestamp for this.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ConsumerResponseEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to this response message from Consumer. May be used to reference the response in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ConsumerRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Unique identifier of Consumer - a Participant reference.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RequestMessageRef" type="MessageRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to an arbitrary unique idenitifer associated with the request which gave rise to this response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="ConsumerResponseEndpointStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Unique reference to this response created by Consumer. May be used to reference the request in subsequent interactions. Used by WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="ConsumerResponseEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking information relating to the original requestor. This allows the aggregation to be stateless. +SIRI 2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ============WSDL========================================================= -->
+	<xsd:element name="ProducerRequest" type="ProducerRequestEndpointStructure" abstract="true" substitutionGroup="AuthenticatedRequest"/>
+	<xsd:complexType name="ProducerRequestEndpointStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Unique reference to request to the producer. May be used to reference request in subsequent interactions. Used for WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AuthenticatedRequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="ProducerRequestEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregting system, trackng informattion relating to the original requestor. This allows the aggregation to be stateless.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ProducerRequestEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to request from producer. May be used to reference request in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Address" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address to which response is to be sent. This may also be determined from ProducerRef and preconfigured data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ProducerRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Unique identifier of Producer - Participant reference.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MessageIdentifier" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arbitrary unique reference to this message. Some systems may use just timestamp for this. Where there are multiple SubscriptionFilters, this can be used to distinguish between different notifications for different filters.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ResponseEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to response May be used to reference response in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Address" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Address for further interaction.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ResponderRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Participant reference that identifies responder.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RequestMessageRef" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to an arbitrary unique reference associated with the request which gave rise to this response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="ResponseEndpointStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Unique reference to reponse. May be used to reference request in subsequent interactions. Used for WSDL 
+
+ .</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="ResponseEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregating system , tracking information relating to the original requestor. This allows the aggregation to be stateless. +SIRI 2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ProducerResponseEndpointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Unique reference to reponse from producer. May be used to reference request in subsequent interactions.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ProducerRef" type="ParticipantRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Unique identifier of Producer - Participant reference.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Address" type="EndpointAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Endpoint Address to which acknowledgements to confirm delivery are to be sent.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ResponseMessageIdentifier" type="MessageQualifierStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>An arbitrary unique reference associated with the response which may be used to reference it.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RequestMessageRef" type="MessageRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to an arbitrary unique identifier associated with the request which gave rise to this response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="ProducerResponseEndpointStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Unique reference to reponse from producer. May be used to reference request in subsequent interactions. Used for WSDL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="ProducerResponseEndpointGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ============Recorded Items========================================================== -->
+	<xsd:complexType name="AbstractItemStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an Activity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RecordedAtTime" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Time at which data was recorded.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractIdentifiedItemStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an Activity that can be referenced.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractItemStructure">
+				<xsd:sequence>
+					<xsd:element name="ItemIdentifier" type="ItemIdentifierType" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractRequiredIdentifiedItemStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an Activity that can be referenced.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractItemStructure">
+				<xsd:sequence>
+					<xsd:element name="ItemIdentifier" type="ItemIdentifierType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of item.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractReferencingItemStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an Activity that references a previous Activity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractItemStructure">
+				<xsd:sequence>
+					<xsd:element name="ItemRef" type="ItemRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Reference to an Activity Element of  a delivery.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractRequiredReferencingItemStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an Activity that references a previous Activity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractItemStructure">
+				<xsd:sequence>
+					<xsd:element name="ItemRef" type="ItemRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>Reference to an Activity Element of  a delivery.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractFunctionalServiceCapabilitiesRequest" type="AbstractServiceRequestStructure" abstract="true" substitutionGroup="AbstractServiceRequest">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI Functional Service Capabiloities equest.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceCapabilitiesRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for ServcieCapabilities request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AbstractServiceRequestStructure">
+				<xsd:sequence>
+					<xsd:element name="ParticipantPermissions" type="xsd:boolean" default="false" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether to include the requestors permissions in the response. Only applies if Access control capability supported. Default is 'false'.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="Extensions" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="version" type="VersionString" default="2.0">
+					<xsd:annotation>
+						<xsd:documentation>Version number of request. Fixed.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CapabilityStatusGroup">
+		<xsd:annotation>
+			<xsd:documentation>Status Information for individual request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="Status" minOccurs="0"/>
+			<xsd:element name="ErrorCondition" type="ServiceDeliveryErrorConditionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of any error or warning condition.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="AbstractFunctionalServiceCapabilitiesResponse" type="AbstractServiceCapabilitiesResponseStructure" abstract="true" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Subsititutable type for a SIRI Functional Service Capabilities Response.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractServiceCapabilitiesResponseStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for capabilities response.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="ContextualisedResponseEndpointGroup"/>
+					<xsd:group ref="DelegatorEndpointGroup">
+						<xsd:annotation>
+							<xsd:documentation>If request has been proxied by an intermediate  aggregting system, trackng informattion relating to the original requestor. This allows the aggregation to be stateless.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+					<xsd:sequence>
+						<xsd:group ref="CapabilityStatusGroup"/>
+					</xsd:sequence>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AbstractCapabilitiesStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Capabilities of StopMonitopring Service.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="GeneralInteraction" type="CapabilityGeneralInteractionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>General capabilities common to all SIRI service request types.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TransportDescription" type="TransportDescriptionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Implementation properties common to all request types.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CapabilityGeneralInteractionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Common Request Policy capabilities.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Interaction">
+				<xsd:annotation>
+					<xsd:documentation>Interaction capabilities.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="RequestResponse" type="xsd:boolean" default="true">
+							<xsd:annotation>
+								<xsd:documentation>Whether the service supports Request Response Interaction. Default is 'true'.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="PublishSubscribe" type="xsd:boolean" default="true">
+							<xsd:annotation>
+								<xsd:documentation>Whether the service supports Publish Subscribe Interaction. Default is 'true'.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Delivery">
+				<xsd:annotation>
+					<xsd:documentation>Delivery capabilities.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="DirectDelivery" type="xsd:boolean">
+							<xsd:annotation>
+								<xsd:documentation>Whether the service supports Direct delivery.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="FetchedDelivery" type="xsd:boolean">
+							<xsd:annotation>
+								<xsd:documentation>Whether the service supports Fetched delivery (VDV Style)</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="MultipartDespatch" type="xsd:boolean" default="true">
+				<xsd:annotation>
+					<xsd:documentation>Whether the service supports multiple part despatch with MoreData flag. Default is 'true'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MultipleSubscriberFilter" type="xsd:boolean" default="false">
+				<xsd:annotation>
+					<xsd:documentation>Whether the service supports multiple Subscriber Filters. Default is ' false'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HasConfirmDelivery" type="xsd:boolean" default="false">
+				<xsd:annotation>
+					<xsd:documentation>Whether the service supports Delivery confirm.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HasHeartbeat" type="xsd:boolean" default="false">
+				<xsd:annotation>
+					<xsd:documentation>Whether the service has a heartbeat message. Default is 'false'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VisitNumberisOrder" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether VisitNumber can be used as a strict order number within JOURNEY PATTERN. Default is 'false'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CapabilityRequestPolicyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Common Request Policy capabilities.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="NationalLanguage" type="xsd:language" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>National languages supported by service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Translations" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether producer can provide multiple  translations of NL text elements  +SIRI 2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:annotation>
+					<xsd:documentation>Default geospatial Coordinates used by service.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element name="GmlCoordinateFormat" type="SrsNameType">
+					<xsd:annotation>
+						<xsd:documentation>Name of GML Coordinate format used for Geospatial points in responses.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="WgsDecimalDegrees" type="EmptyType">
+					<xsd:annotation>
+						<xsd:documentation>Geospatial coordinates are given as Wgs 84 Latiude and longitude, decimial degrees of arc.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CapabilitySubscriptionPolicyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Common Subscription capabilities.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="HasIncrementalUpdates" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether incremental updates can be specified for updates Default is ' true'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HasChangeSensitivity" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether change threshold can be specified for updates. Default is 'true'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ====Permissions================================================= -->
+	<xsd:complexType name="TransportDescriptionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for implementation structure.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CommunicationsTransportMethod" type="CommunicationsTransportMethodEnumeration" default="httpPost">
+				<xsd:annotation>
+					<xsd:documentation>Communications Transport method used to exchange messages. Default is 'httpPost'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CompressionMethod" type="CompressionMethodEnumeration" default="none">
+				<xsd:annotation>
+					<xsd:documentation>Compression method used to compress messages for transmission. Default is 'none'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ====Discovery================================================ -->
+	<xsd:element name="AbstractDiscoveryRequest" type="AbstractDiscoveryRequestStructure" abstract="true" substitutionGroup="AuthenticatedRequest">
+		<xsd:annotation>
+			<xsd:documentation>Abstract Discovery request.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractDiscoveryRequestStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Requests for stop reference data for use in service requests.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AuthenticatedRequestStructure">
+				<xsd:sequence>
+					<xsd:group ref="RequestorEndpointGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="AbstractDiscoveryDelivery" type="AbstractDiscoveryDeliveryStructure" abstract="true" substitutionGroup="AbstractResponse">
+		<xsd:annotation>
+			<xsd:documentation>Abstract type for a discovery delivery.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AbstractDiscoveryDeliveryStructure">
+		<xsd:annotation>
+			<xsd:documentation>Abstract supertype fro discovery responses.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ResponseStructure">
+				<xsd:sequence>
+					<xsd:group ref="DeliveryStatusGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

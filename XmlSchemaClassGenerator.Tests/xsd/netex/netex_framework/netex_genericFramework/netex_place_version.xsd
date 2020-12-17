@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_place_version">
+	<xsd:include schemaLocation="netex_place_support.xsd"/>
+	<xsd:include schemaLocation="../netex_genericFramework/netex_zoneProjection_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Date>
+					<Modified>2017-12-05</Modified>cd Fix error in  type for Place- should be Place_versionStructure
+
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the PLACE Types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}place_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx PLACE Types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>PLACE entities.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="transfersInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of CONNECTIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Transfer" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ====Place========================================================== -->
+	<xsd:element name="Place" type="Place_VersionStructure" abstract="true" substitutionGroup="Zone">
+		<xsd:annotation>
+			<xsd:documentation>A named Place. A geographic place of any type which may be specified as the origin or destination of a trip. A PLACE may be of dimension 0 (a POINT), 1 (a Road section) or 2 (a ZONE).</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Place_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Zone_VersionStructure">
+				<xsd:group ref="PlaceGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PlaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="placeTypes" type="typeOfPlaceRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Classification of PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="Transfer" type="Transfer_VersionStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>The possibility of a passenger to transfer between two PLACEs. May have times associated for the transfer.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Transfer_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TRANSFER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="TransferGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TransferGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TRANSFER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfTransferRef" minOccurs="0"/>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Distance" type="DistanceType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Distance of TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TransferDuration" type="TransferDurationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timings for the TRANSFER to use in journey planning, etc.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="WalkTransferDuration" type="TransferDurationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timings for walking over TRANSFER if different from the JOURNEY PATTERN  transfer duration,</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BothWays" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether timings and validity applies to both directions (true) or just to the from-to direction of the TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="TransferDuration" type="TransferDurationStructure">
+		<xsd:annotation>
+			<xsd:documentation>Times for TRANSFER between two Points.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TransferDurationStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TTRANSFER DURATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DefaultDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default time needed for a traveller to make a TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FrequentTravellerDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time for a traveller familiar with the journey to make transfer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OccasionalTravellerDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time for an Occasional Traveller to make a TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MobilityRestrictedTravellerDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time for a Mobility Restricted traveller to make a TRANSFER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:element name="TypeOfTransfer" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>Classification of a TRANSFER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfTransfer_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfTransferIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfTransfer_ValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF TRANSFER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="TypeOfPlace" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>Classification of a PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfPlace_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfPlaceIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfPlace_ValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

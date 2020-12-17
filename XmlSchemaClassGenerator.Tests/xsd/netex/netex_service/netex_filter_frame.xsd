@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_dataObjectRequest_service">
+	<!-- ===Dependencies ======================================= -->
+	<xsd:include schemaLocation="../netex_framework/netex_responsibility/netex_versionFrame_support.xsd"/>
+	<xsd:include schemaLocation="../netex_part_1/part1_networkDescription/netex_line_support.xsd"/>
+	<xsd:include schemaLocation="netex_filter_object.xsd"/>
+	<!-- ===eGIF/GovTalk Documentation ======================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>NeTEx Project. NeTEx XML working Group. See main package headers </Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0   NeTEx. Nicholas Knowles Kizoom mailto:schemer@/www.netex.org.uk/</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+					<!-- Documentation headers added -->
+				</Date>
+				<Description><p>NeTEx  is an XML representation of a Transport  model that can be used to exchange data objects between NeTEx databases and other services.</p>. 
+					<p>This subschema describes the    NeTEx  web services , which provide a SIRI based XML API to request and return data objects. It includes the following NeTEx services
+					<ul><li>Data Object Request: Request to return a collection of NeTEx data ENTTITIEs IN VERSION, as specified by one or more filters. </li><li>Data Object Subscription Request: Request to subscribe to a feed of Data objects as specified by an Object Request</li><li>Data Object Delivery: Returned value containing one or more elements</li></ul>
+					</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_service}netex__dataObjectRequest.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation><Requires>http://www.netex.org.uk/schemas/1.0/ for svc/ for _data_object.xsd</Requires><Requires>http://www.siri.org.uk/schemas/2.0/xsd/siri/siri_requests-v2.0.xsd</Requires> &gt;
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the NeTEx specification and SIRI standards.<ul><li>ts004.003annexdapr07.xls</li><li>ts004-004a-annexd-sep08.pdf</li></ul>
+						</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Public transport, Bus services, Coach services, Bus stops and stations,
+Business and industry, Transport, 
+Roads and road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx  XML schema.   Subschema describing the NeTEx SIRI data exchange services  </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: Data Object Request Types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<!-- ==== Filter  ============================================================ -->
+	<xsd:element name="NetworkFrameTopic" substitutionGroup="Topic">
+		<xsd:annotation>
+			<xsd:documentation>Network Object filter  Return Network Objects that match these values.  Values are ANDed.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="NetworkFrameTopicStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="NetworkFrameTopicStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a Data Object Filter Topic.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TopicStructure">
+				<xsd:sequence>
+					<xsd:group ref="TopicTemporalScopeGroup">
+						<xsd:annotation>
+							<xsd:documentation>Parameters that specify the temporal scope of the request.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+					<xsd:element ref="TypeOfFrameRef" minOccurs="0"/>
+					<xsd:group ref="TopicFrameScopeGroup" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Parameters that specify the content to be returned. Only content that matches these criteria will be included. The TYPE OF FRAME may be used to specify a National or Standard Profile.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TopicFrameScopeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Parameters that specify the content to be returned.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="VersionFrameRef" maxOccurs="unbounded"/>
+			<xsd:element name="NetworkFilterByValue" type="NetworkFilterByValueStructure">
+				<xsd:annotation>
+					<xsd:documentation>Values for selecting by value.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ==== Filter  ============================================================ -->
+	<xsd:complexType name="NetworkFilterByValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Specifies values to filter by reference value, rather than frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ObjectFilterByValueStructure">
+				<xsd:sequence>
+					<xsd:group ref="NetworkFilterByValueGroup">
+						<xsd:annotation>
+							<xsd:documentation>Values for selcting by value. Return objuects that satisfy alll of the follwoing.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="NetworkFilterByValueGroup">
+		<xsd:annotation>
+			<xsd:documentation>Values for selecting by value.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="NetworkRef" minOccurs="0"/>
+			<xsd:element name="places" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Return all site elements for given place.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="PlaceRef_" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- == Policies======================================================== -->
+	<xsd:complexType name="NetworkFrameRequestPolicyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Parameters that affect the request processing. Mostly act to reduce the number of stops returned.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MaximumNumberOfElements" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum number of objects to include in response. If absent, include all instances.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IncludeDeleted" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether to include  in response. elements flagged as deleted. By default this will be false.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Urgency" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Allows requestor to indicate a relative urgency of request. A longer period can be specified for non urgent requests, e.g. to get  historic data. If not specified assume best possible response desired, preferably immediate.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MustHaveBy" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Allows requestor to indicate that if data cannot be supplied by a given time it will not be useful. Can be used to prioritize data on systems working at full load.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Language" type="xsd:language" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Preferred language for text elements in response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RequestDetail" type="OutputDetailListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Level of detail to return. Default is all.
+All = Return all data and geometry, but not Xref
+NoGeometry = Return all, omitting geometry. 
+XRef - Return Xcross Reference data , e.g. links for zones.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="NetworkFrameSubscriptionPolicyStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for Subscription Request for  NeTEx Data Object  Service.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="IncrementalUpdates" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the producer should return the complete set of current data, or only provide updates to the last data returned, i.e. additions, modifications and deletions.
+If false each subscription response will contain the full information as specified in this request.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

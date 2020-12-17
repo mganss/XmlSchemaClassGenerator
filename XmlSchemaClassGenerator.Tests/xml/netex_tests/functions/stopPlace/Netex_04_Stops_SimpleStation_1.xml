@@ -1,0 +1,1238 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Network Example ====== 
+This example provides an example of a simple station with two platforms encoded in NeTEx XML
+ 
+ 
+OVERVIEW
+
+The station has two platforms with a barrow crossing. There is an entrance hall . There is a bus stop outside.
+
+	_____________________ 
+    |        Bus Stop (QUAY) |
+	_____________________ 
+		:
+		:
+  Entrance
+	___||_____________________________
+    |      Ticket Hall    (ACCESS SPACE)   |
+	|_____________||__________________|.
+	._____________||______________________________
+    |         Platform 1 (QUAY)       [Platform Sign]            |
+	|____________________||_______________________|
+										|| Crossing
+										||
+	____________________||________________________
+    |           Platform 2 (QUAY)         [Platform Sign]         |
+   .|____________________||_______________________|
+
+
+
+
+PATH LINKs and NAVIGATION PATHs to the platforms are included, including asccesibility assesemnts
+
+Some basic equipment (Platform SIGNS, ramps, etc is included)
+
+The Stop identfiiers of thee Physical stop are  be different from those used to reference the stop  in the timetable (ie SCHEDULED STOP POINTs)
+STOP POINT ASSIGNMENTs are used to map these
+
+A CONNECTION specifies the posisbility of a bus / Rail  transfer
+
+DETAILS 
+==============
+
+The STOP PLACE comproses   comprises
+      1.  The Station
+            (i)  A  Rail  STOP PLACE  ztb:bh0023  : -  Bahnhof Ried
+          With two platforms
+            (i) A  QUAY          ztb:bh0023@Rail@Q1  - East side
+           (iii) A  QUAY          ztb:bh0023@Rail@Q2  - West side 
+
+        It has a Ticket office leading to an  open platform with a barrow crossing to the other side
+             (i) An ACCESS SPACE     ztb:bh0023@A1 - Ticket Hall
+             (ii) An ACCESS SPACE     ztb:bh0023@A2 - Area in front of station
+             (iii) An ACCESS SPACE    ztb:bh0023@AX3 - Barrow cossing over tracks
+
+    2. The Bus stop in front of the station
+         (a)  Bus STOP PLACE ztb:bh0024  : -  Bahnhof Ried ouside the station
+              (i) A  Quay         ztb:bh0024_Rail@Q1  - East side
+
+ 4. There are 4 SITE PATH LINKS
+       Bus
+			  SITE PATH LINK ztb:bh0023@lnk_A1-E1_to Bus-Q1 	 :  	: Hall to Bus Stop
+        Rail
+			 SITE PATH LINK ztb:bh0023@lnk_A1-E1+A1-E2  				 forwards 	 :  Across hall
+			SITE PATH LINK  ztb:bh0023@lnk_A1-E2+Rail@Q1-E1tr 	Along platform to barrow xing
+
+  4. There are 8 NAVIGATION PATHs built out of the PATH LINKS
+
+These have been created staticaally - they could be computed from the   PATH LINKS
+       Bus
+		- NAVIGATION PATH   ztb:bh0023@Bus-Q1+A1		Quay to Hall , 
+             PATHLINKS in SEQUENCE
+				PATHLINK 1:	  ztb:bh0023@lnk_A1-E1+Bus-Q1  				reverse	: Hall to Bus Stop
+
+			- Hall to Quay  (Bus), NAVIGATION PATH   ztb:bh0023@A1+Bus-Q1		 
+				PATHLINK 1:	  ztb:bh0023@lnk_A1-E1+Bus-Q1 				 forwards
+
+        Rail
+        -  Hall to Platform 1 ,	NAVIGATION PATH  ztb:bh0023@A1+Rail@Q2			
+             PATHLINKS in SEQUENCE
+				PATHLINK 1:	  ztb:bh0023@lnk_A1-E1+A1-E2  				 forwards 	 :  Across hall		 
+
+        - Platform 1 to Hall,  	NAVIGATION PATH  ztb:bh0023@Rail@Q2+A1		
+             PATHLINKS in SEQUENCE	   
+				PATHLINK 1:	 ztb:bh0023@lnk_A1-E1+A1-E2  					reverse	 :  Across hall	
+
+        - Hall to Platform 2  	NAVIGATION PATH  ztb:bh0023@A1+Rail@Q2			  Hall to Quay 2 ,
+             PATHLINKS in SEQUENCE
+				PATHLINK 1:	  ztb:bh0023@lnk_A1-E1+A1-E2  				 forwards 	 :  Across hall
+				PATHLINK 2:	 ztb:bh0023@lnk_A1-E2+Rail@Q1-E1tr			 forwards	 : 	Along platform to barrow xing
+				PATHLINK 3:	 ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr   forwards	:	Across barrow xing
+
+       - Platform 1 to Hall, 	 NAVIGATION PATH  ztb:bh0023@Rail@Q2+A1   		Quay 1 to Hall,  
+             PATHLINKS in SEQUENCE
+				PATHLINK 1:	 ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr 	reverse	:	Across barrow xing
+				PATHLINK 1:	 ztb:bh0023@lnk_A1-E2+Rail@Q1-E1tr			 reverse : 	Along platform to barrow xing
+				PATHLINK 1:	 ztb:bh0023@lnk_A1-E1+A1-E2  					reverse	 :  Across hall	
+
+        - Platform 1 to Platform 2 	Q1 to Q2 NAVIGATION PATH		ztb:bh0023@Rail@Q1+Rail@Q2
+				PATHLINK 1:	 ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr  forwards
+
+        - Platform 2 to Platform 1  	Q2 to Q1 NAVIGATION PATH		ztb:bh0023@Rail@Q2+Rail@Q1
+				PATHLINK 1:	  ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr  reverse
+ 
+  5. STOP ASSIGNMENTs
+In addition we provide elements to handle the case where the timetable reference is different from the stop database
+
+      (i) A SCHEDULED STOP POINT - hde:SSP0042A  
+
+      (iii) A CONNECTION POINT marks the connection between stop points
+      (ii) STOP POINT ASSIGNMENTs
+            - hde:PSA_20012     			maps  hde:SSA0021:  to  ztb:bh0023  
+            - hde:PSA_20012_Raill-Q1  maps  hde:SSA0021: to ztb:bh0023 ==>   ztb:bh0023@Rail@Q1
+            - hde:PSA_20012_Rail@Q2   maps  hde:SSA0021: to  ztb:bh0023   ==> ztb:bh0023@Rail@Q2
+
+   5. The opening hourse of the station are specified using AVAILABILITY CONDITIONs.
+
+   6.  The STOP PLACE is Association with Gazetteer for stop finding
+		A single TOPOGRAPHIC PLACE is defined - normally this would be referenced externally 
+
+Equipment 
+  A Platform Sign on each platform 
+				PLACE SIGN : ztb:bh0023@Rail@Q1@Sign_0
+				PLACE SIGN : ztb:bh0023@Rail@Q2@Sign_1
+
+
+  An Exit   Sign on Platfrom 1
+				GENERAL SIGN : ztb:bh0023@Rail@Q1@Sign_1 
+
+Ticke Machine in 
+Crossing equipment
+ 
+
+
+============
+Data management
+
+A. Data Ownership
+Two different RESPONSIBILITY SETs are assumed (These do not have to be declared in this file but are include for clarity). These have separate CODESPACEs
+    myBus:RS_10,    Physical stop data
+    hde:RS_22          Timetable stop datea
+
+B. Frames and grouping
+    A RESOURCE FRAME is used to hold the RESPONSIBILITY SETs.
+	A SITE FRAME is used to hold the STOP PLACEs.
+	A SERVICE FRAME is used to hold the SCHEDULED STOP POINTs and STOP ASSIGNMENTs.
+    A SERVICE CALENDAR FRAME is used to hold the DAY TYPEs.
+	A COMPOSITE FRAME is used to hold the other FRAMEs as a coherent version.
+ 
+
+(C) CEN Copyright 2010, 2011
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<Current/>
+				<NetworkFilterByValue>
+					<places>
+						<TopographicPlaceRef ref="topat:E0034695">REQUEST</TopographicPlaceRef>
+					</places>
+				</NetworkFilterByValue>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Simple Stop pair On street example</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="zbt:CF001">
+			<validityConditions>
+				<AvailabilityCondition version="any" id="zbt:CF0021">
+					<FromDate>2010-12-17T09:30:47.0Z</FromDate>
+					<ToDate>2011-12-17T09:30:47.0Z</ToDate>
+				</AvailabilityCondition>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="zbt">
+					<Xmlns>zbt</Xmlns>
+					<XmlnsUrl>http://www.zillerthalerbahn.at/</XmlnsUrl>
+					<Description>ZillerthalerBahn namesapce</Description>
+				</Codespace>
+				<Codespace id="topat">
+					<Xmlns>topat</Xmlns>
+					<XmlnsUrl>http://www.osos.at</XmlnsUrl>
+					<Description>Austrian locality data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="zbt"/>
+			</FrameDefaults>
+			<frames>
+				<!--- ======SERVICE CALENDAR======= -->
+				<ServiceCalendarFrame version="any" id="zbt:SFC0021">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef version="01" ref="zbt:Resp01"/>
+					</FrameDefaults>
+					<ServiceCalendar version="any" id="zbt:SFC0021">
+						<FromDate>2010-12-17</FromDate>
+						<ToDate>2011-12-17</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="zbt:DT001Open_MF">
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>WorkingDay</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+							<timebands>
+								<Timeband version="any" id="zbt:DT001Open_MF@TMB01">
+									<StartTime>05:00:00</StartTime>
+									<Duration>PT19H30M</Duration>
+								</Timeband>
+							</timebands>
+						</DayType>
+						<DayType version="any" id="zbt:DT002Open_Sat">
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Saturday</DaysOfWeek>
+									<HolidayTypes>WorkingDay</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+							<timebands>
+								<Timeband version="any" id="zbt:DT002Open_Sat@TMB01">
+									<StartTime>06:00:00</StartTime>
+									<Duration>PT18H30M</Duration>
+								</Timeband>
+							</timebands>
+						</DayType>
+						<DayType version="any" id="zbt:DT003Open_Sun">
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Sunday</DaysOfWeek>
+								</PropertyOfDay>
+							</properties>
+							<timebands>
+								<Timeband version="any" id="zbt:DT003Open_Sun@TMB01">
+									<StartTime>08:00:00</StartTime>
+									<Duration>PT17H30M</Duration>
+								</Timeband>
+							</timebands>
+						</DayType>
+						<DayType version="any" id="zbt:DT004Open_MFS">
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday Saturday</DaysOfWeek>
+									<HolidayTypes>WorkingDay</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+							<timebands>
+								<Timeband version="any" id="zbt:DT004Open_MFS">
+									<StartTime>08:30:00</StartTime>
+									<EndTime>20:00:00</EndTime>
+								</Timeband>
+							</timebands>
+						</DayType>
+						<DayType version="any" id="zbt:DT005Open_Sun">
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Sunday</DaysOfWeek>
+								</PropertyOfDay>
+							</properties>
+							<timebands>
+								<Timeband version="any" id="zbt:DT005Open_Sun">
+									<StartTime>10:30:00</StartTime>
+									<EndTime>18:00:00</EndTime>
+								</Timeband>
+							</timebands>
+						</DayType>
+					</dayTypes>
+				</ServiceCalendarFrame>
+				<!--- ==========STOPS========== -->
+				<SiteFrame version="any" id="zbt:SF0023">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef version="01" ref="zbt:Resp02"/>
+					</FrameDefaults>
+					<contentValidityConditions>
+						<AvailabilityCondition version="01" id="zbt:AC_02_CC_Opening">
+							<dayTypes>
+								<DayTypeRef version="any" ref="zbt:DT004Open_MFS"/>
+								<DayTypeRef version="any" ref="zbt:DT005Open_Sun"/>
+							</dayTypes>
+						</AvailabilityCondition>
+						<AvailabilityCondition version="01" id="zbt:AC_01_Main_Opening">
+							<dayTypes>
+								<DayTypeRef version="any" ref="zbt:DT001Open_MF"/>
+								<DayTypeRef version="any" ref="zbt:DT002Open_Sat"/>
+								<DayTypeRef version="any" ref="zbt:DT003Open_Sun"/>
+							</dayTypes>
+						</AvailabilityCondition>
+					</contentValidityConditions>
+					<topographicPlaces>
+						<TopographicPlace version="01" id="topat:E0034695">
+							<Name>Reid Im Zillerthal</Name>
+							<Description>Reid</Description>
+							<Descriptor version="01" id="topat:E0034695">
+								<Name lang="de">Reid im Zillerthal</Name>
+								<ShortName lang="de">Reid</ShortName>
+								<Qualify>
+									<QualifierName>Tyrol</QualifierName>
+									<TopographicPlaceRef version="01" ref="topat:E0034"/>
+								</Qualify>
+							</Descriptor>
+							<TopographicPlaceType>  village</TopographicPlaceType>
+							<PlaceCentre> false</PlaceCentre>
+							<CountryRef ref="at"/>
+							<ParentTopographicPlaceRef version="01" ref="topat:E0034"/>
+						</TopographicPlace>
+						<TopographicPlace version="01" id="topat:E0034">
+							<Name>Tyrol</Name>
+							<Descriptor version="01" id="topat:E0034">
+								<Name lang="de">Tyrol</Name>
+							</Descriptor>
+							<TopographicPlaceType> province</TopographicPlaceType>
+							<PlaceCentre> false</PlaceCentre>
+							<CountryRef ref="at"/>
+						</TopographicPlace>
+					</topographicPlaces>
+					<!-- ======================================== -->
+					<stopPlaces>
+						<!-- ========== RAIL========= -->
+						<StopPlace version="01" created="2006-09-11T15:42:00" modification="revise" id="ztb:bh0023">
+							<Name>Bahnhof Ried</Name>
+							<ShortName>Ried</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="ATGRID">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="01" created="2010-05-17T09:30:47Z" modification="new" id="ztb:bh0023@RdAddr_01">
+								<RoadName>Kleiried</RoadName>
+							</RoadAddress>
+							<AccessibilityAssessment version="any" id="ztb:bh0023">
+								<MobilityImpairedAccess>true</MobilityImpairedAccess>
+								<limitations>
+									<AccessibilityLimitation>
+										<WheelchairAccess>true</WheelchairAccess>
+										<StepFreeAccess>true</StepFreeAccess>
+										<EscalatorFreeAccess>true</EscalatorFreeAccess>
+										<LiftFreeAccess>true</LiftFreeAccess>
+										<AudibleSignalsAvailable>false</AudibleSignalsAvailable>
+										<VisualSignsAvailable>true</VisualSignsAvailable>
+									</AccessibilityLimitation>
+								</limitations>
+							</AccessibilityAssessment>
+							<AccessModes>foot</AccessModes>
+							<alternativeNames>
+								<AlternativeName version="01" created="2010-05-17T09:30:47Z" modification="new" id="ztb:bh0023@n01">
+									<TypeOfName>label</TypeOfName>
+									<Name>Ried im Zillertal</Name>
+									<ShortName lang="de">Ried</ShortName>
+									<QualifierName lang="de">Tyrol</QualifierName>
+								</AlternativeName>
+								<AlternativeName version="01" created="2010-05-17T09:30:47Z" modification="new" id="ztb:bh0023@n02">
+									<Lang>en</Lang>
+									<NameType>translation</NameType>
+									<TypeOfName>label</TypeOfName>
+									<Name lang="en">Rail Station Ried im Zillertal</Name>
+									<QualifierName lang="en">Tyrol</QualifierName>
+								</AlternativeName>
+							</alternativeNames>
+							<Covered>mixed</Covered>
+							<TopographicPlaceView>
+								<TopographicPlaceRef version="01" ref="topat:E0034695"/>
+							</TopographicPlaceView>
+							<ContainedInPlaceRef version="01" ref="topat:E0034695"/>
+							<!-- ============LEVELS ===================- -->
+							<levels>
+								<Level version="01" created="2010-04-17T09:30:47Z" id="ztb:bh0023@Lvl_0">
+									<Name>Erde </Name>
+									<PublicCode>E</PublicCode>
+								</Level>
+							</levels>
+							<!-- ============ENTRANCES ===================- -->
+							<entrances>
+								<StopPlaceEntrance version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@A1-E1">
+									<validityConditions>
+										<AvailabilityConditionRef version="01" ref="zbt:AC_01_Main_Opening"/>
+									</validityConditions>
+									<Name>Main Entrance from street</Name>
+									<Description lang="en">External Entrance to  Ticket Hall from forecourt</Description>
+									<ParentZoneRef version="01" ref="ztb:bh0023@A1"/>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<placeEquipments>
+										<RampEquipment version="any" id="ztb:bh0023@A1-E1@ramp">
+											<DirectionOfUse>both</DirectionOfUse>
+											<Gradient>22</Gradient>
+											<GradientType>steep</GradientType>
+											<VisualGuidanceBands>true</VisualGuidanceBands>
+										</RampEquipment>
+										<EntranceEquipment version="any" id="ztb:bh0023@A1-E1@entrance">
+											<Door>true</Door>
+											<KeptOpen>true</KeptOpen>
+											<WheelchairPassable>true</WheelchairPassable>
+										</EntranceEquipment>
+									</placeEquipments>
+									<Label lang="de">Eingang</Label>
+									<EntranceType>openDoor</EntranceType>
+									<IsExternal>true</IsExternal>
+									<IsEntry>true</IsEntry>
+									<IsExit>true</IsExit>
+									<Width>1.0</Width>
+									<Height>2.0</Height>
+								</StopPlaceEntrance>
+								<StopPlaceEntrance version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@A1-E2">
+									<validityConditions>
+										<AvailabilityConditionRef version="01" ref="zbt:AC_02_CC_Opening"/>
+									</validityConditions>
+									<Name>Entrance to platform 1 from Ticket hall </Name>
+									<Description lang="en"> Entrance to  Ticket Hall from platform 1</Description>
+									<ParentZoneRef version="01" ref="ztb:bh0023@A1"/>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<placeEquipments>
+										<EntranceEquipment version="any" id="ztb:bh0023@A1-E2">
+											<Door>true</Door>
+											<KeptOpen>true</KeptOpen>
+											<WheelchairPassable>true</WheelchairPassable>
+										</EntranceEquipment>
+									</placeEquipments>
+									<Label lang="de">Ausgang</Label>
+									<EntranceType>openDoor</EntranceType>
+									<IsExternal>true</IsExternal>
+									<IsEntry>true</IsEntry>
+									<IsExit>true</IsExit>
+									<Width>1.0</Width>
+									<Height>2.0</Height>
+								</StopPlaceEntrance>
+								<StopPlaceEntrance version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@Rail@Q1-E1tr">
+									<Name>Entrance to track  crossing from platorm  l </Name>
+									<Description lang="en">platform 1 Entrance to crossing over tracks to platform 2</Description>
+									<ParentZoneRef version="01" ref="ztb:bh0023@Rail@Q1"/>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<placeEquipments>
+										<RampEquipment version="any" id="ztb:bh0023@Rail@Q1-E1tr@ramp">
+											<DirectionOfUse>both</DirectionOfUse>
+											<Gradient>22</Gradient>
+											<VisualGuidanceBands>true</VisualGuidanceBands>
+										</RampEquipment>
+										<EntranceEquipment version="any" id="ztb:bh0023@Rail@Q1-E1tr@entrance">
+											<Door>false</Door>
+											<KeptOpen>true</KeptOpen>
+											<WheelchairPassable>true</WheelchairPassable>
+										</EntranceEquipment>
+									</placeEquipments>
+									<EntranceType>opening</EntranceType>
+									<IsExternal>true</IsExternal>
+									<IsEntry>true</IsEntry>
+									<IsExit>true</IsExit>
+									<Width>2.0</Width>
+								</StopPlaceEntrance>
+								<StopPlaceEntrance version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@Rail@Q2-E1tr">
+									<Name>platform 2 Entrance to track  crossing from platorm  l </Name>
+									<Description lang="en"> Entrance to crossing over tracks from platform2</Description>
+									<ParentZoneRef version="01" ref="ztb:bh0023@Rail@Q2"/>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<placeEquipments>
+										<RampEquipment version="any" id="ztb:bh0023@Rail@Q2-E1tr@ramp">
+											<DirectionOfUse>both</DirectionOfUse>
+											<Gradient>22</Gradient>
+											<VisualGuidanceBands>true</VisualGuidanceBands>
+										</RampEquipment>
+									</placeEquipments>
+									<EntranceType>opening</EntranceType>
+									<IsExternal>true</IsExternal>
+									<IsEntry>true</IsEntry>
+									<IsExit>true</IsExit>
+									<Width>2.0</Width>
+								</StopPlaceEntrance>
+							</entrances>
+							<PublicCode>1564</PublicCode>
+							<TransportMode>rail</TransportMode>
+							<StopPlaceType>railStation</StopPlaceType>
+							<servedPlaces>
+								<TopographicPlaceRef created="2010-05-17T09:30:47Z" ref="topat:E0034695"/>
+							</servedPlaces>
+							<!-- ============QUAYS ===================- -->
+							<quays>
+								<Quay version="01" created="2010-04-17T09:30:47Z" id="ztb:bh0023@Rail@Q1">
+									<Name>Bahnsteig 1</Name>
+									<Description>Bahnsteig 1  adjacent to ticket hall</Description>
+									<Centroid>
+										<Location>
+											<gml:pos srsName="ATGRID">471800 	 115210</gml:pos>
+										</Location>
+									</Centroid>
+									<Covered>mixed</Covered>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<equipmentPlaces>
+										<EquipmentPlace version="001" created="2010-05-17T09:30:47Z" modification="new" id="ztb:bh0023@Rail@Q1@Sign1">
+											<equipmentPositions>
+												<EquipmentPosition version="any" id="ztb:bh0023@Rail@Q1@Sign1">
+													<EquipmentRef version="any" ref="ztb:bh0023@Rail@Q1@Sign_01"/>
+													<Description>Station name Sign on Platform 1,   10 metres from platform entrance</Description>
+													<ReferencePointRef ref="tbd:bh0023@A1-E2@Sign_01"/>
+													<XOffset>10</XOffset>
+													<YOffset>1</YOffset>
+												</EquipmentPosition>
+												<EquipmentPosition version="any" id="ztb:bh0023@Rail@Q1@Sign_02">
+													<EquipmentRef version="any" ref="ztb:bh0023@Rail@Q1@Sign_02"/>
+													<Description>ExitSigtn  on Platform 1,  5 metres from platform entrance</Description>
+													<ReferencePointRef version="any" ref="tbd:bh0023@A1-E2@Sign_011"/>
+													<XOffset>5</XOffset>
+													<YOffset>0</YOffset>
+												</EquipmentPosition>
+											</equipmentPositions>
+											<placeEquipments>
+												<PlaceSign version="any" id="ztb:bh0023@Rail@Q1@Sign_01">
+													<Height>1</Height>
+													<Width>2</Width>
+													<HeightFromFloor>1.5</HeightFromFloor>
+													<PlaceName>Reid</PlaceName>
+												</PlaceSign>
+												<GeneralSign version="any" id="ztb:bh0023@Rail@Q1@Sign_02">
+													<Height>1</Height>
+													<Width>2</Width>
+													<HeightFromFloor>1.5</HeightFromFloor>
+													<Content>Ausgang</Content>
+												</GeneralSign>
+											</placeEquipments>
+										</EquipmentPlace>
+									</equipmentPlaces>
+									<Label>1</Label>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+								<Quay version="01" created="2010-04-17T09:30:47Z" id="ztb:bh0023@Rail@Q2">
+									<Name>Platform 2</Name>
+									<Description>Platform 2, reached by crossing tracks from platform 1</Description>
+									<Centroid>
+										<Location>
+											<gml:pos srsName="ATGRID">471801 	 115211</gml:pos>
+										</Location>
+									</Centroid>
+									<Covered>mixed</Covered>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<equipmentPlaces>
+										<EquipmentPlace version="001" created="2010-05-17T09:30:47Z" modification="new" id="ztb:bh0023@Rail@Q2@Sign1">
+											<equipmentPositions>
+												<EquipmentPosition version="any" id="ztb:bh0023@Rail@Q2@Sign1">
+													<EquipmentRef version="any" ref="ztb:bh0023@Rail@Q2@Sign1"/>
+													<Description>Station name Sign on Platform 1  "10 metres from platform entrance</Description>
+													<ReferencePointRef version="any" ref="tbd:bh0023@Q2-E2"/>
+													<XOffset>10</XOffset>
+													<YOffset>1</YOffset>
+												</EquipmentPosition>
+											</equipmentPositions>
+											<placeEquipments>
+												<PlaceSign version="any" id="ztb:bh0023@Rail@Q2@Sign1">
+													<Height>1</Height>
+													<Width>2</Width>
+													<HeightFromFloor>1.5</HeightFromFloor>
+													<PlaceName>Reid</PlaceName>
+												</PlaceSign>
+											</placeEquipments>
+										</EquipmentPlace>
+									</equipmentPlaces>
+									<Label>2</Label>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+							</quays>
+							<!-- ============ACCESS SPACES ===================- -->
+							<accessSpaces>
+								<AccessSpace version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@A1">
+									<Name>Ticket Hall</Name>
+									<Description>Main Ticket hall with with Entrance from forecourt</Description>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@A1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+												<AudibleSignalsAvailable>false</AudibleSignalsAvailable>
+												<VisualSignsAvailable>false</VisualSignsAvailable>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>indoors</Covered>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<equipmentPlaces>
+										<EquipmentPlace version="any" id="ztb:bh0023@A1@EqP01">
+											<placeEquipments>
+												<TicketingEquipment version="any" id="ztb:bh0023@A1@EqP01_01">
+													<VehicleModes>rail</VehicleModes>
+													<TicketMachines>true</TicketMachines>
+													<TicketingServiceFacilityList>cardTopUp purchase</TicketingServiceFacilityList>
+													<PaymentMethods>cash creditCard debitCard</PaymentMethods>
+												</TicketingEquipment>
+											</placeEquipments>
+										</EquipmentPlace>
+									</equipmentPlaces>
+									<entrances>
+										<EntranceRef version="01" ref="ztb:bh0023@A1-E1"/>
+										<EntranceRef version="01" ref="ztb:bh0023@A1-E2"/>
+									</entrances>
+									<AccessSpaceType>bookingHall</AccessSpaceType>
+								</AccessSpace>
+								<AccessSpace version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@A2">
+									<Name>Area in front  outside of station  </Name>
+									<Description>Areas in front of station</Description>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@A2">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>outdoors</Covered>
+									<Gated>openArea</Gated>
+									<Lighting>wellLit</Lighting>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<AccessSpaceType>forecourt</AccessSpaceType>
+								</AccessSpace>
+								<AccessSpace version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@AX3">
+									<Name>Barrow Crossing   over tracks</Name>
+									<Description>Crossing over tracks</Description>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@AX3">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+												<AudibleSignalsAvailable>unknown</AudibleSignalsAvailable>
+												<VisualSignsAvailable>true</VisualSignsAvailable>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>outdoors</Covered>
+									<Gated>openArea</Gated>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									<placeEquipments>
+										<CrossingEquipment version="any" id="ztb:bh0023@AX3">
+											<Name>Barrow crossing</Name>
+											<CrossingType>barrowCrossing</CrossingType>
+										</CrossingEquipment>
+									</placeEquipments>
+									<entrances>
+										<EntranceRef version="01" ref="ztb:bh0023@Rail@Q1-E1tr"/>
+										<EntranceRef version="01" ref="ztb:bh0023@Rail@Q2-E1tr"/>
+									</entrances>
+									<AccessSpaceType>passage</AccessSpaceType>
+								</AccessSpace>
+							</accessSpaces>
+							<!-- ============PATH LINKS ===================- -->
+							<pathLinks>
+								<SitePathLink version="any" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E1+Bus-Q1">
+									<Name>Main entrance to bus stop to</Name>
+									<Distance>10</Distance>
+									<From>
+										<PlaceRef version="01" xsi:type="AccessSpaceRefStructure" ref="ztb:bh0023@A1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" ref="ztb:bh0023@A1-E1"/>
+									</From>
+									<To>
+										<PlaceRef version="01" xsi:type="QuayRefStructure" ref="ztb:bh0024_Rail@Q1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+									</To>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E2+Bus-Q1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E2+Bus-Q1">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>outdoors</Covered>
+									<NumberOfSteps>0</NumberOfSteps>
+									<AllowedUse>twoWay</AllowedUse>
+									<Transition>level</Transition>
+									<MaximumFlowPerMinute>200</MaximumFlowPerMinute>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<FrequentTravellerDuration>PT1M</FrequentTravellerDuration>
+										<OccasionalTravellerDuration>PT2M</OccasionalTravellerDuration>
+										<MobilityRestrictedTravellerDuration>PT3M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+								</SitePathLink>
+								<SitePathLink version="any" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E1+A1-E2">
+									<Name>Tthrough hall to platform1 </Name>
+									<Distance>5</Distance>
+									<From>
+										<PlaceRef version="01" xsi:type="AccessSpaceRefStructure" ref="ztb:bh0023@A1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" ref="ztb:bh0023@A1-E1"/>
+									</From>
+									<To>
+										<PlaceRef version="01" xsi:type="AccessSpaceRefStructure" ref="ztb:bh0023@A1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" ref="ztb:bh0023@A1-E2"/>
+									</To>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E1+A1-E2">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E1+A1-E2">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>covered</Covered>
+									<NumberOfSteps>0</NumberOfSteps>
+									<AllowedUse>twoWay</AllowedUse>
+									<Transition>level</Transition>
+									<AccessFeatureType>openSpace</AccessFeatureType>
+									<MaximumFlowPerMinute>200</MaximumFlowPerMinute>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<FrequentTravellerDuration>PT1M</FrequentTravellerDuration>
+										<OccasionalTravellerDuration>PT2M</OccasionalTravellerDuration>
+										<MobilityRestrictedTravellerDuration>PT3M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<checkConstraints>
+										<CheckConstraint version="any" id="ztb:bh0023@lnk_A1-E1+A1-E2">
+											<CheckProcess>ticketPurchase</CheckProcess>
+											<Congestion>queue</Congestion>
+											<delays>
+												<CheckConstraintDelay version="any" id="ztb:bh0023@lnk_A1-E1+A1-E2_01">
+													<MinimumLikelyDelay>PT5M</MinimumLikelyDelay>
+													<AverageDelay>PT2M</AverageDelay>
+													<MaximumLikelyDelay>PT10M</MaximumLikelyDelay>
+												</CheckConstraintDelay>
+											</delays>
+										</CheckConstraint>
+									</checkConstraints>
+								</SitePathLink>
+								<SitePathLink version="any" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E2+Rail@Q1-E1tr">
+									<Name>Along platform1 to barrow crossing entrance</Name>
+									<Distance>5</Distance>
+									<From>
+										<PlaceRef version="01" xsi:type="AccessSpaceRefStructure" ref="ztb:bh0023@A1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" xsi:type="StopPlaceEntranceRefStructure" ref="ztb:bh0023@A1-E2"/>
+									</From>
+									<To>
+										<PlaceRef version="01" xsi:type="QuayRefStructure" ref="ztb:bh0023@Rail@Q1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" xsi:type="StopPlaceEntranceRefStructure" ref="ztb:bh0023@Rail@Q1-E1tr"/>
+									</To>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E2+Rail@Q1-E2tr">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_A1-E2+Rail@Q1-E2tr">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>covered</Covered>
+									<NumberOfSteps>0</NumberOfSteps>
+									<AllowedUse>twoWay</AllowedUse>
+									<Transition>level</Transition>
+									<AccessFeatureType>openSpace</AccessFeatureType>
+									<MaximumFlowPerMinute>200</MaximumFlowPerMinute>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<FrequentTravellerDuration>PT1M</FrequentTravellerDuration>
+										<OccasionalTravellerDuration>PT2M</OccasionalTravellerDuration>
+										<MobilityRestrictedTravellerDuration>PT3M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<checkConstraints>
+										<CheckConstraint version="any" id="ztb:bh0023@lnk_A1-E2+Rail@Q1-E2t">
+											<CheckProcess>ticketPurchase</CheckProcess>
+											<Congestion>queue</Congestion>
+											<delays>
+												<CheckConstraintDelay version="any" id="ztb:bh0023@lnk_A1-E2+Rail@Q1-E2_01">
+													<MinimumLikelyDelay>PT5M</MinimumLikelyDelay>
+													<AverageDelay>PT2M</AverageDelay>
+													<MaximumLikelyDelay>PT10M</MaximumLikelyDelay>
+												</CheckConstraintDelay>
+											</delays>
+										</CheckConstraint>
+									</checkConstraints>
+								</SitePathLink>
+								<SitePathLink version="any" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr">
+									<Name>Crossing over tracks from platform 1 to platform 2</Name>
+									<Distance>10</Distance>
+									<From>
+										<PlaceRef version="01" xsi:type="QuayRefStructure" ref="ztb:bh0023@Rail@Q1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" ref="ztb:bh0023@Rail@Q1-E1tr"/>
+									</From>
+									<To>
+										<PlaceRef version="01" xsi:type="QuayRefStructure" ref="ztb:bh0023@Rail@Q1"/>
+										<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+										<EntranceRef version="01" ref="ztb:bh0023@Rail@Q2-E1tr"/>
+									</To>
+									<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E2tr">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>true</StepFreeAccess>
+												<EscalatorFreeAccess>true</EscalatorFreeAccess>
+												<LiftFreeAccess>true</LiftFreeAccess>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<Covered>covered</Covered>
+									<NumberOfSteps>0</NumberOfSteps>
+									<AllowedUse>twoWay</AllowedUse>
+									<Transition>level</Transition>
+									<AccessFeatureType>openSpace</AccessFeatureType>
+									<MaximumFlowPerMinute>200</MaximumFlowPerMinute>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<FrequentTravellerDuration>PT1M</FrequentTravellerDuration>
+										<OccasionalTravellerDuration>PT2M</OccasionalTravellerDuration>
+										<MobilityRestrictedTravellerDuration>PT3M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<LevelRef version="01" ref="ztb:bh0023@Lvl_0"/>
+								</SitePathLink>
+							</pathLinks>
+							<navigationPaths>
+								<!---  Bus  ========== -->
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:NP_bh0023@Bus-Q1+Rail@Q2-E2tr">
+									<Name>Bus Stop 1 to Rail Tick Hall </Name>
+									<AccessibilityAssessment version="any" id="ztb:NP_bh0023@Bus-Q1+Rail@Q2-E2trr">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<summaries>
+										<AccessSummary version="any" id="ztb:NP_bh0023@Bus-Q1+Rail@Q2-E2tr">
+											<AccessFeatureType>crossing</AccessFeatureType>
+											<Count>1</Count>
+											<Transition> downAndUp</Transition>
+										</AccessSummary>
+									</summaries>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT1M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>quayToHall</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:bh0023@Bus-Q1+Rail@Q2-E2tr-01">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E1+Bus-Q1"/>
+											<Description>Bus stop to entrance (Reverse use of Link)</Description>
+											<Reverse>true</Reverse>
+											<Heading>left</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:NP_bh0023@A1+Bus-Q1">
+									<Name>Rail Ticket Hall to bus Stop 1</Name>
+									<AccessibilityAssessment version="any" id="ztb:NP_bh0023@A1+Bus-Q1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<summaries>
+										<AccessSummary version="any" id="ztb:NP_bh0023@A1+Bus-Q1">
+											<AccessFeatureType>crossing</AccessFeatureType>
+											<Count>1</Count>
+											<Transition>  level</Transition>
+										</AccessSummary>
+									</summaries>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT1M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>hallToQuay</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:NP_bh0023@A1+Bus-Q-01">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E1+Bus-Q1"/>
+											<Description>Bus stop to entrance (Forwards use of Link)</Description>
+											<Reverse>false</Reverse>
+											<Heading>left</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<!---  Rail  ========== -->
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:NP_bh0023@A1+Rail@Q1">
+									<Name>Rail Ticket Hall to Platform 1</Name>
+									<AccessibilityAssessment version="any" id="ztb:NP_bh0023@A1+Rail@Q2">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT2M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>hallToQuay</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:NP_bh0023@A1+Rail@Q1">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E1+A1-E2"/>
+											<Description>From  ticket hall to platform 1</Description>
+											<Reverse>false</Reverse>
+											<Heading>forward</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:NP_bh0023@Rail@Q1+A1">
+									<Name>Platform 1 to Rail Ticket Hall</Name>
+									<AccessibilityAssessment version="any" id="ztb:NP_bh0023@Rail@Q1+A1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT2M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>quayToHall</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:NP_bh0023@Rail@Q1+A1">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E1+A1-E2"/>
+											<Description>Reverse use: platform 1 to From  ticket hall </Description>
+											<Reverse>true</Reverse>
+											<Heading> forward</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:NP_bh0023@A1+Rail@Q2">
+									<Name>Rail Ticket Hall to Platform 2</Name>
+									<AccessibilityAssessment version="any" id="ztb:NP_bh0023@A1+Rail@Q2-E1tr">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<summaries>
+										<AccessSummary version="any" id="ztb:NP_bh0023@A1+Rail@Q2-E1tr">
+											<AccessFeatureType>crossing</AccessFeatureType>
+											<Count>1</Count>
+											<Transition> downAndUp</Transition>
+										</AccessSummary>
+									</summaries>
+									<TransferDuration>
+										<DefaultDuration>PT3M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT10M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>hallToQuay</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:NP_bh0023@A1+Rail@Q2-02">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E1+A1-E2"/>
+											<Description>Across ticket hall</Description>
+											<Reverse>false</Reverse>
+											<Heading>forward</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+										<PathLinkInSequence version="any" order="2" id="ztb:NP_bh0023@A1+Rail@Q2-03">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E2+Rail@Q1-E1tr"/>
+											<Description>Along platform 1 to crossing</Description>
+											<Reverse>false</Reverse>
+											<Heading>right</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+										<PathLinkInSequence version="any" order="3" id="ztb:NP_bh0023@A1+Rail@Q2-04">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr"/>
+											<Description>Crossing from platform 1 to platform 2</Description>
+											<Reverse>false</Reverse>
+											<Heading>forward</Heading>
+											<Transition>downAndUp</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:NP_bh0023@Rail@Q2+A1">
+									<Name>Platform 2 to Rail Ticket Hall </Name>
+									<AccessibilityAssessment version="any" id="ztb:NP_bh0023@Rail@Q2+A1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<summaries>
+										<AccessSummary version="any" id="ztb:NP_bh0023@Rail@Q2+A1">
+											<AccessFeatureType>crossing</AccessFeatureType>
+											<Count>1</Count>
+											<Transition> downAndUp</Transition>
+										</AccessSummary>
+									</summaries>
+									<TransferDuration>
+										<DefaultDuration>PT3M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT10M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>quayToHall</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:NP_bh0023@Rail@Q2+A1-01">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr"/>
+											<Description>Crossing from platform 1 to platform 2</Description>
+											<Reverse>true</Reverse>
+											<Heading>forward</Heading>
+											<Transition>downAndUp</Transition>
+										</PathLinkInSequence>
+										<PathLinkInSequence version="any" order="2" id="ztb:NP_bh0023@Rail@Q2+A1-02">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E2+Rail@Q1-E1tr"/>
+											<Description>Along platform 1 to crossing</Description>
+											<Reverse>true</Reverse>
+											<Heading>right</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+										<PathLinkInSequence version="any" order="3" id="ztb:NP_bh0023@Rail@Q2+A1-03">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_A1-E1+A1-E2"/>
+											<Description>Across ticket hall</Description>
+											<Reverse>true</Reverse>
+											<Heading>forward</Heading>
+											<Transition>level</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@Rail@Q1+Rail@Q2">
+									<Name>Platform1 to Platform2</Name>
+									<AccessibilityAssessment version="any" id="ztb:bh0023@Rail@Q1+Rail@Q2">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation id="ztb:bh0023@lnk_Rail@Q1+Rail@Q2">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>unknown</StepFreeAccess>
+												<EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+												<LiftFreeAccess>unknown</LiftFreeAccess>
+												<AudibleSignalsAvailable>false</AudibleSignalsAvailable>
+												<VisualSignsAvailable>unknown</VisualSignsAvailable>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<summaries>
+										<AccessSummary version="any" id="ztb:bh0023@Rail@Q1+Rail@Q2">
+											<AccessFeatureType>crossing</AccessFeatureType>
+											<Count>1</Count>
+											<Transition> downAndUp</Transition>
+										</AccessSummary>
+									</summaries>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT5M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>quayToQuay</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:bh0023@Rail@Q1+Rail@Q2_01">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr"/>
+											<Description>Crossing  from platform 1 to platform 2</Description>
+											<Reverse>false</Reverse>
+											<Heading>forward</Heading>
+											<Transition>downAndUp</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+								<NavigationPath version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0023@Rail@Q2+Rail@Q1">
+									<Name>Platform 2 to Platform1</Name>
+									<AccessibilityAssessment version="any" id="ztb:bh0023@Rail@Q2+Rail@Q1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+										<limitations>
+											<AccessibilityLimitation id="ztb:bh0023@lnk_Rail@Q2+Rail@Q1">
+												<WheelchairAccess>true</WheelchairAccess>
+												<StepFreeAccess>unknown</StepFreeAccess>
+												<EscalatorFreeAccess>unknown</EscalatorFreeAccess>
+												<LiftFreeAccess>unknown</LiftFreeAccess>
+												<AudibleSignalsAvailable>false</AudibleSignalsAvailable>
+												<VisualSignsAvailable>unknown</VisualSignsAvailable>
+											</AccessibilityLimitation>
+										</limitations>
+									</AccessibilityAssessment>
+									<summaries>
+										<AccessSummary version="any" id="ztb:bh0023@Rail@Q2+Rail@Q1">
+											<AccessFeatureType>crossing</AccessFeatureType>
+											<Count>1</Count>
+											<Transition> downAndUp</Transition>
+										</AccessSummary>
+									</summaries>
+									<TransferDuration>
+										<DefaultDuration>PT1M</DefaultDuration>
+										<MobilityRestrictedTravellerDuration>PT5M</MobilityRestrictedTravellerDuration>
+									</TransferDuration>
+									<NavigationType>quayToQuay</NavigationType>
+									<pathLinksInSequence>
+										<PathLinkInSequence version="any" order="1" id="ztb:bh0023@Rail@Q2+Rail@Q1_01">
+											<PathLinkRef version="any" ref="ztb:bh0023@lnk_Rail@Q1-E1tr+Rail@Q2-E1tr"/>
+											<Description>Crossing  from platform 2 to platform 1 (Reverse use of Link</Description>
+											<Reverse>true</Reverse>
+											<Heading>forward</Heading>
+											<Transition>downAndUp</Transition>
+										</PathLinkInSequence>
+									</pathLinksInSequence>
+								</NavigationPath>
+							</navigationPaths>
+						</StopPlace>
+						<!-- ==========BUSES================- -->
+						<StopPlace version="01" created="2006-09-11T15:42:00" id="ztb:bh0024">
+							<Name>Bahnhof Ried</Name>
+							<ShortName>Bahnhof</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="ATGRID">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="any" id="zbt:LRd_Addr_02">
+								<RoadName>Kleiner Ried</RoadName>
+							</RoadAddress>
+							<AccessibilityAssessment version="01" created="2010-05-17T09:30:47Z" id="ztb:bh0024">
+								<MobilityImpairedAccess>true</MobilityImpairedAccess>
+							</AccessibilityAssessment>
+							<TopographicPlaceView>
+								<TopographicPlaceRef version="01" ref="topat:E0034695"/>
+							</TopographicPlaceView>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="01" created="2010-04-17T09:30:47Z" id="ztb:bh0024_Rail@Q1">
+									<Name>Ried, Bahnhof  Bus</Name>
+									<Description>Stop outside the station </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2068758371</Longitude>
+											<Latitude>51.4207729447</Latitude>
+										</Location>
+									</Centroid>
+									<RoadAddress version="any" id="ztb:Rd_Addr_03">
+										<RoadName>Kleiner Ried</RoadName>
+										<BearingCompass>W</BearingCompass>
+									</RoadAddress>
+									<AccessibilityAssessment version="any" id="ztb:bh0024_Rail@Q1">
+										<MobilityImpairedAccess>true</MobilityImpairedAccess>
+									</AccessibilityAssessment>
+									<Covered>outdoors</Covered>
+									<BoardingUse>true</BoardingUse>
+									<AlightingUse>true</AlightingUse>
+									<Label>Halt A</Label>
+									<PublicCode>1-2345</PublicCode>
+									<destinations>
+										<DestinationDisplayView>
+											<Name>normalizedString</Name>
+										</DestinationDisplayView>
+									</destinations>
+									<CompassOctant>W</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<ServiceFrame id="zbt:SF0023b" version="any">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef version="01" ref="zbt:Resp02"/>
+					</FrameDefaults>
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="032" created="2000-12-17T09:30:47.0Z" changed="2002-12-17T09:30:47.0Z" id="ztb:ssa_bh0023">
+							<Name lang="de">Bahnhof Ried</Name>
+							<VehicleModes>rail</VehicleModes>
+							<ForAlighting>true</ForAlighting>
+							<ForBoarding>true</ForBoarding>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="002" created="2000-12-17T09:30:47.0Z" changed="2002-12-17T09:30:47.0Z" id="ztb:ssa_bh0026">
+							<Name lang="de">Bahnhof Ried Haltstelle</Name>
+							<VehicleModes>bus</VehicleModes>
+							<ForAlighting>true</ForAlighting>
+							<ForBoarding>true</ForBoarding>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<connections>
+						<Connection version="032" created="2000-12-17T09:30:47.0Z" changed="2002-12-17T09:30:47.0Z" id="ztb:ssa_bh0023">
+							<Name>Bahnhof Ried Bus to Train</Name>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="002" ref="ztb:ssa_bh0026"/>
+							</From>
+							<To>
+								<TransportMode>rail</TransportMode>
+								<ScheduledStopPointRef version="032" ref="ztb:ssa_bh0023"/>
+							</To>
+						</Connection>
+					</connections>
+					<!-- == STOP ASSIGNMENTs =========== -->
+					<stopAssignments>
+						<PassengerStopAssignment order="1" version="any" id="ztb:psa_bh0023">
+							<Description>Rail Assignment regardless of Platform </Description>
+							<ScheduledStopPointRef version="032" ref="ztb:ssa_bh0023"/>
+							<StopPlaceRef version="01" ref="ztb:bh0023"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="2" version="any" id="ztb:psa_bh0023@Rail@Q1">
+							<Description>Rail Assignment Platform 1</Description>
+							<ScheduledStopPointRef version="032" ref="ztb:ssa_bh0023"/>
+							<StopPlaceRef version="01" ref="ztb:bh0023"/>
+							<QuayRef version="01" ref="ztb:bh0023@Rail@Q1"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="3" version="any" id="ztb:psa_bh0023@Rail@Q2">
+							<Description>Rail Assignment Platform 2 </Description>
+							<ScheduledStopPointRef version="032" ref="ztb:ssa_bh0023"/>
+							<StopPlaceRef version="01" ref="ztb:bh0023"/>
+							<QuayRef version="01" ref="ztb:bh0023@Rail@Q2"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+				</ServiceFrame>
+				<!--- ========RESPONSIBILITY SETsS========== -->
+				<ResourceFrame version="any" responsibilitySetRef="zbt:Resp01" id="zbt:Resp01">
+					<responsibilitySets>
+						<ResponsibilitySet version="01" created="2010-05-17T09:30:47Z" modification="revise" changed="2010-05-17T09:30:47Z" responsibilitySetRef="zbt:Resp01" id="zbt:Resp01">
+							<Name>Responsibility for Stop Data</Name>
+							<roles>
+								<ResponsibilityRoleAssignment created="2010-05-17T09:30:47Z" version="01" id="mybus:Resp01">
+									<Description>Zall Zillertal transport - Managed centrally</Description>
+									<DataRoleType>all</DataRoleType>
+									<ResponsibleOrganisationRef version="any" xsi:type="OperatorRefStructure" ref="zbt:Org_ZTLB"/>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+						<ResponsibilitySet version="01" created="2010-05-17T09:30:47Z" modification="revise" changed="2010-05-17T09:30:47Z" responsibilitySetRef="zbt:Resp01" id="zbt:Resp02">
+							<Name>Responsibility for timetables</Name>
+							<roles>
+								<ResponsibilityRoleAssignment created="2010-05-17T09:30:47Z" version="01" id="mybus:Resp02">
+									<Description>Zall Zillertal transport - Managed centrally</Description>
+									<DataRoleType>all</DataRoleType>
+									<ResponsibleOrganisationRef version="any" xsi:type="OperatorRefStructure" ref="zbt:Org_ZTLB"/>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+					</responsibilitySets>
+					<organisations>
+						<!--- =====Data owners ========= -->
+						<Operator version="any" id="zbt:Org_ZTLB">
+							<PublicCode>ZTB</PublicCode>
+							<Name>Zillerthalerbahn</Name>
+							<ShortName>Z-Bahn </ShortName>
+							<TradingName>Zillerthalerbahn GMBh</TradingName>
+							<Description>Responsible for Underground</Description>
+							<OrganisationType>operator</OrganisationType>
+						</Operator>
+					</organisations>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

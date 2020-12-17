@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_coupledJourney_version">
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_servicePattern_support.xsd"/>
+	<xsd:include schemaLocation="netex_vehicleService_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Date>
+					<Modified>2017-03-28  CR010  Journey Part - Add order. </Modified>
+				</Date>
+				<Date>
+					<Modified>2017-06-28  CR044  Journey Part - Add day offset to times </Modified>
+				</Date>
+				<Date>
+					<Modified>2017-06-28  CR010 Journey Part - Add Journey Part Position  </Modified>
+				</Date>
+				<Date>
+					<Modified>2017-11-1  CR044 Journey Part - Add  day offset to Journey Part Couple  </Modified>
+				</Date>
+				<Date>
+					<Modified>2020-06-21  Issue JourneyPart #78 -NJSK:  MainJourneyPartRef should be a JourneyPartRef, not a  JourneyPartCoupleRef  </Modified>
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the COUPLED JOURNEY types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_2/part2_journeyTimes}netex_coupledJourney_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx COUPLED JOURNEY support types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: COUPLED JOURNEY  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="journeyPartsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  JOURNEY PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyPart" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="coupledJourneysInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  COUPLED JOURNEYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="CoupledJourney" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="journeyPartCouplesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of  JOURNEY PART COUPLEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyPartCouple" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="journeyParts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="JourneyPartRef"/>
+					<xsd:element ref="JourneyPart" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPart" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A part of a VEHICLE JOURNEY created according to a specific functional purpose, for instance in situations when vehicle coupling or separating occurs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPart_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyPartGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPartIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPart_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyPartGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order of JOURNEY PART  within JOURNEY.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for JOURNEY PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ParentJourneyRef" type="VehicleJourneyRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to parent of which this is part. If given by context does not need to be stated.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="JourneyPartReferencesGroup"/>
+			<xsd:group ref="JourneyPartTimeGroup"/>
+			<xsd:element name="VehicleOrientation" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Orientation of the vehicle carrying
+out the JOURNEY PART compared to the definition
+of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PurposeOfJourneyPartitionRef" minOccurs="0"/>
+			<xsd:element name="facilities" type="serviceFacilitySets_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Facilities available during JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="journeyPartPositions" type="journeyPartPositions_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Positions in Train of JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="JourneyPartReferencesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Reference Elements for JOURNEY PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MainPartRef" type="JourneyPartRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>Main JOURNEY PART for journey.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="JourneyPartCoupleRef" minOccurs="0"/>
+			<xsd:element ref="TrainNumberRef" minOccurs="0"/>
+			<xsd:element ref="BlockPartRef" minOccurs="0"/>
+			<xsd:element name="FromStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Point at which this JOURNEY PART starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Point at which this JOURNEY PART ends.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="JourneyPartTimeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Time Elements for JOURNEY PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StartTime" type="xsd:time">
+				<xsd:annotation>
+					<xsd:documentation>Start time of JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTimeDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of days after journey start time that start time is.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTime" type="xsd:time">
+				<xsd:annotation>
+					<xsd:documentation>End time of JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTimeDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of days after journey start time that end time is.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="journeyPartPositions_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PART POSITIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="JourneyPartPosition" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPartPosition" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Position in train of JOURNEY PART from a given stop. +v1.1.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPartPosition_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyPartPositionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPartPositionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPartPosition_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for JOURNEY PART POSITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyPartPositionGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for JOURNEY PART POSITION.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order of JOURNEY PART  POistion within JOURNEY PART.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPartPositionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for JOURNEY PART POSITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ParentJourneyPartRef" type="JourneyPartRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to parent of which this is part. If given by context does not need to be stated.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ScheduledStopPointRef" maxOccurs="unbounded"/>
+			<xsd:element name="PositionInTrain" type="xsd:integer">
+				<xsd:annotation>
+					<xsd:documentation>Position of JOURNEY PART in TRAIN - from specified SCHEDULED STOP POINT until otherwise stated.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="coupledJourneys_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of COUPLED JOURNEYS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="CoupledJourneyRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="CoupledJourney" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A complete journey operated by a coupled train, composed of two or more VEHICLE JOURNEYs remaining coupled together all along a JOURNEY PATTERN. A COUPLED JOURNEY may be viewed as a single VEHICLE JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="CoupledJourney_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CoupledJourneyGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CoupledJourneyIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="CoupledJourney_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for COUPLED JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="CoupledJourneyGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CoupledJourneyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for COUPLED JOURNEY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of COUPLED JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of COUPLED JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TrainBlockRef" minOccurs="0"/>
+			<xsd:element name="journeys" type="vehicleJourneyRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEYs making up the COUPLED JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="journeyPartCouples_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of JOURNEY PART COUPLEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="JourneyPartCoupleRef"/>
+					<xsd:element ref="JourneyPartCouple" maxOccurs="1"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="JourneyPartCouple" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Two or more  JOURNEY PARTs of different VEHICLE JOURNEYs served simultaneously by a train set up by coupling their single vehicles.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="JourneyPartCouple_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="JourneyPartCoupleGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="JourneyPartCoupleIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="JourneyPartCouple_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a JOURNEY PART COUPLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="JourneyPartCoupleGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Order of JOURNEY PART COUPLE. +v1.1</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="JourneyPartCoupleGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for  JOURNEY PART COUPLe.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time of Departure.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTime" type="xsd:time">
+				<xsd:annotation>
+					<xsd:documentation>Start time of JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartTimeDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of days after journey start time that start time is.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTime" type="xsd:time">
+				<xsd:annotation>
+					<xsd:documentation>End time of JOURNEY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTimeDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of days after journey start time that end time is.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FromStopPointRef" type="ScheduledStopPointRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>Point at which this  JOURNEY PART starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ToStopPointRef" type="ScheduledStopPointRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>Point at which this JOURNEY PART ends.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MainPartRef" type="JourneyPartRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>Main Journey JOURNEY PART of coupling.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="BlockRef" minOccurs="0"/>
+			<xsd:element name="journeyParts" type="journeyPartRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEY PARTs in JOURNEY PART COUPLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TrainNumberRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="PurposeOfJourneyPartition" abstract="false" substitutionGroup="TypeOfValue">
+		<xsd:annotation>
+			<xsd:documentation>An operational purpose changing within a JOURNEY PATTERN and with this subdividing the SERVICE JOURNEY into JOURNEY PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PurposeOfJourneyPartition_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PurposeOfJourneyPartitionIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PurposeOfJourneyPartition_ValueStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PURPOSE OF JOURNEY PARTITION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfValue_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

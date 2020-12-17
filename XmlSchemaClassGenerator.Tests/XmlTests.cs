@@ -2182,17 +2182,20 @@ namespace Test
             {
                 OutputFolder = outputPath,
                 NamespaceProvider = _xsdToCsharpNsMap.ToNamespaceProvider(),
-                CollectionSettersMode = CollectionSettersMode.Public
+                CollectionSettersMode = CollectionSettersMode.Public,
+                SeparateSubstitutes = true,
+                GenerateInterfaces = false,
+                EmitOrder = true
             };
             var xsdFiles = new[]
             {
-                    "AIXM_AbstractGML_ObjectTypes.xsd",
-                    "AIXM_DataTypes.xsd",
-                    "AIXM_Features.xsd",
-                    "extensions\\ADR-23.5.0\\ADR_DataTypes.xsd",
-                    "extensions\\ADR-23.5.0\\ADR_Features.xsd",
-                    "message\\ADR_Message.xsd",
-                    "message\\AIXM_BasicMessage.xsd",
+                "AIXM_AbstractGML_ObjectTypes.xsd",
+                "AIXM_DataTypes.xsd",
+                "AIXM_Features.xsd",
+                "extensions\\ADR-23.5.0\\ADR_DataTypes.xsd",
+                "extensions\\ADR-23.5.0\\ADR_Features.xsd",
+                "message\\ADR_Message.xsd",
+                "message\\AIXM_BasicMessage.xsd",
             }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "aixm", "aixm-5.1.1", x)).ToList();
 
             var assembly = Compiler.GenerateFiles("Aixm", xsdFiles, gen);
@@ -2249,6 +2252,71 @@ namespace Test
                 AssertEx.Equal(deserializedObject, deserializedXml);
             }
             */
+        }
+
+        [Fact, TestPriority(1)]
+        public void TestNetex()
+        {
+            var outputPath = Path.Combine("output", "netex");
+
+            var gen = new Generator
+            {
+                OutputFolder = outputPath,
+                CollectionSettersMode = CollectionSettersMode.Public,
+                EmitOrder = true,
+                SeparateSubstitutes = true,
+                GenerateInterfaces = false
+            };
+            var xsdFiles = new[]
+            {
+                "NeTEx_publication.xsd",
+            }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "netex", x)).ToList();
+
+            var assembly = Compiler.GenerateFiles("Netex", xsdFiles, gen);
+            Assert.NotNull(assembly);
+
+            var testFiles = new Dictionary<string, string>
+            {
+                { "functions/calendar/Netex_calendarCodeing_02.xml", "PublicationDeliveryStructure" },
+            };
+
+            foreach (var testFile in testFiles)
+            {
+                var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
+                Assert.NotNull(type);
+
+                var serializer = new XmlSerializer(type);
+                serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
+                serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
+                var unknownNodeError = false;
+                var unknownAttrError = false;
+
+                void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
+                {
+                    unknownNodeError = true;
+                }
+
+                void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
+                {
+                    unknownAttrError = true;
+                }
+
+                var xmlString = File.ReadAllText($"xml/netex_tests/{testFile.Key}");
+                xmlString = Regex.Replace(xmlString, "xsi:schemaLocation=\"[^\"]*\"", string.Empty);
+                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
+
+                var isDeserializable = serializer.CanDeserialize(reader);
+                Assert.True(isDeserializable);
+
+                var deserializedObject = serializer.Deserialize(reader);
+                Assert.False(unknownNodeError);
+                Assert.False(unknownAttrError);
+
+                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+
+                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+                AssertEx.Equal(deserializedObject, deserializedXml);
+            }
         }
     }
 }

@@ -1,0 +1,1393 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====   Timetable  Example ====== 
+This example shows the encoding of a  bus timetable for a branched route in NeTex XML  
+
+The SERVICE PATTERNS  are made up of five JOURNEY PATTERNS : One section is shared, in all the patterns
+
+It also shows changing DESTINATION DISPLAYS and Vias 
+
+It also show the  use of SERVICE JOURNEY INTERCHANGES
+
+Q. Is it legitimate for a SERVCE PATTERN to be made up of multiple  JOURNEY PATTERNS in Sequence
+
+ 1.  OVERVIEW
+
+    There are seven stops in the topology of LINE 24: each end  of the Line has two branches,  
+ 
+			Y  						P         
+			  \						/		
+				  - A - B  - C    	    
+			  /						\		
+			Z 						   Q
+ 
+There are   four  outbound journeys, each running one of the four possible  routes: from Y or Z to P or Q
+
+JOURNEY		SERVICE PATTERN 				= 	JOURNEY PATTERNs / TIMING PATTERNs
+sj_YP_01 :	svp_YP_01		Y, A, B, C, P   =    [Y-A] + [A-B-C] + [C-P] 
+sj_YQ_02 :	svp_YQ_02 		Y, A, B, C, Q   =    [Y-A] + [A-B-C] + [C-Q] 
+sj_ZP_03 :	svp_ZP_03 		Z, A, B, C, P   = 	 [Z-A] + [A-B-C] + [C-P] 
+sj_ZQ_04 :	svp_ZQ_04 		Z, A, B, C, Q   = 	 [Z-A] + [A-B-C] + [CQ] 
+
+Giving an outbound timetable as follows
+
+			sj_YP_01 	 |  sj_YQ_02  |  sj_ZP_03    |  sj_ZQ_04 			run times
+
+    Y	|	14:20 		 |  14:30 	 	|  ........  		 |  ........ 			|   Y to A :	5mn
+    Z	|	........ 		 |  ........ 	 	|  14:40  		 |  14:50 			|	Z to A : 5mn
+    A	|	14:25 		 |  14:35 	 	|  14:45  		 |  14:55 			| 	A to B :	10mn
+	B	|	14:35 		 |  14:45 	 	|  14:55  		 |  15:05 			|	B to C :	10mn
+	C	|	14:45 	(1) |  14:55  (2) 	|  15:05  (1)	 |  15:15 	  
+	P	|	15:05 		 |  ......... 	 	|  15:25  		 |  ........ 			|	C to P :	20mn
+	Q	|	........		 |  15:15 	 	|  ........ 		 |  15:35 			|	C to Q :20mn 
+
+NOTICE (1) Change at C for Q
+NOTICE (2) Change at C for P
+
+==============
+2. DETAILS
+
+
+SCHEDULED STOP POINTs
+		Y)  SCHEDULED STOP POINT mybus:Yankee
+		Z)  SCHEDULED STOP POINT mybus:Zulu
+
+	    A)  SCHEDULED STOP POINT  mybus:Alpha    
+	    B)  SCHEDULED STOP POINT  mybus:Bravo    
+		C)  SCHEDULED STOP POINT mybus:Charley 
+
+		P) SCHEDULED STOP POINT  mybus:Papa
+		Q)  SCHEDULED STOP POINT mybus:Quebec
+
+
+The SERVICE LINKs and SERVICE POINTs are grouped into four SERVICE PATTERNS
+		The DESTINATION DISPLAY & Vias Change  through the journey
+
+	(i)	Y, A, B, C, P   SERVICE PATTERN   hde:svp_YPo	
+			1. JOURNEY PATTERN  hde:sjp_YAo  
+				 1.1. STOP POINT IN JOURNEY PATTERN mybus:Yankee
+					Y     DESTINATION DISPLAY	 	To Papa 		Via 	Alpha, Charley
+				 1.2 STOP POINT IN JOURNEY PATTERN mybus:Alpha
+			2. JOURNEY PATTERN  hde:sjp_ABCo
+				2.1. A STOP POINT IN JOURNEY PATTERN mybus:Alpha  
+					A     DESTINATION DISPLAY	 	To Papa	 	Via   Charley
+				2.2. A STOP POINT IN JOURNEY PATTERN mybus:Bravo  
+					B     DESTINATION DISPLAY 	To Papa 		Via   Charley
+				2.3. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+					C     DESTINATION DISPLAY	 	To Papa
+			3. JOURNEY PATTERN  hde:sjp_CPo    
+				3.1. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+				3.2. A STOP POINT IN JOURNEY PATTERN mybus:Papa
+  
+	(ii)	Y, A, B, C, Q   SERVICE PATTERN   hde:svp_YQo
+			1. JOURNEY PATTERN  hde:sjp_YAo  
+				 1.1. STOP POINT IN JOURNEY PATTERN mybus:Yankee
+					Y     DESTINATION DISPLAY	 	To Papa 		Via 	Alpha, Charley
+				 1.2 STOP POINT IN JOURNEY PATTERN mybus:Alpha
+			2. JOURNEY PATTERN  hde:sjp_ABCo  
+				2.1. A STOP POINT IN JOURNEY PATTERN mybus:Alpha  
+					A     DESTINATION DISPLAY	 	To Quebec	 	Via   Charley
+				2.2. A STOP POINT IN JOURNEY PATTERN mybus:Bravo  
+					B     DESTINATION DISPLAY 	To Quebec 		Via   Charley
+				2.3. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+				C     DESTINATION DISPLAY 	To Quebec
+			3. JOURNEY PATTERN  hde:sjp_CQo    
+				3.1. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+				3.2. A STOP POINT IN JOURNEY PATTERN mybus:Quebec
+
+	(iii)	Z, A, B, C, P   SERVICE PATTERN   hde:svp_ZPo
+			JOURNEY PATTERN  hde:sjp_ZAo  
+				 1.1. STOP POINT IN JOURNEY PATTERN mybus:Zulu
+					Y     DESTINATION DISPLAY	 	To Papa 		Via 	Alpha, Charley
+				 1.2 STOP POINT IN JOURNEY PATTERN mybus:Alpha
+			JOURNEY PATTERN  hde:sjp_ABCo  
+				2.1. A STOP POINT IN JOURNEY PATTERN mybus:Alpha  
+					A     DESTINATION DISPLAY	 	To Papa	 	Via   Charley
+				2.2. A STOP POINT IN JOURNEY PATTERN mybus:Bravo  
+					B     DESTINATION DISPLAY 	To Papa 		Via   Charley
+				2.3. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+					C     DESTINATION DISPLAY 	To Papa
+			JOURNEY PATTERN  hde:sjp_CPo    
+				3.1. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+				3.2. A STOP POINT IN JOURNEY PATTERN mybus:Papa
+
+	(iv)	Z, A, B, C, Q   SERVICE PATTERN   hde:svp_ZQo
+			1. JOURNEY PATTERN  hde:sjp_ZAo  
+				 1.1. STOP POINT IN JOURNEY PATTERN mybus:Zulu
+					Y     DESTINATION DISPLAY	 	To Papa 		Via 	Alpha, Charley
+				 1.2 STOP POINT IN JOURNEY PATTERN mybus:Alpha
+			2. JOURNEY PATTERN  hde:sjp_ABCo  
+				2.1. A STOP POINT IN JOURNEY PATTERN mybus:Alpha  
+					A     DESTINATION DISPLAY	 	To Quebec	 	Via   Charley
+				2.2. A STOP POINT IN JOURNEY PATTERN mybus:Bravo  
+					B     DESTINATION DISPLAY 	To Quebec 		Via   Charley
+				2.3. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+				C     DESTINATION DISPLAY 	To Quebec
+			3. JOURNEY PATTERN  hde:sjp_CQo    
+				3.1. A STOP POINT IN JOURNEY PATTERN mybus:Charley  
+				3.2. A STOP POINT IN JOURNEY PATTERN mybus:Quebec 
+
+ CONNECTION Link
+	  There is a CONNECTION LINK at Charley to mark it as the place to transfer between services to Papa or Quebec
+
+JOURNEY PATTERNs  & TIMING PATTERNs
+      There are five  JOURNEY PATTERNs  & five TIMING PATTERNs, with the same points  in sequence
+		Y, A,  JOURNEY PATTERN   hde:sjp_YAo  	 Yankee to Alpha
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Yankee
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Alpha
+		Z, A,  JOURNEY PATTERN   hde:sjp_ZAo		Zulu to Alpha
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Zulu
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Alpha
+
+		 A, B, C,  JOURNEY PATTERN   hde:sjp_ABCo		Alpha to Charley
+			 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Alpha
+			 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Bravo
+			 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Charley
+
+		C, P,  JOURNEY PATTERN   hde:sjp_CPo			Charleyt o Papa
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Charley
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Papa
+
+		C, Q,  JOURNEY PATTERN   hde:sjp_CQo			Charley to Quebec
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Charley
+				 POINT IN JOURN EY PATTERN    SCHEDULED STOP POINT mybus:Quebec
+
+ 
+
+TIME DEMAND TYPE:   	mybus:TDT01  Normal Day
+	There is one TIME DEMAND TYPE: with a 
+		Y-> A   RUN TIME 5M	   	  associated with  TIMING LINK		mybus:Yankee+Alpha
+						JOURNEY RUN TIME  mybus:tdtr_TDT01_Yankee+Alpha
+		Z -> A   RUN TIME 5M		  associated with  TIMING LINK		mybus:Zulu+Alpha
+				JOURNEY RUN TIME  mybus:tdtr_TDT01_Zulu+Alpha
+		A -> B   RUN TIME 10M		  associated with  TIMING LINK		mybus: Alpha+Bravo
+				JOURNEY RUN TIME  mybus:tdtr_TDT01_Alpha+Bravo
+		B -> C   RUN TIME 10M	  	associated with  TIMING LINK		mybus:Bravo+Charley
+				JOURNEY RUN TIME  mybus:tdtr_TDT01_Alpha+Charley
+		C-> P	 RUN TIME 20M	  associated with  TIMING LINK		mybus:Charley+Papa
+				JOURNEY RUN TIME  mybus:tdtr_TDT01_Charley+Papa
+		C-> Q    RUN TIME 20M		  associated with  TIMING LINK		mybus:Charley+Quebec
+				JOURNEY RUN TIME  mybus:tdtr_TDT01_Charley+Quebec
+
+
+There are   four SERVICE JOURNEYs in the timetable  
+
+     (i) Yankee to Papa  SERVICE JOURNEY hde:sj_YP_01       
+			 SERVICE PATTERN    hde:svp_YP_01
+             Departs 14:20   on         DAY TYPE      DayType DT01   (MTWTF)
+
+     (iii) Yankee to Quebec  SERVICE JOURNEY hde:sj_YQ_02 
+			SERVICE PATTERN    hde:svp_YQ_02   
+             Departs 14:30   on         DAY TYPE      DayType DT01   (MTWTF) 
+
+     (iii) Zulu to Papa  SERVICE JOURNEY hde:sj_ZP_03  
+			SERVICE PATTERN    hde:svp_ZP_03   
+             Departs 14:40   on         DAY TYPE      DayType DT01   (MTWTF) 
+
+     (iii) Zulu to Quebec  SERVICE JOURNEY hde:sj_ZQ_04
+			SERVICE PATTERN    hde:svp_ZQ_04       
+             Departs 14:50   on         DAY TYPE      DayType DT01   (MTWTF) 
+ 
+There are   three  SERVICE JOURNEY INTERCHANGEs  in the timetable  
+
+	14:45 SERVICE JOURNEY INTERCHANGE hde::sji_YP_01_YQ_02 
+					FROM hde:sj_YP_01    TO  hde:sj_YQ_02 
+	15:05 SERVICE JOURNEY INTERCHANGE hde::sji_ZP_02_YP_03
+					FROM hde:sj_YP_01    TO  hde:sj_YQ_02 
+
+	15:15SERVICE JOURNEY INTERCHANGE ServiceJourneyInterchange:hde:YP_03_ZQ_04"
+					FROM hde:sj_YP_03   TO  hde:sj_ZQ_04		  
+ 
+The SERVICE JOURNEYs are for LINE hde:LN_24 . 
+
+A GROUP of SERVICEs  groups the four outbound journeys.  
+ 
+A LINE NETWORK mybus:LineNetwork:NTP_Route24   describes all the branches as a connecting graph 
+
+		Y -A		LINE SECTION:  hde:LS_Yankee_Alpha  (Y, A)
+	    Z- A		LINE SECTION:  hde:LS_Yankee_Alpha   (Z, A)
+		A - C	LINE SECTION:  hde:LS_Yankee_Alpha   (A, B, C)
+	    C - P 	LINE SECTION:  hde:LS_Yankee_Alpha  (C, P)
+		C- Q 	LINE SECTION:  hde:LS_Yankee_Alpha  (C, Z)
+  
+	A SERVICE  FRAME is used to contain the STOP POINT  elements and LINE
+	A TIMETABLE FRAME is used to contain the SERVICE JOURNEY   elements
+
+	A SERVICE CALENDAR FRAME is used to contain the DAY TYPEs etc
+
+	A COMPOSITE FRAME is used to group the TIMETABLE FRAME with a CALENDAR FRAME as a single version
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<Current/>
+				<TimetableFrameRef ref="hde:TimetableFrameTIM_24o_O"/>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple timetable frame for line with branched bus route</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="hde:CF_1">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Stop data  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<ServiceFrame version="any" id="hde:svf_24">
+					<Name>Stops for Winter timetable for route 24 </Name>
+					<!--- ========DIRECTIONs=========== -->
+					<directions>
+						<Direction version="any" id="mybus:DR_Westwards">
+							<Name>Westwards</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Yankee">
+							<Name>To Yankee  </Name>
+							<ShortName>Yankee</ShortName>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Zulu">
+							<Name>To Zulu  </Name>
+							<ShortName>Zulu</ShortName>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Eastwards">
+							<Name>Eastwards</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Papa">
+							<Name>To Papa  </Name>
+							<ShortName>Papa</ShortName>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Quebec">
+							<Name>To Quebec  </Name>
+							<ShortName>Quebec</ShortName>
+						</Direction>
+					</directions>
+					<!--- =========LINEs=========== -->
+					<lines>
+						<Line version="any" id="mybus:LN_24">
+							<Name>Line 24  </Name>
+							<ShortName>Line 24</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>24</PublicCode>
+						</Line>
+					</lines>
+					<!--- =========DISPLAYs============ -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="mybus:DST_Yankee">
+							<Name>Yankee Square</Name>
+							<ShortName>Yankee</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Zulu">
+							<Name>Zulu Road</Name>
+							<ShortName>Zulu</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Alpha">
+							<Name>Alpha Avenue</Name>
+							<ShortName>Alpha</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Bravo">
+							<Name>Bravo Boulevard</Name>
+							<ShortName>Bravo</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Charley">
+							<Name>Charley Crescent</Name>
+							<ShortName>Charley</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Delta">
+							<Name>Delta Street</Name>
+							<ShortName>Delta</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Echo">
+							<Name>Echo and  Castle</Name>
+							<ShortName>Echo</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Papa">
+							<Name>Papa Lane</Name>
+							<ShortName>Papa</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Quebec">
+							<Name>Quebec Hill</Name>
+							<ShortName>Quebec</ShortName>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!--- =========TOPOLOGIEs============ -->
+					<lineNetworks>
+						<LineNetwork version="any" id="mybus:LineNetwork:NTP_Route24">
+							<Name>Line 24 with all branches</Name>
+							<sections>
+								<LineSection version="any" id="mybus:LS_Yankee_Alpha">
+									<pointsOnSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Yankee_Alpha" order="01">
+											<ScheduledStopPointRef version="any" ref="mybus:Yankee"/>
+											<ServiceLinkRef version="any" ref="mybus:SL@Yankee+Alpha"/>
+										</PointOnLineSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Yankee_Alpha" order="02">
+											<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+										</PointOnLineSection>
+									</pointsOnSection>
+									<SectionType>trunk</SectionType>
+								</LineSection>
+								<LineSection version="any" id="mybus:LS_Zulu_Alpha">
+									<pointsOnSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Zulu_Alpha" order="01">
+											<ScheduledStopPointRef version="any" ref="mybus:Zulu"/>
+											<ServiceLinkRef version="any" ref="mybus:SL@Zulu+Alpha"/>
+										</PointOnLineSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Zulu_Alpha" order="02">
+											<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+										</PointOnLineSection>
+									</pointsOnSection>
+									<SectionType>trunk</SectionType>
+								</LineSection>
+								<LineSection version="any" id="mybus:LS_Alpha_Charley">
+									<pointsOnSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Alpha_Charley" order="1">
+											<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+											<ServiceLinkRef version="any" ref="mybus:SL@Alpha+Bravo"/>
+										</PointOnLineSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Alpha_Charley" order="2">
+											<ScheduledStopPointRef version="any" ref="mybus:Bravo"/>
+											<ServiceLinkRef version="any" ref="mybus:SL@Bravo+Charley"/>
+										</PointOnLineSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Alpha_Charley" order="3">
+											<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+										</PointOnLineSection>
+									</pointsOnSection>
+									<SectionType>trunk</SectionType>
+								</LineSection>
+								<LineSection version="any" id="mybus:LS_Charley_Papa">
+									<pointsOnSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Charley_Papa" order="01">
+											<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+											<ServiceLinkRef version="any" ref="mybus:SL@Charley+Papa"/>
+										</PointOnLineSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Charley_Papa" order="02">
+											<ScheduledStopPointRef version="any" ref="mybus:Papa"/>
+										</PointOnLineSection>
+									</pointsOnSection>
+									<SectionType>trunk</SectionType>
+								</LineSection>
+								<LineSection version="any" id="mybus:LS_Charley_Quebec">
+									<pointsOnSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Charley_Quebec" order="01">
+											<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+											<ServiceLinkRef version="any" ref="mybus:SL@Charley+Quebec"/>
+										</PointOnLineSection>
+										<PointOnLineSection version="any" id="mybus:LSM_Charley_Quebec" order="02">
+											<ScheduledStopPointRef version="any" ref="mybus:Quebec"/>
+										</PointOnLineSection>
+									</pointsOnSection>
+									<SectionType>trunk</SectionType>
+								</LineSection>
+							</sections>
+						</LineNetwork>
+					</lineNetworks>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:Yankee">
+							<Name>Yankee</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Yankee</ShortName>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:Zulu">
+							<Name>Zulu</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:Alpha">
+							<Name>Alpha</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:Bravo">
+							<Name>Bravo</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:Charley">
+							<Name>Charley</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:Papa">
+							<Name>Papa</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:Quebec">
+							<Name>Quebec</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- =========SERVICE LINKs=========== -->
+					<serviceLinks>
+						<!--- =====Outbound=== -->
+						<ServiceLink version="any" id="mybus:SL@Yankee+Alpha">
+							<Name>Yankee to Alpha   </Name>
+							<FromPointRef version="any" ref="mybus:Yankee"/>
+							<ToPointRef version="any" ref="mybus:Alpha"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Zulu+Alpha">
+							<Name>Zulu to Alpha   </Name>
+							<FromPointRef version="any" ref="mybus:Zulu"/>
+							<ToPointRef version="any" ref="mybus:Alpha"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Alpha+Bravo">
+							<Name>Alpha to Bravo</Name>
+							<FromPointRef version="any" ref="mybus:Alpha"/>
+							<ToPointRef version="any" ref="mybus:Bravo"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Bravo+Charley">
+							<Name>Bravo to Charley</Name>
+							<FromPointRef version="any" ref="mybus:Bravo"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Charley+Papa">
+							<Name>Charley to Papa</Name>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Papa"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Charley+Quebec">
+							<Name>Charley to Quebec</Name>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Quebec"/>
+						</ServiceLink>
+						<!--- =====inbound=== -->
+						<ServiceLink version="any" id="mybus:SL@Papa+Charley">
+							<Name>Papa to Charley</Name>
+							<FromPointRef version="any" ref="mybus:Papa"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Quebec+Charley">
+							<Name>Quebec to Charley</Name>
+							<FromPointRef version="any" ref="mybus:Quebec"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Charley+Bravo">
+							<Name>Charley to Bravo</Name>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Bravo"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Bravo+Alpha">
+							<Name>Bravo to Alpha</Name>
+							<FromPointRef version="any" ref="mybus:Bravo"/>
+							<ToPointRef version="any" ref="mybus:Alpha"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Alpha+Yankee">
+							<Name>Alpha to Yankee</Name>
+							<FromPointRef version="any" ref="mybus:Alpha"/>
+							<ToPointRef version="any" ref="mybus:Yankee"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SL@Alpha+Zulu">
+							<Name>Alpha to Zulu</Name>
+							<FromPointRef version="any" ref="mybus:Alpha"/>
+							<ToPointRef version="any" ref="mybus:Zulu"/>
+						</ServiceLink>
+					</serviceLinks>
+					<!--- =========SERVICE PATTERNs============ -->
+					<servicePatterns>
+						<ServicePattern version="any" id="hde:svp_YPo">
+							<Name>Yankee to Papa</Name>
+							<RouteRef ref="mybus:rt_YPo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_YAo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_ABCo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_CPo"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spip_YPo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Yankee"/>
+									<ForAlighting>false</ForAlighting>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Alpha"/>
+										</Via>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spip_YPo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spip_YPo_03">
+									<ScheduledStopPointRef version="any" ref="mybus:Bravo"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spip_YPo_04">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<None/>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="5" id="hde:spip_YPo_05">
+									<ScheduledStopPointRef version="any" ref="mybus:Papa"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:jp_YPo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Yankee+Alpha"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:jp_YPo_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@Alpha+Bravo"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:jp_YPo_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@Bravo+Charley"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="4" id="hde:jp_YPo_04">
+									<ServiceLinkRef version="any" ref="mybus:SL@Charley+Papa"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+						<ServicePattern version="any" id="hde:svp_YQo">
+							<Name>Yankee to Quebec</Name>
+							<RouteRef ref="mybus:rt_YQo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_YAo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_ABCo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_CQo"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spip_YQo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Yankee"/>
+									<ForAlighting>false</ForAlighting>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Alpha"/>
+										</Via>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spip_YQo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spip_YQo_03">
+									<ScheduledStopPointRef version="any" ref="mybus:Bravo"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spip_YQo_04">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+									<ForBoarding>false</ForBoarding>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<None/>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="5" id="hde:spip_YQo_05">
+									<ScheduledStopPointRef version="any" ref="mybus:Quebec"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:jp_YQo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Yankee+Alpha"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:jp_YQo_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@Alpha+Bravo"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:jp_YQo_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@Bravo+Charley"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="4" id="hde:jp_YQo_04">
+									<ServiceLinkRef version="any" ref="mybus:SL@Charley+Quebec"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+						<ServicePattern version="any" id="hde:svp_ZPo">
+							<Name>Zulu to Papa</Name>
+							<RouteRef ref="mybus:rt_ZPo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_ZAo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_ABCo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_CPo"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spip_ZPo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Zulu"/>
+									<ForAlighting>false</ForAlighting>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Alpha"/>
+										</Via>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spip_ZPo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spip_ZPo_03">
+									<ScheduledStopPointRef version="any" ref="mybus:Bravo"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spip_ZPo_04">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+									<ForBoarding>false</ForBoarding>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+									<vias>
+										<None/>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="5" id="hde:spip_ZPo_05">
+									<ScheduledStopPointRef version="any" ref="mybus:Papa"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:jp_ZPo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Zulu+Alpha"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:jp_ZPo_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@Alpha+Bravo"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:jp_ZPo_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@Bravo+Charley"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="4" id="hde:jp_ZPo_04">
+									<ServiceLinkRef version="any" ref="mybus:SL@Charley+Papa"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+						<ServicePattern version="any" id="hde:svp_ZQo">
+							<Name>Zulu to Quebec</Name>
+							<RouteRef ref="mybus:rt_ZQo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_ZAo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_ABCo"/>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_CQo"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spip_ZQo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Zulu"/>
+									<ForAlighting>false</ForAlighting>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Alpha"/>
+										</Via>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spip_ZQo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spip_ZQo_03">
+									<ScheduledStopPointRef version="any" ref="mybus:Bravo"/>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<Via>
+											<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+										</Via>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="4" id="hde:spip_ZQo_04">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+									<ForBoarding>false</ForBoarding>
+									<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+									<vias>
+										<None/>
+									</vias>
+									<ChangeOfDestinationDisplay>true</ChangeOfDestinationDisplay>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="5" id="hde:spip_ZQo_05">
+									<ScheduledStopPointRef version="any" ref="mybus:Quebec"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:jp_ZQo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Zulu+Alpha"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:jp_ZQo_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@Alpha+Bravo"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:jp_ZQo_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@Bravo+Charley"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="4" id="hde:jp_ZQo_04">
+									<ServiceLinkRef version="any" ref="mybus:SL@Charley+Quebec"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+					</servicePatterns>
+					<!--- =========CONNECTION links=========== -->
+					<connections>
+						<Connection version="any" id="mybus:cx_Charley">
+							<Name>Transfer buses  at Charley</Name>
+							<Distance>0</Distance>
+							<TransferDuration>
+								<DefaultDuration>PT1M</DefaultDuration>
+							</TransferDuration>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+							</From>
+							<To>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+							</To>
+						</Connection>
+					</connections>
+					<!--- =========TIMING LINKs=========== -->
+					<timingLinks>
+						<!--- =====Outbound=== -->
+						<TimingLink version="any" id="mybus:@TLYankee+Alpha">
+							<Name>Yankee to Alpha   </Name>
+							<FromPointRef version="any" ref="mybus:Yankee"/>
+							<ToPointRef version="any" ref="mybus:Alpha"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLZulu+Alpha">
+							<Name>Zulu to Alpha   </Name>
+							<FromPointRef version="any" ref="mybus:Zulu"/>
+							<ToPointRef version="any" ref="mybus:Alpha"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLAlpha+Bravo">
+							<Name>Alpha to Bravo</Name>
+							<FromPointRef version="any" ref="mybus:Alpha"/>
+							<ToPointRef version="any" ref="mybus:Bravo"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLBravo+Charley">
+							<Name>Bravo to Charley</Name>
+							<FromPointRef version="any" ref="mybus:Bravo"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLCharley+Papa">
+							<Name>Charley to Delta</Name>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Papa"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLCharley+Quebec">
+							<Name>Charley to Quebec</Name>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Quebec"/>
+						</TimingLink>
+						<!--- =====inbound=== -->
+						<TimingLink version="any" id="mybus:@TLPapa+Charley">
+							<Name>Papa to Charley</Name>
+							<FromPointRef version="any" ref="mybus:Papa"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLQuebec+Charley">
+							<Name>Quebec to Charley</Name>
+							<FromPointRef version="any" ref="mybus:Quebec"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLCharley+Bravo">
+							<Name>Charley to Bravo</Name>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Bravo"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLBravo+Alpha">
+							<Name>Bravo to Alpha</Name>
+							<FromPointRef version="any" ref="mybus:Bravo"/>
+							<ToPointRef version="any" ref="mybus:Alpha"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLAlpha+Yankee">
+							<Name>Alpha to Yankee</Name>
+							<FromPointRef version="any" ref="mybus:Alpha"/>
+							<ToPointRef version="any" ref="mybus:Yankee"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:@TLAlpha+Zulu">
+							<Name>Alpha to Zulu</Name>
+							<FromPointRef version="any" ref="mybus:Alpha"/>
+							<ToPointRef version="any" ref="mybus:Zulu"/>
+						</TimingLink>
+					</timingLinks>
+					<!--- =========TIMING PATTERNs============ -->
+					<timingPatterns>
+						<TimingPattern version="any" id="hde:tp_YAo">
+							<Name>Yankee to Alpha</Name>
+							<RouteRef ref="mybus:rt_YPo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_YAo_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Yankee"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_YAo_02">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Alpha"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="hde:tp_ZAo">
+							<Name>Zulu to Alpha</Name>
+							<RouteRef ref="mybus:rt_ZPo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_ZAo_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Zulu"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_ZAo_02">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Alpha"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="hde:tp_ABCo">
+							<Name>Alpha to Charley</Name>
+							<RouteRef ref="mybus:rt_YPo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_ABCo_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Alpha"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_ABCo_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:Bravo"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="3" id="hde:tpip_ABCo_03">
+									<TimingPointRef version="any" ref="mybus:Charley"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="hde:tp_CPo">
+							<Name>Charley to Papa</Name>
+							<RouteRef ref="mybus:rt_YPo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_CPo_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Charley"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_CPo_02">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Papa"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="hde:tp_CQo">
+							<Name>Charley to Quebec</Name>
+							<RouteRef ref="mybus:rt_YQo">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_CQo_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Charley"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_CQo_02">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:Quebec"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+					</timingPatterns>
+					<!--- ======JOURNEY PATTERNs=========== -->
+					<journeyPatterns>
+						<ServiceJourneyPattern version="any" id="hde:sjp_YAo">
+							<Name>Yankee to Alpha</Name>
+							<DirectionType>outbound</DirectionType>
+							<TimingPatternRef version="any" ref="hde:tp_YAo"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_YAo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Yankee"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_YAo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:lijp_YAo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Yankee+Alpha"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:sjp_ZAo">
+							<Name>Zulu to Alpha</Name>
+							<DirectionType>outbound</DirectionType>
+							<TimingPatternRef version="any" ref="hde:tp_ZAo"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_ZAo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Zulu"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_ZAo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:lijp_ZAo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Zulu+Alpha"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:sjp_ABCo">
+							<Name>Alpha to Charley</Name>
+							<DirectionType>outbound</DirectionType>
+							<TimingPatternRef version="any" ref="hde:tp_ABCo"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_ABCo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Alpha"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_ABCo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Bravo"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:pijp_ABCo_03">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:lijp_YPo_02">
+									<ServiceLinkRef version="any" ref="mybus:SL@Alpha+Bravo"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="3" id="hde:lijp_YPo_03">
+									<ServiceLinkRef version="any" ref="mybus:SL@Bravo+Charley"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:sjp_CPo">
+							<Name>Charley to Papa</Name>
+							<DirectionType>outbound</DirectionType>
+							<TimingPatternRef version="any" ref="hde:tp_CPo"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_CPo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_CPo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Papa"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:lijp_CPo_04">
+									<ServiceLinkRef version="any" ref="mybus:SL@Charley+Papa"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:sjp_CQo">
+							<Name>Charley to Quebec</Name>
+							<DirectionType>outbound</DirectionType>
+							<TimingPatternRef version="any" ref="hde:tp_CQo"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_CQo_01">
+									<ScheduledStopPointRef version="any" ref="mybus:Charley"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_CQo_02">
+									<ScheduledStopPointRef version="any" ref="mybus:Quebec"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:lijp_CQo_01">
+									<ServiceLinkRef version="any" ref="mybus:SL@Charley+Quebec"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServiceJourneyPattern>
+					</journeyPatterns>
+					<!--- ======TIME DEMAND TYPEs=========== -->
+					<timeDemandTypes>
+						<TimeDemandType version="any" id="mybus:TDT01">
+							<Name>Normal Day</Name>
+							<runTimes>
+								<!--- =====Outbound=== -->
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Yankee+Alpha">
+									<TimingLinkRef version="any" ref="mybus:@TLYankee+Alpha"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Zulu+Alpha">
+									<TimingLinkRef version="any" ref="mybus:@TLZulu+Alpha"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Alpha+Bravo">
+									<TimingLinkRef version="any" ref="mybus:@TLAlpha+Bravo"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Bravo+Charley">
+									<TimingLinkRef version="any" ref="mybus:@TLBravo+Charley"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Charley+Papa">
+									<TimingLinkRef version="any" ref="mybus:@TLCharley+Papa"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Charley+Quebec">
+									<TimingLinkRef version="any" ref="mybus:@TLCharley+Quebec"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<!--- =====inbound=== -->
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Papa+Charley">
+									<TimingLinkRef version="any" ref="mybus:@TLPapa+Charley"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Quebec+Charley">
+									<TimingLinkRef version="any" ref="mybus:@TLQuebec+Charley"/>
+									<RunTime>PT5M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Charley+Bravo">
+									<TimingLinkRef version="any" ref="mybus:@TLCharley+Bravo"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Bravo+Alpha">
+									<TimingLinkRef version="any" ref="mybus:@TLBravo+Alpha"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Alpha+Yankee">
+									<TimingLinkRef version="any" ref="mybus:@TLAlpha+Yankee"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TDT01_Alpha+Zulu">
+									<TimingLinkRef version="any" ref="mybus:@TLAlpha+Zulu"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+							</runTimes>
+						</TimeDemandType>
+					</timeDemandTypes>
+				</ServiceFrame>
+				<!--  ========================================== -->
+				<!-- ======Timetable ======= -->
+				<TimetableFrame version="any" id="hde:TIM_24o_O">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="hde:Cnd001">
+							<Description>Sept  to March</Description>
+							<FromDate>2010-11-01T00:00:00Z</FromDate>
+							<ToDate>2011-03-31T00:00:00Z</ToDate>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+						</AvailabilityCondition>
+					</validityConditions>
+					<Name>Winter timetable for route 23 outbound</Name>
+					<VehicleModes>bus</VehicleModes>
+					<!--- ======SERVICE JOURNEYs=========== -->
+					<vehicleJourneys>
+						<ServiceJourney version="any" id="hde:sj_YP_01">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_YPo"/>
+							<TimeDemandTypeRef version="any" ref="mybus:TDT01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef ref="mybus:rt_YPo">EXTERNAL</RouteRef>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_YQ_02">
+							<DepartureTime>14:30:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_YQo"/>
+							<TimeDemandTypeRef version="any" ref="mybus:TDT01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef ref="mybus:rt_YQo">EXTERNAL</RouteRef>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_ZP_03">
+							<DepartureTime>14:40:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_ZPo"/>
+							<TimeDemandTypeRef version="any" ref="mybus:TDT01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef ref="mybus:rt_ZPo">EXTERNAL</RouteRef>
+								<DirectionType>outbound</DirectionType>
+								<DirectionView>
+									<DirectionRef version="any" ref="mybus:DR_Papa"/>
+								</DirectionView>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Papa"/>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_ZQ_04">
+							<DepartureTime>14:50:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_ZQo"/>
+							<TimeDemandTypeRef version="any" ref="mybus:TDT01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef ref="mybus:rt_ZQo">EXTERNAL</RouteRef>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Quebec"/>
+							</JourneyPatternView>
+						</ServiceJourney>
+					</vehicleJourneys>
+					<!--- ======GROUPs OF SERVICEs=========== -->
+					<groupsOfServices>
+						<!-- ==== Weekday OUT  Out === -->
+						<GroupOfServices version="any" id="hde:24_out">
+							<Name>Monday to Friday</Name>
+							<Description>Line 24    Monday to Friday timetable - Outbound services </Description>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<DirectionType>outbound</DirectionType>
+							<DirectionView>
+								<DirectionRef version="any" ref="mybus:DR_Eastwards"/>
+								<Name>Eastbound</Name>
+							</DirectionView>
+							<members>
+								<GroupOfServicesMember version="any" id="hde:GSM_24o_out_YP_01" order="1">
+									<ServiceJourneyRef version="any" ref="hde:sj_YP_01"/>
+								</GroupOfServicesMember>
+								<GroupOfServicesMember version="any" id="hde:GSM_24o_out_ZQ_02" order="2">
+									<ServiceJourneyRef version="any" ref="hde:sj_YQ_02"/>
+								</GroupOfServicesMember>
+								<GroupOfServicesMember version="any" id="hde:GSM_24o_out_ZP_03" order="3">
+									<ServiceJourneyRef version="any" ref="hde:sj_ZP_03"/>
+								</GroupOfServicesMember>
+								<GroupOfServicesMember version="any" id="hde:GSM_24o_out_ZQ_04" order="4">
+									<ServiceJourneyRef version="any" ref="hde:sj_ZQ_04"/>
+								</GroupOfServicesMember>
+							</members>
+						</GroupOfServices>
+					</groupsOfServices>
+					<!--- =========NOTICES ============ -->
+					<notices>
+						<Notice version="any" id="hde:fn_01">
+							<Text>Change at Charley for Quebec</Text>
+							<CanBeAdvertised>true</CanBeAdvertised>
+						</Notice>
+						<Notice version="any" id="hde:fn_02">
+							<Text>Change at Charley for Papa</Text>
+							<CanBeAdvertised>true</CanBeAdvertised>
+						</Notice>
+					</notices>
+					<!--- ======JOURNEY INTERCHANGEs=========== -->
+					<journeyInterchanges>
+						<ServiceJourneyInterchange version="any" id="hde::sji_YP_01_YQ_02">
+							<Description>14:45  Change for Quebec	 Notice (1) </Description>
+							<ConnectionRef version="any" ref="mybus:cx_Charley"/>
+							<StaySeated>false</StaySeated>
+							<Planned>true</Planned>
+							<Guaranteed>false</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>false</Controlled>
+							<StandardWaitTime>PT10M</StandardWaitTime>
+							<MaximumWaitTime>PT15M</MaximumWaitTime>
+							<StandardTransferTime>PT1M</StandardTransferTime>
+							<MinimumTransferTime>PT1M</MinimumTransferTime>
+							<noticeAssignments>
+								<NoticeAssignment version="any" id="hde::sji_YP_01_YQ_02" order="1">
+									<NoticeRef version="any" ref="hde:fn_01"/>
+									<Mark>(1)</Mark>
+									<Advertised>true</Advertised>
+								</NoticeAssignment>
+							</noticeAssignments>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+							<FromJourneyRef version="any" ref="hde:sj_YP_01"/>
+							<ToJourneyRef version="any" ref="hde:sj_YQ_02"/>
+						</ServiceJourneyInterchange>
+						<ServiceJourneyInterchange version="any" id="hde::sji_ZP_02_YP_03">
+							<Description>15:05   Change for Papa	Notice (2) </Description>
+							<ConnectionRef version="any" ref="mybus:cx_Charley"/>
+							<StaySeated>false</StaySeated>
+							<Planned>true</Planned>
+							<Guaranteed>false</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>false</Controlled>
+							<StandardWaitTime>PT10M</StandardWaitTime>
+							<MaximumWaitTime>PT15M</MaximumWaitTime>
+							<StandardTransferTime>PT1M</StandardTransferTime>
+							<MinimumTransferTime>PT1M</MinimumTransferTime>
+							<noticeAssignments>
+								<NoticeAssignment version="any" id="hde::sji_ZP_02_YP_03" order="1">
+									<NoticeRef version="any" ref="hde:fn_02"/>
+									<Mark>(2)</Mark>
+									<Advertised>true</Advertised>
+								</NoticeAssignment>
+							</noticeAssignments>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+							<FromJourneyRef version="any" ref="hde:sj_YQ_02"/>
+							<ToJourneyRef version="any" ref="hde:sj_ZP_03"/>
+						</ServiceJourneyInterchange>
+						<ServiceJourneyInterchange version="any" id="hde::sji_YP_03_ZQ_04">
+							<Description>15:15   Change for Quebec	Notice (1)  </Description>
+							<ConnectionRef version="any" ref="mybus:cx_Charley"/>
+							<StaySeated>false</StaySeated>
+							<Planned>true</Planned>
+							<Guaranteed>false</Guaranteed>
+							<Advertised>true</Advertised>
+							<Controlled>false</Controlled>
+							<StandardWaitTime>PT10M</StandardWaitTime>
+							<MaximumWaitTime>PT15M</MaximumWaitTime>
+							<StandardTransferTime>PT1M</StandardTransferTime>
+							<MinimumTransferTime>PT1M</MinimumTransferTime>
+							<noticeAssignments>
+								<NoticeAssignment version="any" id="hde::sji_ZP_03_ZQ_04" order="1">
+									<NoticeRef version="any" ref="hde:fn_01"/>
+									<Mark>(1)</Mark>
+								</NoticeAssignment>
+							</noticeAssignments>
+							<FromPointRef version="any" ref="mybus:Charley"/>
+							<ToPointRef version="any" ref="mybus:Charley"/>
+							<FromJourneyRef version="any" ref="hde:sj_ZP_03"/>
+							<ToJourneyRef version="any" ref="hde:sj_ZQ_04"/>
+						</ServiceJourneyInterchange>
+					</journeyInterchanges>
+				</TimetableFrame>
+				<!--  ========================================== -->
+				<!--  Service Calendar Nov 2010   COMPACT Coding  === -->
+				<ServiceCalendarFrame version="any" id="hde:CAL_02">
+					<Name>Service Calendar Nov 2010 ALTERNATE MORE COMPACT Coding  </Name>
+					<ServiceCalendar version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2010-11-14</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="hde:DT_01-MF-NH">
+							<Name>Weekdays unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-01">
+							<Description>Monday 2010-11-01</Description>
+							<Date>2010-11-01</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-02">
+							<Description>Tuesday 2010-11-02</Description>
+							<Date>2010-11-02</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-03">
+							<Description>Wednesday 2010-11-03</Description>
+							<Date>2010-11-03</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-04">
+							<Description>Thusday 2010-11-04</Description>
+							<Date>2010-11-04</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-05">
+							<Description>MFriday 2010-11-05</Description>
+							<Date>2010-11-05</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-06">
+							<Description>Saturday 2010-11-06</Description>
+							<Date>2010-11-06</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-07">
+							<Description>Sunday 2010-11-07</Description>
+							<Date>2010-11-07</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

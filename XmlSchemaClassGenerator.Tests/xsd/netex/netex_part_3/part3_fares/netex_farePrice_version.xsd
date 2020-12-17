@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_farePrice_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_utility/netex_units.xsd"/>
+	<xsd:include schemaLocation="netex_fareTable_support.xsd"/>
+	<xsd:include schemaLocation="netex_farePrice_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_alternativeName_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_noticeAssignment_version.xsd"/>
+	<xsd:include schemaLocation="netex_calculationParameters_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes 
+				</Date>
+				<Date>
+					<Modified>2017-06-03</Modified> CR047 (Cf TM6 CR06) Add  to price  price step and reflexive price rule reference to support tax.
+				</Date>
+				<Date>
+					<Modified>2018-04-23</Modified>CR047 Fix price step attributed id and order  - has to be explicitly optional to make visible
+				</Date>
+				<Date>
+					<Modified>2018-06-06</Modified>CR058 NJSK  Add URL to Priceable object
+				</Date>
+				<Date>
+					<Modified>2019-02-25</Modified>CR047  NJSK  Correct Typos on documentation
+				</Date>
+				<Date>
+					<Modified>2019-03-02</Modified>UK-19 Fix __PriceGroup__ should be abstract
+				</Date>
+				<Date>
+					<Modified>2019-03-11</Modified>UK-74 Add PrivateCode to FarePrice. 
+					  Also UK-22 Add  Description to FareProductPrice 
+					    Also UK-22 Add  InfoLinks to PriceableObject
+				</Date>
+				<Date>
+					<Modified>2019-03-02</Modified>UK-19 Fix  To FarePrice amounts to allow price in Price  units other than Money
+						Add  FarePrice AmountWithResultsGroup and refactor  FarePriceAmount groups to be clearer
+					   Also  revise PriceRuleStepResult:  add AdjustmentAmount, AdjustmentUnits .  RoundingRef, RoundingStepRef, and   NARRATIVE text element 
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the FARE PRICE   types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_fares}netex_farePrice_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					<Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx FARE PRICE    types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: FARE PRICE  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====Used in FARE FRAME)=================================================== -->
+	<xsd:complexType name="farePricesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of FARE Prices.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="PriceGroup_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===FARE PRICE================================================= -->
+	<xsd:element name="PriceableObject_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy Abstract price.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PriceableObject" type="PriceableObject_VersionStructure" abstract="true" substitutionGroup="PriceableObject_" id="PriceableObject">
+		<xsd:annotation>
+			<xsd:documentation>An element that may have a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PriceableObject_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for PRICEABLE OBJECT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="PriceableObjectGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PriceableObjectGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a PRICEABLE OBJECT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of PRICEABLE OBJECT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of PRICEABLE OBJECT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Url" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>URL for information on element.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="infoLinks" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Hyperlinks associated with GPRICEABLE OBLECT. Can be used to associated pfs, web pages etc, conditions of use etc.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="infoLinks_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="alternativeNames" type="alternativeNames_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ALTERNATIVE NAMEs for PRICEABLE OBJECT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICE ASSIGNMENTs for PRICEABLE OBJECT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="PriceableObjectPricingGroup"/>
+			<xsd:group ref="PriceableObjectPricesGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="PriceableObjectPricingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Pricing Elements for GROUP OF SALES OFFER PACKAGEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PricingServiceRef" minOccurs="0"/>
+			<xsd:element ref="PricingRuleRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="PriceableObjectPricesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Price  Elements for GROUP OF SALES OFFER PACKAGEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="priceGroups" type="priceGroups_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PRICE GROUPSs  making up FARE PRODUCT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fareTables" type="fareTables_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Other FARE TABLESs for DISTANCE MATRIX ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="FareTable_" type="GroupOfEntities_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of prices that may be associated with a DISTANCE MATRIX ELEMENT, FARE STRUCTURE ELEMENT or  other PRICEABLE OBJECT.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="fareTables_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FAREFARE TABLE PRICE GROUP.s.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="FareTableRef"/>
+					<xsd:element ref="FareTable_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ===FARE PRICE================================================= -->
+	<xsd:complexType name="farePrices_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE PRICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="FarePriceRef"/>
+					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="FarePrice_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FarePrice_" type="VersionedChildStructure" abstract="true" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Dummy Abstract PRICE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="FarePrice" abstract="true" substitutionGroup="FarePrice_" id="FarePrice">
+		<xsd:annotation>
+			<xsd:documentation>A set of all possible price features for a Fare element.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="FarePrice_VersionedChildStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FarePrice_VersionedChildStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="FarePriceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FarePriceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of FARE PRICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of FARE PRICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element name="StartDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start date for selling product or service at the PRICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End date for selling product or services at the PRICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="FarePriceAmountWithDerivationGroup">
+				<xsd:annotation>
+					<xsd:documentation>Amount Elements for a FARE PRICE. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:element name="IsAllowed" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the PRICE is allowed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PricingServiceRef" minOccurs="0"/>
+			<xsd:group ref="FarePriceCalculationGroup"/>
+			<xsd:element name="Ranking" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Ranking to give this discount relatove to other applicable discounts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="FarePriceAmountWithDerivationGroup">
+		<xsd:annotation>
+			<xsd:documentation>Amount Elements for a FARE PRICE with derivation steps.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="FarePriceAmountGroup"/>
+			<xsd:element name="ruleStepResults" type="priceRuleStepResults_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Interim amounts for any pricing rules  applied to derive price , for example VAT amount  charged.  +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="FarePriceAmountGroup">
+		<xsd:annotation>
+			<xsd:documentation>Amount Elements for a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Amount" type="CurrencyAmountType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PRICE amount. in specified currency.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Currency" type="CurrencyType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Currency of Price ISO 4217.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PriceUnitRef" minOccurs="0"/>
+			<xsd:element name="Units" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Other units for PRICE (If not in a currency).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="FarePriceCalculationGroup">
+		<xsd:annotation>
+			<xsd:documentation>Calculation Elements for a DISCOUNTABLE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="FarePriceRef" minOccurs="0"/>
+			<xsd:choice minOccurs="0">
+				<xsd:element ref="PricingRuleRef"/>
+				<xsd:element ref="PricingRule_"/>
+			</xsd:choice>
+			<xsd:element name="CanBeCumulative" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether this discount can be used cumulatively with other discounts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="RoundingRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="priceRuleStepResults_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of rules step calculation results </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element name="RuleStepResult" type="PriceRuleStepResultStructure" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Record of amount deducted by a price rule calculation, e.g. an additional tax step. If PRICING RULES are chained there may be multiple steps to record.  
+The source of the input price can be indicated by a FARE PRICE REF of some sort. 
+The RULE STEP RESULT Amount is the resulting  net price after the pricing rule has been applied to the input amount.  
+The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original input price and the RULE STEP RESULT  Amount (so it is possible to derive the input price amount  by adding the the Adjustment to the  Net Amount.  A similar computation can be done for any units.  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PriceRuleStepResultStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE STEP RESULT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="FarePriceRef" minOccurs="0"/>
+			<xsd:group ref="FarePriceAmountGroup">
+				<xsd:annotation>
+					<xsd:documentation>An amount for a fair price in either  currency. arbitrary units, or both</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="StepCalculationAmountGroup">
+				<xsd:annotation>
+					<xsd:documentation>Step calculation amounts, ie difference between base and result, +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="PriceRuleStepRateGroup">
+				<xsd:annotation>
+					<xsd:documentation>Rules used to  perform step</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:element name="Narrative" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Explanation of calcuation step as text.  +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="RuleStepResultIdType">
+			<xsd:annotation>
+				<xsd:documentation>Identifier of PriceRuleStepResult</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="order" type="xsd:integer" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>Order of step.</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:group name="StepCalculationAmountGroup">
+		<xsd:annotation>
+			<xsd:documentation>Step anounts for for FARE STEP RESULT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RateUsed" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Discount rate used .</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AdjustmentAmount" type="CurrencyAmountType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Step calculation amount,  in same currency as STEP RESULT Amount. ( i.e. difference between  Base Amount and result Amount. PRICE) +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AdjustmentUnits" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Step calculation Units,  in same  PRICE UNIT as STEP RESULT Amount.  ( i.e. difference between base Units and Result Units. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="PriceRuleStepRateGroup">
+		<xsd:annotation>
+			<xsd:documentation>Rates for for FARE STEP RESULT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PricingRuleRef"/>
+			<xsd:element ref="RoundingRef" minOccurs="0"/>
+			<xsd:element ref="RoundingStepRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ==PRICE GROUP============================================================ -->
+	<xsd:complexType name="compositePrices_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE PRICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="FarePriceRef"/>
+					<xsd:element ref="PriceGroupRef"/>
+					<xsd:element ref="FarePrice_"/>
+					<xsd:element ref="PriceGroup_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="priceGroups_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE PRICEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="PriceGroupRef"/>
+					<xsd:element ref="PriceGroup_"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PriceGroup_" type="GroupOfEntities_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of prices, allowing the grouping of numerous possible consumption elements into a limited number of price references, or to apply grouped increase, in value or percentage.
+</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PriceGroup" abstract="false" substitutionGroup="PriceGroup_">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of prices, allowing the grouping of numerous possible consumption elements into a limited number of price references, or to apply grouped increase, in value or percentage.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PriceGroup_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PricePropertyGroup"/>
+							<xsd:element name="members" type="farePrices_RelStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>PRICEs in PRICE GROUP.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element ref="FarePriceRef" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PriceGroupIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PriceGroup_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for PRICE GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:group ref="PriceGroupGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PriceGroupGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a PRICE GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="PricePropertyGroup"/>
+			<xsd:element name="members" type="farePrices_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PRICEs in PRICE GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="FarePriceRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="PricePropertyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a PRICE GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StartDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start date for PRICE GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End date for PRICE GROUP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="RoundingRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>

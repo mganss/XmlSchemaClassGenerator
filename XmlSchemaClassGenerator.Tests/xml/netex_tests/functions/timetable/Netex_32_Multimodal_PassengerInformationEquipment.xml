@@ -1,0 +1,868 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of  logical screen assignments and  PaSSENGER INFORMATION EQUIPMENT  in NeTex XML  
+ 
+  
+1. OVERVIEW
+============
+   The PaSSENGER INFORMATION EQUIPMENT  are for Station  Bravo, which has   Tram, bus and Rail  modes
+   
+   It is an interchange on the following LINES:
+	
+		tram LINE 24  B is midpoint of three stops   A - B  - C   (East West)
+														:
+		bus LINE 46  B is midpoint of three stops   F -  B  - T   (North South)
+														:
+		bus LINE 68 B is terminus of three stops    	B -  J  - K   (East West)
+														:
+		rail	B is terminus  of all rail services		B - P - Q
+		
+   
+   Bravo Station is described by both a STOP PLACE, and some SCHEDULED STOP POINTs for the different modes
+   
+   It has  different  SCHEDULED STOP POINT ids in the bus, tram and rail data 
+ 
+ 
+   STOP PLACE Bravo  has  a ticket hall with a separate  arrivals display and a departures display
+
+   There is a Departures Display  at the on street Bus and Tram StTop for LINES 24, 46 and 68  
+		on   B tram Bus  QUAY 1  showing the eastbound/souhbound journeys
+		on   B tram Bus  QUAY 1  showing the westbound/Northbound journeys
+
+   There are two Displays of all rail journeys at different points on the rail platform (it is a terminus), both showing the same information
+
+==================================
+2. DETAILS
+
+   Rail bus and tram all use different identifiers for their SCHEDULED STOP POINTs
+   Bus lines 
+
+SCHEDULED STOP POINTs
+   tram LINE 24
+	    A)   mybus:ssp_001  Alpha  
+		B)  mybus:ssp_002 	 Bravo   (tram)  
+		C)  mybus:ssp_077	Charley 
+
+   bus LINE 46
+	    F)   mybus:ssp_031  Foxtrot
+		B)  mybus:ssp_032 	 Bravo     (bus)
+		T)  mybus:ssp_033	 Tango
+
+   bus LINE 68
+	    B)   mybus:ssp_032  Bravo   (bus)
+		J)  mybus:ssp_035 	 Juliet   
+		K)  mybus:ssp_036	 Kilo
+ 
+	rail
+		T)  myrail:SSP_042	 Bravo
+
+
+There are separate  outbound and inbound JOURNEY  PATTERNs, each with three POINT IN JOURNEY PATTERN referencing the  three SCHEDULED STOP POINTs ,  which are connected by two      SERVICE LINKs. 
+
+LINE 24 tram
+
+ SERVICE JOURNEY PATTERN:  TimingPattern:jp_24o
+	1 SCHEDULED STOP POINT:  A   mybus:SSP_001 
+	2 SCHEDULED STOP POINT:  B   mybus:SSP_002 
+	3 SCHEDULED STOP POINT:  C   mybus:SSP_077
+
+   SERVICE JOURNEY PATTERN:  TimingPattern:jp_24oi
+	1 SCHEDULED STOP POINT:  C   mybus:SSP_077 
+	2 SCHEDULED STOP POINT:  B   mybus:SSP_002 
+	3 SCHEDULED STOP POINT:  A   mybus:SSP_001
+
+LINE 46 bus 
+
+ SERVICE JOURNEY PATTERN:  TimingPattern:jp_46o
+	1 SCHEDULED STOP POINT:  F   mybus:SSP_021 
+	2 SCHEDULED STOP POINT:  B   mybus:SSP_022 
+	3 SCHEDULED STOP POINT:  T   mybus:SSP_023
+
+   SERVICE JOURNEY PATTERN:  TimingPattern:jp_46i
+	1 SCHEDULED STOP POINT:  T   mybus:SSP_023 
+	2 SCHEDULED STOP POINT:  B   mybus:SSP_022 
+	3 SCHEDULED STOP POINT:  F   mybus:SSP_021
+
+LINE 68 bus
+
+ SERVICE JOURNEY PATTERN:  TimingPattern:jp_68o
+	1 SCHEDULED STOP POINT:  B   mybus:SSP_032 
+	2 SCHEDULED STOP POINT:  J   mybus:SSP_035 
+	3 SCHEDULED STOP POINT:  K   mybus:SSP_036
+
+   SERVICE JOURNEY PATTERN:  TimingPattern:jp_68i
+	1 SCHEDULED STOP POINT:  K   mybus:SSP_036 
+	2 SCHEDULED STOP POINT:  J   mybus:SSP_035 
+	3 SCHEDULED STOP POINT:  B   mybus:SSP_032
+	
+	
+LOGICAL DISPLAYs
+	LOGICAL DISPLAY mybus:LD001_TramBus_Q1_EastboundSouthbound 
+	 	DISPLAY ASSIGNMENT mybus:LD001_SSP_002_24o_departures 
+	 	 	All departures for  mybus:SSP_002 that use JOURNEY PATTERN  hde:jp_24o
+	 		Show first two journeys for each line
+		DISPLAY ASSIGNMENT mybus:LD001_SSP_032_46o_departures 
+			All departures for  mybus:SSP_032 that use JOURNEY PATTERN  hde:jp_46o
+			Show first two journeys for each line
+		DISPLAY ASSIGNMENT mybus:LD001_SSP_032_68o_departures 
+			All departures for  mybus:SSP_068 that use JOURNEY PATTERN  hde:jp_68o
+			Show first two journeys for each line
+ 	 
+	 LOGICAL DISPLAY  mybus:LD002_TramBus_Q2_WestboundNorthbound 
+		 DISPLAY ASSIGNMENT mybus:LD001_SSP_002_24i_departures 
+			 All departures for  mybus:SSP_002 that use JOURNEY PATTERN  hde:jp_24i
+	 		Show first two journeys for each line
+	 	DISPLAY ASSIGNMENT mybus:LD001_SSP_032_46i_departures 
+	 		All departures for  mybus:SSP_032 that use JOURNEY PATTERN  hde:jp_46i
+	 		Show first two journeys for each line
+	 	DISPLAY ASSIGNMENT mybus:LD001_SSP_032_68i_departures 
+	 		All departures for  mybus:SSP_068 that use JOURNEY PATTERN  hde:jp_68i
+	 		Show first two journeys for each line
+
+	LOGICAL DISPLAY  mybus:LD010_TicketHall_arrivals	 
+		DISPLAY ASSIGNMENT mybus:LD010_SSP002_SP_002_arrivals 
+			All arrivals for  mybus:SSP_002  
+			(tram)
+		DISPLAY ASSIGNMENT mybus:LD010_SSP002_SP_032_arrivals 
+			All arrivals for  mybus:SSP_032  
+			(bus)
+		DISPLAY ASSIGNMENT mybus:LD010_SSP002_SP_042_rail
+			All arrivals for  myrail:SSP_042  
+			(railo)	
+						
+	LOGICAL DISPLAY  mybus:LD010_TicketHall_departures
+		DISPLAY ASSIGNMENT mybus:LD010_SSP002_SP_002_departures
+			All departures for  mybus:SSP_002  
+			(tram)
+		DISPLAY ASSIGNMENT mybus:LD010_SSP002_SP_032_departures
+			All departures for  mybus:SSP_032  
+			(bus)
+		DISPLAY ASSIGNMENT mybus:LD010_SSP002_SP_042_departures
+			All departures for  myrail:SSP_042  
+			(railo)	 
+	 
+	 LOGICAL DISPLAY  mybus:LD003_Rail_Q1_all
+		 DISPLAY ASSIGNMENT mybus:LD003_SSP002_042_all
+		 All departures for  myrail:SSP_042 
+		 (rail)
+  
+A COMPOSITE FRAME is used to group the component FRAMEs
+   
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A SITE FRAME defining the STOP PLACEs (only needed because etheer are stop assignments )
+  
+		A RESOURCE FRAME is used to contain  the TYPE OF FACILITY   elements
+ 
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="hde:TimetableFrameTIM_23_O"/>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple timetable frame with two journeys and service calendar</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="any" id="hde:CAL_02">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Stop data  data</Description>
+				</Codespace>
+				<Codespace id="myrail">
+					<Xmlns>myrail</Xmlns>
+					<XmlnsUrl>http://www.myrail.eu/stuff</XmlnsUrl>
+					<Description>My rail data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<ServiceFrame version="any" id="mybus:svf_12">
+					<Name>Logical Display assignments for Bravo </Name>
+					<!--- =========DIRECTIONs=========== -->
+					<directions>
+						<Direction version="any" id="mybus:DR_Westbound">
+							<Name>Westbound</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Eastbound">
+							<Name>Eastbound</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Southbound">
+							<Name>Southbound</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Northbound">
+							<Name>Northbound</Name>
+						</Direction>
+					</directions>
+					<!--- =========LINEs=========== -->
+					<lines>
+						<Line version="any" id="mybus:LN_24">
+							<Name>Line 24 Alpha to Charley Green</Name>
+							<ShortName>Line 24</ShortName>
+							<TransportMode>tram</TransportMode>
+							<PublicCode>24</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_46">
+							<Name>Line 46 Foxtrot to Tango</Name>
+							<ShortName>Line 46</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>46</PublicCode>
+						</Line>
+						<Line version="any" id="mybus:LN_68">
+							<Name>Line 68 Bravo to Kilo</Name>
+							<ShortName>Line 68</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>46</PublicCode>
+						</Line>
+					</lines>
+					<!--- =========DESTINATION DISPLAYs============ -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="mybus:DST_Alpha">
+							<Name>Alpha Avenue</Name>
+							<ShortName>Alpha Av</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Bravo">
+							<Name>Bravo Arch</Name>
+							<ShortName>Bravo</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Charley">
+							<Name>Charley Green</Name>
+							<ShortName>Charley G</ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Foxtrot">
+							<Name>Foxtrot Avenue</Name>
+							<ShortName>Foxtrot </ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Kilo">
+							<Name>Kilo Street</Name>
+							<ShortName>Kilo </ShortName>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Tango">
+							<Name>Tango Green</Name>
+							<ShortName>Tango G</ShortName>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>ALPH</PublicCode>
+							<StopType>onstreetTram</StopType>
+							<VehicleModes>tram</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo Arch ( Tram)</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<ShortName>Bravo Arch</ShortName>
+							<PublicCode>BRAV</PublicCode>
+							<StopType>onstreetTram</StopType>
+							<VehicleModes>bus tram</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_077">
+							<Name>Charley Green</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<ShortName>Charley</ShortName>
+							<PublicCode>CHAS</PublicCode>
+							<StopType>onstreetTram</StopType>
+							<VehicleModes>tram</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_031">
+							<Name>Foxtrot Lane</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<ShortName>Foxtrot Lane</ShortName>
+							<PublicCode>Foxtrot</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus tram</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_032">
+							<Name>Bravo Arch Bus</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<ShortName>Bravo Arch</ShortName>
+							<PublicCode>BRAV</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_033">
+							<Name>Tango Lane</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Tango Lane</ShortName>
+							<PublicCode>Tango</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_035">
+							<Name>Juliet Park</Name>
+							<Location>
+								<Longitude>53.35000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<ShortName>Juliet Lane</ShortName>
+							<PublicCode>Juliet</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_036">
+							<Name>Kilo Street</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<ShortName>Kilo  Lane</ShortName>
+							<PublicCode>Kilo </PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="myrail:SSP_042">
+							<Name>Bravo Arch (Rail)</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo Arch</ShortName>
+							<PublicCode>BRAV</PublicCode>
+							<StopType>railStation</StopType>
+							<VehicleModes>rail</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- =========CONNECTIONs=========== -->
+					<connections>
+						<Connection version="any" id="mybus:CX_SSP_002_to_SSP_032">
+							<Name>Bravo Arch : Tram / Bus  Connection  </Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>tram</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							</From>
+							<To>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+							</To>
+						</Connection>
+						<Connection version="any" id="mybus:CX_SSP_002_to_SSP_042">
+							<Name>Bravo Arch : Tram / Rail  Connection  </Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>tram</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							</From>
+							<To>
+								<TransportMode>rail</TransportMode>
+								<ScheduledStopPointRef version="any" ref="myrail:SSP_042"/>
+							</To>
+						</Connection>
+						<Connection version="any" id="mybus:CX_SSP_042_to_SSP_032">
+							<Name>Bravo Arch : Rail / bus  Connection  </Name>
+							<BothWays>true</BothWays>
+							<From>
+								<TransportMode>rail</TransportMode>
+								<ScheduledStopPointRef version="any" ref="myrail:SSP_042"/>
+							</From>
+							<To>
+								<TransportMode>bus</TransportMode>
+								<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+							</To>
+						</Connection>
+					</connections>
+					<!--- =========STOP ASSIGNMENTs=========== -->
+					<stopAssignments>
+						<PassengerStopAssignment order="1" version="any" id="hde:psa_SSP_002_to_SP002B">
+							<Description lang="en">Assigns   Bravo tram  to physical stop - </Description>
+							<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="hde:psa_SSP_032_to_SP002B">
+							<Description lang="en">Assigns  Bravo bus to physical stop </Description>
+							<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="hde:psa_SSP_042_to_SP002B">
+							<Description lang="en">Assigns  Bravo  rail to physical stop </Description>
+							<ScheduledStopPointRef version="any" ref="myrail:SSP_042"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+					<!--- ======JOURNEY PATTERNS=========== -->
+					<journeyPatterns>
+						<ServiceJourneyPattern version="any" id="hde:jp_24o">
+							<Name>Alpha to Charley Green</Name>
+							<RouteRef ref="mybus:RT_24o">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Westbound"/>
+							<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_24o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_24o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:pijp_24o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:jp_24i">
+							<Name>Charley Green to Alpha</Name>
+							<RouteRef ref="mybus:RT_24i">EXTERNAL</RouteRef>
+							<DirectionType>inbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Eastbound"/>
+							<DestinationDisplayRef version="any" ref="mybus:DST_Alpha"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:jp_24i_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:jp_24i_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:jp_24i_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:jp_46o">
+							<Name>Foxtrot to  Tango   </Name>
+							<RouteRef ref="mybus:RT_46o">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Southbound"/>
+							<DestinationDisplayRef version="any" ref="mybus:DST_Tango"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_46o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_031"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_46o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:pijp_46o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_033"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:jp_46i">
+							<Name>Tango  to  Foxtrot   </Name>
+							<RouteRef ref="mybus:RT_46i">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Northbound"/>
+							<DestinationDisplayRef version="any" ref="mybus:DST_Foxtrot"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_46i_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_033"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_46i_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:pijp_46i_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_031"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:jp_68o">
+							<Name>Bravo to  Kilo   </Name>
+							<RouteRef ref="mybus:RT_68o">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Southbound"/>
+							<DestinationDisplayRef version="any" ref="mybus:DST_Tango"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_68o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_68o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_035"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:pijp_68o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_036"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:jp_68i">
+							<Name>Kilo to  Bravo   </Name>
+							<RouteRef ref="mybus:RT_68i">EXTERNAL</RouteRef>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Northbound"/>
+							<DestinationDisplayRef version="any" ref="mybus:DST_Foxtrot"/>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:pijp_68i_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_036"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:pijp_68i_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_035"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:pijp_68i_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+					</journeyPatterns>
+					<!--- ======LOGICAL DISPLAYs======== -->
+					<logicalDisplays>
+						<LogicalDisplay version="any" id="mybus:LD001_TramBus_Q1_EastboundSouthbound">
+							<Description>Departures Display for use on  Bravo Bus/Tram Quay 1 Outbound</Description>
+							<displayAssignments>
+								<DisplayAssignment version="any" id="mybus:LD001_TramBus_Q1_EastboundSouthbound" order="1">
+									<Name>Assign  ScheduledStopPoint 002 (Bravo) route 24 Eastbound Departures to Display LD001 </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<ServiceJourneyPatternRef version="any" ref="hde:jp_24o"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+									<NumberOfJourneysToShow>2</NumberOfJourneysToShow>
+									<DisplayPriority>1</DisplayPriority>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD001_TramBus_Q1_EastboundSouthbound" order="2">
+									<Name>Assign ScheduledStopPoint 032 (Bravo) route 46 Southbound Departures to Display LD001  </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<ServiceJourneyPatternRef version="any" ref="hde:jp_46o"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+									<NumberOfJourneysToShow>2</NumberOfJourneysToShow>
+									<DisplayPriority>1</DisplayPriority>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD001_TramBus_Q1_EastboundSouthbound" order="3">
+									<Name>Assign   ScheduledStopPoint 032 (Bravo)  route 68 Eastbound Departures to Display LD001  </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<ServiceJourneyPatternRef version="any" ref="hde:jp_68o"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+									<NumberOfJourneysToShow>2</NumberOfJourneysToShow>
+									<DisplayPriority>1</DisplayPriority>
+								</DisplayAssignment>
+							</displayAssignments>
+						</LogicalDisplay>
+						<LogicalDisplay version="any" id="mybus:LD002_TramBus_Q2_WestboundNorthbound">
+							<Description>Departures Display for use on  Bravo Bus/Tram Quay 2</Description>
+							<displayAssignments>
+								<DisplayAssignment version="any" id="mybus:LD002_TramBus_Q2_WestboundNorthbound" order="1">
+									<Name>Assign ScheduledStopPoint 002 (Bravo)  LINE 24 Westbound Departures to Display LD002 </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<ServiceJourneyPatternRef version="any" ref="hde:jp_24i"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+									<NumberOfJourneysToShow>2</NumberOfJourneysToShow>
+									<DisplayPriority>1</DisplayPriority>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD002_TramBus_Q2_WestboundNorthbound" order="2">
+									<Name>Assign ScheduledStopPoint 0032  (Bravo)  LINE 46 Northbound Departures to Display LD002 </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<ServiceJourneyPatternRef version="any" ref="hde:jp_46i"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+									<NumberOfJourneysToShow>2</NumberOfJourneysToShow>
+									<DisplayPriority>2</DisplayPriority>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD002_TramBus_Q2_WestboundNorthbound" order="3">
+									<Name>Assign ScheduledStopPoint 0032  (Bravo)  LINE 68  Northbound  Departuresto Display LD002 - Arrivals</Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<ServiceJourneyPatternRef version="any" ref="hde:jp_68i"/>
+									<DisplayAssignmentType>arrivals</DisplayAssignmentType>
+									<NumberOfJourneysToShow>3</NumberOfJourneysToShow>
+									<DisplayPriority>3</DisplayPriority>
+								</DisplayAssignment>
+							</displayAssignments>
+						</LogicalDisplay>
+						<LogicalDisplay version="any" id="mybus:LD010_TicketHall_arrivals">
+							<Name>All Arrivals Display for use in Rail Ticket Hall</Name>
+							<displayAssignments>
+								<DisplayAssignment version="any" id="mybus:LD010_TicketHall_arrivals" order="1">
+									<Name>Assign ScheduledStopPoint 002 tram arrivals  all routes for Bravo to Display LD010 </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<VehicleMode>tram</VehicleMode>
+									<DisplayPriority>1</DisplayPriority>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD010_TicketHall_arrivals" order="2">
+									<Name>Assign ScheduledStopPoint 032 bus arivals  all  routes for Bravo to Display LD010  </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<VehicleMode>bus</VehicleMode>
+									<DisplayAssignmentType>arrivals</DisplayAssignmentType>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD010_TicketHall_arrivals" order="3">
+									<Name>Assign ScheduledStopPoint 042 rail  arrivals all routes for Bravo to Display LD010  </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<VehicleMode>rail</VehicleMode>
+									<DisplayAssignmentType>arrivals</DisplayAssignmentType>
+								</DisplayAssignment>
+							</displayAssignments>
+						</LogicalDisplay>
+						<LogicalDisplay version="any" id="mybus:LD011_TicketHall_departures">
+							<Description>Departures Display in Ticket Hall</Description>
+							<displayAssignments>
+								<DisplayAssignment version="any" id="mybus:LD011_TicketHall_departures" order="1">
+									<Name>Assign ScheduledStopPoint 002 tram all routes for Bravo to Display LD011 </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD011_TicketHall_departures" order="2">
+									<Name>Assign ScheduledStopPoint 032 bus all routes for Bravo to Display LD011 </Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_032"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+								</DisplayAssignment>
+								<DisplayAssignment version="any" id="mybus:LD011_TicketHall_departures" order="3">
+									<Name>Assign ScheduledStopPoint 042 rail all routes for Bravo to Display LD011 </Name>
+									<ScheduledStopPointRef version="any" ref="myrail:SSP_042"/>
+									<DisplayAssignmentType>departures</DisplayAssignmentType>
+								</DisplayAssignment>
+							</displayAssignments>
+						</LogicalDisplay>
+						<LogicalDisplay version="any" id="mybus:LD003_Rail_Q1_all">
+							<Name>Arrivals and Departures Display for use on  on rail Platform 3</Name>
+							<displayAssignments>
+								<DisplayAssignment version="any" id="mybus:LD003_Rail_Q1_all" order="1">
+									<Name>Assign ScheduledStopPoint 042 rail  all routes for Bravo   </Name>
+									<ScheduledStopPointRef version="any" ref="myrail:SSP_042"/>
+									<VehicleMode>rail</VehicleMode>
+									<DisplayAssignmentType>all</DisplayAssignmentType>
+								</DisplayAssignment>
+							</displayAssignments>
+						</LogicalDisplay>
+					</logicalDisplays>
+					<!--- ======PASSENGER INFORMTION FACILITIES  ======== -->
+					<passengerInformationEquipments>
+						<PassengerInformationEquipment version="any" id="mybus:pif_SP002B_TramBus_Q1">
+							<Name>Display on Bravo Tram bus    departures  Platform 1 </Name>
+							<LogicalDisplayRef version="any" ref="mybus:LD001_TramBus_Q1_EastboundSouthbound"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+							<QuayRef version="any" ref="mybus:Q_SP002B_1"/>
+							<TypeOfPassengerInformationEquipmentRef version="any" ref="mybus:PlatDisp"/>
+						</PassengerInformationEquipment>
+						<PassengerInformationEquipment version="any" id="mybus:pif_SP002B_TramBus_Q2">
+							<Name>Display on Bravo   Tram bus     departures  Platform 2 </Name>
+							<LogicalDisplayRef version="any" ref="mybus:LD002_TramBus_Q2_WestboundNorthbound"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+							<QuayRef version="any" ref="mybus:Q_SP002B_2"/>
+							<TypeOfPassengerInformationEquipmentRef version="any" ref="mybus:PlatDisp"/>
+						</PassengerInformationEquipment>
+						<PassengerInformationEquipment version="any" id="mybus:pif_SP002B_TicketHall_arrivals">
+							<Name>Display of all Arrivals all modes in Bravo  Ticket  Hall</Name>
+							<LogicalDisplayRef version="any" ref="mybus:LD010_TicketHall_arrivals"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+							<AccessSpaceRef version="any" ref="mybus:as_SP002B_01"/>
+							<TypeOfPassengerInformationEquipmentRef version="any" ref="mybus:LargeBoard"/>
+						</PassengerInformationEquipment>
+						<PassengerInformationEquipment version="any" id="mybus:pif_SP002B_TicketHall_departures">
+							<Name>Display of all Departures all modes  in Bravo  Ticket  Hall</Name>
+							<LogicalDisplayRef version="any" ref="mybus:LD011_TicketHall_departures"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+							<AccessSpaceRef version="any" ref="mybus:as_SP002B_01"/>
+							<TypeOfPassengerInformationEquipmentRef version="any" ref="mybus:LargeBoard"/>
+						</PassengerInformationEquipment>
+						<PassengerInformationEquipment version="any" id="mybus:pif_SP002B_Rail_01">
+							<Name>Display 1 on Bravo Rail Rail Platform 3</Name>
+							<LogicalDisplayRef version="any" ref="mybus:LD003_Rail_Q1_all"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+							<QuayRef version="any" ref="mybus:Q_SP002B_3"/>
+							<TypeOfPassengerInformationEquipmentRef version="any" ref="mybus:PlatDisp"/>
+						</PassengerInformationEquipment>
+						<PassengerInformationEquipment version="any" id="mybus:pif_SP002B_Rail_02">
+							<Name>Display 2 on Bravo Rail Rail Platform 3</Name>
+							<LogicalDisplayRef version="any" ref="mybus:LD003_Rail_Q1_all"/>
+							<StopPlaceRef version="any" ref="mybus:SP002B"/>
+							<QuayRef version="any" ref="mybus:Q_SP002B_3"/>
+							<TypeOfPassengerInformationEquipmentRef version="any" ref="mybus:PlatDisp"/>
+						</PassengerInformationEquipment>
+					</passengerInformationEquipments>
+				</ServiceFrame>
+				<!-- ======Timetable ======= -->
+				<SiteFrame version="024" created="2010-05-17T09:30:47.0Z" changed="2010-05-22T10:30:51.0Z" modification="revise" derivedFromVersionRef="0023" id="mybus:infraf002">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="mybus:RS_10">EXTERNAL</DefaultResponsibilitySetRef>
+					</FrameDefaults>
+					<!--- ======STOP PLACEs========== -->
+					<stopPlaces>
+						<StopPlace version="any" id="mybus:SP001A">
+							<Name>Alpha   Castle</Name>
+							<ShortName>Alpha Place A </ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetTram</StopPlaceType>
+							<quays>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP001A_1">
+									<Name>PlaceA</Name>
+									<Description>Stop A is termiuis serves both directions</Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>indoors</Covered>
+									<Label>Stop A</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>S</CompassOctant>
+									<QuayType>tramStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="mybus:SP002B">
+							<Name>Bravo Road (SW19)</Name>
+							<ShortName>Bravo</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="any" id="mybus:RAd_SP002B_01">
+								<RoadName>Bravo Road</RoadName>
+							</RoadAddress>
+							<StopPlaceType>tramStation</StopPlaceType>
+							<quays>
+								<Quay version="any" id="mybus:Q_SP002B_1">
+									<Name>Bravo, Northbound</Name>
+									<Description>Stop Ba  is paired with Stop Bb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Stop B1</Label>
+									<CompassOctant>S</CompassOctant>
+									<QuayType>tramPlatform</QuayType>
+								</Quay>
+								<Quay version="any" id="mybus:Q_SP002B_2">
+									<Name>Bravo SOuthbound</Name>
+									<Description>Stop Ba  is paired with Stop Bb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Stop B2</Label>
+									<PublicCode>1-3457 </PublicCode>
+									<CompassOctant>N</CompassOctant>
+									<QuayType>tramPlatform</QuayType>
+								</Quay>
+								<Quay version="any" id="mybus:Q_SP002B_3">
+									<Name>Bravo Rail Platform 1</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>indoors</Covered>
+									<Label>Platform 1</Label>
+									<CompassOctant>N</CompassOctant>
+									<QuayType>railPlatform</QuayType>
+								</Quay>
+							</quays>
+							<accessSpaces>
+								<AccessSpace version="any" id="mybus:as_SP002B_01">
+									<Name>Bravo Ticket Hall </Name>
+									<Description>Ticket Hall at Bravo</Description>
+									<Covered>indoors</Covered>
+									<AccessSpaceType>bookingHall</AccessSpaceType>
+								</AccessSpace>
+							</accessSpaces>
+						</StopPlace>
+						<StopPlace version="any" id="mybus:SP003C">
+							<Name>Stop Place C</Name>
+							<ShortName>Place C</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="any" id="mybus:RAd_SP003C_01">
+								<RoadName>Foo Road</RoadName>
+							</RoadAddress>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetTram</StopPlaceType>
+							<quays>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP003C_1">
+									<Name>Place C</Name>
+									<Description>StopCa  is paired with Stop Cb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Stop Ca</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>NE</CompassOctant>
+									<QuayType>tramStop</QuayType>
+								</Quay>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP003C_2">
+									<Name>Place C</Name>
+									<Description>Stop Cb  is paired with Stop Ca </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Stop Cb</Label>
+									<PublicCode>1-3455 </PublicCode>
+									<CompassOctant>SE</CompassOctant>
+									<QuayType>tramStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<ResourceFrame version="any" id="tbd:SVC01">
+					<typesOfValue>
+						<!--- =====PASSENGER INFORMATION EQUIPMENT  Types===== -->
+						<ValueSet version="any" id="napt:PassengerInformationEquipmentTypes">
+							<Name>PASSENGER INFORMATION EQUIPMENT  Types</Name>
+							<values>
+								<TypeOfPassengerInformationEquipment version="any" id="mybus:PlatDisp">
+									<Name>ON Platforom Small display </Name>
+								</TypeOfPassengerInformationEquipment>
+								<TypeOfPassengerInformationEquipment version="any" id="mybus:LargeBoard">
+									<Name>Large Display </Name>
+								</TypeOfPassengerInformationEquipment>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

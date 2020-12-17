@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====   Timetable  Example ====== 
+This example shows the encoding of a simple templated Headway Interval timetable in NeTEx XML  
+
+A template journey specifies multiple journeys using a single journey + an interval
+
+A timetable may mix templated and single journeys, but the periods of the the freuency group should not overlap with the times of single journeys.
+
+In this  example there is just a single template journey with two frequency groups ,  prescrbng  a timetable as follows
+
+Stop	| =====tvjh_24o_01 ================================================|		 
+		 | =====hjf_24o_01 ==============	|	 | =====hjf_24o_02 ==============	|	 
+	A	|	    10:00 Then every 12 minutes until 	| 12:00 Then every 20 minutes until 	| 18:00
+	B	|	 	11:00 Then every 12 minutes until 	| 13:00 Then every 20 minutes until 	| 1900
+	C	|	 	13:00 Then every 12 minutes until   |  14:00 Then every 20 minutes until | 20:00
+
+
+The TIMETABLE FRAME   hde:TIM_23_O   groups the elements
+  
+   - It has a VALIDITY CONDITION  that specifes it is valid from Sept to Matrch
+
+There is a single SERVICE PATTERN   
+      hde:ServiceJPattern:svp_24o This is referenced but not included in the data.
+    This has just  three stops         A - B  - C   
+
+There are just one   JOURNEYs in the timetable : 
+
+     (i)  TEMPLATE VEHICLE JOURNEY JOURNEY hde:tvjh_24o_02   
+             Departs 10:00  	 on DAY TYPE: hde:DT_01MTWTFSS 
+
+
+It has two  HEADWAY  JOURNEY  GROUPs
+     
+		(i)		hde:HeadwayFreuencyGroup:hjf_24o_02_01    
+						START TIME: 10:00  end Time 12:00
+						HEADWAY INTERVAL Every 12 minutes
+		(i)		hde:HeadwayFreuencyGroup:hjf_24o_02_02   
+						START TIME: 12:00  end Time 18:00
+						HEADWAY INTERVAL Every 20minutes
+		 
+   
+ 
+The SERVICE JOURNEY are for LINE24 . 
+
+    
+-->
+<PublicationDelivery xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:01">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="hde:TIM_24o_FS_Outbound">REQUEST</TimetableFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple Headwayal  template timetable   with three    journeys  </Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="hde:CF_1">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Stop data  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<!-- ======Timetable ======= -->
+				<ServiceCalendarFrame version="any" id="hde:TIM_24o_FS_Outbound">
+					<Name/>
+					<ServiceCalendar version="any" id="hde:TIM_24o_FS_Outbound">
+						<dayTypes>
+							<DayType version="any" id="hde:DT_01MTWTFSS">
+								<Name>Everyday</Name>
+								<properties>
+									<PropertyOfDay>
+										<DaysOfWeek> Everyday</DaysOfWeek>
+									</PropertyOfDay>
+								</properties>
+							</DayType>
+							<DayType version="any" id="hde:DT_01MTWTF">
+								<Name>Weekdays</Name>
+								<properties>
+									<PropertyOfDay>
+										<DaysOfWeek>  Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									</PropertyOfDay>
+								</properties>
+							</DayType>
+						</dayTypes>
+					</ServiceCalendar>
+				</ServiceCalendarFrame>
+				<TimetableFrame version="001" id="hde:TIM_24o_FS_Outbound">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="hde:TIM_24o_FS_Outbound">
+							<Description>Sept  to March</Description>
+							<FromDate>2010-11-01T00:00:00Z</FromDate>
+							<ToDate>2011-03-31T00:00:00Z</ToDate>
+						</AvailabilityCondition>
+					</validityConditions>
+					<Name>Winter timetable for route 234 outbound</Name>
+					<VehicleModes>bus</VehicleModes>
+					<vehicleJourneys>
+						<TemplateServiceJourney version="any" id="hde:tvjh_24o_01">
+							<DepartureTime>10:00:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01MTWTFSS"/>
+							</dayTypes>
+							<ServicePatternRef ref="hde:svp_24o">EXTERNAL</ServicePatternRef>
+							<LineRef version="any" ref="mybus:LN_234"/>
+							<calls>
+								<Call id="hde:tvjh_24o_02_001" version="any" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>10:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call id="hde:tvjh_24o_02_002" version="any" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<Arrival>
+										<Time>11:20:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>11:22:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+								</Call>
+								<Call id="hde:tvjh_24o_02_003" version="any" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<Time>12:20:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+							<frequencyGroups>
+								<HeadwayJourneyGroup version="any" id="hde:hjg_24o_01">
+									<Name>Regular  Interval service between 10am and 12:00 pm</Name>
+									<Description>About every 12 minutes</Description>
+									<FirstDepartureTime>10:00:00</FirstDepartureTime>
+									<LastDepartureTime>12:00:00</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT12M</ScheduledHeadwayInterval>
+									<HeadwayDisplay>DisplayInsteadOfPassingTimes</HeadwayDisplay>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="hde:hjg_24o_02">
+									<Name>Regular  Interval service between 12am and 18:00 pm</Name>
+									<Description>About every 20 minutes</Description>
+									<FirstDepartureTime>12:00:00</FirstDepartureTime>
+									<LastDepartureTime>18:00:00</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT20M</ScheduledHeadwayInterval>
+									<HeadwayDisplay>DisplayInsteadOfPassingTimes</HeadwayDisplay>
+								</HeadwayJourneyGroup>
+							</frequencyGroups>
+						</TemplateServiceJourney>
+					</vehicleJourneys>
+				</TimetableFrame>
+				<ServiceFrame id="mybus:svf_12" version="any">
+					<Name>Stops for Winter timetable for route 234 </Name>
+					<lines>
+						<Line version="any" id="mybus:LN_234">
+							<Name>Line 234 Alpha to Charley Green</Name>
+							<ShortName>Line 234</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>234</PublicCode>
+						</Line>
+					</lines>
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>EANDC</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo Arch</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo Arch</ShortName>
+							<PublicCode>BRAV</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_077">
+							<Name>Charley Green</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Charley</ShortName>
+							<PublicCode>CHAS</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+				</ServiceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====  GTFS Routes to NeTEx  Example ====== 
+This Example provides an example of mapping of a GTFS Routes.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+ 
+ 
+1. DATA
+    It comprises
+ 
+	route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+	AB,DTA,10,Airport - Bullfrog,,3,http://www.demoagency.org/ab,00FFFF,00FFFF
+	BFC,DTA,20,Bullfrog - Furnace Creek Resort,,3,http://www.demoagency.org/bfc,01FFFF,01FFFF
+	STBA,DTA,30,Stagecoach - Airport Shuttle,Shuttle service to airport,3,http://www.demoagency.org/stba,02FFFF,02FFFF
+	CITY,DTA,40,City,,3,http://www.demoagency.org/city,03FFFF,03FFFF
+	AAMV,DTA,50,Airport - Amargosa Valley,,3,http://www.demoagency.org/aamv,03FFFF,03FFFF
+
+2. MAPPING
+
+A GTFS Route  maps to a NeTEx LINE
+
+GTFS															NeTEx
+route_id														<Line #route_id> @id 
+agency_id,													<Line #route_id> <OperatorRef> #agency_id
+route_short_name,											<Line #route_id> <PublicCode> or <ShortName> #route_short_name
+route_long_name,											<Line #route_id> <Name> #route_long_name
+route_desc,													<Line #route_id> <Description> #route_desc
+route_type,	0 - Tram, Streetcar, LightRail		<Line #route_id> <TransportMode>tram 
+					1 - Subway, Metro						<Line #route_id> <TransportMode>metro
+					2 - Rail										<Line #route_id> <TransportMode>rail
+					3 - Bus										<Line #route_id> <TransportMode>bus
+					4 - Ferry 									<Line #route_id> <TransportMode>ferry
+					5 - CableCar								<Line #route_id> <TransportMode>???
+					6 - Gondola								<Line #route_id> <TransportMode>telecabine
+					7 - Funicular								<Line #route_id> <TransportMode>funicular
+route_url,														<Line #route_id> <Url> #route_url
+route_color,													<Line #route_id> <Presentation> <Colour> #route_color,
+route_text_color												<Line #route_id><Presentation> <TextColour> #route_text_color
+
+
+3. Notes
+
+   Shortname mapping depends on whether it is text or public Line code
+
+GTFS Data copyright Google Inc
+version 1.1 revised ids
+NeTEx (C) CEN Copyright 2010-2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Line data  (routes.txt file)</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<ServiceFrame version="any" id="mygtfsxm:DTA">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<lines>
+				<Line version="any" id="mygtfsxm:AB">
+					<Name>Airport - Bullfrog</Name>
+					<Description>From Airport to Bullfrog</Description>
+					<TransportMode>bus</TransportMode>
+					<Url>http://www.demoagency.org/ab</Url>
+					<PublicCode>10</PublicCode>
+					<OperatorRef ref="mygtfsxm:Operator:DTA"/>
+					<otherModes>
+						<ModeRef ref="railReplacementBus" mode="bus"/>
+					</otherModes>
+					<Presentation>
+						<Colour>00FFFF</Colour>
+						<TextColour>00FFFF</TextColour>
+					</Presentation>
+				</Line>
+				<Line version="any" id="mygtfsxm:BFC">
+					<Name>Bullfrog - Furnace Creek Resort</Name>
+					<Description/>
+					<TransportMode>bus </TransportMode>
+					<Url>http://www.demoagency.org/bfc</Url>
+					<PublicCode>20</PublicCode>
+					<OperatorRef ref="mygtfsxm:Operator:DTA"/>
+					<Presentation>
+						<Colour>01FFFF</Colour>
+						<TextColour>01FFFF</TextColour>
+					</Presentation>
+				</Line>
+				<Line version="any" id="mygtfsxm:STBA">
+					<Name>Stagecoach - Airport Shuttle</Name>
+					<Description>Shuttle service to airport</Description>
+					<TransportMode>bus</TransportMode>
+					<Url>http://www.demoagency.org/stba</Url>
+					<PublicCode>30</PublicCode>
+					<OperatorRef ref="mygtfsxm:Operator:DTA"/>
+					<Presentation>
+						<Colour>02FFFF</Colour>
+						<TextColour>02FFFF</TextColour>
+					</Presentation>
+				</Line>
+				<Line version="any" id="mygtfsxm:CITY">
+					<Name>City</Name>
+					<Description/>
+					<TransportMode>bus</TransportMode>
+					<Url>http://www.demoagency.org/city</Url>
+					<PublicCode>40</PublicCode>
+					<OperatorRef ref="mygtfsxm:Operator:DTA"/>
+					<Presentation>
+						<Colour>03FFFF</Colour>
+						<TextColour>03FFFF</TextColour>
+					</Presentation>
+				</Line>
+				<Line version="any" id="mygtfsxm:AAMV">
+					<Name>Airport - Amargosa Valley</Name>
+					<Description/>
+					<TransportMode>bus</TransportMode>
+					<Url>http://www.demoagency.org/aamv</Url>
+					<PublicCode>50</PublicCode>
+					<OperatorRef ref="mygtfsxm:Operator:DTA"/>
+					<Presentation>
+						<Colour>04FFFF</Colour>
+						<TextColour>04FFFF</TextColour>
+					</Presentation>
+				</Line>
+			</lines>
+		</ServiceFrame>
+	</dataObjects>
+</PublicationDelivery>

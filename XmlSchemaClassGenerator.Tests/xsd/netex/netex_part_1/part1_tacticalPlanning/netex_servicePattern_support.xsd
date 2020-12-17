@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_servicePattern_support">
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_place_support.xsd"/>
+	<xsd:include schemaLocation="../part1_networkDescription/netex_timingPattern_support.xsd"/>
+	<xsd:include schemaLocation="netex_journeyPattern_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified> Add Service Pattern Section 
+				</Date>
+				<Date>
+					<Modified>2017-05-10</Modified> Make ServiceLinkRef a type of Timing Link Ref  and ScheduledStopPoint a type of TimingPoint - allows reuse of points
+				</Date>
+				<Date>
+					<Modified>2017-06-13</Modified> Add StopRequestMethod Type to StopRequest
+				</Date>
+				<Date>
+					<Modified>2018-06-13</Modified>  No.   Added value 'replaced' to ServiceAlterationEnum to meet Norwegian requirement.
+				</Date>
+				<Date>
+					<Modified>2019-02-25</Modified>  Fix    Correction to modularisation and align with UML  -move ServiceAlterationEnum to netex_servicePattern_support.xsd
+				</Date>
+				<Date>
+					<Modified>2019-03-25</Modified>NL48 CD #64 Move DynamicAdvertisementEnumeration to here from netex_serviceJourney_support.xsd.  Correct the annotations.
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the SERVICE PATTERN types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_tacticalPlanning}netex_servicePattern_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx SERVICE PATTERN types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: SERVICE PATTERN identifier types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ScheduledStopPointIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SCHEDULED STOP POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TimingPointIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ScheduledStopPointRef" type="ScheduledStopPointRefStructure" substitutionGroup="TimingPointRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SCHEDULED STOP POINT.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ScheduledStopPointRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SCHEDULED STOP POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TimingPointRefStructure">
+				<xsd:attribute name="ref" type="ScheduledStopPointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of SCHEDULED STOP POINT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="scheduledStopPointRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of SCHEDULED STOP POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="ScheduledStopPointRef"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ConnectionIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a CONNECTION link.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TransferIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ConnectionRef" type="ConnectionRefStructure" substitutionGroup="TransferRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a CONNECTION link.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ConnectionRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a CONNECTION link.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TransferRefStructure">
+				<xsd:attribute name="ref" type="ConnectionIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of CONNECTION link.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ServiceLinkIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SERVICE LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TimingLinkIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ServiceLinkRef" type="ServiceLinkRefStructure" substitutionGroup="LinkRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SERVICE LINK.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceLinkRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SERVICE LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TimingLinkRefStructure">
+				<xsd:attribute name="ref" type="ServiceLinkIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a SERVICE LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="ServiceLinkRefByValue" type="ServiceLinkRefByValueStructure" substitutionGroup="LinkRefByValue">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SERVICE LINK BY VALUE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceLinkRefByValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SERVICE LINK BY VALUE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:restriction base="LinkRefByValueStructure">
+				<xsd:attribute name="fromPointRef" type="ScheduledStopPointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a POINT. at which LINK starts.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="toPointRef" type="ScheduledStopPointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a POINT. at which LINK ends.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfPointRefClass" type="NameOfClass" use="optional" fixed="ScheduledStopPoint">
+					<xsd:annotation>
+						<xsd:documentation>Class of POINT referenced by LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ServicePatternIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SERVICE PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="JourneyPatternIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ServicePatternRef" type="ServicePatternRefStructure" substitutionGroup="JourneyPatternRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SERVICE PATTERN.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServicePatternRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SERVICE PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="JourneyPatternRefStructure">
+				<xsd:attribute name="ref" type="ServicePatternIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced to a SERVICE PATTERN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ServiceJourneyPatternIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SERVICE JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="JourneyPatternIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ServiceJourneyPatternRef" type="ServiceJourneyPatternRefStructure" substitutionGroup="JourneyPatternRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SERVICE JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceJourneyPatternRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SERVICE JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="JourneyPatternRefStructure">
+				<xsd:attribute name="ref" type="ServiceJourneyPatternIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced to a SERVICE JOURNEY PATTERN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ServiceJourneyPatternTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for TYPE OF SERVICE JOURNEY PATTERN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="passenger"/>
+			<xsd:enumeration value="garageRunOut">
+				<xsd:annotation>
+					<xsd:documentation>INTERCHANGE is considered a possible connection between journeys.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="garageRunIn">
+				<xsd:annotation>
+					<xsd:documentation>INTERCHANGE is advertised to public as a possible connection between journeys.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="turningManoeuvre">
+				<xsd:annotation>
+					<xsd:documentation>INTERCHANGE is actively managed as a possible connection between journeys and passengers are informed of real-time alterations.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="StopPointInJourneyPatternIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a STOP POINT IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="PointInJourneyPatternIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="StopPointInJourneyPatternRef" type="StopPointInJourneyPatternRefStructure" substitutionGroup="PointInJourneyPatternRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a STOP POINT IN SEQUENCE. If given by context does not need to be stated.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="StopPointInJourneyPatternRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a STOP POINT IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="PointInJourneyPatternRefStructure">
+				<xsd:attribute name="ref" type="StopPointInJourneyPatternIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced to a SERVICE JOURNEY PATTERN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ServiceLinkInSequenceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of link step in a SERVICE LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LinkInSequenceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ServiceLinkInSequenceRef" type="ServiceLinkInSequenceRefStructure" substitutionGroup="LinkInSequenceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SERVICE LINK IN SEQUENCE. If given by context does not need to be stated.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceLinkInSequenceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SERVICE LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LinkInSequenceRefStructure">
+				<xsd:attribute name="ref" type="LinkInSequenceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced to a SERVICE JOURNEY PATTERN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ServiceLinkInJourneyPatternIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SERVICE LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ServiceLinkInSequenceIdType"/>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="StopAreaIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a STOP AREA.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ZoneIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="StopAreaRef" type="StopAreaRefStructure" substitutionGroup="ZoneRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a STOP AREA.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="StopAreaRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a STOP AREA.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="ZoneRefStructure"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="stopAreaRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of STOP AREAs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element name="StopAreaRef" type="StopAreaRefStructure" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Reference to the identifier of a stop area.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ============================================================= -->
+	<xsd:simpleType name="StopUseEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Stop Use.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="access">
+				<xsd:annotation>
+					<xsd:documentation>Stop May be used to access transport system.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="interchangeOnly">
+				<xsd:annotation>
+					<xsd:documentation>Stop may only be used for interchange. Passengers may not enter or exit the station.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="passthrough">
+				<xsd:annotation>
+					<xsd:documentation>Vehicle passes through without stopping.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="noBoardingOrAlighting"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RequestMethodTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Stop RequestMethod</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="noneRequired">
+				<xsd:annotation>
+					<xsd:documentation>No action required to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="handSignal">
+				<xsd:annotation>
+					<xsd:documentation>Make hand signal to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="turnOnLight">
+				<xsd:annotation>
+					<xsd:documentation>Call number to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="stopButton">
+				<xsd:annotation>
+					<xsd:documentation>Press button at stop to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="phoneCall">
+				<xsd:annotation>
+					<xsd:documentation>Call number to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="mobileApp">
+				<xsd:annotation>
+					<xsd:documentation>Use mobile Application to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="sms">
+				<xsd:annotation>
+					<xsd:documentation>Use Sms to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Use other method to request stop</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ============================================================= -->
+	<xsd:simpleType name="DynamicAdvertisementEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Dynamic Advertisement.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="always">
+				<xsd:annotation>
+					<xsd:documentation>Stop is always advertised to public.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="never">
+				<xsd:annotation>
+					<xsd:documentation>Stop is not advertised to public.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="onlyIfOrdered">
+				<xsd:annotation>
+					<xsd:documentation>Stop is only advertised to public if they booked to go to stop.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="onlyIfSignedOn">
+				<xsd:annotation>
+					<xsd:documentation>Stop is only advertised to public if they are logged into system.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

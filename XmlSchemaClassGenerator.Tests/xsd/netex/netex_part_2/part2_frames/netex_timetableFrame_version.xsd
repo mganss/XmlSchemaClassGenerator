@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_timetableFrame_version">
+	<xsd:include schemaLocation="netex_timetableFrame_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_trainElement_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_frames/netex_serviceCalendarFrame_version.xsd"/>
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_datedVehicleJourney_version.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2017-05-09</Modified>  Add Header
+				</Date>
+				<Date>
+					<Modified>2019-03-25</Modified>CR 51 CD Add VehicleJourneyStop Assignment.
+							NJSK Review make vehicleJourneyStopAssignmentsInFrame_RelStructure lower camel case consistent with NeTEx conventions. 
+							Also correct some documentation comments
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines TIMETABLE FRAME types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_timetableFrame_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-20197</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange TIMETABLE FRAME types. </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>TIMETABLE FRAME types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ==== Production Timetable Delivery =========================================-->
+	<xsd:element name="TimetableFrame" substitutionGroup="CommonFrame">
+		<xsd:annotation>
+			<xsd:documentation>A coherent set of timetable data (VEHICLE JOURNEYs and BLOCKs) to which the same VALIDITY CONDITIONs have been assigned.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Timetable_VersionFrameStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionFrameGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TimetableFrameGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TimetableFrameIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Timetable_VersionFrameStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TIMETABLE FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Common_VersionFrameStructure">
+				<xsd:sequence>
+					<xsd:group ref="TimetableFrameGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TimetableFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TIMETABLE FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="TimetablePropertiesGroup"/>
+			<xsd:group ref="TimetableDefaultsGroup">
+				<xsd:annotation>
+					<xsd:documentation>Default  properties of elements in TIMETABLE FRAME. Use these values on child elements if not specified on individual elements.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="TimeDemandTypeInFrameGroup"/>
+			<xsd:group ref="TimetableJourneyInFrameGroup"/>
+			<xsd:group ref="NoticesInFrameGroup"/>
+			<xsd:group ref="InterchangeInFrameGroup"/>
+			<xsd:group ref="VehicleTypeInFrameGroup"/>
+			<xsd:group ref="JourneyAccountingInFrameGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="TimetableDefaultsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Default  properties of elements in TIMETABLE FRAME. Use these values if not specified on individual elements.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="NetworkView" minOccurs="0"/>
+			<xsd:element ref="LineView" minOccurs="0"/>
+			<xsd:element ref="OperatorView" minOccurs="0"/>
+			<xsd:element ref="ServiceCalendarFrameRef" minOccurs="0"/>
+			<xsd:element name="DefaultMode" type="VehicleModeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default VEHICLE MODE to use on JOURNEYs in TIMETABLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="JourneyAccountingRef" minOccurs="0"/>
+			<xsd:element name="bookingTimes" type="containedAvailabilityConditions_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>When bookings can be made for a SERVICE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="AccessibilityAssessment" minOccurs="0"/>
+			<xsd:element ref="VehicleTypeRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="TimetablePropertiesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Additional descriptive properties of TIMETABLE FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="VehicleModes" type="VehicleModeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Modes of VEHICLE JOURNEYs in timetable.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HeadwayService" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether this is a Headway SERVICE, that is, one shown as operating at a prescribed interval rather than to a fixed timetable.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Monitored" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether VEHICLE JOURNEYs of line are normally monitored. Provides a default value for the Monitored element on individual journeys of the timetable.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==========================================-->
+	<xsd:group name="TimetableJourneyInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Properties of journeys in  TIMETABLE FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="vehicleJourneys" type="journeysInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEYs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="frequencyGroups" type="frequencyGroupsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FREQUENCY GROUPs  In frame. Can be used to template VEHICLE JOURNEYs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="groupsOfServices" type="groupsOfServicesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Groupings of Journeys In frame. Can be used to define inbound and outbound beds for a matrix presentation of the JORUNEYs in the TIMETABLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="trainNumbers" type="trainNumbersInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TRAIN NUMBERs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="journeyPartCouples" type="journeyPartCouplesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEY COUPLINGs  in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="coupledJourneys" type="coupledJourneysInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>JOURNEY COUPLINGs  in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="serviceFacilitySets" type="serviceFacilitySetsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SERVICE FACILITies  in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="typesOfService" type="typesOfServiceInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TYPEs of SERVICE in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="flexibleServiceProperties" type="flexibleServicePropertiesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FLEXIBLE SERVICE PROPERTIES in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="vehicleJourneyStopAssignments" type="vehicleJourneyStopAssignmentsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE JOURNEY STOP ASSIGNMENTs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==========================================-->
+</xsd:schema>

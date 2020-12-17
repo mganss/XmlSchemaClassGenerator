@@ -1,0 +1,1784 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== GTFS   to NeTEx  Example====== 
+This Example provides an example of a NeTEx encoding of a GTFS Data set as a Single  file
+from the sample-feed.zip available at http......
+
+trip & stop times are merged into single set 
+
+Note that the Gtfs fare rule record is heavily overloaded and condensed in its meanings so there  are differet Netex  fare mappings for diffferent  usages
+
+Summary of Mapping
+	GTFS						NeTEx
+
+	 Gtfs: Agency		= Nx: AUTHORITY  | Nx OPERATOR 
+	 (Gtfs: Service)		= Nx: GROUP OF SERVICEs	  + SERVICE CALENDAR
+	 (Gtfs: Zone)			= Nx: TARIFF ZONE
+
+	Gtfs: Route 			= Nx: LINE	+ ROUTE
+	Gtfs: Stop				= Nx: SCHEDULED STOP POINT   + STOP PLACE
+    Gtfs: Transfer 		= Nx: CONNECTION + TRANSFER RESTRICTION or INTERCHANGE RULE
+	Gtfs: Calendar		= Nx: SERVICE CALENDAR + DAY TYPE + PROPERTY OF DAY
+	Gtfs: CalendarDate	= Nx: AVAILABILITY CONDITION
+
+	Gtfs: Trip				= Nx: SERVICE JOURNEY
+	Gtfs: StopTimes	= Nx: CALL
+	Gtfs: Shape			= Nx: LINK SEQUENCE PROJECTION 
+	Gtfs: Frequency		= Nx: HEADWAY JOURNEY GROUP
+
+	Gtfs: FareRule		= Nx: PREASSIGNED FARE PRODUCT  + VALIDABLE ELEMENT + 
+										+ TARIFF   +  FARE STRUCTURE ELEMENTs   (@access &  @conditions_ofUs)
+
+								(a) Flat tariff: FARE STRUCTURE ELEMENT (@access) ==> LINE REF
+			
+								(b) Point to point tariff: FARE STRUCTURE ELEMENT (@access) ==> +  DISTANCE MATRIX ELEMENT  
+
+								(c) Zone sequence tariff:  FARE STRUCTURE ELEMENT (@access) ==> +  FARE STRUCTURE ELEMENT + FARE STRUCTURE ELEMENTs in SEQIENCE
+
+ 
+	Gtfs: FareAttribute	=  PRICE GROUP + FARE   PRICE
+								(a) Flat tariff: FARE   PRICE  : (FARE PRODUCT PRICE  
+
+								(b) Point to point tariff: DISTANCE MATRIX ELEMENT PRICE 
+
+								(b) Zone sequence tariff:  FARE STRUCTURE ELEMENT PRICE
+ 
+										also
+								PREASSIGNED FARE PRODUCT  + VALIDABLE ELEMENT + 
+										+ TARIFF   +  FARE STRUCTURE ELEMENTs    @conditions_ofUse) frequency
+
+Note:  For a Flat tariff, the   fare_id can be used for FARE PRICE id and for the id used for the id of the  TARIFF and the   FARE PRODUCT
+
+		 For a Point to point  tariff's,  the fare_id is ussd for the  fare structure element - ie DISTANCE MATRIX ELEMNT , a d a dummy  BOILERPLATE_P2P is used for  the id of the  TARIFF   and the  FARE PRODUCT
+
+	    For a Zone sequence tariff's,  the fare_id is ussd for the  fare structure element - ie DISTANCE MATRIX ELEMNT , a d a dummy  BOILERPLATE_P2P is used for  the id of the  TARIFF   and the  FARE PRODUCT
+
+ 1.1 Example data
+ 
+September 2011
+
+agency.txt
+	agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url
+	DTA,Demo Transit Authority,http://google.com,America/Los_Angeles,en,1-212-675-9876	,http://google.com/fares
+
+stops.txt
+stop_id,stop_code_stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url, location_type, parent_station
+FUR_CREEK_RES,121,Furnace Creek Resort (Demo),,36.425288,-117.133162,FareZone01,http://www.demoagency.org,0,
+BEATTY_AIRPORT,122,Nye County Airport (Demo),,36.868446,-116.784582,FareZone01,http://www.demoagency.org,0,
+BULLFROG,123,Bullfrog (Demo),,36.88108,-116.81797,FareZone01,http://www.demoagency.org,0,
+STAGECOACH,124,Stagecoach Hotel & Casino (Demo),,36.915682,-116.751677,FareZone01,http://www.demoagency.org,0,
+NADAV,125,North Ave / D Ave N (Demo),,36.914893,-116.76821,FareZone02,http://www.demoagency.org,0,
+NANAA,126,North Ave / N A Ave (Demo),,36.914944,-116.761472,FareZone02,http://www.demoagency.org,0,
+DADAN,127,Doing Ave / D Ave N (Demo),,36.909489,-116.768242,FareZone02,http://www.demoagency.org,0,
+EMSI,129,E Main St / S Irving St (Demo),,36.905697,-116.76218,FareZone02,http://www.demoagency.org,0,
+AMV,1231,Amargosa Valley (Demo),,36.641496,-116.40094,FareZone02,http://www.demoagency.org,0,
+
+routes.txt route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+	AB,DTA,10,Airport - Bullfrog,,3,http://www.demoagency.org/ab,00FFFF,00FFFF
+	BFC,DTA,20,Bullfrog - Furnace Creek Resort,,3,http://www.demoagency.org/bfc,01FFFF,01FFFF
+	STBA,DTA,30,Stagecoach - Airport Shuttle,Shuttle service to airport,3,http://www.demoagency.org/stba,02FFFF,02FFFF
+	CITY,DTA,40,City,,3,http://www.demoagency.org/city,03FFFF,03FFFF
+	AAMV,DTA,50,Airport - Amargosa Valley,,3,http://www.demoagency.org/aamv,03FFFF,03FFFF
+
+trips.txt
+		route_id,service_id,trip_id,trip_headsign,direction_id,block_id,shape_id
+		AB,FULLW,AB1,to Bullfrog,0,1,
+		AB,FULLW,AB2,to Airport,1,2,
+		STBA,FULLW,STBA,Shuttle,,,
+		CITY,FULLW,CITY1,,0,,
+		CITY,FULLW,CITY2,,1,,
+		BFC,FULLW,BFC1,to Furnace Creek Resort,0,1,
+		BFC,FULLW,BFC2,to Bullfrog,1,2,
+		AAMV,WE,AAMV1,to Amargosa Valley,0,,
+		AAMV,WE,AAMV2,to Airport,1,,
+		AAMV,WE,AAMV3,to Amargosa Valley,0,,
+		AAMV,WE,AAMV4,to Airport,1,,16.76218,, 
+
+stoptimes.txt
+trip_Id,arrival_time,departure_time,stop_Id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled
+STBA,6:00:00,6:00:00,STAGECOACH,1, Nye County Airport,1,0,
+STBA,6:20:00,6:20:00,BEATTY_AIRPORT,2,,0,1,
+CITY1,6:00:00,6:00:00,STAGECOACH,1,,,,,
+CITY1,6:05:00,6:07:00,NANAA,2,,,,
+CITY1,6:12:00,6:14:00,NADAV,3,,,,
+CITY1,6:19:00,6:21:00,DADAN,4,,,,
+CITY1,6:26:00,6:28:00,EMSI,5,,,,
+CITY2,6:28:00,6:30:00,EMSI,1,,,,
+CITY2,6:35:00,6:37:00,DADAN,2,,,,
+CITY2,6:42:00,6:44:00,NADAV,3,,,,
+CITY2,6:49:00,6:51:00,NANAA,4,,,,
+CITY2,6:56:00,6:58:00,STAGECOACH,5,,,,
+AB1,8:00:00,8:00:00,BEATTY_AIRPORT,1,,,,
+AB1,8:10:00,8:15:00,BULLFROG,2,,,,
+AB2,12:05:00,12:05:00,BULLFROG,1,,,,
+AB2,12:15:00,12:15:00,BEATTY_AIRPORT,2
+BFC1,8:20:00,8:20:00,BULLFROG,1
+BFC1,9:20:00,9:20:00,FUR_CREEK_RES,2
+BFC2,11:00:00,11:00:00,FUR_CREEK_RES,1
+BFC2,12:00:00,12:00:00,BULLFROG,2
+AAMV1,8:00:00,8:00:00,BEATTY_AIRPORT,1
+AAMV1,9:00:00,9:00:00,AMV,2
+AAMV2,10:00:00,10:00:00,AMV,1
+AAMV2,11:00:00,11:00:00,BEATTY_AIRPORT,2
+AAMV3,13:00:00,13:00:00,BEATTY_AIRPORT,1
+AAMV3,14:00:00,14:00:00,AMV,2
+AAMV4,15:00:00,15:00:00,AMV,1
+AAMV4,16:00:00,16:00:00,BEATTY_AIRPORT,2
+
+transfers.txt
+from_stop_id,to_stop_id, transfer_type,min_transfer_time,
+NADAV,BOONDOCK,0,360 
+STAGECOACH,HOLDUP,1,
+DADAN,DARAH,2,180
+BULLFROG,POND,3
+
+calendar.txt
+	 service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+	FULLW,1,1,1,1,1,1,1,20070101,20101231
+	WE,0,0,0,0,0,1,1,20070101,20101231
+
+CalendarDates.txt
+	service_id,date,exception_type
+	FULLW,20070604,2
+	FULLW,20070608,1
+
+Frequencies.txt
+trip_id,start_time,end_time,headway_secs,exact_times
+STBA,6:00:00,22:00:00,1800,1
+CITY1,6:00:00,7:59:59,1800,0
+CITY2,6:00:00,7:59:59,1800,0
+CITY1,8:00:00,9:59:59,600,0
+CITY2,8:00:00,9:59:59,600,0
+CITY1,10:00:00,15:59:59,1800,0
+CITY2,10:00:00,15:59:59,1800,0
+CITY1,16:00:00,18:59:59,600,0
+CITY2,16:00:00,18:59:59,600,0
+CITY1,19:00:00,22:00:00,1800,0
+CITY2,19:00:00,22:00:00,1800,0
+ 
+
+fare_rules.txt¶
+	fare_id,route_id,origin_id,destination_id,contains_id
+	p,AB,,,
+	p,STBA,,,
+	p,BFC,,,
+	a,AAMV,,,
+
+Fare_Attributes
+fare_id,price,currency_type,payment_method,transfers,transfer_duration
+p,1.25,USD,0,0,
+a,5.25,USD,0,0,
+ 
+
+See individual files for mappings
+
+version 1.1 with revised ids
+(C) CEN Copyright 2010, 2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Agency  data</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<!--- =============== Actual DATA  =========== -->
+		<CompositeFrame version="1.0" id="mygtfsxm:DTA@Tariff">
+			<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Composite"/>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo AGency</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+				<DefaultCurrency>USD</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<ResourceFrame version="1.0" id="mygtfsxm:DTA@agency">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Resource"/>
+					<organisations>
+						<!--- =====Agency========= -->
+						<Authority version="any" id="mygtfsxm:DTA">
+							<!-- Agency.txt.agency_id  -->
+							<!-- Agency.txt.agency_name -->
+							<Name>Demo Transit Authority</Name>
+							<Locale>
+								<!-- Agency.txt.time_zone -->
+								<TimeZone>America/Los_Angeles</TimeZone>
+								<DefaultLanguage>en</DefaultLanguage>
+							</Locale>
+							<ContactDetails>
+								<Phone>1-212-675-9876</Phone>
+								<!-- Agency.txt.agency_url -->
+								<Url>http://google.com</Url>
+							</ContactDetails>
+						</Authority>
+					</organisations>
+				</ResourceFrame>
+				<SiteFrame version="1.0" id="mygtfsxm:DTA@stops">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Site"/>
+					<prerequisites>
+						<ResourceFrameRef version="gtfs:1.5" ref="gtfs:GTFS_BuiltIn_Codes"/>
+					</prerequisites>
+					<stopPlaces>
+						<!--- =====STOP PLACEs ========= -->
+						<StopPlace version="any" id="mygtfsxm:FUR_CREEK_RES">
+							<!-- Stops.txt.stop_id  -->
+							<!-- Stops.txt.stop_name  -->
+							<Name>Furnace Creek Resort (Demo)</Name>
+							<!-- Stops.txt.stop_description  -->
+							<Description>[Description goes here]</Description>
+							<Centroid>
+								<Location>
+									<!-- Stops.txt.stop_lat  -->
+									<Longitude>-117.133162</Longitude>
+									<!-- Stops.txt.stop_lon -->
+									<Latitude>36.425288</Latitude>
+								</Location>
+							</Centroid>
+							<!-- Stops.txt.Location_type -(google value) -->
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<!-- Stops.txt.stop_url -->
+							<Url>http://www.demoagency.org</Url>
+							<!-- Stops.txt.parent_station -->
+							<!-- Can be derived from Location_type if MODE known -->
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:BEATTY_AIRPORT">
+							<Name>Nye County Airport (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.784582</Longitude>
+									<Latitude>36.868446</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:BULLFROG">
+							<Name>Bullfrog (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.81797</Longitude>
+									<Latitude>36.88108</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:STAGECOACH">
+							<Name>Stagecoach Hotel &amp; Casino (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.751677</Longitude>
+									<Latitude>36.915682</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:NADAV">
+							<Name>North Ave / D Ave N (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.76821</Longitude>
+									<Latitude>36.914893</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:NANAA">
+							<Name>North Ave / N A Ave (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.761472</Longitude>
+									<Latitude>36.914944</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:DADAN">
+							<Name>Doing Ave / D Ave N (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.768242</Longitude>
+									<Latitude>36.909489</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:EMSI">
+							<Name>E Main St / S Irving St (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.76218</Longitude>
+									<Latitude>36.905697</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+						<StopPlace version="any" id="mygtfsxm:AMV">
+							<Name>Amargosa Valley (Demo)</Name>
+							<Centroid>
+								<Location>
+									<Longitude>-116.40094</Longitude>
+									<Latitude>36.641496</Latitude>
+								</Location>
+							</Centroid>
+							<placeTypes>
+								<TypeOfPlaceRef version="gtfs:1.5" ref="gtfs:0"/>
+							</placeTypes>
+							<Url>http://www.demoagency.org</Url>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<!--- ==============SERVICE FRAME =========== -->
+				<ServiceFrame version="1.0" id="mygtfsxm:DTA@network">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Service"/>
+					<prerequisites>
+						<ResourceFrameRef version="gtfs:1.5" ref="gtfs:GTFS_BuiltIn_Codes"/>
+					</prerequisites>
+					<!-- Routes.txt data -->
+					<lines>
+						<Line version="any" id="mygtfsxm:AB">
+							<Name>Airport - Bullfrog</Name>
+							<Description>From Airport to Bullfrog</Description>
+							<TransportMode>bus</TransportMode>
+							<Url>http://www.demoagency.org/ab</Url>
+							<PublicCode>10</PublicCode>
+							<AuthorityRef version="any" ref="mygtfsxm:DTA"/>
+							<Presentation>
+								<Colour>00FFFF</Colour>
+								<TextColour>00FFFF</TextColour>
+							</Presentation>
+						</Line>
+						<Line version="any" id="mygtfsxm:BFC">
+							<Name>Bullfrog - Furnace Creek Resort</Name>
+							<Description/>
+							<TransportMode>bus </TransportMode>
+							<Url>http://www.demoagency.org/bfc</Url>
+							<PublicCode>20</PublicCode>
+							<AuthorityRef version="any" ref="mygtfsxm:DTA"/>
+							<Presentation>
+								<Colour>01FFFF</Colour>
+								<TextColour>01FFFF</TextColour>
+							</Presentation>
+						</Line>
+						<Line version="any" id="mygtfsxm:STBA">
+							<Name>Stagecoach - Airport Shuttle</Name>
+							<Description>Shuttle service to airport</Description>
+							<TransportMode>bus</TransportMode>
+							<Url>http://www.demoagency.org/stba</Url>
+							<PublicCode>30</PublicCode>
+							<AuthorityRef version="any" ref="mygtfsxm:DTA"/>
+							<Presentation>
+								<Colour>02FFFF</Colour>
+								<TextColour>02FFFF</TextColour>
+							</Presentation>
+						</Line>
+						<Line version="any" id="mygtfsxm:CITY">
+							<Name>City</Name>
+							<Description/>
+							<TransportMode>bus</TransportMode>
+							<Url>http://www.demoagency.org/city</Url>
+							<PublicCode>40</PublicCode>
+							<AuthorityRef version="any" ref="mygtfsxm:DTA"/>
+							<Presentation>
+								<Colour>03FFFF</Colour>
+								<TextColour>03FFFF</TextColour>
+							</Presentation>
+						</Line>
+						<Line version="any" id="mygtfsxm:AAMV">
+							<Name>Airport - Amargosa Valley</Name>
+							<Description/>
+							<TransportMode>bus</TransportMode>
+							<Url>http://www.demoagency.org/aamv</Url>
+							<PublicCode>50</PublicCode>
+							<AuthorityRef version="any" ref="mygtfsxm:DTA"/>
+							<Presentation>
+								<Colour>04FFFF</Colour>
+								<TextColour>04FFFF</TextColour>
+							</Presentation>
+						</Line>
+					</lines>
+					<groupsOfLines>
+						<!--- === GROUPs OF LINEs ========= -->
+						<!--farerules txt -->
+						<GroupOfLines version="any" id="mygtfsxm:p">
+							<Name>Express routes</Name>
+							<members>
+								<LineRef version="any" ref="mygtfsxm:AB"/>
+								<LineRef version="any" ref="mygtfsxm:STBA"/>
+								<LineRef version="any" ref="mygtfsxm:BFC"/>
+							</members>
+							<TransportMode>bus</TransportMode>
+						</GroupOfLines>
+						<GroupOfLines version="any" id="mygtfsxm:a">
+							<Name>Express routes</Name>
+							<members>
+								<LineRef version="any" ref="mygtfsxm:AAMV"/>
+							</members>
+							<TransportMode>bus</TransportMode>
+						</GroupOfLines>
+					</groupsOfLines>
+					<!--- ===Stops.txt==SCHEDULED STOP POINT======== -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mygtfsxm:FUR_CREEK_RES">
+							<Name>Furnace Creek Resort (Demo)</Name>
+							<Location>
+								<Longitude>-117.133162</Longitude>
+								<Latitude>36.425288</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>121</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:BEATTY_AIRPORT">
+							<Name>Nye County Airport (Demo)</Name>
+							<Location>
+								<Longitude>-116.784582</Longitude>
+								<Latitude>36.868446</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>122</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:BULLFROG">
+							<Name>Bullfrog (Demo)</Name>
+							<Location>
+								<Longitude>-116.81797</Longitude>
+								<Latitude>36.88108</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>123</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:STAGECOACH">
+							<Name>Stagecoach Hotel &amp; Casino (Demo)</Name>
+							<Location>
+								<Longitude>-116.751677</Longitude>
+								<Latitude>36.915682</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone01"/>
+							</tariffZones>
+							<PublicCode>124</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:NADAV">
+							<Name>North Ave / D Ave N (Demo)</Name>
+							<Location>
+								<Longitude>-116.76821</Longitude>
+								<Latitude>36.914893</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>125</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:NANAA">
+							<Name>North Ave / N A Ave (Demo)</Name>
+							<Location>
+								<Longitude>-116.761472</Longitude>
+								<Latitude>36.914944</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>126</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:DADAN">
+							<Name>Doing Ave / D Ave N (Demo)</Name>
+							<Location>
+								<Longitude>-116.768242</Longitude>
+								<Latitude>36.909489</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>127</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:EMSI">
+							<Name>E Main St / S Irving St (Demo)</Name>
+							<Location>
+								<Longitude>-116.76218</Longitude>
+								<Latitude>36.905697</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>129</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mygtfsxm:AMV">
+							<Name>Amargosa Valley (Demo)</Name>
+							<Location>
+								<Longitude>-116.40094</Longitude>
+								<Latitude>36.641496</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef version="gtfs:1.5" ref="gtfs:0"/>
+							</types>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="mygtfsxm:FareZone02"/>
+							</tariffZones>
+							<PublicCode>131</PublicCode>
+							<Url>http://www.demoagency.org</Url>
+							<StopType>onstreetBus</StopType>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- ===Transfers.txt==CONNECTION ======== -->
+					<connections>
+						<Connection version="any" id="mygtfsexm:NADAV+BOONDOCK">
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:0"/>
+							<!--  NADAV,BOONDOCK,0,360   -->
+							<TransferDuration>
+								<DefaultDuration>PT6M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:NADAV"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:BOONDOCK"/>
+							</To>
+						</Connection>
+						<!-- =============  -->
+						<Connection version="any" id="mygtfsexm:STAGECOACH-HOLDUP">
+							<!-- STAGECOACH,HOLDUP,1, -->
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:1"/>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:STAGECOACH"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:HOLDUP"/>
+							</To>
+						</Connection>
+						<!-- ============= -->
+						<Connection version="any" id="mygtfsexm:DADAN+DARAH">
+							<!-- 	DADAN,DARAH,2,180 -->
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:2"/>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:DADAN"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:DARAH"/>
+							</To>
+						</Connection>
+						<!-- ============= -->
+						<Connection version="any" id="mygtfsexm:BULLFROG-POND">
+							<!-- 	BULLFROG,POND,3 -->
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:3"/>
+							<TransferDuration>
+								<DefaultDuration>PT3M</DefaultDuration>
+							</TransferDuration>
+							<From>
+								<ScheduledStopPointRef ref="mygtfsexm:BULLFROG"/>
+							</From>
+							<To>
+								<ScheduledStopPointRef ref="mygtfsexm:POND"/>
+							</To>
+						</Connection>
+					</connections>
+					<!--- ===Stops.txt==TARIFF ZONE======== -->
+					<tariffZones>
+						<TariffZone version="any" id="mygtfsxm:FareZone01">
+							<Name>Fare Zone 01</Name>
+							<members>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:FUR_CREEK_RES"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:BULLFROG"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:STAGECOACH"/>
+							</members>
+						</TariffZone>
+						<TariffZone version="any" id="mygtfsxm:FareZone02">
+							<Name>Fare Zone 02</Name>
+							<members>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:NADAV"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:NANAA"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:DADAN"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:EMSI"/>
+								<ScheduledStopPointRef version="any" ref="mygtfsxm:AMV"/>
+							</members>
+						</TariffZone>
+					</tariffZones>
+					<!--- ===Stops.txt==TRANSFER RESTRICTIONS======== -->
+					<transferRestrictions>
+						<TransferRestriction order="1" version="any" id="mygtfsexm:NADAV+BOONDOCK">
+							<Name>No Transfer</Name>
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:0"/>
+							<RestrictionType>cannotTransfer</RestrictionType>
+							<FromPointRef ref="mygtfsexm:NADAV"/>
+							<ToPointRef ref="mygtfsexm:BOONDOCK"/>
+						</TransferRestriction>
+						<TransferRestriction order="1" version="any" id="mygtfsexm:BULLFROG-POND">
+							<TypeOfTransferRef version="gtfs:1.5" ref="gtfs:3"/>
+							<BothWays>true</BothWays>
+							<RestrictionType>cannotTransfer</RestrictionType>
+							<FromPointRef ref="mygtfsexm:BULLFROG"/>
+							<ToPointRef ref="mygtfsexm:POND"/>
+						</TransferRestriction>
+					</transferRestrictions>
+				</ServiceFrame>
+				<!-- Calendar and Calendar date merged -->
+				<ServiceCalendarFrame version="1.0" id="mygtfsxm:FULLW">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@ServiceCalendar"/>
+					<!--Calendar Dates Use validity condition -->
+					<contentValidityConditions>
+						<AvailabilityCondition version="any" id="mygtfsxm:FULLW-2007-06-04">
+							<FromDate>2007-06-04T00:00:00</FromDate>
+							<ToDate>2007-06-04T23:59:59</ToDate>
+							<IsAvailable>false</IsAvailable>
+						</AvailabilityCondition>
+						<AvailabilityCondition version="any" id="mygtfsxm:FULLW-2007-06-08">
+							<FromDate>2007-06-08T00:00:00</FromDate>
+							<ToDate>2007-06-08T23:59:59</ToDate>
+							<IsAvailable>true</IsAvailable>
+						</AvailabilityCondition>
+					</contentValidityConditions>
+					<ServiceCalendar version="any" id="mygtfsxm:FULLW">
+						<FromDate>2007-01-01</FromDate>
+						<ToDate>2010-12-31</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="mygtfsxm:FULLW">
+							<Name>Weekdays</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+				</ServiceCalendarFrame>
+				<ServiceCalendarFrame version="1.0" id="mygtfsxm:WE">
+					<ServiceCalendar version="1.0" id="mygtfsxm:WE">
+						<FromDate>2007-01-01</FromDate>
+						<ToDate>2010-12-31</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="mygtfsxm:WE">
+							<Name>Weekdays</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Saturday	Sunday</DaysOfWeek>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+				</ServiceCalendarFrame>
+				<!-- trips txt -->
+				<!-- Stop Times.txt -->
+				<!--- Frequency.txt -->
+				<TimetableFrame version="1.0" id="mygtfsxm:DTA">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Timetable"/>
+					<prerequisites>
+						<ServiceFrameRef version="1.0" ref="mygtfsxm:DTA@network"/>
+						<ServiceCalendarFrameRef version="1.0" ref="mygtfsxm:FULLW"/>
+						<ServiceCalendarFrameRef version="1.0" ref="mygtfsxm:WE"/>
+						<VehicleScheduleFrameRef versionRef="EXTERNAL" ref="mygtfsxm:DTA@Blocks"/>
+					</prerequisites>
+					<vehicleJourneys>
+						<ServiceJourney version="any" id="mygtfsxm:AB1">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:AB1">
+								<gml:LineString srsName="WGS84" gml:id="AB1">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>08:10:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:Block:1"/>
+							<LineRef version="any" ref="mygtfsxm:AB"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Bullfrog</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:AB1" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>08:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>08:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:AB1" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BULLFROG"/>
+									<Arrival>
+										<Time>08:10:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>08:15:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AB2">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:AB2">
+								<gml:LineString srsName="WGS84" gml:id="AB2">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>12:05:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:Block:2"/>
+							<LineRef version="any" ref="mygtfsxm:AB"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Airport</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:AB2" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BULLFROG"/>
+									<Arrival>
+										<Time>12:05:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>12:05:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:AB2" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>12:15:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>12:15:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:STBA">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:STBA">
+								<gml:LineString srsName="WGS84" gml:id="STBA">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>06:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:STBA"/>
+							<JourneyPatternView>
+								<DestinationDisplayView>
+									<Name>Shuttle</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:STBA" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:STAGECOACH"/>
+									<Arrival>
+										<Time>06:00:00</Time>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>06:00:00</Time>
+									</Departure>
+									<DestinationDisplayView>
+										<Name>Nye CountyAirport</Name>
+									</DestinationDisplayView>
+								</Call>
+								<Call version="any" id="mygtfsxm:STBA" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>06:20:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:20:00</Time>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:CITY1">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:CITY1">
+								<gml:LineString srsName="WGS84" gml:id="CITY1">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>06:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:CITY"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>None</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:CITY1" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:STAGECOACH"/>
+									<Arrival>
+										<Time>06:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY1" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:NANAA"/>
+									<Arrival>
+										<Time>06:05:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:07:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY1" order="3">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:NADAV"/>
+									<Arrival>
+										<Time>06:12:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:14:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY1" order="4">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:DADAN"/>
+									<Arrival>
+										<Time>06:19:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:21:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY1" order="5">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:EMSI"/>
+									<Arrival>
+										<Time>06:26:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:28:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:CITY2">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:CITY2">
+								<gml:LineString srsName="WGS84" gml:id="CITY2">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>06:28:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:CITY"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name/>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:CITY2" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:EMSI"/>
+									<Arrival>
+										<Time>06:28:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:30:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY2" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:DADAN"/>
+									<Arrival>
+										<Time>06:35:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:37:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY2" order="3">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:NADAV"/>
+									<Arrival>
+										<Time>06:42:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:44:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY2" order="4">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:NANAA"/>
+									<Arrival>
+										<Time>06:49:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:51:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:CITY2" order="5">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:STAGECOACH"/>
+									<Arrival>
+										<Time>06:56:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>06:58:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:BFC1">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:BFC1">
+								<gml:LineString srsName="WGS84" gml:id="BFC1">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>08:20:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:Block:1"/>
+							<LineRef version="any" ref="mygtfsxm:BFC"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Furnace Creek Resort</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:BFC1" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BULLFROG"/>
+									<Arrival>
+										<Time>08:20:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>08:20:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:BFC1" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:FUR_CREEK_RES"/>
+									<Arrival>
+										<Time>09:20:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>09:20:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:BFC2">
+							<validityConditions>
+								<AvailabilityConditionRef version="any" ref="mygtfsxm:FULLW-2007-06-04"/>
+							</validityConditions>
+							<LinkSequenceProjection version="any" id="mygtfsxm:BFC2">
+								<gml:LineString srsName="WGS84" gml:id="BFC2">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>11:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:Block:2"/>
+							<LineRef version="any" ref="mygtfsxm:BFC"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Bullfrog</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:FULLW" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:FUR_CREEK_RES"/>
+									<Arrival>
+										<Time>11:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>11:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:FULLW" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BULLFROG"/>
+									<Arrival>
+										<Time>12:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>12:00:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV1">
+							<LinkSequenceProjection version="any" id="mygtfsxm:AAMV1">
+								<gml:LineString srsName="WGS84" gml:id="AAMV1">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>08:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Amargosa Valley</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:AAMV" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>08:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>08:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:AAMV" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:AMV"/>
+									<Arrival>
+										<Time>09:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>09:00:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV2">
+							<LinkSequenceProjection version="any" id="mygtfsxm:AAMV2">
+								<gml:LineString srsName="WGS84" gml:id="AAMV2">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>10:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Airport</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:AAMV2" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:AMV"/>
+									<Arrival>
+										<Time>10:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>10:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:AAMV2" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>11:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>11:00:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV3">
+							<!-- gtfs Shape -->
+							<LinkSequenceProjection version="any" id="mygtfsxm:AAMV3">
+								<gml:LineString srsName="WGS84" gml:id="AAMV3">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>13:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Amargosa Valley</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:AAMV3" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>13:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>13:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:AAMV3" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:AMV"/>
+									<Arrival>
+										<Time>14:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>14:00:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV4">
+							<!-- gtfs Shape -->
+							<LinkSequenceProjection version="any" id="mygtfsxm:AAMV4">
+								<gml:LineString srsName="WGS84" gml:id="AAMV4">
+									<gml:pos>53.00 1.00</gml:pos>
+									<gml:pos>53.10  1.10</gml:pos>
+									<gml:pos>53.20  1.20</gml:pos>
+								</gml:LineString>
+							</LinkSequenceProjection>
+							<DepartureTime>15:00:00</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef version="any" ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Airport</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="mygtfsxm:AAMV4" order="1">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:AMV"/>
+									<Arrival>
+										<Time>15:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>15:00:00</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="mygtfsxm:AAMV4" order="2">
+									<ScheduledStopPointRef version="any" ref="mygtfsxm:BEATTY_AIRPORT"/>
+									<Arrival>
+										<Time>16:00:00</Time>
+									</Arrival>
+									<Departure>
+										<Time>16:00:00</Time>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<!--- Frequency based journeys -->
+						<TemplateServiceJourney version="any" id="mygtfsxm:STBA@frequencies">
+							<Description>STBA,6:00:00,22:00:00,1800</Description>
+							<DepartureTime>06:00:00</DepartureTime>
+							<frequencyGroups>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:STBA-06:00:00">
+									<FirstDepartureTime>06:00:00</FirstDepartureTime>
+									<LastDepartureTime>22:00:00</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+							</frequencyGroups>
+						</TemplateServiceJourney>
+						<TemplateServiceJourney version="any" id="mygtfsxm:CITY1@frequencies">
+							<DepartureTime>06:00:00</DepartureTime>
+							<frequencyGroups>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY1-06:00:00">
+									<FirstDepartureTime>06:00:00</FirstDepartureTime>
+									<LastDepartureTime>07:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY1-08:00:00">
+									<FirstDepartureTime>08:00:00</FirstDepartureTime>
+									<LastDepartureTime>09:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT10M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY1-10:00:00">
+									<FirstDepartureTime>10:00:00</FirstDepartureTime>
+									<LastDepartureTime>15:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY1-16:00:00">
+									<FirstDepartureTime>16:00:00</FirstDepartureTime>
+									<LastDepartureTime>18:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT10M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY1-19:00:00">
+									<FirstDepartureTime>19:00:00</FirstDepartureTime>
+									<LastDepartureTime>22:00:00</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+							</frequencyGroups>
+						</TemplateServiceJourney>
+						<TemplateServiceJourney version="any" id="mygtfsxm:CITY2@frequencies">
+							<DepartureTime>06:00:00</DepartureTime>
+							<frequencyGroups>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY2-06:00:00">
+									<FirstDepartureTime>06:00:00</FirstDepartureTime>
+									<LastDepartureTime>07:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY2-08:00:00">
+									<FirstDepartureTime>08:00:00</FirstDepartureTime>
+									<LastDepartureTime>09:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT10M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY2-10:00:00">
+									<FirstDepartureTime>10:00:00</FirstDepartureTime>
+									<LastDepartureTime>15:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY2-16:00:00">
+									<FirstDepartureTime>16:00:00</FirstDepartureTime>
+									<LastDepartureTime>18:59:59</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT10M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+								<HeadwayJourneyGroup version="any" id="mygtfsxm:CITY2-19:00:00">
+									<FirstDepartureTime>19:00:00</FirstDepartureTime>
+									<LastDepartureTime>22:00:00</LastDepartureTime>
+									<ScheduledHeadwayInterval>PT30M</ScheduledHeadwayInterval>
+								</HeadwayJourneyGroup>
+							</frequencyGroups>
+						</TemplateServiceJourney>
+					</vehicleJourneys>
+					<!-- =Transfers.txt=======  -->
+					<interchangeRules>
+						<InterchangeRule version="any" id="mygtfsexm:NADAV+BOONDOCK">
+							<!-- NADAV,BOONDOCK,0,360 -->
+							<ConnectionRef ref="mygtfsexm:NADAV+BOONDOCK"/>
+							<Priority>1</Priority>
+							<Advertised>true</Advertised>
+						</InterchangeRule>
+						<InterchangeRule version="any" id="mygtfsexm:DADAN+DARAH">
+							<ConnectionRef ref="DADAN+DARAH"/>
+							<Priority>2</Priority>
+							<Guaranteed>true</Guaranteed>
+						</InterchangeRule>
+					</interchangeRules>
+				</TimetableFrame>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="any" id="mygtfsxm:p">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Fare"/>
+					<prerequisites>
+						<ServiceFrameRef version="1.0" ref="mygtfsxm:DTA@network"/>
+					</prerequisites>
+					<!--- ====Fare USAGE PARAMETERS======= -->
+					<tariffs>
+						<Tariff version="any" id="mygtfsxm:p">
+							<TypeOfTariffRef version="gtfs:1.5" ref="gtfs:flat"/>
+							<fareStructureElements>
+								<FareStructureElement version="any" id="mygtfsxm:p@access">
+									<GenericParameterAssignment order="1" id="mygtfsxm:p@access" version="any">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>bus</VehicleModes>
+											<AuthorityRef ref="mygtfsxm:DTA"/>
+										</validityParameters>
+										<includes>
+											<GenericParameterAssignment order="1" id="mygtfsxm:p@access@details" version="any">
+												<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+												<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+												<validityParameters>
+													<LineRef version="any" ref="mygtfsxm:AB"/>
+													<LineRef version="any" ref="mygtfsxm:STBA"/>
+													<LineRef version="any" ref="mygtfsxm:BFC"/>
+												</validityParameters>
+											</GenericParameterAssignment>
+										</includes>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="mygtfsxm:p@conditions_of_travel" version="any">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="any" order="1" id="mygtfsxm:p@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<UsageValidityPeriod version="any" id="mygtfsxm:p@validity">
+												<UsageEnd>standardDuration</UsageEnd>
+												<StandardDuration>PT60M</StandardDuration>
+											</UsageValidityPeriod>
+											<Interchanging version="any" id="mygtfsxm:p@interchanging">
+												<CanInterchange>true</CanInterchange>
+												<MaximumNumberOfInterchanges>1</MaximumNumberOfInterchanges>
+											</Interchanging>
+											<PurchaseWindow version="any" id="mygtfsxm:p@purchase">
+												<PurchaseMoment>beforeBoarding</PurchaseMoment>
+											</PurchaseWindow>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<priceGroups>
+								<PriceGroupRef version="any" ref="mygtfsxm:p"/>
+							</priceGroups>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="any" id="mygtfsxm:p">
+							<Name>Single flat fare to ride as long as you like on the DTA</Name>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="any" id="mygtfsxm:p">
+									<fareStructureElements>
+										<FareStructureElementRef version="any" ref="mygtfsxm:p@access"/>
+										<FareStructureElementRef version="any" ref="mygtfsxm:p@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTS======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" version="any" id="mygtfsxm:p">
+									<ValidableElementRef version="any" ref="mygtfsxm:p"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!--- ====PRICEs====== -->
+					<priceGroups>
+						<PriceGroup version="any" id="mygtfsxm:p">
+							<members>
+								<FareProductPrice version="any" id="mygtfsxm:p">
+									<Amount>1.25</Amount>
+									<Currency>USD</Currency>
+									<PreassignedFareProductRef version="any" ref="mygtfsxm:p"/>
+								</FareProductPrice>
+							</members>
+						</PriceGroup>
+					</priceGroups>
+				</FareFrame>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="any" id="mygtfsxm:a">
+					<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Fare"/>
+					<prerequisites>
+						<ServiceFrameRef version="1.0" ref="mygtfsxm:DTA@network"/>
+					</prerequisites>
+					<!--- ====Fare USAGE PARAMETERS======= -->
+					<tariffs>
+						<Tariff version="any" id="mygtfsxm:a">
+							<TypeOfTariffRef version="gtfs:1.5" ref="gtfs:flat"/>
+							<fareStructureElements>
+								<FareStructureElement version="any" id="mygtfsxm:a@access">
+									<GenericParameterAssignment order="1" id="mygtfsxm:a@access" version="any">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+										<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+										<validityParameters>
+											<VehicleModes>bus</VehicleModes>
+											<AuthorityRef ref="mygtfsxm:DTA"/>
+										</validityParameters>
+										<includes>
+											<GenericParameterAssignment order="1" id="mygtfsxm:a@access@details" version="any">
+												<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+												<ValidityParameterGroupingType>XOR</ValidityParameterGroupingType>
+												<validityParameters>
+													<LineRef version="any" ref="mygtfsxm:AAMV"/>
+												</validityParameters>
+											</GenericParameterAssignment>
+										</includes>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="mygtfsxm:a@conditions_of_travel" version="any">
+									<Name>Conditions of travel</Name>
+									<GenericParameterAssignment version="any" order="1" id="mygtfsxm:a@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<UsageValidityPeriod version="any" id="mygtfsxm:a@validity">
+												<UsageEnd>endOfFareDay</UsageEnd>
+											</UsageValidityPeriod>
+											<Interchanging version="any" id="mygtfsxm:a@interchanging">
+												<CanInterchange>false</CanInterchange>
+												<MaximumNumberOfInterchanges>0</MaximumNumberOfInterchanges>
+											</Interchanging>
+											<PurchaseWindow version="any" id="mygtfsxm:a@purchase">
+												<PurchaseMoment>beforeBoarding</PurchaseMoment>
+											</PurchaseWindow>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<priceGroups>
+								<PriceGroupRef version="any" ref="mygtfsxm:a"/>
+							</priceGroups>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="any" id="mygtfsxm:a">
+							<Name>Single flat fare to ride as long as you like on the DTA</Name>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="any" id="mygtfsxm:a">
+									<fareStructureElements>
+										<FareStructureElementRef version="any" ref="mygtfsxm:a@access"/>
+										<FareStructureElementRef version="any" ref="mygtfsxm:a@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTS======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct order="1" version="any" id="mygtfsxm:a">
+									<ValidableElementRef version="any" ref="mygtfsxm:a"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!--- ====PRICEs====== -->
+					<priceGroups>
+						<PriceGroup version="any" id="mygtfsxm:a">
+							<members>
+								<FareProductPrice version="any" id="mygtfsxm:a">
+									<Amount>5.25</Amount>
+									<Currency>USD</Currency>
+									<PreassignedFareProductRef version="any" ref="mygtfsxm:a"/>
+								</FareProductPrice>
+							</members>
+						</PriceGroup>
+					</priceGroups>
+				</FareFrame>
+			</frames>
+		</CompositeFrame>
+		<!--   this additional frame show show GTFS metadata can be  described in NeTEx -->
+		<CompositeFrame version="gtfs:1.5" id="gtfs:GTFS_Metadata">
+			<Name>Built in GTFS code values</Name>
+			<TypeOfFrameRef version="gtfs:1.5" ref="gtfs:GTFS_Profile@Metadata"/>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="gtfs">
+					<Xmlns>gtfs</Xmlns>
+					<XmlnsUrl>http://www.google.com/transit/gtfs</XmlnsUrl>
+					<Description>GTFS code values</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="gtfs"/>
+			</FrameDefaults>
+			<frames>
+				<!--- DEFINITIONS OF FIXED  VALUES -->
+				<ResourceFrame version="gtfs:1.5" id="gtfs:GTFS_BuiltIn_Codes">
+					<Name>GTFS Built in values: Metadata defining Google values:  Stop@Location_type,</Name>
+					<typesOfValue>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_StopTypes" classOfValues="TypeOfPlace">
+							<Name>GTFS Built in Stop Types: Stop@location_type </Name>
+							<values>
+								<TypeOfPlace version="gtfs:1.5" id="gtfs:0">
+									<Name>GTFS Stop Type  for use on Stop Place</Name>
+								</TypeOfPlace>
+								<TypeOfPlace version="gtfs:1.5" id="gtfs:1">
+									<Name>GTFS Station Type for use on Stop Place</Name>
+								</TypeOfPlace>
+								<TypeOfPoint version="gtfs:1.5" id="gtfs:0">
+									<Name>GTFS Stop Type for use on Scheduled Stop Point</Name>
+								</TypeOfPoint>
+								<TypeOfPoint version="gtfs:1.5" id="gtfs:1">
+									<Name>GTFS Station Type for use on Scheduled Stop Point </Name>
+								</TypeOfPoint>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_TransferTypes" classOfValues="TypeOfTransfer">
+							<Name>GTFS Built in Transfer Types: Transfer@transfer_type</Name>
+							<values>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:0">
+									<Name>0	Recommended transfer	 : GTFS Transfer Type  for use on Connection</Name>
+								</TypeOfTransfer>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:1">
+									<Name>1	Timed transfer, waits	GTFS Station Type for use on Connection</Name>
+								</TypeOfTransfer>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:2">
+									<Name>	2	min transfer tme GTFS Stop Type for use on Connection</Name>
+								</TypeOfTransfer>
+								<TypeOfTransfer version="gtfs:1.5" id="gtfs:3">
+									<Name>3	No transfer	 GTFS Station Type for use on Connection </Name>
+								</TypeOfTransfer>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Directions" classOfValues="Direction">
+							<Name>GTFS Built in Directions</Name>
+							<values>
+								<Direction version="gtfs:1.5" id="gtfs:0">
+									<Name>GTFS Direction 0</Name>
+								</Direction>
+								<Direction version="gtfs:1.5" id="gtfs:1">
+									<Name>GTFS Direction 1</Name>
+								</Direction>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Types_of_Tariff" classOfValues="TypeOfTariff">
+							<Name>GTFS Built in Types of Frame</Name>
+							<values>
+								<TypeOfTariff version="gtfs:1.5" id="gtfs:flat">
+									<Name>GTFS Built in Types of Tariff - flat fare</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="gtfs:1.5" id="gtfs:point_to_point">
+									<Name>GTFS Built in Types of Tariff - fpoint to point</Name>
+								</TypeOfTariff>
+								<TypeOfTariff version="gtfs:1.5" id="gtfs:zone_sequence">
+									<Name>GTFS Built in Types of Tariff - zone sequence </Name>
+								</TypeOfTariff>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_ChargingMoments" classOfValues="ChargingMoment">
+							<Name>GTFS Built in  Charging Methods: FareAttribute@payment_method</Name>
+							<values>
+								<!--- ====Charging method========= -->
+								<ChargingMoment version="gtfs:1.5" id="gtfs:0">
+									<Name>Pay on Boarding</Name>
+								</ChargingMoment>
+								<ChargingMoment version="gtfs:1.5" id="gtfs:1">
+									<Name>Fare must be paid before boarding</Name>
+								</ChargingMoment>
+							</values>
+						</ValueSet>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_TypesOfFrame" classOfValues="TypeOfFrame">
+							<Name>GTFS Built in Types of Frame</Name>
+							<values>
+								<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Composite">
+									<Name>GTFS Version Frame definition: A GTFS timetable has the following classes </Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+									<classes>
+										<ClassInFrameRef nameOfClass="AvailabilityCondition" classRefType="memberReferences"/>
+									</classes>
+									<includes>
+										<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Resource">
+											<FrameClassRef nameOfClass="ResourceFrame"/>
+											<classes>
+												<ClassInFrameRef nameOfClass="Authority" classRefType="memberReferences"/>
+											</classes>
+										</TypeOfFrame>
+										<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@ServiceCalendar">
+											<FrameClassRef nameOfClass="ServiceCalendarFrame"/>
+											<classes>
+												<ClassInFrameRef nameOfClass="DayType" classRefType="memberReferences"/>
+											</classes>
+										</TypeOfFrame>
+										<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Site">
+											<FrameClassRef nameOfClass="SiteFrame"/>
+											<classes>
+												<ClassInFrameRef nameOfClass="StopPlace" classRefType="memberReferences"/>
+											</classes>
+										</TypeOfFrame>
+										<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Service">
+											<FrameClassRef nameOfClass="ServiceFrame"/>
+											<classes>
+												<ClassInFrameRef nameOfClass="Direction" classRefType="memberReferences"/>
+												<ClassInFrameRef nameOfClass="Line" classRefType="memberReferences"/>
+												<ClassInFrameRef nameOfClass="ScheduledStopPoint" classRefType="memberReferences"/>
+												<ClassInFrameRef nameOfClass="TariffZone" classRefType="memberReferences"/>
+											</classes>
+										</TypeOfFrame>
+										<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Timetable">
+											<FrameClassRef nameOfClass="TimetableFrame"/>
+											<classes>
+												<ClassInFrameRef nameOfClass="AvailabilityCondition" classRefType="memberReferences"/>
+												<ClassInFrameRef nameOfClass="ServiceJourney" classRefType="members"/>
+												<ClassInFrameRef nameOfClass="TemplateServiceJourney" classRefType="members"/>
+												<ClassInFrame nameOfClass="TimetableFrame">
+													<ClassRefType>members</ClassRefType>
+													<relationships>
+														<ClassRelationshipInFrame>
+															<RelationshipRef nameOfClass="serviceJourneys"/>
+															<Mandatory>required</Mandatory>
+															<Containment>inline</Containment>
+															<ModificationSet>all</ModificationSet>
+														</ClassRelationshipInFrame>
+													</relationships>
+												</ClassInFrame>
+											</classes>
+										</TypeOfFrame>
+										<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Fare">
+											<Name>GTFS Built in Types of Frame -   fare structure</Name>
+											<FrameClassRef nameOfClass="FareFrame"/>
+											<classes>
+												<ClassInFrame nameOfClass="Tariff">
+													<ClassRefType>members</ClassRefType>
+													<relationships>
+														<ClassRelationshipInFrame>
+															<RelationshipRef nameOfClass="tariffs"/>
+															<Mandatory>required</Mandatory>
+															<Containment>inline</Containment>
+															<ModificationSet>all</ModificationSet>
+														</ClassRelationshipInFrame>
+													</relationships>
+												</ClassInFrame>
+												<ClassInFrame nameOfClass="FareProducts">
+													<ClassRefType>members</ClassRefType>
+													<relationships>
+														<ClassRelationshipInFrame>
+															<RelationshipRef nameOfClass="tariffs"/>
+															<Mandatory>optional</Mandatory>
+															<Containment>inline</Containment>
+															<ModificationSet>all</ModificationSet>
+														</ClassRelationshipInFrame>
+													</relationships>
+												</ClassInFrame>
+												<ClassInFrame nameOfClass="PriceGroup">
+													<ClassRefType>members</ClassRefType>
+													<relationships>
+														<ClassRelationshipInFrame>
+															<RelationshipRef nameOfClass="pricesGroups"/>
+															<Mandatory>optional</Mandatory>
+															<Containment>inline</Containment>
+															<ModificationSet>all</ModificationSet>
+														</ClassRelationshipInFrame>
+													</relationships>
+												</ClassInFrame>
+												<ClassInFrame nameOfClass="FareTable">
+													<ClassRefType>members</ClassRefType>
+													<relationships>
+														<ClassRelationshipInFrame>
+															<RelationshipRef nameOfClass="fareTables"/>
+															<Mandatory>optional</Mandatory>
+															<Containment>inline</Containment>
+															<ModificationSet>all</ModificationSet>
+														</ClassRelationshipInFrame>
+													</relationships>
+												</ClassInFrame>
+											</classes>
+										</TypeOfFrame>
+									</includes>
+								</TypeOfFrame>
+								<TypeOfFrame version="gtfs:1.5" id="gtfs:GTFS_Profile@Metadata">
+									<Name>GTFS Metadata</Name>
+									<FrameClassRef nameOfClass="CompositeFrame"/>
+								</TypeOfFrame>
+							</values>
+						</ValueSet>
+						<ValueSet version="ntx:1.0" id="ntx:Types_of_AccessRightAssignment" classOfValues="TypeOfAccessRightAssignment">
+							<Name>GTFS Built in   types of assignment</Name>
+							<values>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access">
+									<Name>Can access </Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access_when">
+									<Name>Can access  when </Name>
+								</TypeOfAccessRightAssignment>
+								<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:condition_of_use">
+									<Name>Condition of use</Name>
+								</TypeOfAccessRightAssignment>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

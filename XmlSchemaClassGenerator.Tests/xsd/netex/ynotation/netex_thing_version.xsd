@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns="http://www.netex.org.uk/netex" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="0.1" id="netex_Thing">
+	<xsd:include schemaLocation="netex_thing_support.xsd"/>
+	<xsd:include schemaLocation="../netex_framework/netex_responsibility/netex_typeOfValue_version.xsd"/>
+	<!-- === NOTATION EXAMPLE E==== =================================================== -->
+	<!-- ======================================================================= -->
+	<!-- ==== Thing ========================================================= -->
+	<xsd:element name="Thing" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Thing_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ThingGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ThingIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of THING</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Thing_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="ThingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ThingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of THING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ThingType" type="ThingTypeEnumeration" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>Type of THING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ParentThingRef" type="ThingRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Parent THING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="childThings" type="childThings_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Component parts that make up THING</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="somethingElses" type="somethingElseRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SOMETHING ELSEs associated with this THING.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== Child Thing ======================================================== -->
+	<xsd:complexType name="childThings_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of CHILD THINGs</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="ChildThing" minOccurs="2" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ChildThing" type="ChildThing_VersionedChildStructure" abstract="false" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>A CHILD THING.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ChildThing_VersionedChildStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a CHILD THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:element ref="ThingRef" minOccurs="0"/>
+					<xsd:group ref="ChildThingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ChildThingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CHILD THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of Thing</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IsCool" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of Link.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== Type of Thing ================================================= -->
+	<xsd:element name="TypeOfThing" abstract="false" substitutionGroup="TypeOfValue">
+		<xsd:annotation>
+			<xsd:documentation>Classification of a THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfThing_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:sequence>
+								<xsd:element name="Url" type="xsd:anyURI" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Url of Thing</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfValueIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of TYPE OF THING</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfThing_ValueStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF THING</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfValue_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TypeOfThingGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TypeOfThingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TYPE OF THING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Url" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Url of Thing</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===== SomethingElse =============================================== -->
+	<xsd:element name="SomethingElse" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A SOMETHING ELSE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="SomethingElse_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SomethingElseGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of SOMETHING ELSE</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="SomethingElseIdType"/>
+						</xsd:simpleType>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="SomethingElse_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for an SOMETHING ELSE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="SomethingElseGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SomethingElseGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a SOMETHING ELSE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Alternative code for legacy compatibility</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+</xsd:schema>

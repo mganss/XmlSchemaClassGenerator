@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a simple bus timetable for a linear route in NeTex XML  
+It extends the SimpleTimetable with STOP ASSIGNMENTs which relate the stop points on the timetable with  physical stops.
+
+This may be because differnt codes are used for the SCHEDULED STOP POINT and STOP PLACE, (say if they come from different data systems) or because a specific platform (QUAY) within the area   is assigned more specifically than just the stop place
+   
+Some of the CALLs at the stops are assigned to QUAYs at Stop PLACEs 
+  
+1. OVERVIEW
+============
+
+   The SERVICE PATTERN has just  three stops         A - B  - C   
+
+	There are just two  SERVICE JOURNEYs   in a single DIRECTION 
+
+    hde:sj_24o_01   at 14:20   outbound
+    hde:sj_24o_02   at 15:20   outbound
+ 
+And the timetable is thus
+
+			<== JOURNEYS ==>	STOP ASSIGNMENTs
+			sj_24o_01   sj_24o_02		
+
+	A	d		14:20	15:20     | 	QUAY 4
+	B	a		14:30	15:30     | 	QUAY 1a
+	B	d		14:32	15:32      | QUAY 1b     
+	C	a		15:10	15:10     | 	QUAY 1
+
+
+There are three STOP PLACEs , each with one or more QUAYs
+			A	STOP PLACE: mybus:SP57001A	
+					QUAY: mybus:Q_SP57001A_4
+			B	STOP PLACE: mybus:SP57002B	
+					Ba	Eastbound Arrivals	QUAY: mybus:Q_SP57002B_1a
+					Ba	Eastbound Departures	QUAY: mybus:Q_SP57002B_1b
+					Bb	Westbound   	QUAY: mybus:Q_SP57002B_2
+		C	STOP PLACE: mybus:SP57003C	
+					Ca	Eastbound 	QUAY: mybus:Q_SP57003C_1
+					Cb	Westbound 	QUAY: mybus:Q_SP57003C_2
+
+There are three PASSENGER  STOP ASSIGNMENTs to map the SCHEDULED STOP POINTs to the QUAYs 
+(If the same IDs were used for the SCHEDULED STOP PLACEs and QUAYs,  this could be ommitted)
+
+	A	Assigned to  Quay 4 of Stop Place SP57001A
+		SCHEDULED STOP POINT:  mybus: SSP_001	
+		=>STOP PLACE: mybus:SP57001A	QUAY: mybus:Q_SP57001A_4
+	B	Assigned to to Stop Place SP57002B
+		 Arrivals  to  Quay1a SCHEDULED STOP POINT:  mybus: SSP_002	
+			=>STOP PLACE: mybus:SP57002B	QUAY: mybus:Q_SP57002B_1a     
+		 Departures  to  Quay1b SCHEDULED STOP POINT:  mybus: SSP_002	
+			=>STOP PLACE: mybus:SP57002B	QUAY: mybus:Q_SP57002B_1b         
+	C	 Assigned to STOP PLACE, SP57003C	  but not any specific QUAY
+			 | SCHEDULED STOP POINT:  mybus: SSP_077	
+				=>STOP PLACE: mybus:SP57003C	  
+  
+In this example we include    detailed JOURNEY PATTERN data as well as the
+SERVICE JOURNEY with  CALLs.
+The CALLs are in effect derived from the other  data and could be omitted
+ 
+In  each   CALLs for the first journey we include the QUAY ASSIGNMENT VIEW with the Label and cross refence to the assignment  
+
+In each  CALLs for the first journey we show just the reference to the   PASSENGER  STOP ASSIGNMENTs
+
+==================================
+
+2. DETAILS
+
+SCHEDULED STOP POINTs
+	    A)   mybus:ssp_001  Alpha &amp; Castle 
+						 
+		B)  mybus:ssp_002 	 Bravo Arch< 
+							 
+		C)  mybus:ssp_077	Charley Green > 
+
+There are just two SERVICE JOURNEYs in the timetable  
+
+     (i)  SERVICE JOURNEY hde:sj_24o_01         
+             Departs 14:20   on         DAY TYPE      DayType DT01   (MTWTF)
+
+     (ii)  SERVICE JOURNEY hde:sj_24o_02     
+             Departs 15:20   on         DAY TYPE      DayType DT02   (MTWTFSS)
+             Connects with LINE 4 at stop B 
+   
+The SERVICE  PATTERN  has  three STOP POINT IN JOURNEY PATTERNs referencing the  three SCHEDULED STOP POINTs  
+ which are connected by two      SERVICE LINKs   .
+ 
+ SERVICE   PATTERN:  ServiceJourneyPattern:sjp_24o
+  STOP POINTs
+	1 STOP POINT IN JOURNEY PATTERN
+		SCHEDULED STOP POINT:  A   mybus:SSP_001 
+	2 STOP POINT IN JOURNEY PATTERN
+		SCHEDULED STOP POINT:  B   mybus:SSP_002 
+	3 STOP POINT IN JOURNEY PATTERN
+		SCHEDULED STOP POINT:  C   mybus:SSP_077
+  SERVICE LINKs
+	1 SERVICE LINK IN JOURNEY PATTERN
+		SERVICE LINK :	A		 - B     	mybus:SSP_001_to_SSP_002 
+	2 SERVICE LINK IN JOURNEY PATTERN
+		SERVICE LINK :	B		 - C		mybus:SSP_002_to_SSP_077
+
+    There is a single TIME DEMAND TYPE and one set of RUN TIMES
+ 
+A COMPOSITE FRAME is used to group the component FRAMEs
+ 
+   - It has a VALIDITY CONDITION  that specifies it is valid from Sept to Matrch
+
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A TIMETABLE FRAME is used to contain  the SERVICE JOURNEY   elements
+		A SITE FRAME defining the STOP PLACEs (only needed becaus etheer are stop assignments )
+ 
+			 a SERVICE CALENDAR FRAME 	A SERVICE CALENDAR FRAME is used to contain the DAY TYPEs etc 
+ 
+(C) 2010-2011 CEN NeTEx
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="hde:TimetableFrameTIM_23_O">REQUEST</TimetableFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple timetable frame with two journeys and service calendar</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="hde:CAL_02">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Stop data  data</Description>
+				</Codespace>
+				<Codespace id="dth">
+					<Xmlns>dth</Xmlns>
+					<XmlnsUrl>http://www.dothebyshall.edu/timetable</XmlnsUrl>
+					<Description>Timetable     data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<ServiceFrame version="1" id="mybus:svf_12">
+					<Name>Stops for Winter timetable for route 24 </Name>
+					<!--- =========DIRECTIONs=========== -->
+					<directions>
+						<Direction version="any" id="mybus:DR_Westbound">
+							<Name>Westbound</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Southbound">
+							<Name>Eastbound</Name>
+						</Direction>
+					</directions>
+					<!--- =========ROUTEs=========== -->
+					<routes>
+						<Route version="any" id="mybus:RT_24o">
+							<Name>Line 24 Alpha to Charley Green</Name>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Westbound"/>
+						</Route>
+					</routes>
+					<!--- =========LINEs=========== -->
+					<lines>
+						<Line version="any" id="mybus:LN_24">
+							<Name>Line 24 Alpha to Charley Green</Name>
+							<ShortName>Line 24</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>24</PublicCode>
+						</Line>
+					</lines>
+					<!--- =========DESTINATION DISPLAYs============ -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="mybus:DST_Charley">
+							<Name>Charley Green</Name>
+							<ShortName>Charley G</ShortName>
+							<PublicCode>Charley</PublicCode>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>EANDC</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo Arch</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo Arch</ShortName>
+							<PublicCode>BRAVO</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_077">
+							<Name>Charley Green</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Charley</ShortName>
+							<PublicCode>CHAS</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- =========SERVICE LINKs=========== -->
+					<serviceLinks>
+						<ServiceLink version="any" id="mybus:SSP_001_to_SSP_002">
+							<Name>Alpha &amp; Castle to Bravo Arch</Name>
+							<FromPointRef version="any" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" ref="mybus:SSP_002"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SSP_002_to_SSP_077">
+							<Name>Bravo Arch to Charley Green</Name>
+							<FromPointRef version="any" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" ref="mybus:SSP_077"/>
+						</ServiceLink>
+					</serviceLinks>
+					<!--- =========SERVICE PATTERNS=========== -->
+					<servicePatterns>
+						<ServicePattern version="any" id="hde:svp_24o">
+							<Name>Alpha to Charley</Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_24o"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:spijp_24o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:spijp_24o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:spijp_24o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:slijp_24o_01">
+									<ServiceLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:slijp_24o_02">
+									<ServiceLinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+					</servicePatterns>
+					<!--- =========STOP ASSIGNMENTs=========== -->
+					<stopAssignments>
+						<PassengerStopAssignment order="1" version="any" id="hde:psa_SSP_001_to_SP57001A_Q4">
+							<Description lang="en">Assigns   Alpha to physical stop -   quay  4</Description>
+							<BoardingUse>true</BoardingUse>
+							<AlightingUse>true</AlightingUse>
+							<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+							<StopPlaceRef version="any" ref="mybus:SP57001A"/>
+							<QuayRef version="any" ref="mybus:Q_SP57001A_4"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="hde:psa_SSP_002_to_SP57002B_Q1a">
+							<Description lang="en">Assigns Arrivals  at Bravo to Eastbound Quay</Description>
+							<BoardingUse>false</BoardingUse>
+							<AlightingUse>true</AlightingUse>
+							<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							<StopPlaceRef version="any" ref="mybus:SP57002B"/>
+							<QuayRef version="any" ref="mybus:Q_SP57002B_1a"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="2" version="any" id="hde:psa_SSP_002_to_SP57002B_Q1b">
+							<Description lang="en">Assigns Departures at Bravo to Eastbound Quay</Description>
+							<BoardingUse>true</BoardingUse>
+							<AlightingUse>false</AlightingUse>
+							<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+							<StopPlaceRef version="any" ref="mybus:SP57002B"/>
+							<QuayRef version="any" ref="mybus:Q_SP57002B_1b"/>
+						</PassengerStopAssignment>
+						<PassengerStopAssignment order="1" version="any" id="hde:psa_SSP_077_to_SP57003C">
+							<Description lang="en">Assigns   to  Charley - no quay specified </Description>
+							<BoardingUse>true</BoardingUse>
+							<AlightingUse>true</AlightingUse>
+							<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+							<StopPlaceRef version="any" ref="mybus:SP57003C"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+					<!--- ======JOURNEY PATTERNS=========== -->
+					<journeyPatterns>
+						<ServiceJourneyPattern version="any" id="hde:sjp_24o">
+							<Name>Alpha to Charley  </Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<runTimes>
+								<JourneyPatternRunTime version="any" id="mybus:jprt_24o1_SSP_001_to_SSP_077">
+									<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+									<TimingLinkRef ref="none"/>
+									<RunTime>PT70M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24o_01" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24o_02" order="5">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24o_03" order="10">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+					</journeyPatterns>
+					<!--- ======TIME DEMAND TYPES ========== -->
+					<timeDemandTypes>
+						<TimeDemandType version="any" id="mybus:td_01">
+							<Name>Normal Day</Name>
+						</TimeDemandType>
+					</timeDemandTypes>
+				</ServiceFrame>
+				<!-- ======Timetable ======= -->
+				<TimetableFrame version="1" id="hde:TIM_23_O">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="hde:Cnd001">
+							<Description>Sept  to March</Description>
+							<FromDate>2010-11-01T00:00:00Z</FromDate>
+							<ToDate>2011-03-31T00:00:00Z</ToDate>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+								<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+							</dayTypes>
+						</AvailabilityCondition>
+					</validityConditions>
+					<Name>Winter timetable for route 23 outbound</Name>
+					<VehicleModes>bus</VehicleModes>
+					<vehicleJourneys>
+						<ServiceJourney version="any" id="hde:sj_24o_01">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="mybus:RT_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24o_01_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+										<QuayAssignmentView>
+											<PassengerStopAssignmentRef order="1" version="any" ref="hde:psa_SSP_001_to_SP57001A_Q4"/>
+											<StopPlaceRef version="any" ref="mybus:SP57001A"/>
+											<QuayRef version="any" ref="mybus:Q_SP57001A_4"/>
+											<QuayName>Alpha Platform 4</QuayName>
+											<Label>Quay 4</Label>
+										</QuayAssignmentView>
+									</Arrival>
+									<Departure>
+										<Time>14:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<Arrival>
+										<Time>14:30:00.0Z</Time>
+										<QuayAssignmentView>
+											<PassengerStopAssignmentRef order="1" version="any" ref="hde:psa_SSP_002_to_SP57002B_Q1a"/>
+											<StopPlaceRef version="any" ref="mybus:SP57002B"/>
+											<QuayRef version="any" ref="mybus:Q_SP57002B_1a"/>
+											<Label>Bravo 1A</Label>
+										</QuayAssignmentView>
+									</Arrival>
+									<Departure>
+										<Time>14:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+										<QuayAssignmentView>
+											<PassengerStopAssignmentRef order="2" version="any" ref="hde:psa_SSP_002_to_SP57002B_Q1b"/>
+											<StopPlaceRef version="any" ref="mybus:SP57002B"/>
+											<QuayRef version="any" ref="mybus:Q_SP57002B_1b"/>
+											<Label>Bravo 1B</Label>
+										</QuayAssignmentView>
+									</Departure>
+									<Note>Arrival at Terminus</Note>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<Time>15:10:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+										<QuayAssignmentView>
+											<PassengerStopAssignmentRef order="1" version="any" ref="hde:psa_SSP_077_to_SP57003C"/>
+											<StopPlaceRef version="any" ref="mybus:SP57003C"/>
+											<Label>C1</Label>
+										</QuayAssignmentView>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_24o_02">
+							<DepartureTime>15:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="mybus:RT_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24o_02_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>15:20:00.0Z</Time>
+										<PassengerStopAssignmentRef order="1" version="any" ref="hde:psa_SSP_001_to_SP57001A_Q4"/>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<Arrival>
+										<Time>15:30:00.0Z</Time>
+										<PassengerStopAssignmentRef order="1" version="any" ref="hde:psa_SSP_002_to_SP57002B_Q1a"/>
+										<noticeAssignments>
+											<NoticeAssignmentView id="hde:sj_24o_02_002_01" order="1">
+												<NoticeRef version="any" ref="hde:sj_24o_02"/>
+												<Text>Can connect to LINE 4</Text>
+											</NoticeAssignmentView>
+										</noticeAssignments>
+									</Arrival>
+									<Departure>
+										<Time>15:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+										<PassengerStopAssignmentRef order="2" version="any" ref="hde:psa_SSP_002_to_SP57002B_Q1b"/>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<Time>16:10:00.0Z</Time>
+										<PassengerStopAssignmentRef order="1" version="any" ref="hde:psa_SSP_077_to_SP57003C"/>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+					</vehicleJourneys>
+					<notices>
+						<Notice version="any" id="hde:sj_24o_02">
+							<Text>foot note text</Text>
+							<CanBeAdvertised>true</CanBeAdvertised>
+							<variants>
+								<DeliveryVariant version="any" id="hde:sj_24o_02_01">
+									<DeliveryVariantMediaType>textToSpeech</DeliveryVariantMediaType>
+									<VariantText>mobile foot note text</VariantText>
+								</DeliveryVariant>
+							</variants>
+						</Notice>
+					</notices>
+				</TimetableFrame>
+				<SiteFrame version="024" created="2010-05-17T09:30:47.0Z" changed="2010-05-22T10:30:51.0Z" modification="revise" derivedFromVersionRef="0023" id="mybus:infraf002">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef ref="mybus:RS_10">EXTERNAL</DefaultResponsibilitySetRef>
+					</FrameDefaults>
+					<stopPlaces>
+						<!--- ======JOURNEY PATTERN ========== -->
+						<StopPlace version="any" id="mybus:SP57001A">
+							<Name>Alpha and Castle</Name>
+							<ShortName>Alpha </ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP57001A_4">
+									<Name>Alpha Quay 4  </Name>
+									<Description>Stop A is terminus serves both directions</Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>indoors</Covered>
+									<Label>Quay 4</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>S</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="mybus:SP57002B">
+							<Name>Bravo Road (SW19)</Name>
+							<ShortName>Bravo</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="any" id="mybus:RAd_SP57002B_01">
+								<RoadName>Bravo Road</RoadName>
+							</RoadAddress>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="any" id="mybus:Q_SP57002B_1a">
+									<Name>Bravo  Eastbound  Arrivals(Quay 1)</Name>
+									<Description>Stop Ba  is paired with Stop Bb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Bravo 1A</Label>
+									<PublicCode>1-3456a </PublicCode>
+									<CompassOctant>S</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+								<Quay version="any" id="mybus:Q_SP57002B_1b">
+									<Name>Bravo  Eastbound Departures (Quay 1b)</Name>
+									<Description>Stop Ba  is paired with Stop Bb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4317482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Bravo 1B</Label>
+									<PublicCode>1-3456b </PublicCode>
+									<CompassOctant>S</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP57002B_2">
+									<Name>Bravo  Westbound (Quay 2)</Name>
+									<Description>Stop Ba  is paired with Stop Bb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Stop Bb</Label>
+									<PublicCode>1-3457 </PublicCode>
+									<CompassOctant>N</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="mybus:SP57003C">
+							<Name>Charley Crescent</Name>
+							<ShortName>Charley C</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="any" id="mybus:RAd_SP57003C_01">
+								<RoadName>Foo Road</RoadName>
+							</RoadAddress>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP57003C_1">
+									<Name>Charley  Eaestbound (Quay 1)</Name>
+									<Description>StopCa  is paired with Stop Cb  </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label> Ca</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>NE</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP57003C_2">
+									<Name>Charley  Westbound (Quay 2)</Name>
+									<Description>Stop Cb  is paired with Stop Ca </Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>  C1</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>SE</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+						<StopPlace version="any" id="mybus:SP57004D">
+							<Name>Delta Avenue</Name>
+							<ShortName>Delta</ShortName>
+							<Centroid>
+								<Location>
+									<gml:pos srsName="UKOS">524811 	 170666 </gml:pos>
+								</Location>
+							</Centroid>
+							<RoadAddress version="any" id="mybus:RAd_SP57004D_01">
+								<RoadName>Bar Road</RoadName>
+							</RoadAddress>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SP57004D_1">
+									<Name>Delta  Eastbound (Quay 1)</Name>
+									<Centroid>
+										<Location>
+											<Longitude>-0.2071397147</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<Covered>outdoors</Covered>
+									<Label>Stop D</Label>
+									<PublicCode>1-3455 </PublicCode>
+									<CompassOctant>W</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<!--  Service Calendar Nov 2010   COMPACT Coding  === -->
+				<ServiceCalendarFrame version="any" id="hde:CAL_02">
+					<Name>Service Calendar Nov 2010 ALTERNATE MORE COMPACT Coding  </Name>
+					<ServiceCalendar version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2010-11-14</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="hde:DT_01-MF-NH">
+							<Name>Weekdays unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="hde:DT_02-AA-NH">
+							<Name>Everyday unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Everyday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="hde:DT_03-WE-NH">
+							<Name>Weekends unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Saturday Sunday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="hde:DT_04-AA-NH">
+							<Name>Holidays</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Everyday</DaysOfWeek>
+									<HolidayTypes>AnyHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-01">
+							<Description>Monday 2010-11-01</Description>
+							<Date>2010-11-01</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-02">
+							<Description>Tuesday 2010-11-02</Description>
+							<Date>2010-11-02</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-03">
+							<Description>Wednesday 2010-11-03</Description>
+							<Date>2010-11-03</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-04">
+							<Description>Thusday 2010-11-04</Description>
+							<Date>2010-11-04</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-05">
+							<Description>MFriday 2010-11-05</Description>
+							<Date>2010-11-05</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-06">
+							<Description>Saturday 2010-11-06</Description>
+							<Date>2010-11-06</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-07">
+							<Description>Sunday 2010-11-07</Description>
+							<Date>2010-11-07</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+						<!-- Week 2 -->
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-08">
+							<Description>Monday 2010-11-08</Description>
+							<Date>2010-11-08</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-09">
+							<Description>Tuesday 2010-11-09</Description>
+							<Date>2010-11-09</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-10">
+							<Description>Wednesday 2010-11-10</Description>
+							<Date>2010-11-10</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-11">
+							<Description>Thusday 2010-11-11</Description>
+							<Date>2010-11-11</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-12">
+							<Description>MFriday 2010-11-12</Description>
+							<Date>2010-11-12</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-113">
+							<Description>Saturday 2010-11-13</Description>
+							<Date>2010-11-13</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-14">
+							<Description>Sunday 2010-11-14</Description>
+							<Date>2010-11-14</Date>
+							<DayTypeRef version="any" ref="hde:DT_03-WE-NH"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

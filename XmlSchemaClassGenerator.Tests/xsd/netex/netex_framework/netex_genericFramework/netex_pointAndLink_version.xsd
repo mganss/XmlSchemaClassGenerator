@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_pointAndLink_version">
+	<xsd:include schemaLocation="netex_pointAndLink_support.xsd"/>
+	<xsd:include schemaLocation="../netex_utility/netex_location_types.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLinkSequence_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="netex_grouping_version.xsd"/>
+	<xsd:include schemaLocation="netex_projection_version.xsd"/>
+	<!--fulll gml dependency-->
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gml_extract_all_objects_v_3_2_1.xsd"/>
+	<!--actual gml dependency-->
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/geometryBasic0d1d-extract-v3_2_1.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2010-11-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-06-28</Modified>  Cr0040  Add GENERAL SECTIONand Revise Section Structure.  
+					            Add generic SECTION supertype 
+								Add PointOnSection  for list of points (RetainCommonSectionMember for backwards compatibility)
+								AddLinkOnSection  for list of just links.  
+								Add nameOfLinkClass attribute to help implementors. 
+								Add used to be just a list of LinkSequences.  
+								Move sections to sepaarte package
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines POINT AND LINK types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_pointAndLink_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - POINT AND LINK types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>POINT AND LINK types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<xsd:group name="CommonPointAndLInkFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>ROUTE elements in frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="groupsOfLinks" type="groupOfLinks_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>GROUPs of LINKs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="groupsOfPoints" type="groupOfPoints_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>GROUPs of POINTs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="groupOfLinksInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of GROUP OF LINKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfLinks" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="pointsOnLinkInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of POINTs ON LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PointOnLink" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="Point" type="Point_VersionStructure" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A 0-dimensional node of the network used for the spatial description of the network. POINTs may be located by a LOCATION in a given LOCATING SYSTEM.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Point_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="PointGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PointGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Location" type="LocationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The position of a POINT with a reference to a given LOCATING SYSTEM (e. g. coordinates).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PointNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Arbitrary alternative identifier for the POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="types" type="typeOfPointRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Types of POINT. Used for arbitrary documentation - Specific types of POINTs and LINKs such as ROUTE POINT, TIMING POINT, etc are also proper subtypes of POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="projections" type="projections_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PROJECTIONs of POINT onto another ENTITY or layer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="groupMemberships" type="groupMembershipRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>GROUPs OF POINTs to which POINT belongs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="groupMembershipRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of GROUP OF POINT memberships.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfPointsRef_" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="SimplePoint_VersionStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a Simple POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="EntityInVersionStructure">
+				<xsd:sequence>
+					<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of POINT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Location" type="LocationStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>The position of a POINT with a reference to a given LOCATING SYSTEM (e. g. coordinates).</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="Link" type="Link_VersionStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>LINK connecting two POINTs. An oriented spatial object of dimension 1 with view to the overall description of a network, describing a connection between two POINTs.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Link_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="LinkGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LinkGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of LINK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Distance" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Length of LINK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="types" type="linkTypeRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Types of LINK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="gml:LineString" minOccurs="0"/>
+			<xsd:element name="projections" type="projections_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PROJECTIONs of the LINK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="passingThrough" type="pointsOnLink_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>POINTs through which LINK passes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="pointsOnLink_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of POINTs ON LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PointOnLink" maxOccurs="unbounded"/>
+					<xsd:element name="LineString" type="gml:LineStringType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PointOnLink" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>A POINT on a LINK which is not needed for LINK definition, but may be used for other purposes, e.g. for purposes of AVM or PI, or for driver information.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PointOnLink_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PointOnLinkGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PointOnLinkIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PointOnLink_VersionedChildStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a POINT ON LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="PointOnLinkGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger">
+					<xsd:annotation>
+						<xsd:documentation>
+					Order of step in sequence
+				</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PointOnLinkGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a POINT ON LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of LINK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LinkRef" type="LinkRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Parent LINK -Can be omitted if given by context.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DistanceFromStart" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Distance of Point on Link from start of LINK.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:element ref="PointRef"/>
+				<xsd:element ref="Point"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="TypeOfPoint" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of POINTs according to their functional purpose.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfPoint_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfPointIdType"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Point">
+						<xsd:annotation>
+							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfPoint_ValueStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="TypeOfLink" abstract="false" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of LINKs according to their functional purpose.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfLink_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfLinkIdType"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Link">
+						<xsd:annotation>
+							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfLink_ValueStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==Group of Points============================================================ -->
+	<xsd:complexType name="groupOfPoints_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of GROUPs OF POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfPoints" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="GroupOfPoints" abstract="false" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GroupOfPoints_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GroupOfPointsIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GroupOfPoints_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for GROUP OF POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GroupOfPointsGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GroupOfPointsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a GROUP OF POINTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="members" type="pointRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>POINTs in GROUP OF POINTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ==Group of Links============================================================ -->
+	<xsd:complexType name="groupOfLinks_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of GROUPs OF LINKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfLinks" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="GroupOfLinks" abstract="false" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of LINKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GroupOfLinks_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfLinksGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GroupOfLinksIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GroupOfLinks_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for GROUP OF LINKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GroupOfLinksGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GroupOfLinksGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a GROUP OF LINKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="members" type="linkRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Links in group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="TurnStationIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TURN STATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+</xsd:schema>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ====  GTFS Trips to NeTEx  Example ====== 
+This Example provides an example of mapping of a   GTFS Trips.txt file to NeTEx
+
+The data comes from the sample-feed.zip available at   http://code.google.com/transit/spec/transit_feed_specification.html
+  
+ 
+1. DATA
+Trips.txt
+		route_id,service_id,trip_id,trip_headsign,direction_id,block_id,shape_id
+		AB,FULLW,AB1,to Bullfrog,0,1,
+		AB,FULLW,AB2,to Airport,1,2,
+		STBA,FULLW,STBA,Shuttle,,,
+		CITY,FULLW,CITY1,,0,,
+		CITY,FULLW,CITY2,,1,,
+		BFC,FULLW,BFC1,to Furnace Creek Resort,0,1,
+		BFC,FULLW,BFC2,to Bullfrog,1,2,
+		AAMV,WE,AAMV1,to Amargosa Valley,0,,
+		AAMV,WE,AAMV2,to Airport,1,,
+		AAMV,WE,AAMV3,to Amargosa Valley,0,,
+		AAMV,WE,AAMV4,to Airport,1,,16.76218,, 
+
+2. MAPPING
+
+A GTFS trip maps to a NeTEx SERVICE JOURNEY
+
+GTFS			NeTEx
+route_id			<ServiceJourney trip_id><LineRef #route_id>@ref 
+service_id,			<ServiceJourney trip_id><DayTypeRef #service_id>@ref 	
+trip_id,				<ServiceJourney #trip_id> @id				 
+trip_headsign		<ServiceJourney #trip_id> <DestinationDisplayView><Name> #trip_headsign
+trip_short_name	<ServiceJourney #trip_id>  <ShortName> #name
+direction_id,   	<ServiceJourney id=#gtfs> <DirectionRef #direction_id> #direction_id gtfscode
+block_id,       	<ServiceJourney #trip_id> <BlockRef #block_id>@ref 
+shape_id       	(<ServiceJourne trip_id> <JourneyPatternView><RouteView><LinkSequenceProjection > ++) (lineShape)
+
+3. Notes
+
+     LinkSequenceProjection  (Added) Can be derived from projection of individual links and points
+
+GTFS Data copyright Google Inc
+
+version 1.1 revised ids
+NeTEx (C) CEN Copyright 2010,2019
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Example of GTFS Service Journey data  (trips.txt file)</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="mygtfsxm:DTA">
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mygtfsxm">
+					<Xmlns>mygtfsxm</Xmlns>
+					<XmlnsUrl>http://www.demoagency.com/</XmlnsUrl>
+					<Description>Demo Agency</Description>
+				</Codespace>
+				<Codespace id="gtfs">
+					<Xmlns>gtfs</Xmlns>
+					<XmlnsUrl>http://www.google.com/transit/gtfs</XmlnsUrl>
+					<Description>GTFS code values</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mygtfsxm"/>
+			</FrameDefaults>
+			<frames>
+				<TimetableFrame version="any" id="mygtfsxm:DTA">
+					<vehicleJourneys>
+						<ServiceJourney version="any" id="mygtfsxm:AB1">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:1"/>
+							<LineRef ref="mygtfsxm:AB"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Bullfrog</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AB2">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:2"/>
+							<LineRef ref="mygtfsxm:AB"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Airport</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:STBA">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:STBA"/>
+							<JourneyPatternView>
+								<DestinationDisplayView>
+									<Name>Shuttle</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:CITY1">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:CITY"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>None</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:CITY2">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:CITY"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:BFC1">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:1"/>
+							<LineRef ref="mygtfsxm:BFC"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Furnace Creek Resort</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:BFC2">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:FULLW"/>
+							</dayTypes>
+							<BlockRef ref="mygtfsxm:2"/>
+							<LineRef ref="mygtfsxm:BFC"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Bullfrog</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV1">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Amargosa Valley</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV2">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Airport</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV3">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:0"/>
+								<DestinationDisplayView>
+									<Name>to Amargosa Valley</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="mygtfsxm:AAMV4">
+							<dayTypes>
+								<DayTypeRef ref="mygtfsxm:WE"/>
+							</dayTypes>
+							<LineRef ref="mygtfsxm:AAMV"/>
+							<JourneyPatternView>
+								<RouteView>
+									<LinkSequenceProjectionRef ref="mygtfsxm:SequenceProjection:16.76218"/>
+									<!-- gtfs Shape -->
+								</RouteView>
+								<DirectionRef version="gtfs:1.5" ref="gtfs:1"/>
+								<DestinationDisplayView>
+									<Name>to Airport</Name>
+								</DestinationDisplayView>
+							</JourneyPatternView>
+						</ServiceJourney>
+					</vehicleJourneys>
+				</TimetableFrame>
+				<ResourceFrame version="gtfs:1.5" id="gtfs:GTFS">
+					<Name>GTFS Built in values</Name>
+					<typesOfValue>
+						<ValueSet version="gtfs:1.5" id="gtfs:GTFS_Directions" classOfValues="Direction">
+							<Name>GTFS Built in Directions</Name>
+							<values>
+								<Direction version="gtfs:1.5" id="gtfs:0">
+									<Name>GTFS Direction 0</Name>
+								</Direction>
+								<Direction version="gtfs:1.5" id="gtfs:1">
+									<Name>GTFS Direction 1</Name>
+								</Direction>
+							</values>
+						</ValueSet>
+					</typesOfValue>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

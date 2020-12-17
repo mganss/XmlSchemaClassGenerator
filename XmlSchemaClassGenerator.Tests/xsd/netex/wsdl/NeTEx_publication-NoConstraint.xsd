@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_publication">
+	<!-- ===SIRI system IDs for  request =========================================================== -->
+	<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="siri/siri_base-v2.0.xsd"/>
+	<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="siri_utility/siri_participant-v2.0.xsd"/>
+	<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="siri/siri_requests-v2.0.xsd"/>
+	<!-- ===Regular netex============================================================== -->
+	<xsd:include schemaLocation="netex_service/netex_dataObjectRequest_service.xsd"/>
+	<xsd:include schemaLocation="netex_service/netex_all.xsd"/>
+	<!-- ===eGIF/GovTalk Documentation ======================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>CEN TC278 WG3 SG9 Team.</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First Drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date><Modified>2017-12-01</Modified>Change Version to V1.1				 
+				</Date>
+				<Date><Modified>2011-01-17</Modified>V0.94					<!-- Revised--></Date>
+				<Date><Modified>2011-01-17</Modified>V0.94					<!-- Revised--></Date>
+				<Date>
+					<Created>2010-09-04</Created>
+					<!-- Created from Siri.xsd -->
+				</Date>
+				<Description><p>netex Xml is an XML representation of the Transmodel model that can be used to exchange data objects between netex databases and other services.</p>. 
+					<p> The same netex Xml of netex data objects can be used both in fine grained protocols that exchange one or more objects at a time, such as the SIRI based netex Xml web service, and in bulk publication exchange formats used to exchange whole data sets. </p>
+					<p>This netex Publication exchange XML schema defines a bulk delivery format to exchange netex objects as an XML document. (It has no dependency on SIRI). 
+ <ul><li>For each data object type it describes an XML representation which can be used to exchange netex data.</li><li>It also describes filters to describe requests for publishing data. These can be used both to configure the publication, and to describe the contents of the published document, for example all Network Objects, or all current traffic events.</li><li>A particular use of the netex Publication Exchange format is to publish data from a NeTEx system: at regular intervals as an Xml document which can be transmitted to other systems by FTP or other communication transport means. </li></ul>
+					</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd}netex_publication.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/netex_filters.xsd</Requires>
+					<Requires>http://www.netex.org.uk/schemas/1.0/netex_all_objects.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Created for NeTEx.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Public transport, Bus services, Coach services, 
+Business and industry, Transport, Public transport,
+Roads and Road transport.
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx XML schema. bulk Publication Interface for exchanging NeTEx data </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation> NeTEx PUBLICATION SCHEMA</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:element name="ParticipantRef" type="siri:ParticipantCodeType">
+		<xsd:annotation>
+			<xsd:documentation>Identifier of system requesting Data.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="PublicationRequest" type="PublicationRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>A bulk publication request for NeTEx objects specifying which elements should be returned. Can be echoed back in a publication response.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PublicationRequestStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Publication Request.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RequestTimestamp" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Time of request.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ParticipantRef" minOccurs="0"/>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0"/>
+			<xsd:element name="topics" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>One or more Request filters that specify tthe data to be included in output. Multiple filters are logically ANDed.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="NetworkFrameTopic" type="NetworkFrameTopicStructure" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Vaues to use select Network Objects.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="RequestPolicy" type="NetworkFrameRequestPolicyStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Policies to apply when fetching data specified by Topics.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SubscriptionPolicy" type="NetworkFrameSubscriptionPolicyStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Policy to use when processing Network Subscriptions.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="version" type="xsd:NMTOKEN" default="1.0"/>
+	</xsd:complexType>
+	<!-- ======================================================================= 
+-->
+	<xsd:element name="PublicationDelivery" type="PublicationDeliveryStructure">
+		<xsd:annotation>
+			<xsd:documentation>A set of NeTEx objects as assembled by a publication request or other service 
+
+Provides a general purpose wrapper for NeTEx data content.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- =====END OF CONSTRAINTS================= -->
+	<xsd:complexType name="PublicationDeliveryStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Publication Delivery.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="PublicationHeaderGroup"/>
+			<xsd:group ref="PayloadGroup"/>
+		</xsd:sequence>
+		<xsd:attribute name="version" type="xsd:NMTOKEN" default="1.0"/>
+	</xsd:complexType>
+	<xsd:group name="PublicationHeaderGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for Publication header.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PublicationTimestamp" type="xsd:dateTime">
+				<xsd:annotation>
+					<xsd:documentation>Time of output of data.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ParticipantRef"/>
+			<xsd:element name="PublicationRequest" type="PublicationRequestStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Echo Request used to create bulk response.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PublicationRefreshInterval" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How often data in publication is refreshed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of contents.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!--== Requests ===================================================================== -->
+</xsd:schema>

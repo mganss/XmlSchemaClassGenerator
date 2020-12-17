@@ -1,0 +1,932 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_fareTable_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_transportOrganisation_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_submode_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_line_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_ifopt/netex_ifopt_site_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_fareZone_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_serviceJourney_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_vehicleJourney_support.xsd"/>
+	<xsd:include schemaLocation="netex_fareTable_support.xsd"/>
+	<xsd:include schemaLocation="netex_fareSeries_support.xsd"/>
+	<xsd:include schemaLocation="netex_typeOfTravelDocument_support.xsd"/>
+	<xsd:include schemaLocation="netex_salesDistribution_support.xsd"/>
+	<xsd:include schemaLocation="netex_fareStructureElement_support.xsd"/>
+	<xsd:include schemaLocation="netex_distanceMatrixElement_support.xsd"/>
+	<xsd:include schemaLocation="netex_salesOfferPackage_support.xsd"/>
+	<xsd:include schemaLocation="netex_fareSeries_support.xsd"/>
+	<xsd:include schemaLocation="netex_usageParametersAll_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="netex_farePrice_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2014-04-13</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>Name Space changes 
+				</Date>
+				<Date>
+					<Modified>2017-10-10</Modified>Add TypeOfTravelDocument  and PaymentMethodto Fare Table Specifics  . Add Notice Assignments. to FareTable and Cell
+				</Date>
+				<Date>
+					<Modified>2017-11-08</Modified>Allow declaration of price in Cell
+				</Date>
+				<Date>
+					<Modified>2019-01-11</Modified> 
+							Fix To add CellSpecificNetworkGroup   to Fare Table Specifics, 
+							Fix to add LineRef,  FareZoneRef,  TariffRef,  LineRef, ScheduledStopPointRef SectionRef  and    FareStructureElementInSequenceRef 
+							Fix to add TariffZoneRef to  CellSpecificNetworkGroup 
+				</Date>
+				<Date>
+					<Modified>2019-02-11</Modified> 
+							Fix To add PaymentMethodRef to Cell specifics  pointRef SectionRef  and    FareStructureElementInSequenceRef 
+							Fix to add TariffZoneRef to  CellSpecificNetworkGroup 
+				</Date>
+				<Date>
+					<Modified>2019-02-25</Modified>CR-UK-07   Allow PriceRefs directly in cells. 
+							Also allow  representing VersionOfObjectRef on Row and Column
+							Also Add FareSectionRef to  FareTable / specifics
+				</Date>
+				<Date>
+					<Modified>2019-03-13</Modified>CR-UK-07    
+							Also allow  nested column and row headings 
+				</Date>
+				<Date>
+					<Modified>2019-03-14</Modified>UK-69 Scaleability of    large sets add  new TypeOfOfFareTable element
+				</Date>
+				<Date>
+					<Modified>2019-03-26</Modified>NL-27 CD #58 Add default TypeOfProductCategory and TypeOfService to Line:
+					Move TypeOfProductCategory amnd TypeOfService from netex_journey_version  to  Framework reusable components (netex_travelRights_version)  so they are visible from part 1	
+		  	Can  therefore drop include of netex_travelRights_version from  File netex_fareTable_version.xsd.
+				</Date>
+				<Date>
+					<Modified>2019-04-11</Modified>Internal change - use a structure for specifcs so as to make binding easier.. 
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the FARE TABLE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_fares}netex_fareTable_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx FARE TABLE  types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: FARE TABLE  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<xsd:group name="FarePricesInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>FARE TABLEs in frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="priceGroups" type="farePricesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PRICE GROUPs in FRAME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="fareTables" type="fareTablesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FARE TABLEs in FRAME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="fareTablesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of TARIFF.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="frameContainmentStructure">
+				<xsd:sequence>
+					<xsd:element ref="FareTable_" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- == CELL ================================ -->
+	<!-- ===CELL================================================= -->
+	<xsd:element name="Cell_" type="VersionedChildStructure" abstract="true" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>Dummy Abstract CELL.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:group name="FareClassReferencesGroup">
+		<xsd:annotation>
+			<xsd:documentation>FARE ClassElements for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="FareClass" minOccurs="0"/>
+			<xsd:element ref="ClassOfUseRef" minOccurs="0"/>
+			<xsd:element ref="FacilitySetRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<!-- ==  DARE TABLE============================= -->
+	<xsd:element name="FareTable" substitutionGroup="FareTable_">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of prices that may be associated with a DISTANCE MATRIX ELEMENT, FARE STRUCTURE ELEMENT or  other PRICEABLE OBJECT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareTable_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="FareTableGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareTableIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareTable_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a FARE TABLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:group ref="FareTableGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareTableGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for FARE TABLE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="PricePropertyGroup"/>
+			<xsd:group ref="FareTableReferencesGroup"/>
+			<xsd:group ref="FareTableCommonAssignmentsGroup"/>
+			<xsd:group ref="FareTableHeadingsGroup"/>
+			<xsd:element name="EmbargoUntil" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Prices must not be released until this date.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="prices" type="farePrices_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Cells in the table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="cells" type="cells_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Cells in the table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICEs that apply to whole FARE TABLE</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="FareTableSpecificsStructure">
+		<xsd:annotation>
+			<xsd:documentation>Specific references for FARE TABLE</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="CellSpecificNetworkGroup">
+				<xsd:annotation>
+					<xsd:documentation>Network Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellSpecificRoutingGroup">
+				<xsd:annotation>
+					<xsd:documentation>Routing Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellSpecificServiceGroup">
+				<xsd:annotation>
+					<xsd:documentation>Service Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellSpecificDistributionGroup">
+				<xsd:annotation>
+					<xsd:documentation>Distribution Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="FareTableReferencesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Reference Elements for FARE TABLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TypeOfFareTableRef" minOccurs="0"/>
+			<xsd:element name="pricesFor" type="priceableObjectRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Combination of Elements for which this table provides PRICEs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="usedIn" type="usedInRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Elements that use FARE TABLE that are not PRICEABLE OBJECTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="OrganisationRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="FareTableCommonAssignmentsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="limitations" type="usageParameterRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Usage parameters common to all cells in table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="specifics" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Common factors shared with all cells.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="FareTableSpecificsStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="FareTableHeadingsGroup">
+		<xsd:annotation>
+			<xsd:documentation>PriceHeading lements for a FARE TABLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="columns" type="fareTableColumns_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Column headings to use when presenting table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="rows" type="fareTableRows_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Row headings to use when presenting table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="includes" type="fareTables_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Sub tables contained in table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="usedInRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for use  of  fare table.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="TariffRef" minOccurs="0"/>
+					<xsd:element ref="GroupOfDistanceMatrixElementsRef" minOccurs="0"/>
+					<xsd:element ref="GroupOfSalesOfferPackagesRef" minOccurs="0"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FareTableInContext" type="FareTable_VersionStructure" substitutionGroup="FareTable_">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of prices that may be associated with a DISTANCE MATRIX ELEMENT, FARE STRUCTURE ELEMENT or  other PRICEABLE OBJECT. OPTIMIZATION - Alias for FARE TABLE That does not require an ID to be present.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- ======================================================================= -->
+	<xsd:element name="StandardFareTable" substitutionGroup="FareTable_">
+		<xsd:annotation>
+			<xsd:documentation>A set of price for a combination of price features in a Tariff.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="StandardFareTable_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="StandardFareTableGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="StandardFareTableIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="StandardFareTable_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a STANDARD FARE TABLE PRICE GROUP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:group ref="StandardFareTableGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="StandardFareTableGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements forSTANDARD FARE TABLE PRICE GROUP.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="PricePropertyGroup"/>
+			<xsd:group ref="FareTableReferencesGroup"/>
+			<xsd:group ref="StandardFareTablePricesGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="StandardFareTablePricesGroup">
+		<xsd:annotation>
+			<xsd:documentation>PRice  Elements for a STANDARD FARE TABLE PRICE GROUP.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FirstClassSingle" type="CurrencyAmountType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Price for a first class single  fare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SecondClassSingle" type="CurrencyAmountType">
+				<xsd:annotation>
+					<xsd:documentation>Price for a second class  single fare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FirstClassReturn" type="CurrencyAmountType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Price for a first class return fare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SecondClassReturn" type="CurrencyAmountType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Price for a second class return fare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===Cell============================================================= -->
+	<xsd:complexType name="cells_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE CELL.s.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="Cell" maxOccurs="unbounded"/>
+					<xsd:element name="CellInContext" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>An individual combination of  features in a FARE TABLE, used to associate a FARE PRICE. An optimisation of CELL that can be used in a Faretable without a cell id.  SHould have a unique identity through its other attributes.</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:restriction base="Cell_VersionedChildStructure">
+									<xsd:sequence>
+										<xsd:sequence>
+											<xsd:group ref="VersionedChildGroup"/>
+										</xsd:sequence>
+										<xsd:sequence>
+											<xsd:group ref="CellGroup">
+												<xsd:annotation>
+													<xsd:documentation>Elements for a CELL.</xsd:documentation>
+												</xsd:annotation>
+											</xsd:group>
+										</xsd:sequence>
+									</xsd:sequence>
+								</xsd:restriction>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element ref="FarePrice_"/>
+					<xsd:element ref="FarePriceRef"/>
+					<xsd:element ref="CellRef"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CommonCell_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a CELL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="CommonCellGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for a CELL.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order in which cell is to appear.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CommonCellGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CELL Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of CELL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of CELL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="CellHeadingsGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="Cell" abstract="false" substitutionGroup="Cell_">
+		<xsd:annotation>
+			<xsd:documentation>An individual combination of  features in a FARE TABLE, used to associate a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Cell_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CellGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CellIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Cell_VersionedChildStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a CELL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="CellGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for a CELL.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order in which cell is to appear.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CellGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CELL Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of CELL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of CELL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:annotation>
+					<xsd:documentation>price for cell</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element name="CellPrice" type="FarePrice_VersionedChildStructure">
+					<xsd:annotation>
+						<xsd:documentation>Price within CELL.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element ref="FarePriceRef"/>
+				<xsd:element ref="FarePrice_"/>
+				<xsd:element ref="PriceGroupRef"/>
+			</xsd:choice>
+			<xsd:group ref="CellReferencesGroup">
+				<xsd:annotation>
+					<xsd:documentation>Reference Elements for a CELL indicating element or combination that it is priced .</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellHeadingsGroup"/>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICE relating to CElll</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="CellPriceStructure">
+		<xsd:annotation>
+			<xsd:documentation>Price in a CELL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="FarePriceGroup"/>
+			<xsd:group ref="LimitingRuleGroup"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:group name="CellReferencesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CELL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="CellPriceableReferencesGroup">
+				<xsd:annotation>
+					<xsd:documentation>USAGE PARAMETER Elements for CELL.Group. Any combination may be specified.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellSpecificsGroup"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellPriceableReferencesGroup">
+		<xsd:annotation>
+			<xsd:documentation>PriceableElements for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PriceableObjectRef" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="GroupOfDistanceMatrixElementsRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellSpecificsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="CellSpecificRoutingGroup">
+				<xsd:annotation>
+					<xsd:documentation>Routing Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellSpecificNetworkGroup"/>
+			<xsd:group ref="CellSpecificServiceGroup">
+				<xsd:annotation>
+					<xsd:documentation>Service Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:group ref="CellSpecificDistributionGroup">
+				<xsd:annotation>
+					<xsd:documentation>Distribution Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellSpecificNetworkGroup">
+		<xsd:annotation>
+			<xsd:documentation>Network Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="OperatorRef" minOccurs="0"/>
+			<xsd:element ref="GroupOfLinesRef" minOccurs="0"/>
+			<xsd:element ref="LineRef" minOccurs="0"/>
+			<xsd:element ref="SiteRef" minOccurs="0"/>
+			<xsd:element ref="TariffZoneRef" minOccurs="0"/>
+			<xsd:element ref="FareSectionRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellSpecificRoutingGroup">
+		<xsd:annotation>
+			<xsd:documentation>Routing Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DirectionType" type="RelativeDirectionEnumeration" default="both" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>For fares for DISTANCE MATRIXE LEMENTs, DIRECTION in which price applies.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RoutingType" type="RoutingTypeEnumeration" default="both" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether fare is for s a direct i.e. no changes required point to point  fare or indirect routing.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellSpecificServiceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Service Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="FareClassReferencesGroup"/>
+			<xsd:element ref="TypeOfProductCategoryRef" minOccurs="0"/>
+			<xsd:element ref="TypeOfServiceRef" minOccurs="0"/>
+			<xsd:choice minOccurs="0">
+				<xsd:element ref="ServiceJourneyRef"/>
+				<xsd:element ref="TrainNumberRef"/>
+				<xsd:element ref="GroupOfServicesRef"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellSpecificDistributionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Distribution Aspects of a fare structure element for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TypeOfFareProductRef" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:element ref="DistributionChannelRef" minOccurs="0"/>
+				<xsd:element ref="GroupOfDistributionChannelsRef" minOccurs="0"/>
+			</xsd:choice>
+			<xsd:element name="PaymentMethod" type="PaymentMethodEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Preferred payment Method .</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfPaymentMethodRef" minOccurs="0"/>
+			<xsd:element ref="TypeOfTravelDocumentRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="CellHeadingsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CELL.Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="FareTableRef" minOccurs="0"/>
+			<xsd:element name="ColumnRef" type="FareTableColumnRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Column for CELL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RowRef" type="FareTableRowRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Row for CELL.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === Column Headings============================================= -->
+	<xsd:complexType name="fareTableColumns_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE FARE TABLE COLUMN HEADINGs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="FareTableColumn" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>A Column heading for a FARE TABLE,  </xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FareTableColumn">
+		<xsd:annotation>
+			<xsd:documentation>An individual combination of  features in a FARE TABLE, used to associate a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareTableColumn_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareTableColumnGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements for a FARE TABLE COLUMN HEADING.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareTableColumnIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareTableColumn_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a FARE TABLE COLUMN HEADING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareTableColumnGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for a FARE TABLE COLUMN HEADING.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order in which FARE TABLE COLUMN HEADING is to appear.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareTableColumnGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a FARE TABLE COLUMN .Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of FARE TABLE COLUMN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of FARE TABLE COLUMN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="FareTableRef" minOccurs="0"/>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICEs that apply to whole FARE TABLE COLUMN</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="representing" type="objectRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ENTITIES that column represents. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="columns" type="fareTableColumns_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Column headings to use when presenting table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === Row s============================================= -->
+	<xsd:complexType name="fareTableRows_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of FARE FARE TABLE ROWs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="FareTableRow" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="FareTableRow">
+		<xsd:annotation>
+			<xsd:documentation>An individual combination of  features in a FARE TABLE, used to associate a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareTableRow_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareTableRowGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareTableRowIdType"/>
+					<xsd:attribute name="order" type="xsd:integer">
+						<xsd:annotation>
+							<xsd:documentation>Order in which FARE TABLE ROW  is to appear.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareTableRow_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a FARE TABLE ROW .</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareTableRowGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for a FARE TABLE ROW.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order in which FARE TABLE ROW  is to appear.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareTableRowGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a FARE TABLE ROW .Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of FARE TABLE ROW.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Label" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of FARE TABLE ROW.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="FareTableRef" minOccurs="0"/>
+			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>NOTICEs that apply to whole FARE TABLE ROW.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="representing" type="objectRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ENTITIES that row represents +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="rows" type="fareTableRows_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Rowheadings to use when presenting table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === TYE OF FARE TABLE======================================= -->
+	<xsd:element name="TypeOfFareTable" abstract="false" substitutionGroup="TypeOfValue">
+		<xsd:annotation>
+			<xsd:documentation>Category of FARE TABLE user
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfFareTable_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfFareTableIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfFareTable_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TYPE OF FARE TABLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfValue_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

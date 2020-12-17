@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Network Example ====== 
+This Example provides an example of a single stop on a street encode in in NExTEx XML
+
+    It comprises
+       (i)  A  STOP PLACE  	mybus:SSP_02456A   : -  Poste, St Jean 
+       (ii) A  QUAY           	 mybus:Q_SSP_02456A_1  -  Outside
+       (iii) A TARIFF ZONE     frtop:TZ_0010
+
+We also provide additional elements to handle the case where the timetable reference to the stop  is diifferent from the identifier of the stop in the stop database
+       
+      (i) A SCHEDULED STOP POINT  :  frtop:SSP0044A Poste, St Jean
+      (ii) STOP ASSIGNMENTs:
+                frtop:PassengerStopAssignmentPSA_40016_A1   - Maps  	StopPlace:Q_SSP_02456A:  mybus:Q_SSP_02456A_1   
+
+     PASSENGER STOP ASSIGNMENT  frtop:PSA_40016_A1
+							 SCHEDULED STOP POINT     frtop:SSP0042A 
+							STOP PLACE mybus:Q_SSP_02456A 
+							QUAY  mybus:Q_SSP_02456A_1 
+
+Two different RESPONSIBILITY SETs are assumed (These do not have to be declared in this file but are included in this example  for clarity)
+      RESPONSIBILITY SET myBus:ResponsibilitySetRS_10  -  Physical stop data
+      RESPONSIBILITY SET frtop:RS_22       - Timetable stop datea
+
+A single TOPOGRAPHIC PLACE   frtop:TP_0032A is defined - normall this would be referenced externally 
+ 
+B. Frames and grouping
+    A RESOURCE FRAME is used to hold the RESPONSIBILITY SETs.
+	A SITE FRAME is used to hold the STOP PLACEs.
+	A SERVICE FRAME is used to hold the SCHEDULED STOP POINTs and STOP ASSIGNMENTs.
+	A COMPOSITE FRAME is used to hold the other FRAMEs as a coherent version.
+
+(C) CEN Copyright 2010
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2001-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2001-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<Description>Filter used to get  these contents: Get all STOP PLACEs, STOP ASSIGNMENTs and TOPOGRAPHIC PLACEfor Network TNET1 in specified  area    :TP_0032A.  Also return any  RESPONSIBILITY SETs  used.
+				Also get details for 
+				</Description>
+		<topics>
+			<NetworkFrameTopic>
+				<Current/>
+				<NetworkFilterByValue>
+					<BoundingBox>
+						<UpperLeft>
+							<Longitude>-0.2071300000</Longitude>
+							<Latitude>51.4217400000</Latitude>
+						</UpperLeft>
+						<LowerRight>
+							<Longitude>-0.2071400000</Longitude>
+							<Latitude>51.4217500000</Latitude>
+						</LowerRight>
+					</BoundingBox>
+					<objectReferences>
+						<ScheduledStopPointRef ref=""/>
+						<StopPlaceRef ref=""/>
+						<TopographicPlaceRef ref=""/>
+					</objectReferences>
+					<NetworkRef ref="mynet">REQUEST</NetworkRef>
+				</NetworkFilterByValue>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P3M</PublicationRefreshInterval>
+	<Description>Single Stop On street example</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="frtop:RF01">
+			<validityConditions>
+				<AvailabilityCondition version="any" id="mybus:RF01">
+					<FromDate>2010-12-17T09:30:47.0Z</FromDate>
+					<ToDate>2011-12-17T09:30:47.0Z</ToDate>
+				</AvailabilityCondition>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buses</Description>
+				</Codespace>
+				<Codespace id="frtop">
+					<Xmlns>frtop</Xmlns>
+					<XmlnsUrl>http://www.ptgazetteer.fr</XmlnsUrl>
+					<Description>French Stop data  data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="mybus"/>
+			</FrameDefaults>
+			<frames>
+				<!--- =====SITE FRAME========== -->
+				<SiteFrame version="any" id="frtop:SF005">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="frtop:SF005">
+							<FromDate>2012-07-26T00:00:00Z</FromDate>
+							<ToDate>2012-08-12T00:00:00Z</ToDate>
+						</AvailabilityCondition>
+					</validityConditions>
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef version="3.0" ref="frtop:RS_22"/>
+					</FrameDefaults>
+					<!--- ====TOPOGRAPHIC PLACES======== -->
+					<topographicPlaces>
+						<TopographicPlace version="any" id="frtop:TP_0032A">
+							<Name lang="fr">St Jean des Fous</Name>
+							<Descriptor>
+								<Name lang="fr">St Jean des Fous</Name>
+								<ShortName lang="fr">St Jean</ShortName>
+								<Qualify>
+									<QualifierName lang="fr">Normandie</QualifierName>
+									<TopographicPlaceRef version="any" ref="frtop:TP_0082A"/>
+								</Qualify>
+							</Descriptor>
+						</TopographicPlace>
+						<TopographicPlace version="any" id="frtop:TP_0082A">
+							<Name lang="fr">Normandie</Name>
+							<Descriptor>
+								<Name lang="fr">Normandie</Name>
+							</Descriptor>
+						</TopographicPlace>
+					</topographicPlaces>
+					<!--- ====STOP PLACES======== -->
+					<stopPlaces>
+						<StopPlace version="any" created="2006-09-11T15:42:00" responsibilitySetRef="mybus:RS_10" id="mybus:SSP_02456A">
+							<keyList>
+								<KeyValue>
+									<Key>abc:System</Key>
+									<Value>12345</Value>
+								</KeyValue>
+								<KeyValue>
+									<Key>xxx:altkey2</Key>
+									<Value>kkkk12345</Value>
+								</KeyValue>
+							</keyList>
+							<Name lang="fr">Poste, St Jean</Name>
+							<ShortName lang="fr">Poste </ShortName>
+							<Centroid>
+								<Location>
+									<Longitude>-0.2071397147</Longitude>
+									<Latitude>51.4217482061</Latitude>
+								</Location>
+							</Centroid>
+							<AccessibilityAssessment version="any" id="mybus:SSP_02456A">
+								<MobilityImpairedAccess>true</MobilityImpairedAccess>
+								<limitations>
+									<AccessibilityLimitation>
+										<WheelchairAccess>true</WheelchairAccess>
+										<StepFreeAccess>true</StepFreeAccess>
+									</AccessibilityLimitation>
+								</limitations>
+							</AccessibilityAssessment>
+							<facilities>
+								<SiteFacilitySet id="mybus:SSP_02456A" version="any">
+									<AccessibilityToolList>walkingstick audioNavigator passengerCart</AccessibilityToolList>
+									<PassengerInformationFacilityList>passengerInformationDisplay</PassengerInformationFacilityList>
+								</SiteFacilitySet>
+							</facilities>
+							<TopographicPlaceRef version="any" ref="frtop:TP_0032A"/>
+							<!-- ============LEVELS ===================- -->
+							<levels>
+								<Level version="01" created="2010-04-17T09:30:47Z" id="mybus:SSP_02456A_0">
+									<Name>Erde </Name>
+									<PublicCode>E</PublicCode>
+								</Level>
+							</levels>
+							<TransportMode>bus</TransportMode>
+							<StopPlaceType>onstreetBus</StopPlaceType>
+							<quays>
+								<Quay version="any" created="2010-04-17T09:30:47Z" id="mybus:Q_SSP_02456A_1">
+									<Name lang="fr">Poste</Name>
+									<Description lang="fr">Pres de la Gare 20m a droit .</Description>
+									<Centroid>
+										<Location>
+											<Longitude>-0.207139714</Longitude>
+											<Latitude>51.4217482061</Latitude>
+										</Location>
+									</Centroid>
+									<RoadAddress version="any" id="mybus:Rad_SP001A_01">
+										<RoadName>Rue  de la Gare</RoadName>
+									</RoadAddress>
+									<CrossRoad lang="fr">Rue du Chene</CrossRoad>
+									<Landmark lang="fr">Place Victoire</Landmark>
+									<Covered>outdoors</Covered>
+									<Lighting>unlit</Lighting>
+									<placeEquipments>
+										<PassengerInformationEquipment version="any" id="mybus:Q_SSP_02456A_1">
+											<AccessibilityInfoFacilityList> visualDisplays</AccessibilityInfoFacilityList>
+										</PassengerInformationEquipment>
+									</placeEquipments>
+									<BoardingUse>true</BoardingUse>
+									<AlightingUse>true</AlightingUse>
+									<Label lang="fr">A</Label>
+									<PublicCode>1-3454 </PublicCode>
+									<CompassOctant>NW</CompassOctant>
+									<QuayType>busStop</QuayType>
+								</Quay>
+							</quays>
+						</StopPlace>
+					</stopPlaces>
+				</SiteFrame>
+				<ServiceFrame version="any" id="frtop:SVF004">
+					<FrameDefaults>
+						<DefaultResponsibilitySetRef version="3.0" ref="frtop:RS_24"/>
+					</FrameDefaults>
+					<scheduledStopPoints>
+						<!--- =====SCHEDULED STOP POINT ====== -->
+						<ScheduledStopPoint version="032" created="2000-12-17T09:30:47.0Z" changed="2002-12-17T09:30:47.0Z" id="frtop:SSP0042A">
+							<Name>Poste, St Jean</Name>
+							<PrivateCode>legacy3452</PrivateCode>
+							<VehicleModes>bus</VehicleModes>
+							<ForAlighting>true</ForAlighting>
+							<ForBoarding>true</ForBoarding>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- =====TARIFF ZONE ====== -->
+					<tariffZones>
+						<TariffZone version="001" id="frtop:TZ_0010">
+							<Name lang="fr">Zone A</Name>
+							<members>
+								<ScheduledStopPointRef version="032" ref="frtop:SSP0042A"/>
+							</members>
+						</TariffZone>
+					</tariffZones>
+					<stopAssignments>
+						<PassengerStopAssignment order="1" version="any" id="frtop:PSA_40016_A1">
+							<Description lang="en">Assigns Timetable timetable ref to physical stop</Description>
+							<ScheduledStopPointRef version="032" ref="frtop:SSP0042A"/>
+							<StopPlaceRef version="any" ref="mybus:SSP_02456A"/>
+							<QuayRef version="any" ref="mybus:Q_SSP_02456A_1"/>
+						</PassengerStopAssignment>
+					</stopAssignments>
+				</ServiceFrame>
+				<!--- =====RESOURCE FRAME========== -->
+				<ResourceFrame version="any" id="frtop:RF01">
+					<responsibilitySets>
+						<!--- =====Data owners ========= -->
+						<ResponsibilitySet created="2010-05-17T09:30:47Z" modification="revise" changed="2010-05-17T09:30:47Z" version="3.0" id="frtop:RS_22">
+							<Name>Stop data on street</Name>
+							<roles>
+								<ResponsibilityRoleAssignment created="2010-05-17T09:30:47Z" id="frtop:RS_22_01" version="3.0">
+									<DataRoleType>collects</DataRoleType>
+									<ResponsibleOrganisationRef version="any" ref="mybus:Org_Mb042"/>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+						<ResponsibilitySet created="2010-05-17T09:30:47Z" modification="revise" changed="2010-05-17T09:30:47Z" version="3.0" id="frtop:RS_24">
+							<Name>Stop data on timetable</Name>
+							<roles>
+								<ResponsibilityRoleAssignment created="2010-05-17T09:30:47Z" id="frtop:RS_24_01" version="3.0">
+									<DataRoleType>collects</DataRoleType>
+									<ResponsibleOrganisationRef version="any" ref="frtop:Org_Hd001"/>
+								</ResponsibilityRoleAssignment>
+							</roles>
+						</ResponsibilitySet>
+					</responsibilitySets>
+					<organisations>
+						<Authority version="any" id="mybus:Org_Mb042">
+							<Name>Pays De Fou Transport </Name>
+							<ShortName>PDFT</ShortName>
+							<OrganisationType>authority</OrganisationType>
+						</Authority>
+						<Operator version="any" id="frtop:Org_Hd001">
+							<Name>Voyages Fou </Name>
+							<OrganisationType>operator</OrganisationType>
+						</Operator>
+					</organisations>
+				</ResourceFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

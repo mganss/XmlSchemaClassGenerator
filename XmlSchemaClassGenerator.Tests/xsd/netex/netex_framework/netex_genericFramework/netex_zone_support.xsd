@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_zone_version">
+	<xsd:include schemaLocation="netex_pointAndLink_support.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2010-11-05</Modified>
+				</Date>
+				<Date>
+					<Modified>20109-02-25</Modified>UK-05 Fix: Introduce a dummy TariffzoneRef so that Fare zone can be a specialisation of TariffZone. Workaround to XMLSPY issue.
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines ZONE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_genericFramework}netex_zone_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - ZONE identifier types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>ZONE identifier types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ====Zone======================================================= -->
+	<xsd:simpleType name="ZoneIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="GroupOfPointsIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ZoneRef" type="ZoneRefStructure" substitutionGroup="GroupOfPointsRef_">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a ZONE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- === Unresolved XMLSPy issue: cant make ZoneRefStructure a restriction of Group of points =====-->
+	<xsd:complexType name="ZoneRefStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="GroupOfPointsRefStructure"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="zoneRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ZONEs. This is to workaround s bug in XMLSPY</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="ZoneRef"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="TariffZoneRef_" type="ZoneRefStructure" abstract="true" substitutionGroup="ZoneRef">
+		<xsd:annotation>
+			<xsd:documentation>Dummy type Reference to a TARIFF ZONE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:simpleType name="TariffZoneIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TARIFF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ZoneIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TariffZoneRef" substitutionGroup="TariffZoneRef_">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TARIFF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="TariffZoneRefStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TariffZoneRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TARIFF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="ZoneRefStructure"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="tariffZoneRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of TARIFF ZONEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="TariffZoneRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="TypeOfZoneIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfZoneRef" type="TypeOfZoneRefStructure" substitutionGroup="TypeOfEntityRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF ZONE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfZoneRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TYPE OF ZONE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfZoneIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF ZONE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:complexType name="typeOfZoneRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of TYPE OF ZONEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="TypeOfZoneRef" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

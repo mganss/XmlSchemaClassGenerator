@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_stopAssignment_version">
+	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_stopPlace_version.xsd"/>
+	<xsd:include schemaLocation="netex_stopAssignment_support.xsd"/>
+	<xsd:include schemaLocation="netex_servicePattern_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_assignment_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_trainElement_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2012-03-04</Modified>Revise attributes of StopAssignment MODEL CHANGE
+				</Date>
+				<Date>
+					<Modified>2017-06-03</Modified>CR0040 Allow inlining of STOP POINT, STOP PLACE, QUAY etc so as to iimprove packaging  (no semantic change) 			 
+				</Date>
+				<Date>
+					<Modified>2017-06-03</Modified>CR0051 CD Allow reference to JOURNEY PATTERN on SYNAMIC STOP ASSIGNMENT.		 
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines common STOP ASSIGNMENT types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_tacticalPlanning}netex_stopAssignment_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+					<Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - STOP ASSIGNMENT types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>STOP ASSIGNMENT types for NeTEx.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
+	<xsd:group name="StopAssignmentInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>STOP ASSIGNMENT related elements in frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="stopAssignments" type="stopAssignmentsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>STOP ASSIGNMENTs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="stopAssignmentsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of STOP ASSIGNMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="StopAssignment" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>The allocation of a SCHEDULED STOP POINT (i.e. a SCHEDULED STOP POINT of a SERVICE PATTERN or JOURNEY PATTERN) to a specific STOP PLACE, for either a Passenger JOURNEY or VEHICLE SERVICE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="StopAssignment" type="StopAssignment_VersionStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Assignment of a SCHEDULED STOP POINT to a STOP PLACE and QUAY, etc.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="StopAssignment_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Assignment_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="StopAssignmentGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="StopAssignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="BoardingUse" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether alignment is for boarding use. Default is 'true'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AlightingUse" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether alignment is for alighting use. Default is 'true'.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:choice minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference or inline declaration of SCHEDULED STOP POINT which is being assigned  </xsd:documentation>
+				</xsd:annotation>
+				<xsd:element ref="ScheduledStopPointRef"/>
+				<xsd:element ref="ScheduledStopPoint"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="PassengerStopAssignment" abstract="false" substitutionGroup="StopAssignment">
+		<xsd:annotation>
+			<xsd:documentation>Assignment of a SCHEDULED STOP POINT to a STOP PLACE and QUAY, etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PassengerStopAssignment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+							</xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="DataManagedObjectGroup"/>
+							</xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="AssignmentGroup"/>
+							</xsd:sequence>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopAssignmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PassengerStopAssignmentGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PassengerStopAssignmentIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PassengerStopAssignment_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PASSENGER STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopAssignment_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="PassengerStopAssignmentGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PassengerStopAssignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a PASSENGER STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>STOP PLACE to which SCHEDULED STOP POINT is to be  assigned.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element ref="StopPlaceRef"/>
+				<xsd:element ref="StopPlace"/>
+			</xsd:choice>
+			<xsd:choice minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>QUAY to which SCHEDULED STOP POINT is to be assigned.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element ref="QuayRef"/>
+				<xsd:element ref="Quay"/>
+			</xsd:choice>
+			<xsd:choice minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BOARDING POSITION to which SCHEDULED STOP POINT is to be  assigned.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element ref="BoardingPositionRef"/>
+				<xsd:element ref="BoardingPosition"/>
+			</xsd:choice>
+			<xsd:element name="trainElements" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Train elements to which SCHEDULED STOP POINT is to be assigned.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="trainStopAssignments_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="DynamicStopAssignment" abstract="false" substitutionGroup="StopAssignment">
+		<xsd:annotation>
+			<xsd:documentation>Change to a PASSENGER STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DynamicStopAssignment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+							</xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="DataManagedObjectGroup"/>
+							</xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="AssignmentGroup"/>
+							</xsd:sequence>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopAssignmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PassengerStopAssignmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DynamicStopAssignmentGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DynamicStopAssignmentIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DynamicStopAssignment_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DYNAMIC PASSENGER STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="PassengerStopAssignment_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="DynamicStopAssignmentGroup">
+						<xsd:annotation>
+							<xsd:documentation>Elements for a DYNAMIC PASSENGER STOP ASSIGNMENT.  Original Passenger Stop Assignment for whiuch this is a change.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DynamicStopAssignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DYNAMIC PASSENGER STOP ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="JourneyPatternRef" minOccurs="0"/>
+			<xsd:element ref="PassengerStopAssignmentRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:complexType name="trainStopAssignments_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of references to a TRAIN STOP POINT ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="TrainStopAssignmentRef"/>
+					<xsd:element ref="TrainStopAssignment"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TrainStopAssignment" substitutionGroup="StopAssignment">
+		<xsd:annotation>
+			<xsd:documentation>Assignment of a scheduled train stop point to a STOP PLACE and quay. etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TrainStopAssignment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+							</xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="DataManagedObjectGroup"/>
+							</xsd:sequence>
+							<xsd:sequence>
+								<xsd:group ref="AssignmentGroup"/>
+							</xsd:sequence>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="StopAssignmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TrainStopAssignmentGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TrainStopAssignmentIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TrainStopAssignment_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TRAIN STOP POINT ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopAssignment_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TrainStopAssignmentGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TrainStopAssignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TRAIN STOP POINT ASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="PassengerStopAssignmentRef" minOccurs="0"/>
+			<xsd:element ref="TrainRef" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:element ref="TrainComponentRef" minOccurs="0"/>
+				<xsd:element ref="TrainComponentView" minOccurs="0"/>
+			</xsd:choice>
+			<xsd:element name="PositionOfTrainElement" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Relative position of TRAIN ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BoardingPositionRef" type="BoardingPositionRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>BOARDING POSITION to which SCHEDULED STOP POINT is to be assigned.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EntranceToVehicle" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>A specific ENTRANCE to the VEHICLE. E.g. Front, rear.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<!-- ======================================================================= -->
+	<xsd:element name="PassengerStopAssignmentView" abstract="false" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>View of an assignment of a SCHEDULED STOP POINT to a STOP PLACE and quay. etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PassengerStopAssignment_DerivedViewStructure">
+					<xsd:sequence>
+						<xsd:element ref="PassengerStopAssignmentRef" minOccurs="0"/>
+						<xsd:element ref="StopPlaceRef" minOccurs="0"/>
+						<xsd:element name="QuayRef" type="QuayRefStructure" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>QUAY to which SCHEDULED STOP POINT is to be assigned.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="QuayName" type="MultilingualString" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Name of QUAY or platform to which the SCHEDULED STOP POINT is assigned.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PassengerStopAssignmentIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of Object of which this is a view.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PassengerStopAssignment_DerivedViewStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PASSENGER STOP POINT ASSIGNMENT VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element ref="PassengerStopAssignmentRef" minOccurs="0"/>
+					<xsd:element ref="StopPlaceRef" minOccurs="0"/>
+					<xsd:element name="QuayRef" type="QuayRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>QUAY to which SCHEDULED STOP POINT is to be assigned.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="QuayName" type="MultilingualString" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Name of QUAY or platform to which the SCHEDULED STOP POINT is assigned.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="Label" type="xsd:normalizedString" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:integer">
+					<xsd:annotation>
+						<xsd:documentation>Order of Assignment.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:group name="QuayAssignmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a  QUAYASSIGNMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element ref="PassengerStopAssignmentRef" minOccurs="0"/>
+				<xsd:element ref="QuayAssignmentView" minOccurs="0"/>
+			</xsd:choice>
+			<xsd:element ref="DynamicStopAssignment" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="QuayAssignmentView" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Assignment to a specific QUAY within the STOP PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PassengerStopAssignment_DerivedViewStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DerivedViewGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element ref="PassengerStopAssignmentRef" minOccurs="0"/>
+							<xsd:element ref="StopPlaceRef" minOccurs="0"/>
+							<xsd:element name="QuayRef" type="QuayRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>QUAY to which SCHEDULED STOP POINT is to be assigned.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="QuayName" type="MultilingualString" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Name of QUAY or platform to which the SCHEDULED STOP POINT is assigned.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="Label" type="xsd:normalizedString" minOccurs="0"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PassengerStopAssignmentIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of Object of which this is a view.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- ======================================================================= -->
+</xsd:schema>

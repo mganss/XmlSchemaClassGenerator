@@ -1,0 +1,1838 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== SImple Timetable  Example ====== 
+This example shows the encoding of a simple bus timetable for a linear route in NeTex XML  
+
+It extends the SimpleTimetable example with a ROUTE,LINK PROJECTIONs and STOP ASSIGNMENTs.
+  
+There are separate LINK PROJECTIONs of the SERVICE LINKs onto both the ROUTE LINKs and the TIMING LINKs.
+
+It also shows the use of ACTIVATION POINTs and LINKs (these are projected onto various layers) with TRAFFIC CONTROl POINts and BEACON POINTs and ACTIVATED EQUIPMENT
+
+For illustrative purposes it uses     projections more extensively that would normally be needed to associate route and service data adequately
+  
+ Only the outbound elements are described in detail in this header  The route is mostly symmetrical 
+
+1. OVERVIEW
+============
+
+   The SERVICE PATTERN has just  three stops         A - B  - C   
+
+	There are just two  SERVICE JOURNEYs   in each DIRECTION 
+
+    hde:sj_24o_01   at 14:20   outbound
+    hde:sj_24o_02   at 15:20   outbound
+
+    hde:sj_24i_01   at 14:20   inbound
+    hde:sj_24i_02   at 15:20   inbound
+ 
+And the timetable is thus
+
+OUTBOUND
+			<== JOURNEYS ==>	 
+			sj_24o_01   sj_24o_02		
+
+	A	d		14:20	15:20     | 	 
+	B	a		14:30	15:30     | 	 
+	B	d		14:32	15:32      |      
+	C	a		15:10	16:10     | 	 
+
+INBOUND
+			<== JOURNEYS ==>	 
+			sj_24i_01   sj_24i_02		
+
+	A	d		14:20	15:20     | 	 
+	B	a		14:30	15:30     | 	 
+	B	d		14:32	15:32      |      
+	A	a		15:10	16:10     | 
+
+  
+In this example we include both  detailed TIMING & JOURNEY PATTERN data as well as the
+SERVICE JOURNEY with  CALLs.
+The CALLs are in effect dervivd from the other  data and could be omitted
+
+ROUTE details are also provided   
+ 
+The points and links are chosen to illustrate several points
+		- There may me more links in one layer than another, e.g. there are more TIMING LINKS than there are SERVICE LINKS and more ROUTE LINKS than there are TIMING LINKS
+	    - The End of a LINK in one layer can    be projected onto a MIDPOINT of a LINK in another LAYER e.g. the  LINKS
+
+Mostly we project downwards i.e. Service layer ==> Timng layer ==> Route Layer
+But we also have exampels of projecting up e.g. route point to Service point.
+
+
+			001@		rp01			rp02			rp03				    rp04				rp05				003@
+		<== rl1 ==><== rl2 ==><== rl3 => <== rl4=======><== rl5====><== rl6=======>    ROUTE LINKS
+
+																			002@
+			:													<:::::d1:::::|<::::::::											::
+			:																  :	 :													::  projection
+				A		 - a_t1-			 a_t2 					- B  :	 :					 - b-t1	 						C   
+			<== tl1 ==><== tl2 ==><== tl3 ==========><== tl4=======><====== tll5======>    TIMING LINKS
+			:																: 	:													::
+				:															:	:													:: projection
+			:  A 															- B													 C   
+			<==sl1 ===========================><== sl2==================>	SERVICE LINKS
+											tcp1															tcp2							TrafficCOntrol points
+							bp1					ap1						ap2						  ap3		  				Beacon &			Activation points
+			<           						<===== al2 ======>														  Activation links
+													:	
+										;::;;rl3-d1;;;;;>																			Projecections of ap
+										;;;tl3-d1;;;;;>
+			;;;;;;;sl1-d1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;>					;;;;;;;sl2-d1;;;;;;;;;;>
+
+==================================
+2. DETAILS
+
+
+SCHEDULED STOP POINTs
+	    A)   mybus:ssp_001  Alpha
+						 
+		B)  mybus:ssp_002   Bravo
+							 
+		C)  mybus:ssp_077	 Charley
+
+There are just two  Outbound SERVICE JOURNEYs in the timetable  for LINE 24
+
+     (i)  SERVICE JOURNEY hde:sj_24o_01         
+             Departs 14:20   on         DAY TYPE      DayType DT01   (MTWTF)
+
+     (ii)  SERVICE JOURNEY hde:sj_24o_02     
+             Departs 15:20   on         DAY TYPE      DayType DT02   (MTWTF)
+
+
+There are just two  inbound SERVICE JOURNEYs in the timetable  for LINE 24
+
+     (i)  SERVICE JOURNEY hde:sj_24i_01         
+             Departs 14:20   on         DAY TYPE      DayType DT01   (MTWTF)
+
+     (ii)  SERVICE JOURNEY hde:sj_24i_02     
+             Departs 15:20   on         DAY TYPE      DayType DT02   (MTWTF)
+
+ 
+The single SERVICE  PATTERN  has  three STOP POINTs IN JOURNEY PATTERN referencing the  three SCHEDULED STOP POINTs  
+ which are connected by two      SERVICE LINKs   .
+ 
+ SERVICE PATTERN:  ServicePattern:svp_24o  ===>   JOURNEY PATTERN:  ServiceJourneyPattern:sjp_24o
+
+The JOURNEY  PATTERN  has  three STOP POINT IN JOURNEY PATTERN referencing the  three SCHEDULED STOP POINTs  
+	1 SCHEDULED STOP POINT:  A   mybus:SSP_001
+		SERVICE LINK :	A		 - B     	mybus:SSP_001_to_SSP_002 
+	2 SCHEDULED STOP POINT:  B   mybus:SSP_002
+		SERVICE LINK :	B		 - C		mybus:SSP_002_to_SSP_077
+	3 SCHEDULED STOP POINT:  C   mybus:SSP_077
+
+    The TIMING PATTERN has   three intermediate TIMING POINTs which are not SCHEDULED STOP POINTs, as well as the three     SCHEDULED STOP POINTs
+			  A - a_t1- a_t2 - B  - b-t1- C   
+
+    The TIMING PATTERN  has  thus six POINTs IN TIMING PATTERN, referencing the  TIMING POINTs 
+	connected by five   TIMING LINKs    
+ TIMING PATTERN:  TimingPattern:tp_24o
+	1.TIMING POINT:  A   mybus:SSP_001
+		TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001_to_SSP_001_t1
+    2. TIMING POINT: mybus:SSP_001_t1
+		TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1_to_SSP_001_t2
+	3. TIMING POINT: mybus:SSP_001_t2
+		TIMING LINK :	a_t2	-	B				mybus:SSP_001_t2_to_SSP_002
+	4. TIMING POINT:  B   mybus:SSP_002
+		TIMING LINK :	A		 - b_t1			mybus:SSP_002_to_SSP_002_t1
+    5. TIMING POINT: mybus:SSP_002_t1
+		TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1_to_SSP_077
+	6. TIMING POINT:  C   mybus:SSP_077
+
+There is alink for the whole route as well
+	0 TIMING LINK :	A		 - 	C    	mybus:SSP_001_to_SSP_077
+ 
+
+    There is a single TIME DEMAND TYPE and one set of RUN TIMES 
+ 	01			02		 	 
+	A	d		14:20	 	1520		    
+	  t1										+10m	RUN TIME 
+	  t2										+10m	RUN TIME 
+	B	a		14:30		15:30 		+10m	RUN TIME  
+	B	d		14:32	...	15:32 		+2m	 	WAIT TIME
+	  t1										+180m	 RUN TIME .
+	C	d		15:10		16:10		.+20m	RUN TIME  
+												+70m	 JOURNEY PATTERN RUN TIME  	
+
+ 
+    1.  A  Depart: 14:20, 15 20
+		1.1.TIMING POINT:  A   mybus:SSP_001
+			TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001_to_SSP_001_t1  
+				JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_001_to_SSP_001_t1  	 10M
+		1.2. TIMING POINT: mybus:SSP_001_t1
+			TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1_to_SSP_001_t2 TIME 
+					JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_001_t1_to_SSP_001_t2   10M
+		1.3. TIMING POINT: mybus:SSP_001_t2
+			TIMING LINK :	a_t2	-	B				mybus:SSP_001_t2_to_SSP_002 
+ 					JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_001_t1_to_SSP_002	   10M
+    2.  B  Arrive14:30, 15 30
+			TIMING POINT :	B		 - 	a_t1     	mybus:SSP_002    
+ 					JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_00002	   2M
+    2.  B  Depart14:32, 15 32
+		4. TIMING POINT:  B   mybus:SSP_002
+		TIMING LINK :	B		 - b_t1			mybus:SSP_002_to_SSP_002_t1   
+				JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_002_to_SSP_002_t1  	 18M
+		5. TIMING POINT: mybus:SSP_002_t1
+		TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1_to_SSP_077  
+ 					JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_002_t1_to_SSP_077	   20M
+	3..B  Arrive: 15:10, 16 10
+		 TIMING POINT:  C   mybus:SSP_077
+
+		Whole journey SSP001 to SSP 078
+			TIMING LINK :	A		 - 	C     	mybus:SSP_001_to_SSP_078   
+				JOURNEY RUN TIME  mybus:tdtr_TD01_SSP_001_to_SSP_077	   70M
+
+The SERVICE JOURNEY  PATTERN  has  six  POINT IN JOURNEY PATTERN referencing the  three SCHEDULED STOP POINTs  and three additional timing points
+ which are connected by two      SERVICE LINKs   .and five TIMING LINKs
+ 
+ SERVICE JOURNEY PATTERN:  TimingPattern:tp_24o
+	1 POINT IN JOURNEY PATTERN		SCHEDULED STOP POINT:  A   mybus:SSP_001
+			SERVICE LINK :	A		 - B     	mybus:SSP_001_to_SSP_002 
+			TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001_to_SSP_001_t1
+
+    2. POINT IN JOURNEY PATTERN:		TIMING POINT: mybus:SSP_001_t1
+			TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1_to_SSP_001_t2
+
+	3.  POINT IN JOURNEY PATTERN:		TIMING POINT: mybus:SSP_001_t2
+			TIMING LINK :	a_t2	-	B				mybus:SSP_001_t2_to_SSP_002
+
+	4 POINT IN JOURNEY PATTERN: SCHEDULED STOP POINT:  B   mybus:SSP_002
+			SERVICE LINK :	B		 - C		mybus:SSP_002_to_SSP_077
+			TIMING LINK :	A		 - b_t1			mybus:SSP_002_to_SSP_002_t1  JOURNEY RUN TIME  18M
+
+	5. POINT IN JOURNEY PATTERN: 		TIMING POINT: mybus:SSP_002_t1
+			TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1_to_SSP_077  JOURNEY RUN TIME  20M
+
+	6 POINT IN JOURNEY PATTERN: 		SCHEDULED STOP POINT:  C   mybus:SSP_077
+
+
+There is one    ROUTE which  goes along the centre of the ROAD, so the ROUTE POINTs have different coordinates to the TIMING POINTs and SCHEDUELD STOP POINTs.   there are eight route points including the two endpoints.  
+Stop B project to a point on ROUTE LINK 4 
+			  A 															- B														 C   
+																	::::::>@B
+			  a @	 -   rp1	- 		  rp2 -		  rp3	-					rp4  		-	  rp5		-	 rp6  	- 	 c@      
+			<== rl1 ==><== rl2 ==><== rl3 => <== rl4=======><== rl5==><== rl6=======>    ROUTE LINKS
+
+	1. POINT ON ROUTE 	mybus:POR_Rt24o_001
+			ROUTE POINT:  A   mybus:SSP_001@   (In Road near SSP_001)
+			ROUTE LINK: A to rp1	   mybus:RL_RT_24o_SSP_001@_to_RT_24o_1
+	2.  POINT ON ROUTE 	mybus:POR_Rt24o_002
+			ROUTE POINT:   A  +  mybus:Rtpt_RT_24_1
+			ROUTE LINK: rp1  to rp2	   mybus:RL_RT_24o_RT_24o_1_to_RT_24o_2
+	3.  POINT ON ROUTE 	mybus:POR_Rt24o_003
+			ROUTE POINT:   A  +  mybus:Rtpt_RT_24_2
+			ROUTE LINK: rp2  to rp3	   mybus:RL_RT_24o_RT_24o_2_to_RT_24o_3
+	4.  POINT ON ROUTE 	mybus:POR_Rt24o_004
+			ROUTE POINT:   A  +  mybus:Rtpt_RT_24_3
+			ROUTE LINK: rp3  to rp4	   mybus:RL_RT_24o_RT_24o_3_to_RT_24o_4
+	5.  POINT ON ROUTE 	mybus:POR_Rt24o_004
+			ROUTE POINT:   A  +  mybus:Rtpt_RT_24_4
+			ROUTE LINK: rp4  to rp5	   mybus:RL_RT_24o_RT_24o_4_to_RT_24o_5
+	6.  POINT ON ROUTE 	mybus:POR_Rt24o_005
+			ROUTE POINT:   A  +  mybus:Rtpt_RT_24_5		 
+			ROUTE LINK: rp5  to  C	   mybus:RL_RT_24o_RT_24o_5_to_SSP_003@_
+	7.  POINT ON ROUTE 	mybus:POR_Rt24o_006
+	8 	ROUTE POINT:  A   mybus:SSP_003@   (In Road neear SSP_003 
+
+	2. POINT ON LINK  :  A   mybus:SSP_002@   (In Road neear SSP_002 
+
+
+There are Two TRAFFIC CONTROL POINTs
+		from TRAFFIC CONTROL POINT  hde:tcp_01
+	    to TRAFFIC CONTROL POINT   hde:tcp_02
+
+There are Three activayion points
+	     ACTIVATION POINT   hde:ap_01  at TimingPoint 3
+	     ACTIVATION POINT   hde:ap_02 at TimingPoint  4
+	     ACTIVATION POINT   hde:ap_03     at TimingPoint  5
+
+There is One BEACON POINT  at TimingPoint 1
+
+There is one ACTIVATION LINK  that projects exactloy onto TimingLink 2
+
+
+ACTIVATION LINK hde:ActivationLink:al_01
+		from ACTIVATION POINT  hde:ap_01
+	    to ACTIVATION POINT   hde:ap_02
+
+	     ACTIVATION POINT   hde:ap_03
+
+		001@		rp01			rp02			rp03				    rp04				rp05					003@
+		<== rl1 ==><== rl2 ==><== rl3 => <== rl4=======><== rl5====><== rl6=======>    ROUTE LINKS
+
+																			002@
+			:													<:::::d1:::::|<::::::::											::
+			:																  :	 :													::  projection
+				A		 - a_t1-			 a_t2 					- B  :	 :					 - b-t1	 						C   
+			<== tl1 ==><== tl2 ==><== tl3 ==========><== tl4=======><====== tll5======>    TIMING LINKS
+			:																: 	:													::
+				:															:	:													:: projection
+			:  A 															- B													 C   
+			<==sl1 ===========================><== sl2==================>	SERVICE LINKS
+											tcp1															tcp2							TrafficCOntrol points
+							bp1					ap1						ap2						  ap3		  				Beacon &			Activation points
+			<           						<===== al2 ======>														  Activation links
+													:	
+										;::;;rl3-d1;;;;;>																			Projecections of ap
+										;;;tl3-d1;;;;;>
+			;;;;;;;sl1-d1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;>					;;;;;;;sl2-d1;;;;;;;;;;>
+
+SERVICE LINK :	A		 - B     	mybus:SSP_001_to_SSP_002 
+	Starts    A)   mybus:ssp_001  Alpha
+    Ends	B)  mybus:ssp_002   Bravo
+	PROJECTIONS
+		1. ROUTE LINK: A to rp1	   mybus:RL_RT_24o_SSP_001@_to_RT_24o_1
+		2. ROUTE LINK: rp1  to rp2	   mybus:RL_RT_24o_RT_24o_1_to_RT_24o_2
+		3. ROUTE LINK: rp2  to rp3	   mybus:RL_RT_24o_RT_24o_2_to_RT_24o_3
+		4. ROUTE LINK: rp3  to rp4	   mybus:RL_RT_24o_RT_24o_3_to_RT_24o_4
+				   x metetrs along
+ 
+		1. TIMING LINK :	A		 - 	a_t1     	mybus:SSP_001_to_SSP_001_t1
+		2. TIMING LINK :	 a_t1	-	a_t2		mybus:SSP_001_t1_to_SSP_001_t2
+		3. TIMING LINK :	a_t2	-	B				mybus:SSP_001_t2_to_SSP_002 
+
+	Passes Through
+.	1.  ROUTE POINT:  A   mybus:SSP_001@   (In Road neear SSP_001)	
+    2. TIMING POINT: mybus:SSP_001_t1
+	3. ROUTE POINT:   A  +  mybus:Rtpt_RT_24_1
+	4. ROUTE POINT:   A  +  mybus:Rtpt_RT_24_2
+	5. TIMING POINT: mybus:SSP_001_t2	
+	6, ACTIVATION POINT   hde:ap_01	
+	7. ROUTE POINT:   A  +  mybus:Rtpt_RT_24_3
+	8. ROUTE POINT:   A  +  mybus:Rtpt_RT_24_4
+	9.ACTIVATION POINT   hde:ap_02
+	10. POINT ON LINK  :  A   mybus:Rtpt_RT_24_002@   (In Road neear SSP_002
+ 
+SERVICE LINK :	B -C     	mybus:SSP_002_to_SSP_077 
+     Starts	B)  mybus:ssp_002   Bravo
+	Ends	C)  mybus:ssp_077	 Charley
+	PROJECTIONS
+	 
+		1. ROUTE LINK: rp3  to rp4	   mybus:RL_RT_24o_RT_24o_3_to_RT_24o_4
+				 Starts x meters along
+		2. ROUTE LINK: rp4  to rp5	   mybus:RL_RT_24o_RT_24o_4_to_RT_24o_5	 
+		3. ROUTE LINK: rp5  to  C	   mybus:RL_RT_24o_RT_24o_5_to_SSP_003@
+ 
+		1. TIMING LINK :	B		 - b_t1			mybus:SSP_002_to_SSP_002_t1   
+		2. TIMING LINK :	b_t1		- 	C			mybus:SSP_002_t1_to_SSP_077
+
+	Passes Through
+.	 
+	1. POINT ON LINK  :  A   mybus:Rtpt_RT_24_002@   (In Road neear SSP_002
+	2. TIMING POINT: mybus:SSP_002_t1
+	3. ROUTE POINT:   A  +  mybus:Rtpt_RT_24_5
+	4.	ACTIVATION POINT   hde:ap_03
+	5. ROUTE POINT:   A  +  mybus:Rtpt_RT_24_6
+	6. ROUTE POINT:  A   mybus:SSP_003@   (In Road neear SSP_003 
+
+ 
+A COMPOSITE FRAME is used to group the component FRAMEs
+ 
+   - It has a VALIDITY CONDITION  that specifies it is valid from Sept to Matrch
+
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A TIMETABLE FRAME is used to contain  the SERVICE JOURNEY   elements
+			a SITE FRAME defining the STOP PLACEs (only needed becaus etheer are stop assignments )
+ 
+			 a SERVICE CALENDAR FRAME 	A SERVICE CALENDAR FRAME is used to contain the DAY TYPEs etc 
+
+The Calendar is shown coded in two differnt ways
+      Compact : OPERATING DAYs are assumed for each calendar date within the period of the calendar
+      Verbose: an OPERATING DAY is created for  every single date within the period of the calendar
+
+(C) 2010 CEN NeTEx
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<TimetableFrameRef ref="hde:TimetableFrameTIM_23_O">REQUEST</TimetableFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example  of simple timetable   with two journeys and service calendar and route projections</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="hde:CAL_02">
+			<!-- ==  CODESPACEs = -->
+			<codespaces>
+				<Codespace id="hde">
+					<Xmlns>hde</Xmlns>
+					<XmlnsUrl>http://www.halt.de/</XmlnsUrl>
+					<Description>Bus co data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="hde"/>
+			</FrameDefaults>
+			<frames>
+				<!-- ==== SERVICE FRAME Stops Routes and TIMING PATTERNs  ========= -->
+				<ServiceFrame version="1" id="mybus:svf_12">
+					<Name>Stops for Winter timetable for route 24 </Name>
+					<!--- =========DIRECTIONs=========== -->
+					<directions>
+						<Direction version="any" id="mybus:DR_Westbound">
+							<Name>Westbound</Name>
+						</Direction>
+						<Direction version="any" id="mybus:DR_Eastbound">
+							<Name>Eastbound</Name>
+						</Direction>
+					</directions>
+					<routePoints>
+						<!--- ======  ROUTE POINTs ========== -->
+						<!-- 
+					    The ROUTE goes along the centre of the Road   there are fiove  
+	001@		rp01			rp02			rp03				           rp04				   rp05					003@
+		<== rl1 ==><== rl2 ==><== rl3 => <== rl4=========><== rl5===><== rl6=======>    ROUTE LINKS
+
+																			002@						:
+			:													<:::::d1:::::|<::::::::					:						::
+			:																  :	 :							:						::  projection
+				A		 - a_t1-			 a_t2 					- B  :	 :					 - b-t1	 						C   
+			<== tl1 ==><== tl2 ==><== tl3 ==========><== tl4=======><====== tl5======>    TIMING LINKS
+			:									:							: 	:							:						::
+				:															:	:							:						:: projection
+			:  A 								:							- B							:						 C   
+			<==sl1 ===========================><== sl2======================>	SERVICE LINKS
+											tcp1															tcp2							TrafficCOntrol points
+							bp1					ap1						ap2						  ap3		  				Beacon &			Activation points
+			<           						<===== al2 ======>														  Activation links
+													:	
+										;:;;rl3-d1;;;>																			Projecections of ap
+										;;;tl3-d1;;;;;>
+			;;;;;;;sl1-d1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;>					;;;;;;;sl2-d1;;;;;;;;;;>
+			<;;;;;;;;sl1-sd1;;;;;;;;;;;;;;;;;>
+									-->
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_SSP_001@">
+							<Name>Point in Road near Stop A</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_SSP_001@">
+									<Name>Projects onto Alpha</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_001"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_SSP_002@">
+							<Name>Point in Road near Stop B</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_SSP_002@_01">
+									<Name>Projects onto Bravo</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_002"/>
+								</PointProjection>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_SSP_002@_02">
+									<Name>Projects onto activation point 02</Name>
+									<ProjectToPointRef version="any" ref="hde:ap_02"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_SSP_003@">
+							<Name>Point in Road near Stop C</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_SSP_003@">
+									<Name>Projects onto Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_003"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_1">
+							<Name>Point in Road between Stop A and B  1</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.4000</Latitude>
+							</Location>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_2">
+							<Name>Point in Road between Stop A and B  2</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.5000</Latitude>
+							</Location>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_3">
+							<Name>Point in Road between Stop A and B  3</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.6000</Latitude>
+							</Location>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_4">
+							<Name>Point in Road between Stop A and B  4</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.7000</Latitude>
+							</Location>
+						</RoutePoint>
+						<RoutePoint version="any" id="mybus:Rtpt_RT_24_5">
+							<Name>Point in Road between Stop B and C  1</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.7500</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_RT_24o_5_SSP_002_t1">
+									<Name>Projects onto timing point between Bravo and Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_002_t1"/>
+								</PointProjection>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_RT_24o_5_ap_03">
+									<Name>Projects onto activation point 3</Name>
+									<ProjectToPointRef version="any" ref="mybus:ap_03"/>
+								</PointProjection>
+							</projections>
+						</RoutePoint>
+					</routePoints>
+					<routeLinks>
+						<!--- ======  ROUTE LINKs ==OUTBOUND======== -->
+						<RouteLink version="any" id="mybus:RL_24o_RT_SSP_001@_to_RT_24_1">
+							<projections>
+								<!-- === Projections onto Service LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_RL_RT_24o_SSP_001@_to_RT_24o_1_01" order="1">
+									<Name>Project on to first part of  Alpha to Bravo</Name>
+									<ProjectToLinkRef version="any" xsi:type="ServiceLinkRefStructure" ref="mybus:SSP_001_to_SSP_002"/>
+									<EndPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_01-d200"/>
+								</LinkProjection>
+							</projections>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_1_to_RT_24_2">
+							<projections>
+								<!-- === Projections onto Service LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_RL_24o_RT_24_1_to_RT_24_2_02" order="1">
+									<Name>Project on to second part of  Alpa to Bravo</Name>
+									<ProjectToLinkRef version="any" xsi:type="ServiceLinkRefStructure" ref="mybus:SSP_001_to_SSP_002"/>
+									<StartPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_01-d200"/>
+									<EndPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_SSP_001_t2-d500"/>
+								</LinkProjection>
+							</projections>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_2_to_RT_24_3">
+							<projections>
+								<!-- === Projections onto Service LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_RL_24o_RT_24_2_to_RT_24_3_01" order="1">
+									<Name>Project on to third  part of  Alpha to Bravo</Name>
+									<ProjectToLinkRef version="any" xsi:type="ServiceLinkRefStructure" ref="mybus:SSP_001_to_SSP_002"/>
+									<StartPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_SSP_001_t2-d500"/>
+									<EndPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_03-d600"/>
+								</LinkProjection>
+							</projections>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_3_to_RT_24_4">
+							<projections>
+								<!-- === Projections onto Service LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_RL_24o_RT_24_3_to_RT_24_4_01" order="1">
+									<Name>Project on to last  part of alpha to Bravo and first part of  Bravo  to Charley </Name>
+									<ProjectToLinkRef version="any" xsi:type="ServiceLinkRefStructure" ref="mybus:SSP_002_to_SSP_077"/>
+									<StartPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_002_to_SSP_077_rtpt_05-d800"/>
+									<EndPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_002_to_SSP_077_rtp_SSP_003@-d2000"/>
+								</LinkProjection>
+							</projections>
+							<!-- === Points on the link o ==== -->
+							<passingThrough>
+								<PointOnLink version="any" id="mybus:pol_SSP_002_to_SSP_077_01-d300">
+									<Name>Goes through Bravo</Name>
+									<DistanceFromStart>300</DistanceFromStart>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_4_to_RT_24_5">
+							<Name>Route point fopr stop 2 lies on this link</Name>
+							<projections>
+								<!-- === Projections onto Service LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_RL_24o_RT_24_4_to_RT_24_5_01" order="1">
+									<Name>Project on to last  part of Alpha to Bravo   to Charley </Name>
+									<StartPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_ap_02-d1300"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_RL_24o_RT_24_4_to_RT_24_5_02" order="2">
+									<Name>Project on to first part of Bravo  to Charley </Name>
+									<ProjectToLinkRef version="any" xsi:type="ServiceLinkRefStructure" ref="mybus:SSP_002_to_SSP_077"/>
+									<EndPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_02-d400"/>
+								</LinkProjection>
+							</projections>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_5_to_RT_24_SSP_003@">
+							<projections>
+								<!-- === Projections onto Service LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_RL_24o_RT_24_5_to_RT_24_SSP_003@_01" order="1">
+									<Name>Project on to last  part of Alpha to Bravo   to Charley </Name>
+									<ProjectToLinkRef version="any" xsi:type="ServiceLinkRefStructure" ref="mybus:SSP_002_to_SSP_077"/>
+									<StartPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_02-d400"/>
+								</LinkProjection>
+							</projections>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+						</RouteLink>
+						<!--- ======  ROUTE LINKs ==InBOUND======== -->
+						<RouteLink version="any" id="mybus:RL_RT_24o_SSP_003@_to_RT_24o_5">
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_5_to_RT_24_4">
+							<Name>Route point fopr stop 2 lies on this link</Name>
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_4_to_RT_24_3">
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_3_to_RT_24_2">
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_24o_RT_24_2_to_RT_24_1">
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+						</RouteLink>
+						<RouteLink version="any" id="mybus:RL_RT_24o_RT_24o_1_to_SSP_001@">
+							<FromPointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+							<ToPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+						</RouteLink>
+					</routeLinks>
+					<!--- =========ROUTEs=========== -->
+					<routes>
+						<Route version="any" id="mybus:RT_24o">
+							<Name>Line 24 Alpha to Charley Green</Name>
+							<DirectionType>outbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Westbound"/>
+							<pointsInSequence>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_001" order="1">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_002" order="2">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_003" order="3">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_004" order="4">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_005" order="5">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_006" order="6">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24o_007" order="7">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+						<Route version="any" id="mybus:RT_24i">
+							<Name>Line 24 Alpha to Charley Green</Name>
+							<DirectionType>inbound</DirectionType>
+							<DirectionRef version="any" ref="mybus:DR_Eastbound"/>
+							<pointsInSequence>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_001" order="1">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_002" order="2">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_003" order="3">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_004" order="4">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_005" order="5">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_006" order="6">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+								</PointOnRoute>
+								<PointOnRoute version="any" id="mybus:POR_Rt24i_007" order="7">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointOnRoute>
+							</pointsInSequence>
+						</Route>
+					</routes>
+					<!--- =========LINEs=========== -->
+					<lines>
+						<Line version="any" id="mybus:LN_24">
+							<Name>Line 24 Alpha to Charley Green</Name>
+							<ShortName>Line 24</ShortName>
+							<TransportMode>bus</TransportMode>
+							<PublicCode>24</PublicCode>
+						</Line>
+					</lines>
+					<!--- =========DESTINATION DISPLAYs============ -->
+					<destinationDisplays>
+						<DestinationDisplay version="any" id="mybus:DST_Alpha">
+							<Name>Alpha Green</Name>
+							<ShortName>Charley G</ShortName>
+							<PublicCode>ALPH</PublicCode>
+						</DestinationDisplay>
+						<DestinationDisplay version="any" id="mybus:DST_Charley">
+							<Name>Charley Green</Name>
+							<ShortName>Charley G</ShortName>
+							<PublicCode>CHAS</PublicCode>
+						</DestinationDisplay>
+					</destinationDisplays>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_SSP_001_01">
+									<Name>Projects onto route point</Name>
+									<ProjectToPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointProjection>
+							</projections>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>EANDC</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo Arch</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_SSP_002_01">
+									<Name>Projects onto route point</Name>
+									<ProjectToPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_002@"/>
+								</PointProjection>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_SSP_002_02">
+									<Name>Projects onto activation point 02</Name>
+									<ProjectToPointRef version="any" ref="hde:ap_02"/>
+								</PointProjection>
+							</projections>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Bravo Arch</ShortName>
+							<PublicCode>BRAVO</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_077">
+							<Name>Charley Green</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_SSP_003_01">
+									<Name>Projects onto route point</Name>
+									<ProjectToPointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointProjection>
+							</projections>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<ShortName>Charley</ShortName>
+							<PublicCode>CHAS</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<!--- =========SERVICE LINKs=========== -->
+					<serviceLinks>
+						<!--- ====OUTBOUND===SERVICE LINKs=========== -->
+						<ServiceLink version="any" id="mybus:SSP_001_to_SSP_002">
+							<Name>Alpha   to Bravo Arch</Name>
+							<projections>
+								<!-- === Projections onto ROUTE LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoRL_01" order="1">
+									<ProjectToLinkRef version="any" xsi:type="RouteLinkRefStructure" ref="mybus:RL_24o_RT_SSP_001@_to_RT_24_1"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoRL_02" order="2">
+									<ProjectToLinkRef version="any" xsi:type="RouteLinkRefStructure" ref="mybus:RL_24o_RT_24_1_to_RT_24_2"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoRL_03" order="3">
+									<ProjectToLinkRef version="any" xsi:type="RouteLinkRefStructure" ref="mybus:RL_24o_RT_24_2_to_RT_24_3"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoRL_04" order="4">
+									<ProjectToLinkRef version="any" xsi:type="RouteLinkRefStructure" ref="mybus:RL_24o_RT_24_3_to_RT_24_4"/>
+									<EndPointOnLinkRef version="any" ref="mybus:pol_SSP_002_to_SSP_077_01-d300"/>
+								</LinkProjection>
+								<!-- === Projections onto TIMING  LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoTL_01" order="1">
+									<ProjectToLinkRef version="any" xsi:type="TimingLinkRefStructure" ref="mybus:SSP_001_to_SSP_077"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoTL_02" order="2">
+									<ProjectToLinkRef version="any" xsi:type="TimingLinkRefStructure" ref="mybus:SSP_001_to_SSP_001_t1"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoTL_03" order="3">
+									<ProjectToLinkRef version="any" xsi:type="TimingLinkRefStructure" ref="mybus:SSP_001_t1_to_SSP_001_t2"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_001_to_SSP_002_SLontoTL_04" order="4">
+									<ProjectToLinkRef version="any" xsi:type="TimingLinkRefStructure" ref="mybus:SSP_001_t2_to_SSP_002"/>
+								</LinkProjection>
+							</projections>
+							<!-- === Points on the link   ==== -->
+							<passingThrough>
+								<PointOnLink version="any" order="1" id="mybus:pol_sl_SSP_001_to_SSP_002_rtp_SSP_001@-d0">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>0</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="2" id="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_01-d200">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>200</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="3" id="mybus:pol_sl_SSP_001_to_SSP_002_SSP_001_t1-d300">
+									<Name>Goes through timing poit SSP_001_t1   </Name>
+									<DistanceFromStart>300</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:SSP_001_t1"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="4" id="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_02-d400">
+									<Name>Goes through rtpt 2 </Name>
+									<DistanceFromStart>400</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="5" id="mybus:pol_sl_SSP_001_to_SSP_002_SSP_001_t2-d500">
+									<Name>Goes through timing point SSP_001_t2   </Name>
+									<DistanceFromStart>500</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:SSP_001_t2"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="5" id="mybus:pol_sl_SSP_001_to_SSP_002_ap_01-d550">
+									<Name>Goes through ap1 </Name>
+									<DistanceFromStart>550</DistanceFromStart>
+									<ActivationPointRef version="any" ref="hde:ap_01"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="6" id="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_03-d600">
+									<Name>Goes through rtpt  </Name>
+									<DistanceFromStart>600</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="7" id="mybus:pol_sl_SSP_001_to_SSP_002_ap_02-d1300">
+									<Name>Goes through ap2 </Name>
+									<DistanceFromStart>1300</DistanceFromStart>
+									<ActivationPointRef version="any" ref="hde:ap_02"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="8" id="mybus:pol_sl_SSP_001_to_SSP_002_rtp_SSP_002@-d1500">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>1500</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_002@"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" ref="mybus:SSP_002"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SSP_002_to_SSP_077">
+							<Name>Bravo   to Charley  </Name>
+							<projections>
+								<!-- === Projection of this link onto onto ROUTE LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_SSP_002_to_SSP_077_SLontoRL_01" order="1">
+									<Name>Project to Route Links NB  startpoint is 50m, along  link</Name>
+									<ProjectToLinkRef version="any" ref="mybus:RL_24o_RT_24_4_to_RT_24_5"/>
+									<StartPointOnLinkByValue>
+										<DistanceFromStart>50</DistanceFromStart>
+									</StartPointOnLinkByValue>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_002_to_SSP_077_SLontoRL_03" order="3">
+									<ProjectToLinkRef version="any" ref="mybus:RL_24o_RT_24_5_to_RT_24_SSP_003@"/>
+								</LinkProjection>
+								<!-- === Projection onto TIMING  LINKS ==== -->
+								<LinkProjection version="any" id="mybus:LP_SSP_002_to_SSP_077_SLontoTL_01" order="1">
+									<ProjectToLinkRef version="any" xsi:type="TimingLinkRefStructure" ref="mybus:SSP_002_to_SSP_002_t1"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="mybus:LP_SSP_002_to_SSP_077_SLontoTL_02" order="2">
+									<ProjectToLinkRef version="any" xsi:type="TimingLinkRefStructure" ref="mybus:SSP_002_t1_to_SSP_077"/>
+								</LinkProjection>
+							</projections>
+							<!-- === Points on the link   ==== -->
+							<passingThrough>
+								<PointOnLink version="any" order="1" id="mybus:pol_sl_SSP_002_to_SSP_077_rtp_SSP_002@-d0">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>0</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_002@"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="3" id="mybus:pol_sl_SSP_002_to_SSP_077_rtpt_04-d800">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>800</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="4" id="mybus:pol_sl_SSP_002_to_SSP_077_SSP_002_t1-d900">
+									<Name>Goes through timing poit SSP_001_t1   </Name>
+									<DistanceFromStart>900</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:SSP_002_t1"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="5" id="mybus:pol_sl_SSP_002_to_SSP_077_rtpt_05-d800">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>800</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="6" id="mybus:pol_sL_SSP_002_to_SSP_077_01_ap_03-d900">
+									<Name>Activation Point 3</Name>
+									<DistanceFromStart>900</DistanceFromStart>
+									<ActivationPointRef version="any" ref="hde:ap_03"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="7" id="mybus:pol_sl_SSP_002_to_SSP_077_rtp_SSP_003@-d2000">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>2000</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" ref="mybus:SSP_077"/>
+						</ServiceLink>
+						<!--- ====INBOUND===SERVICE LINKs=========== -->
+						<ServiceLink version="any" id="mybus:SSP_002_to_SSP_001">
+							<Name>Bravo  to ALpha</Name>
+							<FromPointRef version="any" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" ref="mybus:SSP_001"/>
+						</ServiceLink>
+						<ServiceLink version="any" id="mybus:SSP_077_to_SSP_002">
+							<Name>Charley to Bravo </Name>
+							<FromPointRef version="any" ref="mybus:SSP_077"/>
+							<ToPointRef version="any" ref="mybus:SSP_002"/>
+						</ServiceLink>
+					</serviceLinks>
+					<!--- =========SERVICE PATTERNs=========== -->
+					<servicePatterns>
+						<!--- ====OUTBOUND===SERVICE PATTERNs=========== -->
+						<ServicePattern version="any" id="hde:svp_24o">
+							<Name>Alpha to Charley Outbound </Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_24o"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:jp_24o_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:jp_24o_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:jp_24o_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:slijp_24o_01">
+									<ServiceLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:slijp_24o_02">
+									<ServiceLinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+						<!--- ====INBOUND===SERVICE PATTERNs=========== -->
+						<ServicePattern version="any" id="hde:svp_24i">
+							<Name>Charley to Alpha inbound </Name>
+							<RouteRef version="any" ref="mybus:RT_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<journeyPatterns>
+								<ServiceJourneyPatternRef version="any" ref="hde:sjp_24i"/>
+							</journeyPatterns>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" order="1" id="hde:jp_24i_01">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<ForAlighting>false</ForAlighting>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="2" id="hde:jp_24i_02">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+								</StopPointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" order="3" id="hde:jp_24i_03">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<ForBoarding>false</ForBoarding>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+							<linksInSequence>
+								<ServiceLinkInJourneyPattern version="any" order="1" id="hde:slijp_24i_01">
+									<ServiceLinkRef version="any" ref="mybus:SSP_077_to_SSP_002"/>
+								</ServiceLinkInJourneyPattern>
+								<ServiceLinkInJourneyPattern version="any" order="2" id="hde:slijp_24i_02">
+									<ServiceLinkRef version="any" ref="mybus:SSP_002_to_SSP_001"/>
+								</ServiceLinkInJourneyPattern>
+							</linksInSequence>
+						</ServicePattern>
+					</servicePatterns>
+					<!--- =========TIMING POINTs============ -->
+					<timingPoints>
+						<TimingPoint version="any" id="mybus:SSP_001_t1">
+							<Name>Between Alpha  and Bravo  Point 1</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</TimingPoint>
+						<TimingPoint version="any" id="mybus:SSP_001_t2">
+							<Name>Between Alpha and Bravo  Point 2</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_TimingPoint:SSP_001_t2_ap_03">
+									<Name>Projects onto activation point 3</Name>
+									<ProjectToPointRef version="any" ref="mybus:ap_03"/>
+								</PointProjection>
+							</projections>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</TimingPoint>
+						<TimingPoint version="any" id="mybus:SSP_002_t1">
+							<Name>Between  Bravo and Charley    Point 1</Name>
+							<Location>
+								<Longitude>53.4000</Longitude>
+								<Latitude>0.4000</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="mybus:ppj_Rtpt_TimingPoint:SSP_002_t1_Rtpt_RT_24o_5">
+									<Name>Project onto Route  Point 5 between  Bravo  and Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointProjection>
+								<PointProjection version="any" id="mybus:ppj_TimingPoint:SSP_002_t1_ap_03">
+									<Name>Projects onto activation point 3</Name>
+									<ProjectToPointRef version="any" ref="mybus:ap_03"/>
+								</PointProjection>
+							</projections>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+						</TimingPoint>
+					</timingPoints>
+					<!--- =========TIMING LINKs=========== -->
+					<timingLinks>
+						<!--- ======OUTBOUND===TIMING LINKs=========== -->
+						<TimingLink version="any" id="mybus:SSP_001_to_SSP_077">
+							<Name>Overall timing Alpha   to  Charley  </Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_077"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_001_to_SSP_001_t1">
+							<Name>Alpha   to  After Alpha   t1</Name>
+							<!-- === Points on the link   ==== -->
+							<passingThrough>
+								<PointOnLink version="any" order="1" id="mybus:pol_tl_SSP_001_to_SSP_001_t1_rtp_SSP_001@">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>0</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="2" id="mybus:pol_tl_SSP_001_to_SSP_001_t1_rtpt_01">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>200</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_001_t1_to_SSP_001_t2">
+							<Name>After Alpha    t1 to After Alpha   t2</Name>
+							<passingThrough>
+								<PointOnLink version="any" order="1" id="mybus:pol_tl_SSP_001_t1_to_SSP_001_t2_rtpt_02">
+									<Name>Goes through rtpt 2 </Name>
+									<DistanceFromStart>400</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_001_t2_to_SSP_002">
+							<Name>After Alpha   t2 to Bravo  </Name>
+							<passingThrough>
+								<PointOnLink version="any" order="5" id="mybus:pol_tl_SSP_001_t2_to_SSP_002_ap_01">
+									<Name>Goes through ap1 </Name>
+									<DistanceFromStart>550</DistanceFromStart>
+									<ActivationPointRef version="any" ref="hde:ap_01"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="6" id="mybus:pol_tl_SSP_001_t2_to_SSP_002_rtpt_03">
+									<Name>Goes through rtpt  </Name>
+									<DistanceFromStart>600</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="7" id="mybus:pol_tl_SSP_001_t2_to_SSP_002_ap_02">
+									<Name>Goes through ap2 </Name>
+									<DistanceFromStart>1300</DistanceFromStart>
+									<ActivationPointRef version="any" ref="hde:ap_02"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="8" id="mybus:pol_tl_SSP_001_t2_to_SSP_002_rtp_SSP_002@">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>1500</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_002@"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_002_to_SSP_002_t1">
+							<Name>Bravo   to After Bravo   t1</Name>
+							<!-- === Points on the link   ==== -->
+							<passingThrough>
+								<PointOnLink version="any" order="1" id="mybus:pol_tl_SSP_002_to_SSP_002_t1_rtp_SSP_002@">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>0</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_002@"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="2" id="mybus:pol_tl_SSP_002_to_SSP_002_t1_rtpt_04">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>800</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_002_t1_to_SSP_077">
+							<Name>After Bravo   t1 to Charley  </Name>
+							<!-- === Points on the link   ==== -->
+							<passingThrough>
+								<PointOnLink version="any" order="1" id="mybus:pol_sl_SSP_002_t1_to_SSP_077_rtpt_05">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>800</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="2" id="mybus:pol_sL_SSP_002_t1_to_SSP_077_01_ap_03">
+									<Name>Activation Point 3</Name>
+									<DistanceFromStart>900</DistanceFromStart>
+									<ActivationPointRef version="any" ref="hde:ap_03"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="3" id="mybus:pol_sl_SSP_002_t1_to_SSP_077_rtp_SSP_003@">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>2000</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_077"/>
+						</TimingLink>
+						<!--- ======INBOUND===TIMING LINKs=========== -->
+						<TimingLink version="any" id="mybus:SSP_077_to_SSP_001">
+							<Name>Overall timing Charley to Alpha        </Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_077"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_077_to_SSP_002_t1">
+							<Name>Charlet to After Bravo   t1    </Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_077"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_002_t1_to_SSP_002">
+							<Name>After Bravo  t1  to   Bravo  </Name>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_002_to_SSP_001_t2">
+							<Name>After Bravo to Alpha   t2  </Name>
+							<FromPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_001_t2_to_SSP_001_t1">
+							<Name>After Alpha    t2 to After Alpha   t1</Name>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+							<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+						</TimingLink>
+						<TimingLink version="any" id="mybus:SSP_001_t1_to_SSP_001">
+							<Name>After Alpha   t1 to alALpha </Name>
+							<FromPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+							<ToPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+						</TimingLink>
+					</timingLinks>
+					<!--- =========TIMING PATTERNs============ -->
+					<timingPatterns>
+						<TimingPattern version="any" id="hde:tp_24o">
+							<Name>Route 24</Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_24o_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_001"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_001_to_SSP_001_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_24o_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_001_t1_to_SSP_001_t2"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="3" id="hde:tpip_24o_03">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_001_t2_to_SSP_002"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="4" id="hde:tpip_24o_04">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_002_to_SSP_002_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="5" id="hde:tpip_24o_05">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_002_t1_to_SSP_077"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="6" id="hde:tpip_24o_06">
+									<TimingPointRef version="any" ref="mybus:SSP_077"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+						<TimingPattern version="any" id="hde:tp_24i">
+							<Name>Route 24 Inbound</Name>
+							<RouteRef version="any" ref="mybus:RT_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<pointsInSequence>
+								<TimingPointInJourneyPattern version="any" order="1" id="hde:tpip_24i_01">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_077"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_077_to_SSP_002_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="2" id="hde:tpip_24i_02">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_002_t1_to_SSP_002"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="3" id="hde:tpip_24i_03">
+									<TimingPointRef version="any" xsi:type="ScheduledStopPointRefStructure" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_002_to_SSP_001_t2"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="4" id="hde:tpip_24i_04">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t2"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_001_t2_to_SSP_001_t1"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="5" id="hde:tpip_24i_05">
+									<TimingPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_001_t1"/>
+									<OnwardTimingLinkRef version="any" ref="mybus:SSP_001_t1_to_SSP_001"/>
+								</TimingPointInJourneyPattern>
+								<TimingPointInJourneyPattern version="any" order="6" id="hde:tpip_24i_06">
+									<TimingPointRef version="any" ref="mybus:SSP_001"/>
+								</TimingPointInJourneyPattern>
+							</pointsInSequence>
+						</TimingPattern>
+					</timingPatterns>
+					<!--- ======JOURNEY PATTERNS=========== -->
+					<journeyPatterns>
+						<ServiceJourneyPattern version="any" id="hde:sjp_24o">
+							<Name>Alpha to Charley  </Name>
+							<RouteRef version="any" ref="mybus:RT_24o"/>
+							<DirectionType>outbound</DirectionType>
+							<runTimes>
+								<!--  IN		 -->
+								<JourneyPatternRunTime version="any" id="mybus:jp_24o1_SSP_001_to_SSP_077">
+									<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+									<TimingLinkRef version="any" ref="mybus:SSP_001_to_SSP_077"/>
+									<RunTime>PT70M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24o_SSP_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+								</StopPointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_SSP_001@" order="2">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_1" order="3">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_2" order="4">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+								</PointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24o_SSP_002" order="5">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+								</StopPointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_3" order="6">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_4" order="7">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_5" order="8">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24o_RT_24_SSP_003@" order="9">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24o_SSP_07" order="10">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+						<ServiceJourneyPattern version="any" id="hde:sjp_24i">
+							<Name>Charley to ALpha  </Name>
+							<RouteRef version="any" ref="mybus:RT_24i"/>
+							<DirectionType>inbound</DirectionType>
+							<runTimes>
+								<!--  IN		 -->
+								<JourneyPatternRunTime version="any" id="mybus:jp_24i1_SSP_077_to_SSP_001">
+									<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+									<TimingLinkRef version="any" ref="mybus:SSP_077_to_SSP_001"/>
+									<RunTime>PT70M</RunTime>
+								</JourneyPatternRunTime>
+							</runTimes>
+							<pointsInSequence>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24i_SSP_077" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SSP_077_to_SSP_002"/>
+								</StopPointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_SSP_003@" order="2">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_003@"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_RT_24_5" order="3">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_RT_24_4" order="4">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_4"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_RT_24_3" order="5">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24i_SSP_002" order="6">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardServiceLinkRef version="any" ref="mybus:SSP_002_to_SSP_001"/>
+								</StopPointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_RT_24_2" order="7">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_2"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_RT_24_1" order="8">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_1"/>
+								</PointInJourneyPattern>
+								<PointInJourneyPattern version="any" id="hde:pijp_24i_SSP_001@" order="9">
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_001@"/>
+								</PointInJourneyPattern>
+								<StopPointInJourneyPattern version="any" id="hde:pijp_24i_SSP_001" order="10">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+								</StopPointInJourneyPattern>
+							</pointsInSequence>
+						</ServiceJourneyPattern>
+					</journeyPatterns>
+					<!--- ======TIME DEMAND TYPES ========== -->
+					<timeDemandTypes>
+						<TimeDemandType version="any" id="mybus:td_01">
+							<Name>Normal Day</Name>
+							<runTimes>
+								<JourneyRunTime version="any" id="mybus:tdtr_TD01_SSP_001_to_SSP_001_t1">
+									<TimingLinkRef version="any" ref="mybus:SSP_001_to_SSP_001_t1"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TD01_SSP_001_t1_to_SSP_001_t2">
+									<TimingLinkRef version="any" ref="mybus:SSP_001_t1_to_SSP_001_t2"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TD01_SSP_001_t2_to_SSP_002">
+									<TimingLinkRef version="any" ref="mybus:SSP_001_t2_to_SSP_002"/>
+									<RunTime>PT10M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TD01_SSP_002_to_SSP_002_t1">
+									<TimingLinkRef version="any" ref="mybus:SSP_002_to_SSP_002_t1"/>
+									<RunTime>PT18M</RunTime>
+								</JourneyRunTime>
+								<JourneyRunTime version="any" id="mybus:tdtr_TD01_SSP_002_t1_to_SSP_077">
+									<TimingLinkRef version="any" ref="mybus:SSP_002_t1_to_SSP_077"/>
+									<RunTime>PT20M</RunTime>
+								</JourneyRunTime>
+							</runTimes>
+							<waitTimes>
+								<JourneyWaitTime version="any" id="mybus:jp_24o1_SSP_002">
+									<Name>Wait at Stop B</Name>
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<WaitTime>PT2M</WaitTime>
+								</JourneyWaitTime>
+							</waitTimes>
+						</TimeDemandType>
+					</timeDemandTypes>
+				</ServiceFrame>
+				<!--  Infrastructure frame with Activation Points === -->
+				<InfrastructureFrame version="1" id="hde:InfrastructureFrame:INF_02">
+					<Name>Activation Elements  </Name>
+					<trafficControlPoints>
+						<TrafficControlPoint version="any" id="hde:tcp_01">
+							<Name>TCP Between Alpha and Bravo at TP1 </Name>
+							<Location>
+								<Longitude>0.35</Longitude>
+								<Latitude>52.00</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="hde:ppj_tcp_01_pj01">
+									<Name>Project onto Service link between A  and Charley</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+									<Distance>900</Distance>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_tcp_01_pj02">
+									<Name>Project onto Timing Point2 between  Bravo  and Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_001_t1"/>
+								</PointProjection>
+							</projections>
+						</TrafficControlPoint>
+						<TrafficControlPoint version="any" id="hde:tcp_02">
+							<Name>TCP Between Alpha and Bravo   aafter tp5</Name>
+							<Location>
+								<Longitude>0.35</Longitude>
+								<Latitude>52.00</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="hde:ppj_tcp_02_pj01">
+									<Name>Project onto Service link between Bravo  and Charley</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+									<Distance>400</Distance>
+								</PointProjection>
+							</projections>
+						</TrafficControlPoint>
+					</trafficControlPoints>
+					<activationPoints>
+						<!--
+		001@		rp01			rp02			rp03				    rp04				rp05					003@
+		<== rl1 ==><== rl2 ==><== rl3 => <== rl4=======><== rl5====><== rl6=======>    ROUTE LINKS
+
+																			002@
+			:													<:::::d1:::::|<::::::::											::
+			:																  :	 :													::  projection
+				A		 - a_t1-			 a_t2 					- B  :	 :					 - b-t1	 						C   
+			<== tl1 ==><== tl2 ==><== tl3 ==========><== tl4=======><====== tll5======>    TIMING LINKS
+			:																: 	:													::
+				:															:	:													:: projection
+			:  A 															- B													 C   
+			<==sl1 ===========================><== sl2==================>	SERVICE LINKS
+											tcp1															tcp2							TrafficCOntrol points
+							bp1					ap1						ap2						  ap3		  				Beacon &			Activation points
+			<           						<===== al2 ======>														  Activation links
+													:	
+										;::;;rl3-d1;;;;;>																			Projecections of ap
+										;;;tl3-d1;;;;;>
+			;;;;;;;sl1-d1;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;>					;;;;;;;sl2-d1;;;;;;;;;;>
+
+-->
+						<ActivationPoint version="any" id="hde:ap_01">
+							<Name>AP 1   before Bravo  start of activation link al1</Name>
+							<Location>
+								<Longitude>0.3</Longitude>
+								<Latitude>52.00</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef ref="hde:Type_of_point@ActPoint1"/>
+							</types>
+							<projections>
+								<PointProjection version="any" id="hde:ppj_01_pj01">
+									<Name>Project onto Service link between Alpha and Bravo</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+									<Distance>10050</Distance>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_01_pj02">
+									<Name>Project onto Timing Link  2 between Alpha and Bravo</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_001_t2_to_SSP_002"/>
+									<Distance>50</Distance>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_01_pj03">
+									<Name>Project onto Route  Link 3 between Alpha 3@ and 4@ on way to and Bravo</Name>
+									<ProjectToPointRef version="any" ref=""/>
+									<ProjectToLinkRef version="any" ref="mybus:RL_24o_RT_24_3_to_RT_24_4"/>
+									<Distance>80</Distance>
+								</PointProjection>
+							</projections>
+							<PrivateCode>MyPoint23</PrivateCode>
+						</ActivationPoint>
+						<ActivationPoint version="any" id="hde:ap_02">
+							<Name>AP2 at  Bravo  end of activation link</Name>
+							<Location>
+								<Longitude>0.35</Longitude>
+								<Latitude>52.00</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef ref="hde:Type_of_point@ActPoint1"/>
+							</types>
+							<projections>
+								<PointProjection version="any" id="hde:ppj_02_pj01">
+									<Name>Project onto   Bravo  </Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_002"/>
+									<Distance>2000</Distance>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_02_pj03">
+									<Name>Project onto Route  Poinbt 5 for   Bravo  </Name>
+									<ProjectToPointRef version="any" ref="mybus:Rtpt_RT_002@"/>
+								</PointProjection>
+							</projections>
+							<PrivateCode>MyPoint24</PrivateCode>
+						</ActivationPoint>
+						<ActivationPoint version="any" id="hde:ap_03">
+							<Name>AP2  Between Bravo and Charlwey </Name>
+							<Location>
+								<Longitude>0.35</Longitude>
+								<Latitude>52.00</Latitude>
+							</Location>
+							<types>
+								<TypeOfPointRef ref="hde:Type_of_point@ActPoint1"/>
+							</types>
+							<projections>
+								<PointProjection version="any" id="hde:ppj_ap03_pj01">
+									<Name>Project onto Service link between Bravo  and Charley</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+									<Distance>2000</Distance>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_ap03_pj02">
+									<Name>Project onto Timing Point2 between  Bravo  and Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_002_t1"/>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_ap03_pj03">
+									<Name>Project onto Route  Point 5 between  Bravo  and Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:Rtpt_RT_24_5"/>
+								</PointProjection>
+							</projections>
+							<PrivateCode>MyPoint25</PrivateCode>
+						</ActivationPoint>
+						<BeaconPoint version="any" id="hde:BeaconPoint:bp_01">
+							<Name>BeaconP1 Between Alpha and Bravo and Charlwey </Name>
+							<Location>
+								<Longitude>0.35</Longitude>
+								<Latitude>52.00</Latitude>
+							</Location>
+							<projections>
+								<PointProjection version="any" id="hde:ppj_bp_01_pj01">
+									<Name>Project onto Service link between A  and Charley</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+									<Distance>900</Distance>
+								</PointProjection>
+								<PointProjection version="any" id="hde:ppj_bp_01_pj02">
+									<Name>Project onto Timing Point2 between  Bravo  and Charley</Name>
+									<ProjectToPointRef version="any" ref="mybus:SSP_001_t1"/>
+								</PointProjection>
+							</projections>
+						</BeaconPoint>
+					</activationPoints>
+					<activationLinks>
+						<ActivationLink version="any" id="hde:ActivationLink:al_01">
+							<Name>AL  1  same as TimingLink   tl3   just before Bravo </Name>
+							<types>
+								<TypeOfLinkRef ref="hde:TypeOLink:ActLinkType21"/>
+							</types>
+							<projections>
+								<LinkProjection version="any" id="hde:ppj_aL01_pj01">
+									<Name>Project onto Service link between Alpha and Bravo</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+									<StartPointOnLinkRef version="any" ref="mybus:pol_sl_SSP_001_to_SSP_002_rtpt_01-d200"/>
+								</LinkProjection>
+								<LinkProjection version="any" id="hde:ppj_aL01_pj02">
+									<Name>Project onto timing img link 3 just before Bravo</Name>
+									<ProjectToLinkRef version="any" ref="mybus:SSP_001_t2_to_SSP_002"/>
+								</LinkProjection>
+							</projections>
+							<!-- === Points on the link   ==== -->
+							<passingThrough>
+								<PointOnLink version="any" order="5" id="mybus:pol_al_01_SSP_001_t2">
+									<Name>Goes through timing poit SSP_001_t2   </Name>
+									<DistanceFromStart>500</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:SSP_001_t2"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="6" id="mybus:pol_al_01_rtpt_03">
+									<Name>Goes through rtpt  </Name>
+									<DistanceFromStart>600</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_3"/>
+								</PointOnLink>
+								<PointOnLink version="any" order="8" id="mybus:pol_al_01_rtp_SSP_002@">
+									<Name>Goes through rtpt 11 </Name>
+									<DistanceFromStart>1500</DistanceFromStart>
+									<RoutePointRef version="any" ref="mybus:Rtpt_RT_24_SSP_002@"/>
+								</PointOnLink>
+							</passingThrough>
+							<FromPointRef version="any" ref="hde:ap_01"/>
+							<ToPointRef version="any" ref="hde:ap_02"/>
+						</ActivationLink>
+					</activationLinks>
+					<activatedEquipments>
+						<ActivatedEquipment version="any" id="hde:ActivatedEquipment:aeq_01">
+							<Name>Equipment at TCP1</Name>
+							<OutOfService>false</OutOfService>
+							<TrafficControlPointRef ref="hde:tcp_01"/>
+							<assignments>
+								<ActivationAssignment version="any" id="hde:aeq_01" order="1">
+									<LinkRef version="any" ref="hde:ActivationLink:al_01"/>
+									<PointRef version="any" ref="hde:tcp_01"/>
+								</ActivationAssignment>
+							</assignments>
+						</ActivatedEquipment>
+						<ActivatedEquipment version="any" id="hde:ActivatedEquipment:aeq_02">
+							<Name>Equipment at AP3</Name>
+							<OutOfService>false</OutOfService>
+							<TrafficControlPointRef ref="hde:tcp_02"/>
+							<assignments>
+								<ActivationAssignment version="any" id="hde:aeq_02" order="1">
+									<LinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+									<PointRef version="any" ref="hde:ap_03"/>
+								</ActivationAssignment>
+							</assignments>
+						</ActivatedEquipment>
+					</activatedEquipments>
+				</InfrastructureFrame>
+				<!-- ======Timetable ======= -->
+				<TimetableFrame version="1" id="hde:TIM_23_O">
+					<validityConditions>
+						<AvailabilityCondition version="any" id="hde:Cnd001">
+							<Description>Sept  to March</Description>
+							<FromDate>2010-11-01T00:00:00Z</FromDate>
+							<ToDate>2011-03-31T00:00:00Z</ToDate>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+						</AvailabilityCondition>
+					</validityConditions>
+					<Name>Winter timetable for route 24, outbound</Name>
+					<VehicleModes>bus</VehicleModes>
+					<!-- =====  JOURNEYS====== -->
+					<vehicleJourneys>
+						<!-- =====OUTBOUND JOURNEYS====== -->
+						<ServiceJourney version="any" id="hde:sj_24o_01">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="mybus:RT_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24o_01_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:SSP_001_to_SSP_001_t1"/>
+										<ToPointRef version="any" ref="mybus:SSP_001_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SSP_001_to_SSP_002"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>14:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<OnwardTimingLinkView>
+										<TimingLinkRef version="any" ref="mybus:SSP_002_to_SSP_002_t1"/>
+										<ToPointRef version="any" xsi:type="TimingPointRefStructure" ref="mybus:SSP_002_t1"/>
+									</OnwardTimingLinkView>
+									<OnwardServiceLinkRef version="any" ref="mybus:SSP_002_to_SSP_077"/>
+									<Arrival>
+										<Time>14:30:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>14:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+									<Note>Arrival at Terminus</Note>
+								</Call>
+								<Call version="any" id="hde:sj_24o_01_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<Time>15:10:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_24o_02">
+							<DepartureTime>15:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24o"/>
+							<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="mybus:RT_24o"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24o_02_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>15:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<Arrival>
+										<Time>15:30:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>15:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24o_02_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<Time>16:10:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<!-- =====INBOUND JOURNEYS====== -->
+						<ServiceJourney version="any" id="hde:sj_24i_01">
+							<DepartureTime>14:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24i"/>
+							<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="mybus:RT_24i"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24i_01_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>14:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24i_01_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<Arrival>
+										<Time>14:30:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>14:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+									<Note>Arrival at Terminus</Note>
+								</Call>
+								<Call version="any" id="hde:sj_24i_01_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<Arrival>
+										<Time>15:10:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+						<ServiceJourney version="any" id="hde:sj_24i_02">
+							<DepartureTime>15:20:00.0Z</DepartureTime>
+							<dayTypes>
+								<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+							</dayTypes>
+							<ServicePatternRef version="any" ref="hde:svp_24i"/>
+							<TimeDemandTypeRef version="any" ref="mybus:td_01"/>
+							<LineRef version="any" ref="mybus:LN_24"/>
+							<JourneyPatternView>
+								<RouteRef version="any" ref="mybus:RT_24i"/>
+								<DirectionType>outbound</DirectionType>
+								<DestinationDisplayRef version="any" ref="mybus:DST_Charley"/>
+							</JourneyPatternView>
+							<calls>
+								<Call version="any" id="hde:sj_24i_02_001" order="1">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_077"/>
+									<Arrival>
+										<ForAlighting>false</ForAlighting>
+									</Arrival>
+									<Departure>
+										<Time>15:20:00.0Z</Time>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24i_02_002" order="2">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_002"/>
+									<Arrival>
+										<Time>15:30:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<Time>15:32:00.0Z</Time>
+										<WaitTime>PT2M</WaitTime>
+									</Departure>
+								</Call>
+								<Call version="any" id="hde:sj_24i_02_003" order="3">
+									<ScheduledStopPointRef version="any" ref="mybus:SSP_001"/>
+									<Arrival>
+										<Time>16:10:00.0Z</Time>
+									</Arrival>
+									<Departure>
+										<ForBoarding>false</ForBoarding>
+									</Departure>
+								</Call>
+							</calls>
+						</ServiceJourney>
+					</vehicleJourneys>
+				</TimetableFrame>
+				<!--  Service Calendar Nov 2010   COMPACT Coding  === -->
+				<ServiceCalendarFrame version="1" id="hde:CAL_02">
+					<Name>Service Calendar Nov 2010 ALTERNATE MORE COMPACT Coding  </Name>
+					<ServiceCalendar version="any" id="hde:CAL_02">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2010-11-14</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="hde:DT_01-MF-NH">
+							<Name>Weekdays unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+					<dayTypeAssignments>
+						<DayTypeAssignment version="any" order="1" id="hde:DayAsgn_2010-11-01">
+							<Description>Monday 2010-11-01</Description>
+							<Date>2010-11-01</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="2" id="hde:DayAsgn_2010-11-02">
+							<Description>Tuesday 2010-11-02</Description>
+							<Date>2010-11-02</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="3" id="hde:DayAsgn_2010-11-03">
+							<Description>Wednesday 2010-11-03</Description>
+							<Date>2010-11-03</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="4" id="hde:DayAsgn_2010-11-04">
+							<Description>Thusday 2010-11-04</Description>
+							<Date>2010-11-04</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+						<DayTypeAssignment version="any" order="5" id="hde:DayAsgn_2010-11-05">
+							<Description>MFriday 2010-11-05</Description>
+							<Date>2010-11-05</Date>
+							<DayTypeRef version="any" ref="hde:DT_01-MF-NH"/>
+						</DayTypeAssignment>
+					</dayTypeAssignments>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+	</dataObjects>
+</PublicationDelivery>

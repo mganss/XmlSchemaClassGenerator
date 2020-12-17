@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_duty_version">
+	<xsd:include schemaLocation="../../netex_part_1/part1_networkDescription/netex_timingPattern_support.xsd"/>
+	<xsd:include schemaLocation="../part2_frames/netex_timetableFrame_support.xsd"/>
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_vehicleService_support.xsd"/>
+	<xsd:include schemaLocation="netex_duty_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified> Name Space changes  
+				</Date>
+				<Date>
+					<Modified>2018-02-25</Modified>Skinkie: Fix:  #35 Correct Case on AccountingTime.  Also Renamed DayOffset to EndDayOffset
+						Also changed VehicleModeEnumeration   to AllVehicleModesOfTransportEnumeration to allow for non vehicle modes.
+				</Date>
+				<Date>
+					<Modified>2019-03-25</Modified>NJSK : Fix:  Revise to Add separate  EndDayOffset. NB this changes DayOffset to mean start day offset 
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the DUTY types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_2/part2_vehicleService}netex_duty_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx DUTY    types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: DUTY  types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ======================================================================= -->
+	<xsd:group name="DutyFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DUTY FRAME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="duties" type="dutiesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DUTIes in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dutyParts" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DUTY PARTs (Runs) in frame.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="dutyPartsInFrame_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="driverTrips" type="driverTripsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DRIVER TRIPs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="dutiesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of DUTies.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Duty" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="dutyPartsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of DUTY PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="DutyPart" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="driverTripsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of DRIVER TRIPs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="DriverTrip" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- === DUTY ================================================== -->
+	<xsd:element name="Duty" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>The work to be performed by a driver on a particular DAY TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Duty_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DutyGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DutyIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Duty_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DUTY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="DutyGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DutyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DUTY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of DUTY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FinishingDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time to complete DUTY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time to complete DUTY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TimetableFrameRef" minOccurs="0"/>
+			<xsd:element name="dutyParts" type="dutyParts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Parts of a DUTY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- === ACCOUNTABLE ELEMENT ================================================================== -->
+	<xsd:element name="AccountableElement" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A period of a driver's DUTY during which (s)he is continuously working without a BREAK. PAUSEs during which (the)he remains responsible for the vehicle may be included.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="AccountableElementStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="AccountableElementGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="AccountableElementIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AccountableElementStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for ACCOUNTABLE ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="AccountableElementGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AccountableElementGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for an ACCOUNTABLE ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of ACCOUNTABLE ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccountingTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How long a time shoudl be used for the the ACCOUNTABLE ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccountingFactor" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Accounting Factor to use for the the ACCOUNTABLE ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time to prepare ACCOUNTABLE ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FinishingDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time to complete ACCOUNTABLE ELEMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== DUTY PARTS ================================================== -->
+	<xsd:complexType name="dutyParts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of DUTY PARTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="DutyPartRef"/>
+					<xsd:element ref="DutyPart">
+						<xsd:annotation>
+							<xsd:documentation>An area within a Site. May be connected to Quays by PATH LINKs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DutyPart" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A continuous part of a driver DUTY during which (s)he is under the management of the company. A DUTY PART may include BREAKs.
+.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DutyPart_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="AccountableElementGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DutyPartGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DutyPartIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DutyPart_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a DUTY PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AccountableElementStructure">
+				<xsd:sequence>
+					<xsd:group ref="DutyPartGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DutyPartGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DUTY PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DriverAccessDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time for DRIVER to access DUTY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DriverReturnDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Time for DRIVER to return from DUTY PART.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="DutyRef" minOccurs="0"/>
+			<xsd:element name="StartTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start time.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset for start time. Number of days after the current operating day for Duty y . Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndTime" type="xsd:time" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>End time.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Day offset for end time. Number of days after the starting departure time of the journey if  not same calendar day as starting timey. Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartPointRef" type="TimingPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIMING POINT at which DUTY PART starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndPointRef" type="TimingPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIMING POINT at which DUTY PART starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== DRIVER TRIP ================================================== -->
+	<xsd:element name="DriverTrip" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A planned non-driving movement of a driver within a DUTY PART. This may be necessary to reach the first SPELL in a STRETCH, between two SPELLs or after the last SPELL in a STRETCH. It may be entirely on foot or may use a VEHICLE JOURNEY on a vehicle driven by another driver.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DriverTrip_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DriverTripGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DriverTripIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DriverTrip_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DRIVER TRIP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="DriverTripGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DriverTripGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DRIVER TRIP.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of DRIVER TRIP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartPointRef" type="TimingPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIMING POINT at which run starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndPointRef" type="TimingPointRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TIMING POINT at which run starts.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccountingTime" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How long the run takes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AccountingFactor" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How long the run takes to prepare.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="tripTimes" type="driverTripTimes_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DRIVER TRIP TIMEs for DRIVER TRIP.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- =====DRIVER TRIP TIMES ================================================= -->
+	<xsd:complexType name="driverTripTimes_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of DRIVER TRIP TIMEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="DriverTripTimeRef"/>
+					<xsd:element ref="DriverTripTime">
+						<xsd:annotation>
+							<xsd:documentation>An area within a Site. May be connected to Quays by PATH LINKs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DriverTripTime" abstract="false" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A part of a BLOCK composed of consecutive VEHICLE JOURNEYs defined for the same DAY TYPE, all operated on the same LINE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DriverTripTime_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DriverTripTimeGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DriverTripTimeIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DriverTripTime_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DRIVER TRIP TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="DriverTripTimeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="DriverTripTimeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a DRIVER TRIP TIME.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of DRIVER TRIP TIME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="DriverTripRef" minOccurs="0"/>
+			<xsd:element name="Duration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>How long the DRIVER TRIP takes.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Mode of Transport.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+</xsd:schema>

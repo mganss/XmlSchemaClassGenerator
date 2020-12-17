@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- ==== Simple Zone to Zone with peak and Off peak  ratesFare Example ====== 
+This example shows the encoding of tariff for a simple bus network witha one to zone stucture  and peak and off peak fares in NeTex XML 
+ 
+It is similar to the simple zonal example except that there are separate 
+FARE PRODUCTS for Peak and Off Peak times 
+
+The Prices are held separately in a PRICE GROUP to make it easy to change them 
+ 
+Data is Fictional 
+
+(C) CEN & Crown Copyright 2018, 2019 
+Free to use under a Creative Commons license.
+
+v1.1 Add Price refs, revise time_bands corrections
+
+===================================================
+ 
+1. OVERVIEW
+============
+OPERATOR mybus:Dta  operates  the mybus:DTA NETWORK,  with lines LINE   mybus:Line_24 -  & Line_24_48
+
+		 The first route has just three stops 	 A - B - C 
+																		::
+	 	The second route 	has stops							B	- Q - R
+		
+	TARIFF ZONE 1 has SCHEDULED STOP POINT : A
+	TARIFF ZONE 2 has SCHEDULED STOP POINTss: B, C , Q 
+	TARIFF ZONE 3 has SCHEDULED STOP POINTs: Q, R
+
+Stop Q is in two zones : 2 and 3.
+
+
+There are separate peak and off peak  prices.
+      Peak is Working Weekdays 08:30  to 10:00  am  and 17:00 to 18:30 pm  (holidays excluded)
+      Offpeak is other times
+
+There is one  ZoneToZone FARE PRODUCT, covering : 
+
+	Adult Standard Fare
+	Child Standard fare
+	Adult Peak Fare
+	Child Peak fare
+
+Adult prices are
+	From To	Adult Price 
+						Zone	1		Zone	2				Zone	3
+ Zone	1 		 0.50 EUR		1.00 EUR	 	3.00 EUR		 
+ Zone	2	 			-				0.50 EUR		2.00 EUR	
+	Zone	3				 -				-					0.75 EUR	
+	
+The prices are thus 
+Zone to Zone Fare matrix
+				Adult Price 						Child price
+From To	OffPeak 		Peak 	
+ 1 1		0.50 EUR		1.00 EUR		50% 		 
+ 1 2		1.00 EUR		2.00 EUR		50% 
+ 1 3		3.00 EUR		4.00 EUR 		50%
+ 2 2		0.50 EUR		1.00 EUR.		50%
+ 2 3		2.00 EUR		2.50 EUR.		50%
+3 3		0.75 EUR		1.00 EUR.		50%
+
+==================================
+2. DETAILS
+
+SCHEDULED STOP POINTs
+	    A)   mybus:ssp_001  Alpha 
+		B)  mybus:ssp_002   Bravo 
+		C)  mybus:ssp_077	 Charley 
+
+		Q)  mybus:ssp_021	 Quebec 
+		R)  mybus:ssp_022	 Romeo
+ 
+TARIFF ZONEs
+	TARIFF ZONE 1 has SCHEDULED STOP POINT : A
+	TARIFF ZONE 2 has SCHEDULED STOP POINTss: B, C
+	TARIFF ZONE 3 has SCHEDULED STOP POINTs: Q,  R
+ 
+
+TARIFF with FARE STRUCTURE ELEMENTS for 
+   (i)  Access FARE STRUCTURE ELEMENTmyfares:Tz2z@access
+        DISTANCE MATRIX ELEMENTs
+	1 1   DISTANCE MATRIX ELEMENT myfares:Z1+Z1
+	1 2   DISTANCE MATRIX ELEMENT myfares:Z1+Z2
+    1 3   DISTANCE MATRIX ELEMENT myfares:Z1+Z3
+    2 2   DISTANCE MATRIX ELEMENT myfares:Z2+Z2
+    2 3   DISTANCE MATRIX ELEMENT myfares:Z2+Z3
+    3 3   DISTANCE MATRIX ELEMENT myfares:Z3+Z3
+
+   (ii) Eligibility  FARE STRUCTURE ELEMENT myfares:Tz2z@Eligibility
+		USER PROFLE - Adults 17 or over 
+		USER PROFLE - Child  16 or under  , discounted  
+
+   (iii) demand type  FARE STRUCTURE ELEMENT myfares:Tz2z@deman_type
+		FARE DEMAND TYPE  - myfares:TF01@demand_types@peak
+			FARE DEMAND TYPE  - myfares:TF01@demand_types@opp_peak
+
+	(iv) Conditions of Use ARE STRUCTURE ELEMENT myfares:Tz2z@conditions_pf_travel
+   		FREQUENCY OF USE   one trip unlimited   myfares:FrequencyOfUse:oneTrip
+     		ROUND TRIP OF USE  single
+    
+FARE PRODUCT:s
+
+	 PREASSIGNED FARE PRODUCT myfares:SingleTrip
+		
+           With VALIDABLE  ELEMENT  that references the FARE STRUCTUR ELEMENts
+
+SALES OFFER PACKAGEa   
+
+          SALES OFFER PACKAGE  myfares:SingleTrip-SOP@p-ticket  that references the fare product
+
+
+FARE TABLE  used to group sets of prices 
+
+Two nested FARE TABLES are used to group sets of prices
+	OffPeak FARE TABLE myfares:FareTable:offPeak
+			USAGE PARAMETER PRICE	myfares:Tz2z@adult 100%
+			USAGE PARAMETER PRICE	myfares:Tz2z@adult 	50%
+
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z1+Z1@offPeak : 0.50 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z1+Z2@offPeak : 1,00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z1+Z3@offPeak : 3.00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z2+Z2@offPeak : 0.50 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z2+Z3@offPeak : 2.00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z3+Z3@offPeak : 0.75 EUR
+
+	Peak FARE TABLE  myfares:FareTable:Peak 
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z1+Z1_adult@peak : 1,00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z1+Z2_adult@peak : 2.00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z1+Z3_adult@peak : 3.00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z2+Z2_adult@peak : 1,00 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z2+Z3_adult@peak : 2.50 EUR
+			DISTANCE MATRIX ELEMENT PRICE myfares:Z3+Z3_adult@peak : 1,00 EUR
+
+
+A COMPOSITE FRAME is used to group the component FRAMEs
+ 
+   - It has a VALIDITY CONDITION   and sets the codespaces etc
+
+		A SERVICE  FRAME is used to contain the STOP POINT  elements   LINE, etc
+		A FARE  FRAME is used to contain  the FARE  product description   elements 
+		A FARE  FRAME is used to contain  the FARE     prices 
+		A SERVICE CALENDAR FRAME is used to contain  the temporla conditions that define peak/off peak
+		A RESOURCE  FRAME is used to contain  the common code values
+==================================
+2. DETAILS  
+  
+
+ 
+A COMPOSITE FRAME is used to group the component FRAMEs
+ 
+ - It has a VALIDITY CONDITION that specifies it is valid from Sept to Matrch
+
+		A SERVICE FRAME is used to contain the STOP POINT elements LINE, etc
+		A FARE FRAME is used to contain the FARE elements 
+ 
+
+The Calendar is shown coded as
+ Compact : OPERATING DAYs are assumed for each calendar date within the period of the calendar 
+
+-->
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mybus="http://www.mybuses.eu/stuff" xmlns:myfares="http://www.mybuses.eu/fares" xmlns:hde="http://www.halt.de/" version="1.0" xsi:schemaLocation="http://www.netex.org.uk/netex ../../../xsd/NeTEx_publication.xsd">
+	<PublicationTimestamp>2010-12-17T09:30:47.0Z</PublicationTimestamp>
+	<ParticipantRef>SYS001</ParticipantRef>
+	<!--- ======WHAT WAS REQUESTED ========== -->
+	<PublicationRequest version="1.0">
+		<RequestTimestamp>2010-12-17T09:30:47.0Z</RequestTimestamp>
+		<ParticipantRef>SYS002</ParticipantRef>
+		<topics>
+			<NetworkFrameTopic>
+				<selectionValidityConditions>
+					<AvailabilityCondition version="any" id="hde:CAL_02">
+						<FromDate>2011-01-01T00:00:00Z</FromDate>
+					</AvailabilityCondition>
+				</selectionValidityConditions>
+				<FareFrameRef ref="myfares:FF01">REQUEST</FareFrameRef>
+			</NetworkFrameTopic>
+		</topics>
+	</PublicationRequest>
+	<PublicationRefreshInterval>P1M</PublicationRefreshInterval>
+	<Description>Example of simple point to point fares</Description>
+	<!--- =============== RESULTS =========== -->
+	<dataObjects>
+		<CompositeFrame version="1" id="myfares:DTA@z2z_time_banded">
+			<validityConditions>
+				<ValidBetween>
+					<FromDate>2011-01-01T00:00:00Z</FromDate>
+					<ToDate>2011-07-01T00:00:00Z</ToDate>
+				</ValidBetween>
+			</validityConditions>
+			<!--- ======= CODESPACEs======== -->
+			<codespaces>
+				<Codespace id="mybus">
+					<Xmlns>mybus</Xmlns>
+					<XmlnsUrl>http://www.mybuses.eu/stuff</XmlnsUrl>
+					<Description>My buse network description</Description>
+				</Codespace>
+				<Codespace id="myfares">
+					<Xmlns>myfares</Xmlns>
+					<XmlnsUrl>http://www.myfares,com/fares</XmlnsUrl>
+					<Description>Fare data</Description>
+				</Codespace>
+			</codespaces>
+			<!--- =======FRAME DEFAULTS======== -->
+			<FrameDefaults>
+				<DefaultCodespaceRef ref="myfares"/>
+				<DefaultCurrency>EUR</DefaultCurrency>
+			</FrameDefaults>
+			<frames>
+				<!--- ========SERVICE FRAME ========== -->
+				<ServiceFrame version="1.0" id="mybus:DTA@z2z_time_banded@network">
+					<Name>Stopss and tariff zones for   routes 24 and 46</Name>
+					<prerequisites>
+						<ResourceFrameRef version="1.0" ref="mybus:DTA@Common_Resources"/>
+					</prerequisites>
+					<Network version="any" id="mybus:DTA">
+						<OperatorRef version="any" ref="mybus:DTA"/>
+						<groupsOfLines>
+							<GroupOfLines version="any" id="mybus:DTA@lines">
+								<members>
+									<LineRef version="any" ref="mybus:Line_24"/>
+									<LineRef version="any" ref="mybus:Line_48"/>
+								</members>
+							</GroupOfLines>
+						</groupsOfLines>
+						<tariffZones>
+							<TariffZoneRef version="any" ref="myfares:1"/>
+							<TariffZoneRef version="any" ref="myfares:2"/>
+							<TariffZoneRef version="any" ref="myfares:3"/>
+						</tariffZones>
+					</Network>
+					<lines>
+						<Line version="any" id="mybus:Line_24">
+							<Name>Line  24</Name>
+						</Line>
+						<Line version="any" id="mybus:Line_48">
+							<Name>Line  48</Name>
+						</Line>
+					</lines>
+					<!--- =========STOP POINTs============ -->
+					<scheduledStopPoints>
+						<ScheduledStopPoint version="any" id="mybus:SSP_001">
+							<Name>Alpha &amp; Castle</Name>
+							<Location>
+								<Longitude>53.0000</Longitude>
+								<Latitude>0.1000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="myfares:1"/>
+							</tariffZones>
+							<ShortName>Alpha</ShortName>
+							<PublicCode>EANDC</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_002">
+							<Name>Bravo</Name>
+							<Location>
+								<Longitude>53.2000</Longitude>
+								<Latitude>0.2000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="myfares:2"/>
+							</tariffZones>
+							<ShortName>Bravo</ShortName>
+							<PublicCode>MARCH</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_077">
+							<Name>Charley</Name>
+							<Location>
+								<Longitude>53.3000</Longitude>
+								<Latitude>0.3000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="myfares:2"/>
+							</tariffZones>
+							<ShortName>Charley</ShortName>
+							<PublicCode>KENG</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_022">
+							<Name>Quebec Street</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="myfares:2"/>
+								<TariffZoneRef version="any" ref="myfares:3"/>
+							</tariffZones>
+							<ShortName>Quebec</ShortName>
+							<PublicCode>QBC</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+						<ScheduledStopPoint version="any" id="mybus:SSP_021">
+							<Name>Romeo</Name>
+							<Location>
+								<Longitude>53.34000</Longitude>
+								<Latitude>0.34000</Latitude>
+							</Location>
+							<TimingPointStatus>timingPoint</TimingPointStatus>
+							<tariffZones>
+								<TariffZoneRef version="any" ref="myfares:3"/>
+							</tariffZones>
+							<ShortName>Romeo</ShortName>
+							<PublicCode>ROM</PublicCode>
+							<StopType>onstreetBus</StopType>
+							<VehicleModes>bus</VehicleModes>
+						</ScheduledStopPoint>
+					</scheduledStopPoints>
+					<tariffZones>
+						<!--- ====TARIFF ZONEs ======== -->
+						<TariffZone version="any" id="myfares:1">
+							<Name>Zone 1</Name>
+						</TariffZone>
+						<TariffZone version="any" id="myfares:2">
+							<Name>Zone 2</Name>
+						</TariffZone>
+						<TariffZone version="any" id="myfares:3">
+							<Name>Zone 3</Name>
+						</TariffZone>
+					</tariffZones>
+				</ServiceFrame>
+				<!--- =============== FAREs =========== -->
+				<FareFrame version="1.0" id="myfares:DTA@z2z_time_banded@products">
+					<prerequisites>
+						<ServiceFrameRef version="1.0" ref="mybus:DTA@z2z_time_banded@network"/>
+							<ServiceCalendarFrameRef version="1.0" ref="myfares:DTA@z2z_time_banded@calendar"/>
+					</prerequisites>
+					<!--- ====Pricing Parmaters======= -->
+					<PricingParameterSet version="1.0" id="myfares:price_rules">
+						<pricingRules>
+							<DiscountingRule version="1.0" id="myfares:0%">
+								<DiscountAsPercentage>0</DiscountAsPercentage>
+							</DiscountingRule>
+							<DiscountingRule version="1.0" id="myfares:50%">
+								<DiscountAsPercentage>50</DiscountAsPercentage>
+							</DiscountingRule>
+						</pricingRules>
+					</PricingParameterSet>
+					<tariffs>
+						<Tariff version="1.0" id="myfares:Tz2z">
+							<Name>Zone to Zone Trip tariff</Name>
+							<OperatorRef version="any" ref="mybus:DTA"/>
+							<TypeOfTariffRef version="ntx:v1.0" ref="ntx:zone_to_zone"/>
+							<qualityStructureFactors>
+								<FareDemandFactor version="1.0" id="myfares:peak">
+									<Name>Any time</Name>
+									<FareDemandType>peak</FareDemandType>
+								</FareDemandFactor>
+								<FareDemandFactor version="1.0" id="myfares:off_peak">
+									<Name>Off Peak</Name>
+									<FareDemandType>offPeak</FareDemandType>
+								</FareDemandFactor>
+							</qualityStructureFactors>
+							<!--- ====Fare Structure======= -->
+							<fareStructureElements>
+								<FareStructureElement version="1.0" id="myfares:Tz2z@access">
+									<Name>Allowed zone to zone transitions</Name>
+									<distanceMatrixElements>
+										<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z2"/>
+										<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z3"/>
+										<DistanceMatrixElementRef version="any" ref="myfares:Z2+Z3"/>
+										<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z1"/>
+										<DistanceMatrixElementRef version="any" ref="myfares:Z2+Z2"/>
+										<DistanceMatrixElementRef version="any" ref="myfares:Z3+Z3"/>
+									</distanceMatrixElements>
+									<GenericParameterAssignment order="1" id="myfares:Tz2z@access" version="1.0">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access"/>
+										<validityParameters>
+											<OperatorRef version="any" ref="mybus:DTA"/>
+											<NetworkRef version="any" ref="mybus:DTA"/>
+										</validityParameters>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement version="1.0" id="myfares:Tz2z@eligibility">
+									<Name>Eligible user types</Name>
+									<GenericParameterAssignment order="1" id="myfares:Tz2z@eligibility" version="1.0">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:eligible"/>
+										<LimitationGroupingType>XOR</LimitationGroupingType>
+										<limitations>
+											<!--- ===ELIGIBILITY USAGE PARAMETERS ========= -->
+											<UserProfile version="any" id="myfares:adult">
+												<Name>Child Fare</Name>
+												<prices>
+													<UsageParameterPrice version="1.0" id="myfares:Tz2z@adult">
+														<Name>Adult - full fare</Name>
+														<UserProfileRef version="any" ref="myfares:adult"/>
+													</UsageParameterPrice>
+												</prices>
+												<TypeOfConcessionRef version="any" ref="myfares:adult"/>
+												<MaximumAge>16</MaximumAge>
+											</UserProfile>
+											<UserProfile version="any" id="myfares:child">
+												<Name>Child Fare</Name>
+												<prices>
+													<UsageParameterPrice version="1.0" id="myfares:Tz2z@child">
+														<Name>Child discount - all fares</Name>
+														<DiscountingRuleRef version="1.0" ref="myfares:50%"/>
+														<UserProfileRef version="any" ref="myfares:child"/>
+													</UsageParameterPrice>
+												</prices>
+												<TypeOfConcessionRef version="any" ref="myfares:child"/>
+												<MaximumAge>16</MaximumAge>
+											</UserProfile>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:Tz2z@demand_types" version="1.0">
+									<Name>Timebands for travel</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:Tz2z@demand_types">
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access_when"/>
+										<IncludesGroupingType>XOR</IncludesGroupingType>
+										<includes>
+											<GenericParameterAssignment version="1.0" order="1" id="myfares:Tz2z@demand_types@peak">
+												<Name>Peak Fare</Name>
+												<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access_when"/>
+												<ValidityParameterGroupingType>AND</ValidityParameterGroupingType>
+												<temporalValidityParameters>
+													<DayTypeRef version="any" ref="myfares:DT_01-MF-NH"/>
+													<GroupOfTimebandsRef version="any" ref="myfares:peak"/>
+												</temporalValidityParameters>
+												<FareDemandFactorRef version="1.0" ref="myfares:peak"/>
+											</GenericParameterAssignment>
+											<GenericParameterAssignment version="1.0" order="1" id="myfares:Tz2z@demand_types@off_peak">
+												<Name>Peak Fare</Name>
+												<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:can_access_when"/>
+												<temporalValidityParameters>
+													<DayTypeRef version="any" ref="myfares:DT_02-NotWorkingDay"/>
+												</temporalValidityParameters>
+												<FareDemandFactorRef version="1.0" ref="myfares:off_peak"/>
+											</GenericParameterAssignment>
+										</includes>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+								<FareStructureElement id="myfares:Tz2z@conditions_of_travel" version="1.0">
+									<Name>eligible user types</Name>
+									<GenericParameterAssignment version="1.0" order="1" id="myfares:Tz2z@conditions_of_travel">
+										<Name>Conditions of travel</Name>
+										<TypeOfAccessRightAssignmentRef version="ntx:v1.0" ref="ntx:condition_of_use"/>
+										<LimitationGroupingType>AND</LimitationGroupingType>
+										<limitations>
+											<RoundTrip version="1.0" id="myfares:Tz2z@conditions_of_travel@direction">
+												<Name>Single Trip</Name>
+												<TripType>single</TripType>
+											</RoundTrip>
+											<FrequencyOfUse version="any" id="myfares:Tz2z@conditions_of_travel@one_trip">
+												<Name>One trip only, any route, unlimited transfers</Name>
+												<FrequencyOfUseType>single</FrequencyOfUseType>
+												<MaximalFrequency>1</MaximalFrequency>
+											</FrequencyOfUse>
+											<Interchanging version="1.0" id="myfares:Tz2z@conditions_of_travel@no_transfers">
+												<MaximumNumberOfInterchanges>0</MaximumNumberOfInterchanges>
+											</Interchanging>
+										</limitations>
+									</GenericParameterAssignment>
+								</FareStructureElement>
+							</fareStructureElements>
+							<distanceMatrixElements>
+								<DistanceMatrixElement version="any" id="myfares:Z1+Z1">
+									<Name>Zone 1 to Zone 1</Name>
+									<StartTariffZoneRef version="any" ref="myfares:1"/>
+									<EndTariffZoneRef version="any" ref="myfares:1"/>
+									<prices>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z1+Z1@peak"/>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z1+Z1@offPeak"/>
+									</prices>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Z1+Z2">
+									<Name>Zone 1 to Zone 2</Name>
+									<StartTariffZoneRef version="any" ref="myfares:1"/>
+									<EndTariffZoneRef version="any" ref="myfares:2"/>
+									<prices>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z1+Z2@peak"/>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z1+Z2@offPeak"/>
+									</prices>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Z1+Z3">
+									<Name>Zone 1 to Zone 3</Name>
+									<StartTariffZoneRef version="any" ref="myfares:1"/>
+									<EndTariffZoneRef version="any" ref="myfares:3"/>
+									<prices>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z1+Z3@peak"/>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z1+Z3@offPeak"/>
+									</prices>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Z2+Z2">
+									<Name>Zone 2 to Zone 2</Name>
+									<StartTariffZoneRef version="any" ref="myfares:2"/>
+									<EndTariffZoneRef version="any" ref="myfares:2"/>
+									<prices>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z2+Z2@peak"/>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z2+Z2@offPeak"/>
+									</prices>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Z2+Z3">
+									<Name>Zone 2 to Zone 3</Name>
+									<StartTariffZoneRef version="any" ref="myfares:2"/>
+									<EndTariffZoneRef version="any" ref="myfares:3"/>
+									<prices>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z2+Z3@peak"/>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z2+Z3@offPeak"/>
+									</prices>
+								</DistanceMatrixElement>
+								<DistanceMatrixElement version="any" id="myfares:Z3+Z3">
+									<Name>Zone 3 to Zone 3</Name>
+									<StartTariffZoneRef version="any" ref="myfares:3"/>
+									<EndTariffZoneRef version="any" ref="myfares:3"/>
+									<prices>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z3+Z3@peak"/>
+										<DistanceMatrixElementPriceRef version="any" ref="myfares:SingleTrip@Z3+Z3@offPeak"/>
+									</prices>
+								</DistanceMatrixElement>
+							</distanceMatrixElements>
+							<!--  == Prices === -->
+							<fareTables>
+								<FareTableRef version="1.0" ref="myfares:DTA"/>
+							</fareTables>
+						</Tariff>
+					</tariffs>
+					<!--- ====Fare Product======= -->
+					<fareProducts>
+						<PreassignedFareProduct version="1.0" id="myfares:SingleTrip">
+							<Name>Adult Standard Zone to zone - Peak</Name>
+							<TypeOfFareProductRef version="ntx:v1.0" ref="ntx:trip"/>
+							<OperatorRef version="any" ref="mybus:DTA"/>
+							<!--- ====VALIDABLE ELEMENTs====== -->
+							<validableElements>
+								<ValidableElement version="1.0" id="myfares:SingleTrip@travel">
+									<Name>Single ride</Name>
+									<fareStructureElements>
+										<FareStructureElementRef version="1.0" ref="myfares:Tz2z@access"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Tz2z@eligibility"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Tz2z@demand_types"/>
+										<FareStructureElementRef version="1.0" ref="myfares:Tz2z@conditions_of_travel"/>
+									</fareStructureElements>
+								</ValidableElement>
+							</validableElements>
+							<!--- ====ACCESS RIGHTs======= -->
+							<accessRightsInProduct>
+								<AccessRightInProduct version="1.0" id="myfares:SingleTrip@access" order="1">
+									<Name>Single ride</Name>
+									<IsFirstInSequence>true</IsFirstInSequence>
+									<IsLastInSequence>true</IsLastInSequence>
+									<ValidableElementRef version="1.0" ref="myfares:SingleTrip@travel"/>
+								</AccessRightInProduct>
+							</accessRightsInProduct>
+						</PreassignedFareProduct>
+					</fareProducts>
+					<!--==== Sales Packages==== -->
+					<salesOfferPackages>
+						<SalesOfferPackage version="1.0" id="myfares:SingleTrip-SOP@p-ticket">
+							<Name>Single</Name>
+							<distributionAssignments>
+								<DistributionAssignment version="10" id="myfares:SingleTrip-SOP@p-ticket@atStop" order="1">
+									<Name>Onboard</Name>
+									<Description>Pay for ticket onboard</Description>
+									<DistributionChannelRef versionRef="ntx:v1.0" ref="ntx:on_board"/>
+									<DistributionChannelType>atStop</DistributionChannelType>
+									<TicketingServiceFacilityList>purchase</TicketingServiceFacilityList>
+									<PaymentMethods>cashAndCard</PaymentMethods>
+									<FulfilmentMethodRef ref="ntx:collect_on_board" versionRef="ntx:v1.0"/>
+								</DistributionAssignment>
+								<DistributionAssignment version="1.0" id="myfares:SingleTrip-SOP@p-ticket@onBoard" order="2">
+									<Name>Onboard</Name>
+									<Description>Pay for ticket onboard</Description>
+									<DistributionChannelRef versionRef="ntx:v1.0" ref="ntx:on_board"/>
+									<DistributionChannelType>onBoard</DistributionChannelType>
+									<TicketingServiceFacilityList>purchase</TicketingServiceFacilityList>
+									<PaymentMethods>cashAndCard</PaymentMethods>
+									<FulfilmentMethodRef ref="ntx:collect_on_board" versionRef="ntx:v1.0"/>
+								</DistributionAssignment>
+							</distributionAssignments>
+							<salesOfferPackageElements>
+								<SalesOfferPackageElement version="1.0" id="myfares:SingleTrip-SOP@p-ticket" order="1">
+									<TypeOfTravelDocumentRef versionRef="ntx:v1.0" ref="ntx:printed_ticket"/>
+									<PreassignedFareProductRef version="1.0" ref="myfares:SingleTrip"/>
+								</SalesOfferPackageElement>
+							</salesOfferPackageElements>
+						</SalesOfferPackage>
+					</salesOfferPackages>
+				</FareFrame>
+				<FareFrame version="1.0" id="myfares:DTA@z2z_time_banded@prices">
+							<prerequisites>
+						<FareFrameRef version="1.0" ref="myfares:DTA@z2z_time_banded@products"/>
+					</prerequisites>	
+					<!--- ====Fare Prices======= -->
+					<fareTables>
+						<FareTable version="1.0" id="myfares:DTA">
+							<Name>Prices for Zonal Tariff Trip Product</Name>
+							<pricesFor>
+								<SalesOfferPackageRef version="1.0" ref="myfares:SingleTrip-SOP@p-ticket"/>
+								<PreassignedFareProductRef version="1.0" ref="myfares:SingleTrip"/>
+							</pricesFor>
+							<usedIn>
+								<TariffRef version="1.0" ref="myfares:Tz2z"/>
+							</usedIn>
+							<limitations>
+								<UserProfileRef version="any" ref="myfares:adult"/>
+							</limitations>
+							<includes>
+								<FareTable version="1.0" id="myfares:SingleTrip@off_peak">
+									<Name>Off Peak Prices for Zonal Tariff Product</Name>
+									<pricesFor>
+										<FareDemandFactorRef version="1.0" ref="myfares:off_peak"/>
+									</pricesFor>
+									<cells>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z1+Z1@offPeak">
+											<Name>Zone 1 to Zone 2</Name>
+											<Amount>0.50</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z1"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z1+Z2@offPeak">
+											<Name>Zone 1 to Zone 2</Name>
+											<Amount>1.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z2"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z1+Z3@offPeak">
+											<Name>Zone 1 to Zone 3</Name>
+											<Amount>3.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z3"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z2+Z2@offPeak">
+											<Name>Zone 2 to Zone 2</Name>
+											<Amount>0.50</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z2+Z2"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z2+Z3@offPeak">
+											<Name>Zone 2 to Zone 3</Name>
+											<Amount>2.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z2+Z3"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z3+Z3@offPeak">
+											<Name>Zone 3 to Zone 3</Name>
+											<Amount>0.75</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z3+Z3"/>
+										</DistanceMatrixElementPrice>
+									</cells>
+								</FareTable>
+								<FareTable version="1.0" id="myfares:SingleTrip@peak">
+									<Name>Peak Fare Prices for Zonal Tariff Trip Product</Name>
+									<pricesFor>
+										<FareDemandFactorRef version="1.0" ref="myfares:peak"/>
+									</pricesFor>
+									<cells>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z1+Z1@peak">
+											<Name>Zone 1 to Zone 1 Peak</Name>
+											<Amount>1.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z1"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z1+Z2@peak">
+											<Name>Zone 1 to Zone 2 Peak</Name>
+											<Amount>2.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z2"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z1+Z3@peak">
+											<Name>Zone 1 to Zone 3 Peak</Name>
+											<Amount>4.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z1+Z3"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z2+Z2@peak">
+											<Name>Zone 2 to Zone 2 Peak</Name>
+											<Amount>1.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z2+Z2"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z2+Z3@peak">
+											<Name>Zone 2 to Zone 3 Peak</Name>
+											<Amount>2.50</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z2+Z3"/>
+										</DistanceMatrixElementPrice>
+										<DistanceMatrixElementPrice version="any" id="myfares:SingleTrip@Z3+Z3@peak">
+											<Name>Zone 3 to Zone 3 Peak</Name>
+											<Amount>1.00</Amount>
+											<DistanceMatrixElementRef version="any" ref="myfares:Z3+Z3"/>
+										</DistanceMatrixElementPrice>
+									</cells>
+								</FareTable>
+							</includes>
+						</FareTable>
+					</fareTables>
+				</FareFrame>
+				<!-- Service Calendar Nov 2010 COMPACT Coding === -->
+				<ServiceCalendarFrame version="1.0" id="myfares:DTA@z2z_time_banded@calendar">
+					<Name>Service Calendar Coding</Name>
+					<ServiceCalendar version="any" id="myfares:DTA@z2z_time_banded@calendar">
+						<FromDate>2010-11-01</FromDate>
+						<ToDate>2012-11-14</ToDate>
+					</ServiceCalendar>
+					<dayTypes>
+						<DayType version="any" id="myfares:DT_01-MF-NH">
+							<Name>Weekdays unless a holiday</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Monday Tuesday Wednesday Thursday Friday</DaysOfWeek>
+									<HolidayTypes>NotHoliday</HolidayTypes>
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+						<DayType version="any" id="myfares:DT_02-NotWorkingDay">
+							<Name>Not a working day</Name>
+							<properties>
+								<PropertyOfDay>
+									<DaysOfWeek>Everyday</DaysOfWeek>
+									<HolidayTypes>NotWorkingDay</HolidayTypes>
+									<!-- === SHoudl eb not holiday -->
+								</PropertyOfDay>
+							</properties>
+						</DayType>
+					</dayTypes>
+					<timebands>
+						<Timeband version="any" id="myfares:MorningPeak">
+							<Name>Morning Peak</Name>
+							<StartTime>08:30:00</StartTime>
+							<EndTime>10:00:00</EndTime>
+						</Timeband>
+						<Timeband version="any" id="myfares:EveningPeak">
+							<Name>Evening Peak</Name>
+							<StartTime>17:00:00</StartTime>
+							<EndTime>18:30:00</EndTime>
+						</Timeband>
+					</timebands>
+					<groupOfTimebands>
+						<GroupOfTimebands version="any" id="myfares:peak">
+							<Name>Peak Fare hours</Name>
+							<timebands>
+								<TimebandRef version="any" ref="myfares:MorningPeak"/>
+								<TimebandRef version="any" ref="myfares:EveningPeak"/>
+							</timebands>
+						</GroupOfTimebands>
+					</groupOfTimebands>
+				</ServiceCalendarFrame>
+			</frames>
+		</CompositeFrame>
+		<!--- ====RESOURCES==== -->
+		<ResourceFrame version="1.0" id="mybus:DTA@Common_Resources">
+			<Name>Common resources</Name>
+			<codespaces>
+				<Codespace id="ntx">
+					<Xmlns>ntx</Xmlns>
+					<XmlnsUrl>http://netex.org.uk/</XmlnsUrl>
+					<Description>Netex built in value</Description>
+				</Codespace>
+			</codespaces>
+			<typesOfValue>
+				<ValueSet version="ntx:v1.0" id="ntx:Types_of_Tariff" classOfValues="TypeOfTariff">
+					<Name>Types of Tariff</Name>
+					<values>
+						<!--- ====Types OfTariff ========= -->
+						<TypeOfTariff version="ntx:v1.0" id="ntx:Distance_kilometers">
+							<Name>Kilometer Distance Kilometers</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:flat">
+							<Name>Flat</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:point_to_point">
+							<Name>Point to point</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:zone_to_zone">
+							<Name>Zone to Zone</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:zonal">
+							<Name>Zonal</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:section">
+							<Name>Section</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:banded">
+							<Name>Section</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:stored_value">
+							<Name>Stored value</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:discount">
+							<Name>Discount value</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:multitrip">
+							<Name>Multitrip carnet</Name>
+						</TypeOfTariff>
+						<TypeOfTariff version="ntx:v1.0" id="ntx:identity_card">
+							<Name>SIdentity</Name>
+						</TypeOfTariff>
+					</values>
+				</ValueSet>
+				<ValueSet version="ntx:v1.0" id="ntx:Types_of_FareProduct" classOfValues="TypeOfFareProduct">
+					<Name>Types of Fare Product</Name>
+					<values>
+						<TypeOfFareProduct version="ntx:v1.0" id="ntx:trip">
+							<Name>Trip product</Name>
+						</TypeOfFareProduct>
+						<TypeOfFareProduct version="ntx:v1.0" id="ntx:multi_trip">
+							<Name>Multitrip / carnet  product</Name>
+						</TypeOfFareProduct>
+						<TypeOfFareProduct version="ntx:v1.0" id="ntx:period_pass">
+							<Name>Peroid pass product</Name>
+						</TypeOfFareProduct>
+						<TypeOfFareProduct version="ntx:v1.0" id="ntx:day_pass">
+							<Name>Day pass product</Name>
+						</TypeOfFareProduct>
+						<TypeOfFareProduct version="ntx:v1.0" id="ntx:discount_card">
+							<Name>Discount  product</Name>
+						</TypeOfFareProduct>
+					</values>
+				</ValueSet>
+				<ValueSet version="any" id="myfares:Types_of_Concession" classOfValues="TypeOfConcession">
+					<Name>Types of concession</Name>
+					<values>
+						<!--- ====TypeOfConcession method========= -->
+						<TypeOfConcession version="any" id="myfares:adult">
+							<Name>Adult</Name>
+						</TypeOfConcession>
+						<TypeOfConcession version="any" id="myfares:child">
+							<Name>Student</Name>
+						</TypeOfConcession>
+					</values>
+				</ValueSet>
+				<ValueSet version="ntx:v1.0" id="ntx:Types_of_AccessRightAssignment" classOfValues="TypeOfAccessRightAssignment">
+					<Name>Types of Access Right Assignment</Name>
+					<values>
+						<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:eligible">
+							<Name>Eligible for a product or discount</Name>
+						</TypeOfAccessRightAssignment>
+						<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access">
+							<Name>Grants access rights to use or travel on</Name>
+						</TypeOfAccessRightAssignment>
+						<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:can_access_when">
+							<Name>Grants access rights to use or travel during some period</Name>
+						</TypeOfAccessRightAssignment>
+						<TypeOfAccessRightAssignment version="ntx:v1.0" id="ntx:condition_of_use">
+							<Name>Defines a condition or restriction on use</Name>
+						</TypeOfAccessRightAssignment>
+					</values>
+				</ValueSet>
+			</typesOfValue>
+			<organisations>
+				<!--- =====Agency========= -->
+				<Operator version="any" id="mybus:DTA">
+					<Name>Demo Transit Authority</Name>
+				</Operator>
+			</organisations>
+		</ResourceFrame>
+	</dataObjects>
+</PublicationDelivery>

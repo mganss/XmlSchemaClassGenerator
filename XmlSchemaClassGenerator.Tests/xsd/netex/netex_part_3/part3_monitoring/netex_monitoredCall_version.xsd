@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_monitoredCall_version">
+	<xsd:include schemaLocation="netex_monitoredPassingTimes_version.xsd"/>
+	<xsd:include schemaLocation="netex_monitoredVehicleJourney_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_call_version.xsd"/>
+	<!-- ==== CALL =========================================-->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+					<!-- Name Space changes -->
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the MONITORED CALL types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_monitoring}nnetex_monitoredCall_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx MONITORED CALL    types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: MONITORED CALL   types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ====MonitoredCall=========================================-->
+	<xsd:complexType name="monitoredCalls_RelStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for List of MONITORED CALLs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="MonitoredCall" minOccurs="2" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="MonitoredCall">
+		<xsd:annotation>
+			<xsd:documentation>Current monitored real-tieme CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="MonitoredCall_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="MonitoredCallGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="MonitoredCallIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="MonitoredCall_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for Monitored CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Call_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="MonitoredCallGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="MonitoredCallGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the Monitored CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TargetPassingTimeView" minOccurs="0"/>
+			<xsd:element ref="EstimatedPassingTimeView" minOccurs="0"/>
+			<xsd:element ref="ObservedPassingTimeView" minOccurs="0"/>
+			<xsd:element name="previousCalls" type="previousCalls_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Previous stops  in the SERVICE PATTERN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="onwardCalls" type="onwardCalls_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Onwards stops  in the SERVICE PATTERN.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====onwards=========================================-->
+	<xsd:complexType name="onwardCalls_RelStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for List of ONWARD CALLs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="OnwardCall" minOccurs="0" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>Onward class after the current call.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="OnwardCall">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="OnwardCall_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="OnwardCallGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="OnwardCallIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="OnwardCall_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for Onward  CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Call_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="OnwardCallGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="OnwardCallGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the Onward CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TargetPassingTimeView" minOccurs="0"/>
+			<xsd:element ref="EstimatedPassingTimeView" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====previous=========================================-->
+	<xsd:complexType name="previousCalls_RelStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for List of PREVIOUS CALLs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PreviousCall" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PreviousCall">
+		<xsd:annotation>
+			<xsd:documentation>An already completed CALL of  a VEHICLE JOURNEY that occurred earlier in the the JOURNEY PATTERN before the current stop.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PreviousCall_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="CallGroup"/>
+							<!-- The FacilityChangeElement has bee removed here in Siri 1.1, but it is still available at the same place through the AimedCallGroup->DisruptionGroup 
+                  (DisruptionGroup has been added to AimedCallGroup)
+            <xsd:element ref="FacilityChangeElement" minOccurs="0"/>
+            -->
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PreviousCallGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PreviousCallIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PreviousCall_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Data type for Previous  CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Call_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="PreviousCallGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PreviousCallGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements describing the Previous CALL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TargetPassingTimeView" minOccurs="0"/>
+			<xsd:element ref="EstimatedPassingTimeView" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>

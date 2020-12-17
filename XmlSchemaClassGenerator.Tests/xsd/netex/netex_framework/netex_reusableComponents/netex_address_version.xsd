@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 2007 03 23 add Road numbers -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_address_version">
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date>
+					<Modified>2011-02-05</Modified>
+				</Date>
+				<Date>
+					<Modified>2017-03-28  CR031 add Countries in Frame.   Fix add ISO 3166-2  principality code as subkey of Country</Modified>
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines common Address types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_reusableComponents}netex_address_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+ <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from ifopt.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0 Draft for approval</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - ADDRESS types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>ADDRESS types for IFOPT Fixed Objects in Public Transport.</xsd:documentation>
+	</xsd:annotation>
+	<xsd:include schemaLocation="../netex_genericFramework/netex_place_version.xsd"/>
+	<xsd:include schemaLocation="../netex_genericFramework/netex_alternativeName_version.xsd"/>
+	<xsd:include schemaLocation="netex_address_support.xsd"/>
+	<xsd:include schemaLocation="netex_country_support.xsd"/>
+	<!--=============================================================================-->
+	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<xsd:complexType name="addressesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of ADDRESSes.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Address" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="countriesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of COUNTRies. +v1.1</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Country" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--=============================================================================-->
+	<xsd:element name="Address" type="Address_VersionStructure" abstract="true" substitutionGroup="Place">
+		<xsd:annotation>
+			<xsd:documentation>An ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="Address_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Place_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="AddressGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AddressGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for an ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="CountryRef" minOccurs="0"/>
+			<xsd:element name="CountryName" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of Counntry, derivedable from Country Ref.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!--=============================================================================-->
+	<xsd:element name="AddressablePlace" substitutionGroup="Place">
+		<xsd:annotation>
+			<xsd:documentation>A PLACE which may have an address.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="AddressablePlace_VersionStructure"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AddressablePlace_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an ADDRESSABLE PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Place_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="AddressablePlaceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AddressablePlaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for an ADDRESSABLE PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Url" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default URL for ADDRESSABLE PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Image" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Default image for ADDRESSABLE PLACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PostalAddress" minOccurs="0"/>
+			<xsd:element ref="RoadAddress" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ADDRESS of a numbered building on a named road.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!--=============================================================================-->
+	<xsd:element name="RoadAddress" abstract="false" substitutionGroup="Address">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of ADDRESS refining it by using the characteristics such as road number, and name used for conventional identification of along a road.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="RoadAddress_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RoadAddressGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="RoadAddressIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of  ROAD ADDRESS.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="RoadAddress_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Road ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Address_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="RoadAddressGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RoadAddressGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a ROAD ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="GisFeatureRef" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a GIS feature identifier.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RoadNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Road Number.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RoadName" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Road name.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BearingCompass" type="CompassBearing16Enumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Bearing of Road at point in compass octants to North.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BearingDegrees" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Bearing of Road in absolute degrees against North.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OddNumberRange" type="RoadNumberRangeStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Range of odd house numbers that the ROAD ADDRESS covers.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EvenNumberRange" type="RoadNumberRangeStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Range of even house numbers that the ROAD ADDRESS covers.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="RoadNumberRangeStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a range of numbers.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FromNumber" type="xsd:positiveInteger" minOccurs="0"/>
+			<xsd:element name="ToNumber" type="xsd:positiveInteger" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--=============================================================================-->
+	<xsd:element name="PostalAddress" abstract="false" substitutionGroup="Address">
+		<xsd:annotation>
+			<xsd:documentation>A POSTAL ADDRESS to which mail can be sent.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PostalAddress_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="AddressGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PostalAddressGroup"/>
+							<xsd:element name="RoadAddressRef" type="AddressRefStructure" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Road on which ADDRESS lies.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PostalAddressIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of POSTAL ADDRESS.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PostalAddress_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a POSTAL ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Address_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="PostalAddressGroup"/>
+					<xsd:element name="RoadAddressRef" type="AddressRefStructure" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Road on which address lies.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PostalAddressGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a POSTAL ADDRESS.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="HouseNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of house on street.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BuildingName" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of Building.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AddressLine1" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>First line of Address.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AddressLine2" type="MultilingualString" minOccurs="0"/>
+			<xsd:element name="Street" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Street on which building is found.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Town" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Town, City, Village or other named settlement.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Suburb" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Subarea of Town.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PostCode" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Postcode or Zip code of address.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PostCodeExtension" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Post code extension.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PostalRegion" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Postal Region.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Province" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Province or State of Country.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="AddressPlaceGroup">
+		<xsd:annotation>
+			<xsd:documentation>ADDRESSes associated with an ENTITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Url" type="xsd:anyURI" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Web address.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!--=============================================================================-->
+	<xsd:element name="Country" substitutionGroup="Place">
+		<xsd:annotation>
+			<xsd:documentation>A sovereign COUNTRY.where entities may be located or domiciled.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Country_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfPointsGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ZoneGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="PlaceGroup"/>
+						<xsd:sequence>
+							<xsd:group ref="CountryGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="CountryCodeType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of COUNTRY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Country_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a  COUNTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Place_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="CountryGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="principality" type="CountryPrincipalityCodeType">
+					<xsd:annotation>
+						<xsd:documentation>ISO Country Subdivision code type, eg GB-WLS, GB-SCT, GB-NIR, GB-ENG.  +v1.1.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="CountryGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a  COUNTRY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="UicCode" type="PrivateCodeStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Code given to COUNTRY by UIC.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="alternativeNames" type="alternativeNames_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Alternative names for COUNTRY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+</xsd:schema>
