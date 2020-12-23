@@ -30,7 +30,7 @@ namespace XmlSchemaClassGenerator.Tests
             Output = output;
         }
 
-        private IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
+        private static IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
         {
             if (name is null)
             {
@@ -75,7 +75,7 @@ namespace XmlSchemaClassGenerator.Tests
             return writer.Content;
         }
 
-        private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+        private static IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
         {
             return ConvertXml(name, new[] {xsd}, generatorPrototype);
         }
@@ -325,7 +325,20 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void TestIS24RestApi()
         {
-            Compiler.Generate("IS24RestApi", IS24Pattern);
+            Compiler.Generate("IS24RestApi", IS24Pattern, new Generator
+            {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "IS24RestApi",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CompactTypeNames = true
+            });
             TestSamples("IS24RestApi", IS24Pattern);
         }
 
@@ -376,7 +389,7 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void TestTableau()
         {
-            Compiler.Generate("Tableau", TableauPattern, new Generator());
+            Compiler.Generate("Tableau", TableauPattern, new Generator { CompactTypeNames = true });
             TestSamples("Tableau", TableauPattern);
         }
 
@@ -440,7 +453,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         private bool HandleValidationError(string[] xmlLines, ValidationEventArgs e)
         {
-            var line = xmlLines[e.Exception.LineNumber - 1].Substring(e.Exception.LinePosition - 1);
+            var line = xmlLines[e.Exception.LineNumber - 1][(e.Exception.LinePosition - 1)..];
             var severity = e.Severity == XmlSeverityType.Error ? "Error" : "Warning";
             Output.WriteLine($"{severity} at line {e.Exception.LineNumber}, column {e.Exception.LinePosition}: {e.Message}");
             Output.WriteLine(line);
@@ -578,12 +591,12 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.NotNull(t1);
                 var t2 = Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace == "IS24RestApi.Xsd");
                 Assert.NotNull(t2);
-                var f = char.ToLower(c[0]) + c.Substring(1);
+                var f = char.ToLower(c[0]) + c[1..];
                 TestCompareToXsd(t1, t2, f);
             }
         }
 
-        void TestCompareToXsd(Type t1, Type t2, string file)
+        static void TestCompareToXsd(Type t1, Type t2, string file)
         {
             foreach (var suffix in new[] { "max", "min" })
             {
@@ -727,7 +740,7 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        private IDictionary<string, string> GetNamespacesFromSource(string source)
+        private static IDictionary<string, string> GetNamespacesFromSource(string source)
         {
             XPathDocument doc = new XPathDocument(new StringReader(source));
             XPathNavigator namespaceNavigator = doc.CreateNavigator();
@@ -744,12 +757,12 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
                 Assert.NotNull(t1);
-                var f = char.ToLower(c[0]) + c.Substring(1);
+                var f = char.ToLower(c[0]) + c[1..];
                 TestRoundtrip(t1, f);
             }
         }
 
-        void TestRoundtrip(Type t, string file)
+        static void TestRoundtrip(Type t, string file)
         {
             var serializer = new XmlSerializer(t);
 
@@ -811,7 +824,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         [Theory]
         [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
-        [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
+        [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
         public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
@@ -987,10 +1000,6 @@ namespace XmlSchemaClassGenerator.Tests
 // This code was generated by Tests version 1.0.0.1.
 namespace Test
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Xml.Serialization;
 
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute(""Tests"", ""1.0.0.1"")]

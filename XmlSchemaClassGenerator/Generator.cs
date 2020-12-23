@@ -259,6 +259,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.SeparateSubstitutes = value; }
         }
 
+        public bool CompactTypeNames
+        {
+            get { return _configuration.CompactTypeNames; }
+            set { _configuration.CompactTypeNames = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

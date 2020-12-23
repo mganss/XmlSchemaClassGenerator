@@ -1011,7 +1011,7 @@ namespace XmlSchemaClassGenerator
             var hierarchy = NamespaceHierarchyItem.Build(Namespaces.Values.GroupBy(x => x.Name).SelectMany(x => x))
                 .MarkAmbiguousNamespaceTypes();
             return hierarchy.Flatten()
-                .Select(nhi => NamespaceModel.Generate(nhi.FullName, nhi.Models));
+                .Select(nhi => NamespaceModel.Generate(nhi.FullName, nhi.Models, _configuration));
         }
 
         private string BuildNamespace(Uri source, string xmlNamespace)

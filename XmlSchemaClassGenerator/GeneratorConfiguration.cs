@@ -240,17 +240,17 @@ namespace XmlSchemaClassGenerator
         /// </code>
         ///
         /// With <code>false</code> it generates the classes:
-        /// 
+        ///
         /// <code>
         /// public class books {
         ///     public Container&lt;componentType&gt; components {get; set;}
         /// }
         ///
-        /// public class componentType {} 
+        /// public class componentType {}
         /// </code>
         ///
         /// With <code>true</code> it generates the classes:
-        /// 
+        ///
         /// <code>
         /// public class books {
         ///     public Container&lt;componentType&gt; components {get; set;}
@@ -260,7 +260,7 @@ namespace XmlSchemaClassGenerator
         ///     public Container&lt;componentType&gt; components {get; set;}
         /// }
         ///
-        /// public class componentType {} 
+        /// public class componentType {}
         /// </code>
         /// </summary>
         public bool GenerateComplexTypesForCollections { get; set; } = true;
@@ -274,5 +274,10 @@ namespace XmlSchemaClassGenerator
         /// Generates a separate property for each element of a substitution group
         /// </summary>
         public bool SeparateSubstitutes { get; set; } = false;
+
+        /// <summary>
+        /// Generates type names without namespace qualifiers for namespaces in using list
+        /// </summary>
+        public bool CompactTypeNames { get; set; }
     }
 }

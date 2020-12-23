@@ -89,7 +89,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            var a = new CodeAttributeDeclaration(new CodeTypeReference(typeof(StringLengthAttribute), Configuration.CodeTypeReferenceOptions),
+            var a = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(StringLengthAttribute), Configuration),
                 new CodeAttributeArgument(Max > 0 ? (CodeExpression)new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
             if (Min > 0) { a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min))); }
 
@@ -120,7 +120,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MaxLengthAttribute), Configuration.CodeTypeReferenceOptions),
+            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(MaxLengthAttribute), Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
@@ -148,7 +148,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(MinLengthAttribute), Configuration.CodeTypeReferenceOptions),
+            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(MinLengthAttribute), Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
@@ -220,7 +220,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(new CodeTypeReference(typeof(RegularExpressionAttribute), Configuration.CodeTypeReferenceOptions),
+            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(RegularExpressionAttribute), Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }

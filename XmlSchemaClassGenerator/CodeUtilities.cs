@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -34,24 +35,13 @@ namespace XmlSchemaClassGenerator
 
         public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type)
         {
-            bool? result;
-            switch (type.TypeCode)
+            bool? result = type.TypeCode switch
             {
-                case XmlTypeCode.AnyAtomicType:
-                    // union
-                    result = false;
-                    break;
-                case XmlTypeCode.DateTime:
-                case XmlTypeCode.Time:
-                case XmlTypeCode.Date:
-                case XmlTypeCode.Base64Binary:
-                case XmlTypeCode.HexBinary:
-                    result = true;
-                    break;
-                default:
-                    result = false;
-                    break;
-            }
+                XmlTypeCode.AnyAtomicType => false,// union
+                XmlTypeCode.DateTime or XmlTypeCode.Time or XmlTypeCode.Date or XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
+                _ => false,
+            };
+
             return result;
         }
 
@@ -118,7 +108,7 @@ namespace XmlSchemaClassGenerator
                 return result;
             }
 
-            if (!(restrictions.SingleOrDefault(r => r is TotalDigitsRestrictionModel) is TotalDigitsRestrictionModel totalDigits)
+            if (restrictions.SingleOrDefault(r => r is TotalDigitsRestrictionModel) is not TotalDigitsRestrictionModel totalDigits
                 || ((xmlTypeCode == XmlTypeCode.PositiveInteger
                      || xmlTypeCode == XmlTypeCode.NonNegativeInteger) && totalDigits.Value >= 30)
                 || ((xmlTypeCode == XmlTypeCode.Integer
@@ -126,7 +116,7 @@ namespace XmlSchemaClassGenerator
                      || xmlTypeCode == XmlTypeCode.NonPositiveInteger) && totalDigits.Value >= 29))
             {
                 if (configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null)
-                  return configuration.IntegerDataType;
+                    return configuration.IntegerDataType;
                 return typeof(string);
             }
 
@@ -184,40 +174,15 @@ namespace XmlSchemaClassGenerator
 
         public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions, bool attribute = false)
         {
-            Type resultType;
-
-            switch (type.TypeCode)
+            var resultType = type.TypeCode switch
             {
-                case XmlTypeCode.AnyAtomicType:
-                    // union
-                    resultType = typeof(string);
-                    break;
-                case XmlTypeCode.AnyUri:
-                case XmlTypeCode.Duration:
-                case XmlTypeCode.GDay:
-                case XmlTypeCode.GMonth:
-                case XmlTypeCode.GMonthDay:
-                case XmlTypeCode.GYear:
-                case XmlTypeCode.GYearMonth:
-                    resultType = typeof(string);
-                    break;
-                case XmlTypeCode.Time:
-                    resultType = typeof(DateTime);
-                    break;
-                case XmlTypeCode.Idref:
-                    resultType = typeof(string);
-                    break;
-                case XmlTypeCode.Integer:
-                case XmlTypeCode.NegativeInteger:
-                case XmlTypeCode.NonNegativeInteger:
-                case XmlTypeCode.NonPositiveInteger:
-                case XmlTypeCode.PositiveInteger:
-                    resultType = GetIntegerDerivedType(type, configuration, restrictions);
-                    break;
-                default:
-                    resultType = type.ValueType;
-                    break;
-            }
+                XmlTypeCode.AnyAtomicType => typeof(string),// union
+                XmlTypeCode.AnyUri or XmlTypeCode.Duration or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
+                XmlTypeCode.Time => typeof(DateTime),
+                XmlTypeCode.Idref => typeof(string),
+                XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
+                _ => type.ValueType,
+            };
 
             if (type.Variety == XmlSchemaDatatypeVariety.List)
             {
@@ -248,7 +213,7 @@ namespace XmlSchemaClassGenerator
         public static XmlQualifiedName GetQualifiedName(this TypeModel typeModel)
         {
             XmlQualifiedName qualifiedName;
-            if (!(typeModel is SimpleModel simpleTypeModel))
+            if (typeModel is not SimpleModel simpleTypeModel)
             {
                 if (typeModel.IsAnonymous)
                 {
@@ -397,6 +362,41 @@ namespace XmlSchemaClassGenerator
                 netNs = namespacePrefix + "." + netNs;
             }
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
+        }
+
+        public static readonly List<(string Namespace, Func<GeneratorConfiguration,bool> Condition)> UsingNamespaces = new List<(string, Func<GeneratorConfiguration, bool>)> {
+            ("System", c => c.CompactTypeNames),
+            ("System.CodeDom.Compiler", c => c.CompactTypeNames),
+            ("System.Collections.Generic", c => c.CompactTypeNames),
+            ("System.Collections.ObjectModel", c => c.CompactTypeNames),
+            ("System.ComponentModel", c => c.CompactTypeNames),
+            ("System.ComponentModel.DataAnnotations", c => c.CompactTypeNames && (c.DataAnnotationMode != DataAnnotationMode.None || c.EntityFramework)),
+            ("System.Diagnostics", c => c.CompactTypeNames && c.GenerateDebuggerStepThroughAttribute),
+            ("System.Linq", c => c.EnableDataBinding),
+            ("System.Xml.Serialization", c => c.CompactTypeNames)
+        };
+
+        public static bool IsUsingNamespace(Type t, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == t.Namespace && n.Condition(conf));
+
+        public static CodeTypeReference CreateTypeReference(Type t, GeneratorConfiguration conf)
+        {
+            if (IsUsingNamespace(t, conf))
+            {
+                var name = t.Name;
+                var typeRef = new CodeTypeReference(name, conf.CodeTypeReferenceOptions);
+
+                if (t.IsConstructedGenericType)
+                {
+                    var typeArgs = t.GenericTypeArguments.Select(a => CreateTypeReference(a, conf)).ToArray();
+                    typeRef.TypeArguments.AddRange(typeArgs);
+                }
+
+                var generic = t.IsGenericType || t.IsGenericTypeDefinition || t.IsConstructedGenericType;
+
+                return typeRef;
+            }
+            else
+                return new CodeTypeReference(t, conf.CodeTypeReferenceOptions);
         }
     }
 }

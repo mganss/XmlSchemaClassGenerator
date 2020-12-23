@@ -48,6 +48,7 @@ namespace XmlSchemaClassGenerator.Console
             var separateSubstitutes = false;
             var collectionSettersMode = CollectionSettersMode.Private;
             var doNotForceIsNullable = false;
+            var compactTypeNames = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -113,7 +114,8 @@ without backing field initialization for collections
                 { "s|useShouldSerialize", "use ShouldSerialize pattern instead of Specified pattern (default is false)", v => useShouldSerialize = v != null },
                 { "sf|separateFiles", "generate a separate file for each class (default is false)", v => separateClasses = v != null },
                 { "sg|separateSubstitutes", "generate a separate property for each element of a substitution group (default is false)", v => separateSubstitutes = v != null },
-                { "dnfin|doNotForceIsNullable", "do not force generator to emit IsNullable = true in XmlElement annotation for nillable elements when element is nullable (minOccurs < 1 or parent element is choice) (default is false)", v => doNotForceIsNullable = v != null }
+                { "dnfin|doNotForceIsNullable", "do not force generator to emit IsNullable = true in XmlElement annotation for nillable elements when element is nullable (minOccurs < 1 or parent element is choice) (default is false)", v => doNotForceIsNullable = v != null },
+                { "cn|compactTypeNames", "use type names without namespace qualifier for types in the using list (default is false)", v => compactTypeNames = v != null }
             };
 
             var globsAndUris = options.Parse(args);
@@ -184,7 +186,8 @@ without backing field initialization for collections
                 SeparateClasses = separateClasses,
                 CollectionSettersMode = collectionSettersMode,
                 DoNotForceIsNullable = doNotForceIsNullable,
-                SeparateSubstitutes = separateSubstitutes
+                SeparateSubstitutes = separateSubstitutes,
+                CompactTypeNames = compactTypeNames
             };
 
             if (pclCompatible)
