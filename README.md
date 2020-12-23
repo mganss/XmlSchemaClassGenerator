@@ -134,6 +134,12 @@ Options:
                                in XmlElement annotation for nillable elements
                                when element is nullable (minOccurs < 1 or
                                parent element is choice) (default is false)
+      --cn, --compactTypeNames
+                             use type names without namespace qualifier for
+                               types in the using list (default is false)
+      --cl, --commentLanguages=VALUE
+                             comment languages to use (default is en; supported
+                               are en, de)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
