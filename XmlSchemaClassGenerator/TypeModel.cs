@@ -38,7 +38,7 @@ namespace XmlSchemaClassGenerator
         {
             var codeNamespace = new CodeNamespace(namespaceName);
 
-            foreach (var (Namespace, Condition) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)))
+            foreach (var (Namespace, Condition) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)).OrderBy(n => n.Namespace))
                 codeNamespace.Imports.Add(new CodeNamespaceImport(Namespace));
 
             var typeModels = parts.SelectMany(x => x.Types.Values).ToList();
@@ -62,14 +62,16 @@ namespace XmlSchemaClassGenerator
         public string Text { get; set; }
         public static bool DisableComments { get; set; }
 
-        public static IEnumerable<CodeCommentStatement> GetComments(IList<DocumentationModel> docs)
+        public static IEnumerable<CodeCommentStatement> GetComments(IList<DocumentationModel> docs, GeneratorConfiguration conf)
         {
             if (DisableComments || docs.Count == 0)
                 yield break;
 
             yield return new CodeCommentStatement("<summary>", true);
 
-            foreach (var doc in docs.OrderBy(d => d.Language))
+            foreach (var doc in docs
+                .Where(d => conf.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+                .OrderBy(d => d.Language))
             {
                 var text = doc.Text;
                 var comment = string.Format(@"<para{0}>{1}</para>",
@@ -84,7 +86,7 @@ namespace XmlSchemaClassGenerator
         {
             if (!conf.GenerateDescriptionAttribute || DisableComments || !docs.Any()) return;
 
-            var doc = GetSingleDoc(docs);
+            var doc = GetSingleDoc(docs.Where(d => conf.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase))));
 
             if (doc != null)
             {
@@ -127,7 +129,7 @@ namespace XmlSchemaClassGenerator
         {
             var typeDeclaration = new CodeTypeDeclaration { Name = Name };
 
-            typeDeclaration.Comments.AddRange(DocumentationModel.GetComments(Documentation).ToArray());
+            typeDeclaration.Comments.AddRange(DocumentationModel.GetComments(Documentation, Configuration).ToArray());
 
             DocumentationModel.AddDescription(typeDeclaration.CustomAttributes, Documentation, Configuration);
 
@@ -387,7 +389,7 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
+                    member.Comments.AddRange(DocumentationModel.GetComments(docs, Configuration).ToArray());
 
                     member.CustomAttributes.Add(attribute);
                     classDeclaration.Members.Add(member);
@@ -766,7 +768,7 @@ namespace XmlSchemaClassGenerator
                 member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
             }
 
-            member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
+            member.Comments.AddRange(DocumentationModel.GetComments(docs, Configuration).ToArray());
         }
 
         private CodeAttributeDeclaration CreateDefaultValueAttribute(CodeTypeReference typeReference, CodeExpression defaultValueExpression)
@@ -969,7 +971,7 @@ namespace XmlSchemaClassGenerator
                     specifiedMember.Attributes = MemberAttributes.Public;
                     var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets or sets a value indicating whether the {0} property is specified.", Name) },
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Eigenschaft spezifiziert ist, oder legt diesen fest.", Name) } };
-                    specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
+                    specifiedMember.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs, Configuration).ToArray());
                     typeDeclaration.Members.Add(specifiedMember);
 
                     var specifiedMemberPropertyModel = new PropertyModel(Configuration)
@@ -1078,7 +1080,7 @@ namespace XmlSchemaClassGenerator
 
                 var specifiedDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format("Gets a value indicating whether the {0} collection is empty.", Name) },
                     new DocumentationModel { Language = "de", Text = string.Format("Ruft einen Wert ab, der angibt, ob die {0}-Collection leer ist.", Name) } };
-                specifiedProperty.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs).ToArray());
+                specifiedProperty.Comments.AddRange(DocumentationModel.GetComments(specifiedDocs, Configuration).ToArray());
 
                 Configuration.MemberVisitor(specifiedProperty, this);
 
@@ -1098,7 +1100,7 @@ namespace XmlSchemaClassGenerator
                     constructor = new CodeConstructor { Attributes = MemberAttributes.Public | MemberAttributes.Final };
                     var constructorDocs = new[] { new DocumentationModel { Language = "en", Text = string.Format(@"Initializes a new instance of the <see cref=""{0}"" /> class.", typeDeclaration.Name) },
                         new DocumentationModel { Language = "de", Text = string.Format(@"Initialisiert eine neue Instanz der <see cref=""{0}"" /> Klasse.", typeDeclaration.Name) } };
-                    constructor.Comments.AddRange(DocumentationModel.GetComments(constructorDocs).ToArray());
+                    constructor.Comments.AddRange(DocumentationModel.GetComments(constructorDocs, Configuration).ToArray());
                     typeDeclaration.Members.Add(constructor);
                 }
 
@@ -1341,7 +1343,7 @@ namespace XmlSchemaClassGenerator
                     docs.Add(obsolete);
                 }
 
-                member.Comments.AddRange(DocumentationModel.GetComments(docs).ToArray());
+                member.Comments.AddRange(DocumentationModel.GetComments(docs, Configuration).ToArray());
 
                 enumDeclaration.Members.Add(member);
             }

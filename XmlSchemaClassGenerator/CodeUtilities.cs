@@ -373,6 +373,7 @@ namespace XmlSchemaClassGenerator
             ("System.ComponentModel.DataAnnotations", c => c.CompactTypeNames && (c.DataAnnotationMode != DataAnnotationMode.None || c.EntityFramework)),
             ("System.Diagnostics", c => c.CompactTypeNames && c.GenerateDebuggerStepThroughAttribute),
             ("System.Linq", c => c.EnableDataBinding),
+            ("System.Xml.Schema", c => c.CompactTypeNames),
             ("System.Xml.Serialization", c => c.CompactTypeNames)
         };
 

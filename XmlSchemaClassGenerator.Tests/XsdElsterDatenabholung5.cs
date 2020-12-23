@@ -41,22 +41,16 @@ namespace XmlSchemaClassGenerator.Tests
                 {
                     GenerateNamespace = key =>
                     {
-                        switch (Path.GetFileName(key.Source.LocalPath))
+                        return (Path.GetFileName(key.Source.LocalPath)) switch
                         {
-                            case "th000008_extern.xsd":
-                            case "ndh000010_extern.xsd":
-                            case "headerbasis000002.xsd":
-                                return "Elster.Basis";
-                            case "datenabholung_5.xsd":
-                            case "elster0810_datenabholung_5.xsd":
-                                return key.XmlSchemaNamespace switch
-                                {
-                                    "http://www.elster.de/2002/XMLSchema" => "Elster.Datenabholung5",
-                                    _ => throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source)),
-                                };
-                            default:
-                                throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source));
-                        }
+                            "th000008_extern.xsd" or "ndh000010_extern.xsd" or "headerbasis000002.xsd" => "Elster.Basis",
+                            "datenabholung_5.xsd" or "elster0810_datenabholung_5.xsd" => key.XmlSchemaNamespace switch
+                            {
+                                "http://www.elster.de/2002/XMLSchema" => "Elster.Datenabholung5",
+                                _ => throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source)),
+                            },
+                            _ => throw new NotSupportedException(string.Format("Namespace {0} for schema {1}", key.XmlSchemaNamespace, key.Source)),
+                        };
                     }
                 }
             };

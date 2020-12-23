@@ -265,6 +265,11 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CompactTypeNames = value; }
         }
 
+        public List<string> CommentLanguages
+        {
+            get { return _configuration.CommentLanguages; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

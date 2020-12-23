@@ -57,6 +57,9 @@ namespace XmlSchemaClassGenerator.Tests
                 DoNotForceIsNullable = generatorPrototype.DoNotForceIsNullable
             };
 
+            gen.CommentLanguages.Clear();
+            gen.CommentLanguages.AddRange(generatorPrototype.CommentLanguages);
+
             var set = new XmlSchemaSet();
 
             foreach (var xsd in xsds)
@@ -980,7 +983,8 @@ namespace XmlSchemaClassGenerator.Tests
                 NamespaceProvider = new NamespaceProvider
                 {
                     GenerateNamespace = key => "Test"
-                }
+                },
+                CommentLanguages = { "de", "en" }
             };
 
             var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);

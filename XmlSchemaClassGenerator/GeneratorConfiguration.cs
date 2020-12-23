@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -279,5 +280,10 @@ namespace XmlSchemaClassGenerator
         /// Generates type names without namespace qualifiers for namespaces in using list
         /// </summary>
         public bool CompactTypeNames { get; set; }
+
+        /// <summary>
+        /// The language identifiers comments will be generated for, e.g. "en", "de-DE".
+        /// </summary>
+        public List<string> CommentLanguages { get; } = new List<string>();
     }
 }
