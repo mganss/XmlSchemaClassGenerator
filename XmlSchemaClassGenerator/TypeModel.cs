@@ -70,7 +70,7 @@ namespace XmlSchemaClassGenerator
             yield return new CodeCommentStatement("<summary>", true);
 
             foreach (var doc in docs
-                .Where(d => conf.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+                .Where(d => string.IsNullOrEmpty(d.Language) || conf.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(d => d.Language))
             {
                 var text = doc.Text;
@@ -86,7 +86,7 @@ namespace XmlSchemaClassGenerator
         {
             if (!conf.GenerateDescriptionAttribute || DisableComments || !docs.Any()) return;
 
-            var doc = GetSingleDoc(docs.Where(d => conf.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase))));
+            var doc = GetSingleDoc(docs.Where(d => string.IsNullOrEmpty(d.Language) || conf.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase))));
 
             if (doc != null)
             {
