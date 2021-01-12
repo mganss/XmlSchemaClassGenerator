@@ -399,5 +399,15 @@ namespace XmlSchemaClassGenerator
             else
                 return new CodeTypeReference(t, conf.CodeTypeReferenceOptions);
         }
+
+        /// <summary>
+        /// See https://github.com/mganss/XmlSchemaClassGenerator/issues/245
+        /// and https://docs.microsoft.com/en-us/dotnet/api/system.xml.serialization.xmlattributeattribute#remarks
+        /// </summary>
+        public static bool IsXmlLangOrSpace(XmlQualifiedName name)
+        {
+            return name != null && name.Namespace == "http://www.w3.org/XML/1998/namespace"
+                && (name.Name == "lang" || name.Name == "space");
+        }
     }
 }

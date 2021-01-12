@@ -813,7 +813,8 @@ namespace XmlSchemaClassGenerator
             {
                 var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue, IsAttribute);
 
-                if ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression))
+                if ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression)
+                    && !CodeUtilities.IsXmlLangOrSpace(XmlSchemaName))
                 {
                     var defaultValueAttribute = CreateDefaultValueAttribute(typeReference, defaultValueExpression);
                     member.CustomAttributes.Add(defaultValueAttribute);
@@ -927,7 +928,8 @@ namespace XmlSchemaClassGenerator
 
                 member.Name += GetAccessors(member.Name, backingField.Name, propertyType.GetPropertyValueTypeCode(), false, withDataBinding);
 
-                if (IsNullable && ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression)))
+                if (IsNullable && ((defaultValueExpression is CodePrimitiveExpression) || (defaultValueExpression is CodeFieldReferenceExpression))
+                    && !CodeUtilities.IsXmlLangOrSpace(XmlSchemaName))
                 {
                     var defaultValueAttribute = CreateDefaultValueAttribute(typeReference, defaultValueExpression);
                     member.CustomAttributes.Add(defaultValueAttribute);
