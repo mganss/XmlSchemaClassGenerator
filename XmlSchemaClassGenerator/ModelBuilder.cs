@@ -77,7 +77,7 @@ namespace XmlSchemaClassGenerator
 
         private void CreateSubstitutes()
         {
-            var classesProps = Types.Values.OfType<ClassModel>().Select(c => c.Properties.Where(p => p.XmlSchemaName != null).ToList()).ToList();
+            var classesProps = Types.Values.OfType<ClassModel>().Select(c => c.Properties.ToList()).ToList();
 
             foreach (var classProps in classesProps)
             {
@@ -91,27 +91,30 @@ namespace XmlSchemaClassGenerator
                         order++;
                     }
 
-                    var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
-
-                    if (_configuration.SeparateSubstitutes)
+                    if (prop.XmlSchemaName != null)
                     {
-                        var elems = GetElements(prop.XmlParticle, prop.XmlParent);
+                        var substitutes = GetSubstitutedElements(prop.XmlSchemaName).ToList();
 
-                        foreach (var substitute in substitutes)
+                        if (_configuration.SeparateSubstitutes)
                         {
-                            var cls = (ClassModel)prop.OwningType;
-                            var schema = substitute.Element.GetSchema();
-                            var source = CodeUtilities.CreateUri(schema.SourceUri);
-                            var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, new[] { prop.Particle }, substitute, order);
+                            var elems = GetElements(prop.XmlParticle, prop.XmlParent);
 
-                            cls.Properties.AddRange(props);
+                            foreach (var substitute in substitutes)
+                            {
+                                var cls = (ClassModel)prop.OwningType;
+                                var schema = substitute.Element.GetSchema();
+                                var source = CodeUtilities.CreateUri(schema.SourceUri);
+                                var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, new[] { prop.Particle }, substitute, order);
 
-                            order += props.Count();
+                                cls.Properties.AddRange(props);
+
+                                order += props.Count();
+                            }
                         }
-                    }
-                    else
-                    {
-                        prop.Substitutes = substitutes;
+                        else
+                        {
+                            prop.Substitutes = substitutes;
+                        }
                     }
                 }
             }

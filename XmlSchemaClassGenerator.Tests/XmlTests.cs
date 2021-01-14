@@ -85,7 +85,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         const string IS24Pattern = @"xsd\is24\*\*.xsd";
         const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
-        const string WadlPattern = @"xsd\wadl\*.xsd";
+        const string WadlPattern = @"xsd\wadl\wadl.xsd";
         const string ListPattern = @"xsd\list\list.xsd";
         const string SimplePattern = @"xsd\simple\*.xsd";
         const string ArrayOrderPattern = @"xsd\array-order\array-order.xsd";
@@ -96,6 +96,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string VSTstPattern = @"xsd\vstst\vstst.xsd";
         const string BpmnPattern = @"xsd\bpmn\*.xsd";
         const string DtsxPattern = @"xsd\dtsx\dtsx2.xsd";
+        const string WfsPattern = @"xsd\wfs\schemas.opengis.net\wfs\2.0\wfs.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -447,6 +448,21 @@ namespace XmlSchemaClassGenerator.Tests
             TestSamples("VSTst", VSTstPattern);
         }
 
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestWfs()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "wfs"));
+            Compiler.Generate("wfs", WfsPattern,
+                new Generator
+                {
+                    OutputWriter = output,
+                    EmitOrder = true,
+                    GenerateInterfaces = false
+                });
+            TestSamples("wfs", WfsPattern);
+        }
+
         private void TestSamples(string name, string pattern)
         {
             var assembly = Compiler.GetAssembly(name);
@@ -464,13 +480,18 @@ namespace XmlSchemaClassGenerator.Tests
                 && !e.Message.Contains("The Pattern constraint failed"));  // generator doesn't generate valid values where pattern restrictions exist, e.g. email
         }
 
+        private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
+
         private void DeserializeSampleXml(string pattern, Assembly assembly)
         {
             var files = Glob.ExpandNames(pattern);
 
             var set = new XmlSchemaSet();
+            var xmlSchemaReaderSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
 
-            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f), (s, e) =>
+            set.XmlResolver = new XmlUrlResolver();
+
+            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f, xmlSchemaReaderSettings), (s, e) =>
             {
                 Assert.True(false, e.Message);
             }));
@@ -484,7 +505,11 @@ namespace XmlSchemaClassGenerator.Tests
 
             var anyValidXml = false;
             var sb = new StringBuilder();
-            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e => !e.IsAbstract && !(e.ElementSchemaType is XmlSchemaSimpleType)))
+
+            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e =>
+                !e.IsAbstract
+                && !(e.ElementSchemaType is XmlSchemaSimpleType)
+                && e.ElementSchemaType.QualifiedName != AnyType))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);
                 var serializer = new XmlSerializer(type);
