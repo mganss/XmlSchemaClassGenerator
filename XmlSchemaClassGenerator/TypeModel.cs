@@ -1115,7 +1115,8 @@ namespace XmlSchemaClassGenerator
                 if (collectionType == typeof(System.Array))
                 {
                     var initTypeReference = propertyType.GetReferenceFor(OwningType.Namespace, collection: false, forInit: true, attribute: IsAttribute);
-                    initExpression = new CodeArrayCreateExpression(initTypeReference);
+                    var arrayReference = CodeUtilities.CreateTypeReference(typeof(System.Array), Configuration);
+                    initExpression = new CodeMethodInvokeExpression(new CodeMethodReferenceExpression(new CodeTypeReferenceExpression(arrayReference), "Empty", initTypeReference));
                 }
                 else
                 {
