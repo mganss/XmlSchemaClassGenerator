@@ -140,6 +140,9 @@ Options:
       --cl, --commentLanguages=VALUE
                              comment languages to use (default is en; supported
                                are en, de)
+      --un, --uniqueTypeNames
+                             generate type names that are unique across
+                               namespaces (default is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
