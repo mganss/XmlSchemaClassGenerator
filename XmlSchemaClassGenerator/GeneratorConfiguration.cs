@@ -285,5 +285,10 @@ namespace XmlSchemaClassGenerator
         /// The language identifiers comments will be generated for, e.g. "en", "de-DE".
         /// </summary>
         public List<string> CommentLanguages { get; } = new List<string>();
+
+        /// <summary>
+        /// Create unique type names across all namespaces. See https://github.com/mganss/XmlSchemaClassGenerator/issues/240
+        /// </summary>
+        public bool UniqueTypeNameAcrossNamespaces { get; set; } = false;
     }
 }

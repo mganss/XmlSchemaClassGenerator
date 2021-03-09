@@ -73,6 +73,23 @@ namespace XmlSchemaClassGenerator
             }
 
             AddXmlRootAttributeToAmbiguousTypes();
+
+            if (_configuration.UniqueTypeNameAcrossNamespaces)
+                CreateUniqueTypeNames();
+        }
+
+        private void CreateUniqueTypeNames()
+        {
+            foreach (var types in Namespaces.Values.SelectMany(n => n.Types.Values).GroupBy(t => t.Name))
+            {
+                var i = 2;
+
+                foreach (var t in types.Skip(1))
+                {
+                    t.Name += $"_{i}";
+                    i++;
+                }
+            }
         }
 
         private void CreateSubstitutes()

@@ -110,6 +110,7 @@ namespace XmlSchemaClassGenerator.Tests
                 CollectionImplementationType = generatorPrototype.CollectionImplementationType,
                 SeparateSubstitutes = generatorPrototype.SeparateSubstitutes,
                 CompactTypeNames = generatorPrototype.CompactTypeNames,
+                UniqueTypeNamesAcrossNamespaces = generatorPrototype.UniqueTypeNamesAcrossNamespaces,
             };
 
             gen.CommentLanguages.Clear();

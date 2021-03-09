@@ -97,6 +97,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string BpmnPattern = @"xsd\bpmn\*.xsd";
         const string DtsxPattern = @"xsd\dtsx\dtsx2.xsd";
         const string WfsPattern = @"xsd\wfs\schemas.opengis.net\wfs\2.0\wfs.xsd";
+        const string EppPattern = @"xsd\epp\*.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -463,6 +464,42 @@ namespace XmlSchemaClassGenerator.Tests
             TestSamples("wfs", WfsPattern);
         }
 
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestEpp()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "epp"));
+            Compiler.Generate("epp", EppPattern,
+                new Generator
+                {
+                    OutputWriter = output,
+                    GenerateInterfaces = false,
+                    UniqueTypeNamesAcrossNamespaces = true,
+                    NamespaceProvider = new Dictionary<NamespaceKey, string>
+                    {
+                        { new NamespaceKey("urn:ietf:params:xml:ns:eppcom-1.0"), "FoxHillSolutions.Escrow.eppcom" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeDomain-1.0"), "FoxHillSolutions.Escrow.rdeDomain" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeHeader-1.0"), "FoxHillSolutions.Escrow.rdeHeader" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeHost-1.0"), "FoxHillSolutions.Escrow.rdeHost" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeIDN-1.0"), "FoxHillSolutions.Escrow.rdeIDN" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeRegistrar-1.0"), "FoxHillSolutions.Escrow.Registrar" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeDnrdCommon-1.0"), "FoxHillSolutions.Escrow.DnrdCommon" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:secDNS-1.1"), "FoxHillSolutions.Escrow.secDNS" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:domain-1.0"), "FoxHillSolutions.Escrow.domain" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:contact-1.0"), "FoxHillSolutions.Escrow.contact" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:host-1.0"), "FoxHillSolutions.Escrow.host" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rgp-1.0"), "FoxHillSolutions.Escrow.rgp" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:epp-1.0"), "FoxHillSolutions.Escrow.epp" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rde-1.0"), "FoxHillSolutions.Escrow.rde" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeContact-1.0"), "FoxHillSolutions.Escrow.rdeContact" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeEppParams-1.0"), "FoxHillSolutions.Escrow.rdeEppParams" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeNNDN-1.0"), "FoxHillSolutions.Escrow.rdeNNDN" },
+                        { new NamespaceKey("urn:ietf:params:xml:ns:rdePolicy-1.0"), "FoxHillSolutions.Escrow.rdePolicy" },
+                    }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Epp" }.NamespaceProvider.GenerateNamespace),
+                });
+            TestSamples("epp", EppPattern);
+        }
+
         private void TestSamples(string name, string pattern)
         {
             var assembly = Compiler.GetAssembly(name);
@@ -491,15 +528,10 @@ namespace XmlSchemaClassGenerator.Tests
 
             set.XmlResolver = new XmlUrlResolver();
 
-            var schemas = files.Select(f => XmlSchema.Read(XmlReader.Create(f, xmlSchemaReaderSettings), (s, e) =>
-            {
-                Assert.True(false, e.Message);
-            }));
+            var readers = files.Select(f => XmlReader.Create(f, xmlSchemaReaderSettings));
 
-            foreach (var s in schemas)
-            {
-                set.Add(s);
-            }
+            foreach (var reader in readers)
+                set.Add(null, reader);
 
             set.Compile();
 

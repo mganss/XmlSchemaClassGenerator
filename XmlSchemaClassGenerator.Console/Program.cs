@@ -51,6 +51,7 @@ namespace XmlSchemaClassGenerator.Console
             var compactTypeNames = false;
             var commentLanguages = new[] { "en" };
             var supportedCommentLanguages = new[] { "en", "de" };
+            var uniqueTypeNamesAcrossNamespaces = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -119,7 +120,8 @@ without backing field initialization for collections
                 { "dnfin|doNotForceIsNullable", "do not force generator to emit IsNullable = true in XmlElement annotation for nillable elements when element is nullable (minOccurs < 1 or parent element is choice) (default is false)", v => doNotForceIsNullable = v != null },
                 { "cn|compactTypeNames", "use type names without namespace qualifier for types in the using list (default is false)", v => compactTypeNames = v != null },
                 { "cl|commentLanguages=", $"comment languages to use (default is {string.Join(", ", commentLanguages)}; supported are {string.Join(", ", supportedCommentLanguages)})",
-                    v => commentLanguages = v.Split(',').Select(l => l.Trim()).ToArray() }
+                    v => commentLanguages = v.Split(',').Select(l => l.Trim()).ToArray() },
+                { "un|uniqueTypeNames", "generate type names that are unique across namespaces (default is false)", v => uniqueTypeNamesAcrossNamespaces = v != null },
             };
 
             var globsAndUris = options.Parse(args);
@@ -191,7 +193,8 @@ without backing field initialization for collections
                 CollectionSettersMode = collectionSettersMode,
                 DoNotForceIsNullable = doNotForceIsNullable,
                 SeparateSubstitutes = separateSubstitutes,
-                CompactTypeNames = compactTypeNames
+                CompactTypeNames = compactTypeNames,
+                UniqueTypeNamesAcrossNamespaces = uniqueTypeNamesAcrossNamespaces
             };
 
             generator.CommentLanguages.AddRange(commentLanguages);

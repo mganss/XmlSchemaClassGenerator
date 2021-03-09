@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:ietf:params:xml:ns:rdeHeader-1.0"
+       xmlns:rdeHeader="urn:ietf:params:xml:ns:rdeHeader-1.0"
+       xmlns:rde="urn:ietf:params:xml:ns:rde-1.0"
+       xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+       xmlns="http://www.w3.org/2001/XMLSchema"
+       elementFormDefault="qualified">
+ <import namespace="urn:ietf:params:xml:ns:eppcom-1.0"  schemaLocation=".\eppcom-1.0.xsd"/>
+ <import namespace="urn:ietf:params:xml:ns:rde-1.0"  schemaLocation=".\rde-1.0.xsd"/>
+ <annotation>
+   <documentation>
+     Data Escrow Deposit Header schema
+   </documentation>
+ </annotation>
+ <!-- Root Element -->
+ <element name="header"
+          type="rdeHeader:contentType"
+          substitutionGroup="rde:content" />
+ <!-- Content Type -->
+ <complexType name="contentType">
+   <complexContent>
+     <extension base="rde:contentType">
+       <sequence>
+         <group ref="rdeHeader:repositoryTypeGroup" />
+         <element name="count"
+                  type="rdeHeader:countType"
+                  maxOccurs="unbounded" />
+         <element name="contentTag"
+                  type="token"
+                  minOccurs="0" />
+       </sequence>
+     </extension>
+   </complexContent>
+ </complexType>
+ <group name="repositoryTypeGroup">
+   <choice>
+     <element name="tld"
+              type="eppcom:labelType" />
+     <element name="registrar"
+              type="positiveInteger" />
+     <element name="ppsp"
+              type="token" />
+     <element name="reseller"
+              type="token" />
+   </choice>
+ </group>
+ <complexType name="countType">
+   <simpleContent>
+     <extension base="long">
+       <attribute name="uri"
+                  type="anyURI"
+                  use="required" />
+       <attribute name="rcdn"
+                  type="eppcom:labelType" />
+       <attribute name="registrarId"
+                  type="positiveInteger" />
+     </extension>
+   </simpleContent>
+ </complexType>
+</schema>

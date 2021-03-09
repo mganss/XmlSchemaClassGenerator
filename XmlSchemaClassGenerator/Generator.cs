@@ -270,6 +270,12 @@ namespace XmlSchemaClassGenerator
             get { return _configuration.CommentLanguages; }
         }
 
+        public bool UniqueTypeNamesAcrossNamespaces
+        {
+            get { return _configuration.UniqueTypeNameAcrossNamespaces; }
+            set { _configuration.UniqueTypeNameAcrossNamespaces = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
