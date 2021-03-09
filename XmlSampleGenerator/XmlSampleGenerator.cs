@@ -30,7 +30,7 @@ namespace Microsoft.Xml.XMLGen {
     }
 
     public class XmlSampleGenerator {
-        private XmlSchemaSet schemaSet;
+        private readonly XmlSchemaSet schemaSet;
         private XmlWriter writer;
         private XmlResolver xmlResolver;
         private InstanceElement instanceRoot;
@@ -114,7 +114,7 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         public void WriteXml (XmlWriter writer) {
-            this.writer = writer ?? throw new ArgumentNullException("writer");
+            this.writer = writer ?? throw new ArgumentNullException(nameof(writer));
             elementTypesProcessed = new Hashtable();
             if(ProcessSchemaSet()) { //Only if valid schemas were loaded
                 if (instanceRoot != null) { //If found a root to generate XML
@@ -130,11 +130,10 @@ namespace Microsoft.Xml.XMLGen {
             //Add all the Elements from all schemas into the Elements table
             schemaSet.Compile();
             if (schemaSet.IsCompiled) {
-                XmlSchemaElement schemaElem = null;
                 if (rootElement == null) {
                     rootElement = XmlQualifiedName.Empty;
                 }
-                schemaElem = schemaSet.GlobalElements[rootElement] as XmlSchemaElement;
+                var schemaElem = schemaSet.GlobalElements[rootElement] as XmlSchemaElement;
                 if (schemaElem == null) { //If element by name is not found, Get first non-abstract root element
                     foreach(XmlSchemaElement elem1 in schemaSet.GlobalElements.Values) {
                         if (elem1.IsAbstract) {
@@ -241,7 +240,7 @@ namespace Microsoft.Xml.XMLGen {
                 elem.ValueGenerator = XmlValueGenerator.CreateGenerator(ct.Datatype, listLength);
             }
             else {
-                GenerateParticle(ct.ContentTypeParticle, false, elem);
+                GenerateParticle(ct.ContentTypeParticle, elem);
             }
             //Check for attribute wild card
             if (ct.AttributeWildcard != null) {
@@ -341,7 +340,7 @@ namespace Microsoft.Xml.XMLGen {
         private XmlSchemaAttribute GetAttributeFromNS(string ns, bool other, XmlSchemaObjectTable attributes) {
             if (other) {
                 foreach(XmlSchemaAttribute attr in schemaSet.GlobalAttributes.Values) {
-                    if (attr.QualifiedName.Namespace != ns && attr.QualifiedName.Namespace != string.Empty && attributes[attr.QualifiedName] == null) {
+                    if (attr.QualifiedName.Namespace != ns && !string.IsNullOrEmpty(attr.QualifiedName.Namespace) && attributes[attr.QualifiedName] == null) {
                         return attr;
                     }
                 }
@@ -359,8 +358,8 @@ namespace Microsoft.Xml.XMLGen {
         private void GenerateAttribute(XmlSchemaObjectTable attributes, InstanceElement elem) {
             IDictionaryEnumerator ienum = attributes.GetEnumerator();
             while (ienum.MoveNext()) {
-                if (ienum.Value is XmlSchemaAttribute) {
-                    GenerateInstanceAttribute((XmlSchemaAttribute)ienum.Value, elem);
+                if (ienum.Value is XmlSchemaAttribute attribute) {
+                    GenerateInstanceAttribute(attribute, elem);
                 }
             }
         }
@@ -383,7 +382,7 @@ namespace Microsoft.Xml.XMLGen {
         }
 
 
-        private void GenerateParticle(XmlSchemaParticle particle, bool root, InstanceGroup iGrp) {
+        private void GenerateParticle(XmlSchemaParticle particle, InstanceGroup iGrp) {
             decimal max;
             max = particle.MaxOccurs >= maxThreshold ? maxThreshold : particle.MaxOccurs;
             max = particle.MinOccurs > max ? particle.MinOccurs : max;
@@ -403,7 +402,7 @@ namespace Microsoft.Xml.XMLGen {
                 if (ch.MaxOccurs == 1)
                 {
                     XmlSchemaParticle pt = (XmlSchemaParticle)(ch.Items[0]);
-                    GenerateParticle(pt, false, iGrp);
+                    GenerateParticle(pt, iGrp);
                 }
                 else
                 {
@@ -416,9 +415,9 @@ namespace Microsoft.Xml.XMLGen {
                     GenerateGroupBase(ch, grp);
                 }
             }
-            else if (particle is XmlSchemaAll)
+            else if (particle is XmlSchemaAll all)
             {
-                GenerateAll((XmlSchemaAll)particle, iGrp);
+                GenerateAll(all, iGrp);
             }
             else if (particle is XmlSchemaElement)
             {
@@ -430,23 +429,23 @@ namespace Microsoft.Xml.XMLGen {
                 }
                 if (ch != null)
                 {
-                    GenerateParticle(ch, false, iGrp);
+                    GenerateParticle(ch, iGrp);
                 }
                 else
                 {
                     GenerateElement(elem, false, iGrp, null);
                 }
             }
-            else if (particle is XmlSchemaAny && particle.MinOccurs > 0)
+            else if (particle is XmlSchemaAny any && particle.MinOccurs > 0)
             { //Generate any only if we should
-                GenerateAny((XmlSchemaAny)particle, iGrp);
+                GenerateAny(any, iGrp);
             }
 
         }
 
         private void GenerateGroupBase(XmlSchemaGroupBase gBase, InstanceGroup grp) {
             foreach(XmlSchemaParticle particle1 in gBase.Items) {
-                        GenerateParticle(particle1, false, grp);
+                        GenerateParticle(particle1, grp);
             }
         }
 
@@ -454,14 +453,13 @@ namespace Microsoft.Xml.XMLGen {
             XmlSchemaParticle pt;
             for (int i=all.Items.Count; i > 0; i--) {
                 pt = (XmlSchemaParticle)(all.Items[i-1]);
-                GenerateParticle(pt,false, grp);
+                GenerateParticle(pt, grp);
             }
 
         }
 
         private void GenerateAny(XmlSchemaAny any, InstanceGroup grp) {
-            InstanceElement parentElem = grp as InstanceElement;
-            char[] whitespace = new char[] {' ', '\t', '\n', '\r'};
+            var whitespace = new char[] { ' ', '\t', '\n', '\r' };
             InstanceElement elem = null;
             XmlSchemaElement anyElem = null;
             string namespaceList = any.Namespace;
@@ -523,7 +521,7 @@ namespace Microsoft.Xml.XMLGen {
                     return;
                 }
                 else { //Write comment in generated XML that match for wild card cd not be found.
-                    if (parentElem == null) {
+                    if (!(grp is InstanceElement parentElem)) {
                         parentElem = GetParentInstanceElement(grp);
                     }
                     if (parentElem.Comment.Length == 0) { //For multiple wildcards in the same element, generate comment only once
@@ -541,7 +539,7 @@ namespace Microsoft.Xml.XMLGen {
         private XmlSchemaElement GetElementFromNS(string ns, bool other) {
             if (other) {
                 foreach(XmlSchemaElement elem in schemaSet.GlobalElements.Values) {
-                    if(elem.QualifiedName.Namespace != ns && elem.QualifiedName.Namespace != string.Empty) {
+                    if(elem.QualifiedName.Namespace != ns && !string.IsNullOrEmpty(elem.QualifiedName.Namespace)) {
                         return elem;
                     }
                 }
@@ -689,8 +687,8 @@ namespace Microsoft.Xml.XMLGen {
         }
 
         private void ProcessGroup(InstanceGroup grp) {
-            if(grp is InstanceElement) {
-                ProcessElement((InstanceElement)grp);
+            if(grp is InstanceElement element) {
+                ProcessElement(element);
             }
             else { //Its a group node of sequence or choice
                 if(!grp.IsChoice) {
@@ -782,7 +780,7 @@ namespace Microsoft.Xml.XMLGen {
 
         private void ProcessElementAttrs(InstanceElement elem) {
             if(elem.XsiType != XmlQualifiedName.Empty) {
-                if (elem.XsiType.Namespace != string.Empty) {
+                if (!string.IsNullOrEmpty(elem.XsiType.Namespace)) {
                     writer.WriteStartAttribute("xsi", "type", null);
                     writer.WriteQualifiedName(elem.XsiType.Name, elem.XsiType.Namespace);
                     writer.WriteEndAttribute();

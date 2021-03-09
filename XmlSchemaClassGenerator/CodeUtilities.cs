@@ -392,8 +392,6 @@ namespace XmlSchemaClassGenerator
                     typeRef.TypeArguments.AddRange(typeArgs);
                 }
 
-                var generic = t.IsGenericType || t.IsGenericTypeDefinition || t.IsConstructedGenericType;
-
                 return typeRef;
             }
             else

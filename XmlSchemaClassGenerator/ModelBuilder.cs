@@ -114,8 +114,6 @@ namespace XmlSchemaClassGenerator
 
                         if (_configuration.SeparateSubstitutes)
                         {
-                            var elems = GetElements(prop.XmlParticle, prop.XmlParent);
-
                             foreach (var substitute in substitutes)
                             {
                                 var cls = (ClassModel)prop.OwningType;

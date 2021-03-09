@@ -434,10 +434,11 @@ namespace XmlSchemaClassGenerator
 
             foreach (var property in Properties.GroupBy(x => x.Name))
             {
-                var propertyIndex = 0;
+                var propertyIndex = 1;
+
                 foreach (var p in property)
                 {
-                    if (propertyIndex > 0)
+                    if (propertyIndex > 1)
                     {
                         p.Name += $"_{propertyIndex}";
                     }

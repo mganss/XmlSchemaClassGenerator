@@ -18,7 +18,7 @@ namespace XmlSchemaClassGenerator
 
         public static PropertyValueTypeCode GetPropertyValueTypeCode(this TypeModel model)
         {
-            if (!(model is SimpleModel simpleType))
+            if (model is not SimpleModel simpleType)
             {
                 if (!(model is EnumModel))
                 {
