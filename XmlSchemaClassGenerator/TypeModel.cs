@@ -1131,7 +1131,7 @@ namespace XmlSchemaClassGenerator
             if (isArray)
             {
                 var arrayItemProperty = typeClassModel.Properties[0];
-                var propertyAttributes = arrayItemProperty.GetAttributes(false).ToList();
+                var propertyAttributes = arrayItemProperty.GetAttributes(false, OwningType).ToList();
                 // HACK: repackage as ArrayItemAttribute
                 foreach (var propertyAttribute in propertyAttributes)
                 {
@@ -1158,7 +1158,7 @@ namespace XmlSchemaClassGenerator
             Configuration.MemberVisitor(member, this);
         }
 
-        private IEnumerable<CodeAttributeDeclaration> GetAttributes(bool isArray)
+        private IEnumerable<CodeAttributeDeclaration> GetAttributes(bool isArray, TypeModel owningType = null)
         {
             var attributes = new List<CodeAttributeDeclaration>();
 
@@ -1196,11 +1196,13 @@ namespace XmlSchemaClassGenerator
                 {
                     if (!Configuration.SeparateSubstitutes && Substitutes.Any())
                     {
+                        owningType ??= OwningType;
+
                         foreach (var substitute in Substitutes)
                         {
                             var substitutedAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(XmlElementAttribute), Configuration),
                                 new CodeAttributeArgument(new CodePrimitiveExpression(substitute.Element.QualifiedName.Name)),
-                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(substitute.Type.GetReferenceFor(OwningType.Namespace))),
+                                new CodeAttributeArgument("Type", new CodeTypeOfExpression(substitute.Type.GetReferenceFor(owningType.Namespace))),
                                 new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(substitute.Element.QualifiedName.Namespace)));
 
                             if (Order != null)
