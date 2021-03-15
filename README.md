@@ -143,6 +143,9 @@ Options:
       --un, --uniqueTypeNames
                              generate type names that are unique across
                                namespaces (default is false)
+      --gc, --generatedCodeAttribute
+                             Adds version information to GeneratedCodeAttribute
+                               (default is true)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
