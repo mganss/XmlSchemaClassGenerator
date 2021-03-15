@@ -144,7 +144,7 @@ Options:
                              generate type names that are unique across
                                namespaces (default is false)
       --gc, --generatedCodeAttribute
-                             Adds version information to GeneratedCodeAttribute
+                             add version information to GeneratedCodeAttribute
                                (default is true)
 ```
 
