@@ -123,7 +123,7 @@ without backing field initialization for collections
                 { "cl|commentLanguages=", $"comment languages to use (default is {string.Join(", ", commentLanguages)}; supported are {string.Join(", ", supportedCommentLanguages)})",
                     v => commentLanguages = v.Split(',').Select(l => l.Trim()).ToArray() },
                 { "un|uniqueTypeNames", "generate type names that are unique across namespaces (default is false)", v => uniqueTypeNamesAcrossNamespaces = v != null },
-                { "gc|generatedCodeAttribute", "Adds version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
+                { "gc|generatedCodeAttribute", "add version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
             };
 
             var globsAndUris = options.Parse(args);
