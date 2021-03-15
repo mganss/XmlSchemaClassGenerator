@@ -135,7 +135,7 @@ namespace XmlSchemaClassGenerator
 
             var generatedAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(GeneratedCodeAttribute), Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Configuration.Version.Title)),
-                new CodeAttributeArgument(new CodePrimitiveExpression(Configuration.Version.Version)));
+                new CodeAttributeArgument(new CodePrimitiveExpression(Configuration.CreateGeneratedCodeAttributeVersion ? Configuration.Version.Version : "")));
             typeDeclaration.CustomAttributes.Add(generatedAttribute);
 
             return typeDeclaration;

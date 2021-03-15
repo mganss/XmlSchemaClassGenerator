@@ -290,5 +290,10 @@ namespace XmlSchemaClassGenerator
         /// Create unique type names across all namespaces. See https://github.com/mganss/XmlSchemaClassGenerator/issues/240
         /// </summary>
         public bool UniqueTypeNameAcrossNamespaces { get; set; } = false;
+
+        /// <summary>
+        /// Adds version information to <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/>. Default is true.
+        /// </summary>
+        public bool CreateGeneratedCodeAttributeVersion { get; set; } = true;
     }
 }

@@ -52,6 +52,7 @@ namespace XmlSchemaClassGenerator.Console
             var commentLanguages = new[] { "en" };
             var supportedCommentLanguages = new[] { "en", "de" };
             var uniqueTypeNamesAcrossNamespaces = false;
+            var createGeneratedCodeAttributeVersion = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -122,6 +123,7 @@ without backing field initialization for collections
                 { "cl|commentLanguages=", $"comment languages to use (default is {string.Join(", ", commentLanguages)}; supported are {string.Join(", ", supportedCommentLanguages)})",
                     v => commentLanguages = v.Split(',').Select(l => l.Trim()).ToArray() },
                 { "un|uniqueTypeNames", "generate type names that are unique across namespaces (default is false)", v => uniqueTypeNamesAcrossNamespaces = v != null },
+                { "gc|generatedCodeAttribute", "Adds version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
             };
 
             var globsAndUris = options.Parse(args);
@@ -194,7 +196,8 @@ without backing field initialization for collections
                 DoNotForceIsNullable = doNotForceIsNullable,
                 SeparateSubstitutes = separateSubstitutes,
                 CompactTypeNames = compactTypeNames,
-                UniqueTypeNamesAcrossNamespaces = uniqueTypeNamesAcrossNamespaces
+                UniqueTypeNamesAcrossNamespaces = uniqueTypeNamesAcrossNamespaces,
+                CreateGeneratedCodeAttributeVersion = createGeneratedCodeAttributeVersion
             };
 
             generator.CommentLanguages.AddRange(commentLanguages);
