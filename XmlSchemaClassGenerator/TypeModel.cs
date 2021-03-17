@@ -1255,7 +1255,7 @@ namespace XmlSchemaClassGenerator
                             new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(CodeUtilities.CreateTypeReference(typeof(XmlSchemaForm), Configuration)),
                                 "Qualified")));
                     }
-                    else if (Form == XmlSchemaForm.Unqualified && !IsAttribute && !IsAny && XmlNamespace == null)
+                    else if ((Form == XmlSchemaForm.Unqualified || Form == XmlSchemaForm.None) && !IsAttribute && !IsAny && XmlNamespace == null)
                     {
                         attribute.Arguments.Add(new CodeAttributeArgument("Form",
                             new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(CodeUtilities.CreateTypeReference(typeof(XmlSchemaForm), Configuration)),
