@@ -1479,6 +1479,12 @@ namespace XmlSchemaClassGenerator
                     "Parse", new CodePrimitiveExpression(defaultString));
                 return rv;
             }
+            else if (type == typeof(TimeSpan))
+            {
+                var rv = new CodeMethodInvokeExpression(new CodeTypeReferenceExpression(CodeUtilities.CreateTypeReference(typeof(XmlConvert), Configuration)),
+                    "ToTimeSpan", new CodePrimitiveExpression(defaultString));
+                return rv;
+            }
             else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
             {
                 if (defaultString == "0")

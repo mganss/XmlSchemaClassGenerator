@@ -177,7 +177,7 @@ namespace XmlSchemaClassGenerator
             var resultType = type.TypeCode switch
             {
                 XmlTypeCode.AnyAtomicType => typeof(string),// union
-                XmlTypeCode.AnyUri or XmlTypeCode.Duration or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
+                XmlTypeCode.AnyUri or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
                 XmlTypeCode.Time => typeof(DateTime),
                 XmlTypeCode.Idref => typeof(string),
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
@@ -373,6 +373,7 @@ namespace XmlSchemaClassGenerator
             ("System.ComponentModel.DataAnnotations", c => c.CompactTypeNames && (c.DataAnnotationMode != DataAnnotationMode.None || c.EntityFramework)),
             ("System.Diagnostics", c => c.CompactTypeNames && c.GenerateDebuggerStepThroughAttribute),
             ("System.Linq", c => c.EnableDataBinding),
+            ("System.Xml", c => c.CompactTypeNames),
             ("System.Xml.Schema", c => c.CompactTypeNames),
             ("System.Xml.Serialization", c => c.CompactTypeNames)
         };
