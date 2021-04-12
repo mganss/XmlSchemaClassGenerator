@@ -111,7 +111,8 @@ namespace XmlSchemaClassGenerator.Tests
                 SeparateSubstitutes = generatorPrototype.SeparateSubstitutes,
                 CompactTypeNames = generatorPrototype.CompactTypeNames,
                 UniqueTypeNamesAcrossNamespaces = generatorPrototype.UniqueTypeNamesAcrossNamespaces,
-                CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion
+                CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
+                NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode
             };
 
             gen.CommentLanguages.Clear();

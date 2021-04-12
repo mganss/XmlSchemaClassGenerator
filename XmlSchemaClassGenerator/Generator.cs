@@ -282,6 +282,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CreateGeneratedCodeAttributeVersion = value; }
         }
 
+        public bool NetCoreSpecificCode
+        {
+            get { return _configuration.NetCoreSpecificCode; }
+            set { _configuration.NetCoreSpecificCode = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

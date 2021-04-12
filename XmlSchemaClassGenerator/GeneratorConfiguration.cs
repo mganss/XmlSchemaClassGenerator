@@ -295,5 +295,14 @@ namespace XmlSchemaClassGenerator
         /// Adds version information to <see cref="System.CodeDom.Compiler.GeneratedCodeAttribute"/>. Default is true.
         /// </summary>
         public bool CreateGeneratedCodeAttributeVersion { get; set; } = true;
+
+        /// <summary>
+        /// Generate code that works with .NET Core but might be incompatible with .NET Framework. Default is false.
+        /// Specific differences:
+        /// <list type="bullet">
+        /// <item>Use <see cref="TimeSpan"/> for duration instead of string <see cref="string"/></item>
+        /// </list>
+        /// </summary>
+        public bool NetCoreSpecificCode { get; set; }
     }
 }

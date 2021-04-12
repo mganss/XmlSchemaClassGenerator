@@ -55,7 +55,8 @@ namespace XmlSchemaClassGenerator.Tests
                 MemberVisitor = generatorPrototype.MemberVisitor,
                 CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
                 DoNotForceIsNullable = generatorPrototype.DoNotForceIsNullable,
-                CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion
+                CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
+                NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode
             };
 
             gen.CommentLanguages.Clear();
@@ -310,7 +311,8 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateInterfaces = true,
                 NamespacePrefix = "Simple",
                 GenerateDescriptionAttribute = true,
-                CodeTypeReferenceOptions = CodeTypeReferenceOptions.GlobalReference
+                CodeTypeReferenceOptions = CodeTypeReferenceOptions.GlobalReference,
+                NetCoreSpecificCode = true
             });
             TestSamples("Simple", SimplePattern);
         }
