@@ -49,7 +49,7 @@ For command line use, choose your preferred installation:
 ```
 Usage: dotnet xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 2.0.252.0
+Version 2.0.522.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -146,6 +146,8 @@ Options:
       --gc, --generatedCodeAttribute
                              add version information to GeneratedCodeAttribute
                                (default is true)
+      --nc, --netCore        generate .NET Core specific code that might not
+                               work with .NET Framework (default is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
