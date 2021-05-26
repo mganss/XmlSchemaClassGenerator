@@ -1406,7 +1406,7 @@ namespace Test
 
         private static void CompareOutput(string expected, string actual)
         {
-            static string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r\n", "\n");
+            static string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r?\n", "\n");
             Assert.Equal(Normalize(expected), Normalize(actual));
         }
 
