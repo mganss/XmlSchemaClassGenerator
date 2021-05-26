@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using System;
@@ -149,11 +149,9 @@ namespace XmlSchemaClassGenerator.Tests
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
             var result = Compiler.GenerateAssembly(compilation);
 
+            Assert.Empty(result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+            Assert.Empty(result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning));
             Assert.True(result.Result.Success);
-            var errors = result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
-            Assert.False(errors.Any(), string.Join("\n", errors.Select(e => e.GetMessage())));
-            var warnings = result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning).ToList();
-            Assert.False(warnings.Any(), string.Join("\n", errors.Select(w => w.GetMessage())));
             Assert.NotNull(result.Assembly);
 
             Assemblies[name] = result.Assembly;

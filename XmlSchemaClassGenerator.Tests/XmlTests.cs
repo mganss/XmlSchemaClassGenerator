@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -157,7 +157,7 @@ namespace XmlSchemaClassGenerator.Tests
             var iListType = typeof(Collection<>);
             var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
             var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPrivate).OrderBy(p=>p.Name).ToList();
-            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.NotEmpty(collectionPropertyInfos);
             Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
 
             var myClassInstance = Activator.CreateInstance(myClassType);
@@ -189,7 +189,7 @@ namespace XmlSchemaClassGenerator.Tests
             var iListType = typeof(Collection<>);
             var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
             var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p=>p.Name).ToList();
-            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.NotEmpty(collectionPropertyInfos);
             Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
 
             var myClassInstance = Activator.CreateInstance(myClassType);
@@ -221,7 +221,7 @@ namespace XmlSchemaClassGenerator.Tests
             var iListType = typeof(Collection<>);
             var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
             var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p=>p.Name).ToList();
-            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.NotEmpty(collectionPropertyInfos);
             Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
             var myClassInstance = Activator.CreateInstance(myClassType);
             foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
@@ -253,7 +253,7 @@ namespace XmlSchemaClassGenerator.Tests
             var iListType = typeof(Collection<>);
             var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
             var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
-            Assert.True(collectionPropertyInfos.Count > 0);
+            Assert.NotEmpty(collectionPropertyInfos);
             Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
             var myClassInstance = Activator.CreateInstance(myClassType);
 
