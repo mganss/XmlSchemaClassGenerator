@@ -247,11 +247,10 @@ namespace XmlSchemaClassGenerator
         {
             foreach (var rootElement in elements)
             {
-                var rootSchema = rootElement.GetSchema();
-                var source = CodeUtilities.CreateUri(rootSchema.SourceUri);
+                var typeSource = CodeUtilities.CreateUri(rootElement.ElementSchemaType.SourceUri);
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) { qualifiedName = rootElement.QualifiedName; }
-                var type = CreateTypeModel(source, rootElement.ElementSchemaType, qualifiedName);
+                var type = CreateTypeModel(typeSource, rootElement.ElementSchemaType, qualifiedName);
                 ClassModel derivedClassModel = null;
 
                 if (type.RootElementName != null)
@@ -261,10 +260,12 @@ namespace XmlSchemaClassGenerator
                         // There is already another global element with this type.
                         // Need to create an empty derived class.
 
+                        var elementSource = CodeUtilities.CreateUri(rootElement.SourceUri);
+
                         derivedClassModel = new ClassModel(_configuration)
                         {
                             Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(rootElement.QualifiedName),
-                            Namespace = CreateNamespaceModel(source, rootElement.QualifiedName)
+                            Namespace = CreateNamespaceModel(elementSource, rootElement.QualifiedName)
                         };
 
                         derivedClassModel.Documentation.AddRange(GetDocumentation(rootElement));
