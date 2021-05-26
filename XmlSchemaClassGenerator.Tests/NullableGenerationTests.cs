@@ -5,7 +5,7 @@ namespace XmlSchemaClassGenerator.Tests
 {
     public class NullableGenerationTests
     {
-        const string NullablePattern = @"xsd\nullable\*.xsd";
+        const string NullablePattern = "xsd/nullable/*.xsd";
 
         [Fact]
         public void No_nullable_support()

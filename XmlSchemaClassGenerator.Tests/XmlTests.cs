@@ -85,21 +85,21 @@ namespace XmlSchemaClassGenerator.Tests
             return ConvertXml(name, new[] {xsd}, generatorPrototype);
         }
 
-        const string IS24Pattern = @"xsd\is24\*\*.xsd";
-        const string IS24ImmoTransferPattern = @"xsd\is24immotransfer\is24immotransfer.xsd";
-        const string WadlPattern = @"xsd\wadl\wadl.xsd";
-        const string ListPattern = @"xsd\list\list.xsd";
-        const string SimplePattern = @"xsd\simple\*.xsd";
-        const string ArrayOrderPattern = @"xsd\array-order\array-order.xsd";
-        const string ClientPattern = @"xsd\client\client.xsd";
-        const string IataPattern = @"xsd\iata\*.xsd";
-        const string TimePattern = @"xsd\time\time.xsd";
-        const string TableauPattern = @"xsd\ts-api\*.xsd";
-        const string VSTstPattern = @"xsd\vstst\vstst.xsd";
-        const string BpmnPattern = @"xsd\bpmn\*.xsd";
-        const string DtsxPattern = @"xsd\dtsx\dtsx2.xsd";
-        const string WfsPattern = @"xsd\wfs\schemas.opengis.net\wfs\2.0\wfs.xsd";
-        const string EppPattern = @"xsd\epp\*.xsd";
+        const string IS24Pattern = "xsd/is24/*/*.xsd";
+        const string IS24ImmoTransferPattern = "xsd/is24immotransfer/is24immotransfer.xsd";
+        const string WadlPattern = "xsd/wadl/wadl.xsd";
+        const string ListPattern = "xsd/list/list.xsd";
+        const string SimplePattern = "xsd/simple/*.xsd";
+        const string ArrayOrderPattern = "xsd/array-order/array-order.xsd";
+        const string ClientPattern = "xsd/client/client.xsd";
+        const string IataPattern = "xsd/iata/*.xsd";
+        const string TimePattern = "xsd/time/time.xsd";
+        const string TableauPattern = "xsd/ts-api/*.xsd";
+        const string VSTstPattern = "xsd/vstst/vstst.xsd";
+        const string BpmnPattern = "xsd/bpmn/*.xsd";
+        const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
+        const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
+        const string EppPattern = "xsd/epp/*.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -779,10 +779,7 @@ namespace XmlSchemaClassGenerator.Tests
                 unknownAttrError = true;
             }
 
-            var currDir = Directory.GetCurrentDirectory();
-            var testDir = "bpmn_tests";
-            var fileExt = "bpmn";
-            var testFiles = Glob.ExpandNames(string.Format("{0}\\xml\\{1}\\*.{2}", currDir, testDir, fileExt));
+            var testFiles = Glob.ExpandNames(Path.Combine("xml", "bpmn_tests", "*.bpmn"));
 
             foreach (var testFile in testFiles)
             {
@@ -864,8 +861,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         static string ReadXml(string name)
         {
-            var folder = Directory.GetCurrentDirectory();
-            var xml = File.ReadAllText(string.Format(@"{0}\xml\{1}.xml", folder, name));
+            var xml = File.ReadAllText(Path.Combine("xml", name + ".xml"));
             return xml;
         }
 
@@ -2266,10 +2262,10 @@ namespace Test
                 "AIXM_AbstractGML_ObjectTypes.xsd",
                 "AIXM_DataTypes.xsd",
                 "AIXM_Features.xsd",
-                "extensions\\ADR-23.5.0\\ADR_DataTypes.xsd",
-                "extensions\\ADR-23.5.0\\ADR_Features.xsd",
-                "message\\ADR_Message.xsd",
-                "message\\AIXM_BasicMessage.xsd",
+                Path.Combine("extensions", "ADR-23.5.0", "ADR_DataTypes.xsd"),
+                Path.Combine("extensions", "ADR-23.5.0", "ADR_Features.xsd"),
+                Path.Combine("message", "ADR_Message.xsd"),
+                Path.Combine("message", "AIXM_BasicMessage.xsd"),
             }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "aixm", "aixm-5.1.1", x)).ToList();
 
             var assembly = Compiler.GenerateFiles("Aixm", xsdFiles, gen);
