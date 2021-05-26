@@ -62,7 +62,7 @@ namespace XmlSchemaClassGenerator.Tests
         {
             if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
 
-            var files = Glob.ExpandNames(pattern);
+            var files = Glob.ExpandNames(pattern).OrderByDescending(f => f);
 
             return GenerateFiles(name, files, generatorPrototype);
         }
