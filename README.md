@@ -47,7 +47,7 @@ For command line use, choose your preferred installation:
 - CI Builds are available at the NuGet feed https://ci.appveyor.com/nuget/xmlschemaclassgenerator-0f1t3r6ti475
 
 ```
-Usage: dotnet xscgen [OPTIONS]+ xsdFile...
+Usage: xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
 Version 2.0.522.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
@@ -185,7 +185,7 @@ var generator = new Generator
 Using the optional `|` syntax of the `-n` command line option you can map individual xsd files to C# namespaces. If you have several input files using the same XML namespace you can still generate an individual C# namespace for the types defined within a single xsd file. For example, if you have two input files `a.xsd` and `b.xsd` both of which have the same `targetNamespace` of `http://example.com/namespace` you can generate the C# namespaces `Example.NamespaceA` and `Example.NamespaceB`:
 
 ```
-dotnet-xscgen.exe -n "|a.xsd=Example.NamespaceA" -n "|b.xsd=Example.NamespaceB" a.xsd b.xsd
+xscgen -n "|a.xsd=Example.NamespaceA" -n "|b.xsd=Example.NamespaceB" a.xsd b.xsd
 ```
 
 #### Mapping empty XML namespaces
@@ -193,7 +193,7 @@ dotnet-xscgen.exe -n "|a.xsd=Example.NamespaceA" -n "|b.xsd=Example.NamespaceB" 
 In order to provide a C# namespace name for an empty XML namespace you can specify it on the command line like this:
 
 ```
-XmlSchemaClassGenerator.Console.exe -n =Example example.xsd
+xscgen -n =Example example.xsd
 ```
 
 Note the space between `-n` and `=Example`.
