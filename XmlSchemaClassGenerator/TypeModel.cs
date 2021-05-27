@@ -1523,11 +1523,27 @@ namespace XmlSchemaClassGenerator
 
             if (minInclusive != null && maxInclusive != null)
             {
-                yield return new CodeAttributeDeclaration(
-                        CodeUtilities.CreateTypeReference(typeof(RangeAttribute), Configuration),
-                        new CodeAttributeArgument(new CodeTypeOfExpression(minInclusive.Type)),
-                        new CodeAttributeArgument(new CodePrimitiveExpression(minInclusive.Value)),
-                        new CodeAttributeArgument(new CodePrimitiveExpression(maxInclusive.Value)));
+                var rangeAttribute = new CodeAttributeDeclaration(
+                    CodeUtilities.CreateTypeReference(typeof(RangeAttribute), Configuration),
+                    new CodeAttributeArgument(new CodeTypeOfExpression(minInclusive.Type)),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(minInclusive.Value)),
+                    new CodeAttributeArgument(new CodePrimitiveExpression(maxInclusive.Value)));
+
+                // see https://github.com/mganss/XmlSchemaClassGenerator/issues/268
+                if (Configuration.NetCoreSpecificCode)
+                {
+                    if (minInclusive.Value.Contains(".") || maxInclusive.Value.Contains("."))
+                    {
+                        rangeAttribute.Arguments.Add(new CodeAttributeArgument("ParseLimitsInInvariantCulture", new CodePrimitiveExpression(true)));
+                    }
+
+                    if (minInclusive.Type != typeof(int) && minInclusive.Type != typeof(double))
+                    {
+                        rangeAttribute.Arguments.Add(new CodeAttributeArgument("ConvertValueInInvariantCulture", new CodePrimitiveExpression(true)));
+                    }
+                }
+
+                yield return rangeAttribute;
             }
         }
     }
