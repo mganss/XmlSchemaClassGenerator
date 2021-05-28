@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,27 @@ namespace XmlSchemaClassGenerator
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> propertySelector)
         {
             return source.GroupBy(propertySelector).Select(x => x.First());
+        }
+
+        public static string GetFormattedCommandLineArgs()
+        {
+            var args = Environment.GetCommandLineArgs();
+            return string.Join(" ", args.Take(1).Select(Path.GetFileNameWithoutExtension).Concat(args.Skip(1)).Select(QuoteIfNeeded));
+        }
+
+        public static string QuoteIfNeeded(this string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            if (text.Contains(" "))
+            {
+                return "\"" + text + "\"";
+            }
+
+            return text;
         }
     }
 }
