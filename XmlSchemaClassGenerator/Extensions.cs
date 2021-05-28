@@ -43,12 +43,6 @@ namespace XmlSchemaClassGenerator
             return source.GroupBy(propertySelector).Select(x => x.First());
         }
 
-        public static string GetFormattedCommandLineArgs()
-        {
-            var args = Environment.GetCommandLineArgs();
-            return string.Join(" ", args.Take(1).Select(Path.GetFileNameWithoutExtension).Concat(args.Skip(1)).Select(QuoteIfNeeded));
-        }
-
         public static string QuoteIfNeeded(this string text)
         {
             if (string.IsNullOrEmpty(text))

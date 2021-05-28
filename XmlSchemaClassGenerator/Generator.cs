@@ -288,6 +288,18 @@ namespace XmlSchemaClassGenerator
             set { _configuration.NetCoreSpecificCode = value; }
         }
 
+        public bool GenerateCommandLineArgumentsComment
+        {
+            get { return _configuration.GenerateCommandLineArgumentsComment; }
+            set { _configuration.GenerateCommandLineArgumentsComment = value; }
+        }
+
+        public CommandLineArgumentsProvider CommandLineArgumentsProvider
+        {
+            get { return _configuration.CommandLineArgumentsProvider; }
+            set { _configuration.CommandLineArgumentsProvider = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -334,9 +346,15 @@ namespace XmlSchemaClassGenerator
                     {
                         comment.Append($" version {Version.Version}");
                     }
-                    comment.Append(" using the following command:");
+                    if (GenerateCommandLineArgumentsComment)
+                    {
+                        comment.Append(" using the following command:");
+                    }
                     ns.Comments.Add(new CodeCommentStatement(comment.ToString()));
-                    ns.Comments.Add(new CodeCommentStatement(Extensions.GetFormattedCommandLineArgs()));
+                    if (GenerateCommandLineArgumentsComment)
+                    {
+                        ns.Comments.Add(new CodeCommentStatement(CommandLineArgumentsProvider?.CommandLineArguments ?? "N/A"));
+                    }
                 }
 
                 writer.Write(ns);
