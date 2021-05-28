@@ -148,6 +148,9 @@ Options:
                                (default is true)
       --nc, --netCore        generate .NET Core specific code that might not
                                work with .NET Framework (default is false)
+      --ca, --commandArgs    generate a comment with the exact command line
+                               arguments that were used to generate the source
+                               code (default is true)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
