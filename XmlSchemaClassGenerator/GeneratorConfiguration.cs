@@ -38,7 +38,7 @@ namespace XmlSchemaClassGenerator
             NamingProvider = new NamingProvider(NamingScheme);
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
-            CommandLineArgumentsProvider = new CommandLineArgumentsProvider();
+            CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         }
 
         /// <summary>

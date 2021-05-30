@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -6,13 +7,18 @@ namespace XmlSchemaClassGenerator
 {
     public class CommandLineArgumentsProvider
     {
-        public virtual string CommandLineArguments
+        public CommandLineArgumentsProvider(string commandLineArguments)
         {
-            get
-            {
-                var args = Environment.GetCommandLineArgs();
-                return string.Join(" ", args.Take(1).Select(Path.GetFileNameWithoutExtension).Concat(args.Skip(1)).Select(Extensions.QuoteIfNeeded));
-            }
+            CommandLineArguments = commandLineArguments ?? throw new ArgumentNullException(nameof(commandLineArguments));
+        }
+
+        public string CommandLineArguments { get; }
+
+        public static CommandLineArgumentsProvider CreateFromEnvironment()
+        {
+            var args = Environment.GetCommandLineArgs();
+            var commandLineArguments = string.Join(" ", args.Take(1).Select(Path.GetFileNameWithoutExtension).Concat(args.Skip(1)).Select(Extensions.QuoteIfNeeded));
+            return new CommandLineArgumentsProvider(commandLineArguments);
         }
     }
 }
