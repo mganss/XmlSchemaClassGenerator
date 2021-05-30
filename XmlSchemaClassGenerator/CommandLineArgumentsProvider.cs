@@ -9,7 +9,7 @@ namespace XmlSchemaClassGenerator
     {
         public CommandLineArgumentsProvider(string commandLineArguments)
         {
-            CommandLineArguments = commandLineArguments ?? throw new ArgumentNullException(nameof(commandLineArguments));
+            CommandLineArguments = commandLineArguments;
         }
 
         public string CommandLineArguments { get; }
