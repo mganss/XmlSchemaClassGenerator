@@ -38,6 +38,7 @@ namespace XmlSchemaClassGenerator
             NamingProvider = new NamingProvider(NamingScheme);
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
+            CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         }
 
         /// <summary>
@@ -304,5 +305,16 @@ namespace XmlSchemaClassGenerator
         /// </list>
         /// </summary>
         public bool NetCoreSpecificCode { get; set; }
+
+        /// <summary>
+        /// Adds a comment with the exact command line arguments that were used to generate the
+        /// source code using the <see cref="CommandLineArgumentsProvider"/>. Default is false.
+        /// </summary>
+        public bool GenerateCommandLineArgumentsComment { get; set; }
+
+        /// <summary>
+        /// A provider to obtain the command line arguments of the tool.
+        /// </summary>
+        public CommandLineArgumentsProvider CommandLineArgumentsProvider { get; set; }
     }
 }
