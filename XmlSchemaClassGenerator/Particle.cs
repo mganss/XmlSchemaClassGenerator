@@ -13,8 +13,8 @@ namespace XmlSchemaClassGenerator
         {
             XmlParticle = particle;
             XmlParent = parent;
-            MinOccurs = particle.MinOccurs;
-            MaxOccurs = particle.MaxOccurs;
+            MinOccurs = particle?.MinOccurs ?? 1;
+            MaxOccurs = particle?.MaxOccurs ?? 1;
         }
 
         public XmlSchemaParticle XmlParticle { get; set; }

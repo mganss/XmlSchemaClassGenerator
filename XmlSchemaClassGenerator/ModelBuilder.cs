@@ -119,7 +119,7 @@ namespace XmlSchemaClassGenerator
                                 var cls = (ClassModel)prop.OwningType;
                                 var schema = substitute.Element.GetSchema();
                                 var source = CodeUtilities.CreateUri(schema.SourceUri);
-                                var props = CreatePropertiesForElements(source, cls, prop.XmlParticle, new[] { prop.Particle }, substitute, order);
+                                var props = CreatePropertiesForElements(source, cls, prop.Particle, new[] { prop.Particle }, substitute, order);
 
                                 cls.Properties.AddRange(props);
 
@@ -379,8 +379,9 @@ namespace XmlSchemaClassGenerator
                 Types[key] = interfaceModel;
             }
 
-            var particle = group.Particle;
-            var items = GetElements(particle);
+            var xmlParticle = group.Particle;
+            var particle = new Particle(xmlParticle, group.Parent);
+            var items = GetElements(xmlParticle);
             var properties = CreatePropertiesForElements(source, interfaceModel, particle, items.Where(i => !(i.XmlParticle is XmlSchemaGroupRef)));
             interfaceModel.Properties.AddRange(properties);
             var interfaces = items.Select(i => i.XmlParticle).OfType<XmlSchemaGroupRef>()
@@ -462,20 +463,20 @@ namespace XmlSchemaClassGenerator
                 if (baseModel is ClassModel baseClassModel) { baseClassModel.DerivedTypes.Add(classModel); }
             }
 
-            XmlSchemaParticle particle = null;
+            XmlSchemaParticle xmlParticle = null;
             if (classModel.BaseClass != null)
             {
                 if (complexType.ContentModel.Content is XmlSchemaComplexContentExtension complexContent)
                 {
-                    particle = complexContent.Particle;
+                    xmlParticle = complexContent.Particle;
                 }
 
                 // If it's a restriction, do not duplicate elements on the derived class, they're already in the base class.
                 // See https://msdn.microsoft.com/en-us/library/f3z3wh0y.aspx
             }
-            else particle = complexType.Particle ?? complexType.ContentTypeParticle;
+            else xmlParticle = complexType.Particle ?? complexType.ContentTypeParticle;
 
-            var items = GetElements(particle, complexType).ToList();
+            var items = GetElements(xmlParticle, complexType).ToList();
 
             if (_configuration.GenerateInterfaces)
             {
@@ -485,6 +486,7 @@ namespace XmlSchemaClassGenerator
                 classModel.AddInterfaces(interfaces);
             }
 
+            var particle = new Particle(xmlParticle, xmlParticle?.Parent);
             var properties = CreatePropertiesForElements(source, classModel, particle, items);
             classModel.Properties.AddRange(properties);
 
@@ -763,10 +765,11 @@ namespace XmlSchemaClassGenerator
             return properties;
         }
 
-        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, XmlSchemaParticle particle, IEnumerable<Particle> items,
+        private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, Particle particle, IEnumerable<Particle> items,
             Substitute substitute = null, int order = 0)
         {
             var properties = new List<PropertyModel>();
+            var xmlParticle = particle.XmlParticle;
 
             foreach (var item in items)
             {
@@ -784,7 +787,7 @@ namespace XmlSchemaClassGenerator
                         if (elementQualifiedName.IsEmpty)
                         {
                             // inner type, have to generate a type name
-                            var typeModelName = particle is XmlSchemaGroupRef groupRef ? groupRef.RefName : typeModel.XmlSchemaName;
+                            var typeModelName = xmlParticle is XmlSchemaGroupRef groupRef ? groupRef.RefName : typeModel.XmlSchemaName;
                             var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModelName.Name, element.QualifiedName.Name);
                             elementQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                             // try to avoid name clashes
@@ -861,7 +864,7 @@ namespace XmlSchemaClassGenerator
                             }
 
                             var groupItems = GetElements(group.Particle);
-                            var groupProperties = CreatePropertiesForElements(source, typeModel, item.XmlParticle, groupItems, order: order).ToList();
+                            var groupProperties = CreatePropertiesForElements(source, typeModel, item, groupItems, order: order).ToList();
                             if (_configuration.EmitOrder)
                             {
                                 order += groupProperties.Count;
