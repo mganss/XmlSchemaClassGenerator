@@ -118,6 +118,7 @@ namespace XmlSchemaClassGenerator
         public List<DocumentationModel> Documentation { get; private set; }
         public bool IsAnonymous { get; set; }
         public GeneratorConfiguration Configuration { get; private set; }
+        public virtual bool IsSubtype => false;
 
         protected TypeModel(GeneratorConfiguration configuration)
         {
@@ -148,7 +149,7 @@ namespace XmlSchemaClassGenerator
                 var typeAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(XmlTypeAttribute), Configuration),
                     new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)),
                     new CodeAttributeArgument("Namespace", new CodePrimitiveExpression(XmlSchemaName.Namespace)));
-                if (IsAnonymous && (this is not ClassModel classModel || classModel.BaseClass == null))
+                if (IsAnonymous && !IsSubtype)
                 {
                     // don't generate AnonymousType if it's derived class, otherwise XmlSerializer will
                     // complain with "InvalidOperationException: Cannot include anonymous type '...'"
@@ -259,6 +260,8 @@ namespace XmlSchemaClassGenerator
         public bool IsSubstitution { get; set; }
         public TypeModel BaseClass { get; set; }
         public List<ClassModel> DerivedTypes { get; set; }
+        public override bool IsSubtype => BaseClass != null;
+
         public ClassModel(GeneratorConfiguration configuration)
             : base(configuration)
         {
