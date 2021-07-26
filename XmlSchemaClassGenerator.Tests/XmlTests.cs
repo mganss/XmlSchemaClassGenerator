@@ -522,7 +522,7 @@ namespace XmlSchemaClassGenerator.Tests
                 && !e.Message.Contains("The Pattern constraint failed"));  // generator doesn't generate valid values where pattern restrictions exist, e.g. email
         }
 
-        private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
+        private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
         private void DeserializeSampleXml(string pattern, Assembly assembly)
         {
@@ -691,7 +691,7 @@ namespace XmlSchemaClassGenerator.Tests
             string dcXsd = "DC.xsd";
             string diXsd = "DI.xsd";
 
-            Dictionary<string, string> xsdToCsharpNsMap = new Dictionary<string, string>
+            Dictionary<string, string> xsdToCsharpNsMap = new()
             {
                 { bpmnXsd, "Namespace1" },
                 { semantXsd, "Namespace1" },
@@ -700,7 +700,7 @@ namespace XmlSchemaClassGenerator.Tests
                 { diXsd, "Namespace4" }
             };
 
-            Dictionary<string, string> xsdToCsharpTypeMap = new Dictionary<string, string>
+            Dictionary<string, string> xsdToCsharpTypeMap = new()
             {
                 { bpmnXsd, "TDefinitions" },
                 { semantXsd, "TActivity" },
@@ -709,7 +709,7 @@ namespace XmlSchemaClassGenerator.Tests
                 { diXsd, "DiagramElement" }
             };
 
-            List<string> customNamespaceConfig = new List<string>();
+            List<string> customNamespaceConfig = new();
 
             foreach (var ns in xsdToCsharpNsMap)
                 customNamespaceConfig.Add(string.Format(customNsPattern, ns.Key, ns.Value));
@@ -804,7 +804,7 @@ namespace XmlSchemaClassGenerator.Tests
 
         private static IDictionary<string, string> GetNamespacesFromSource(string source)
         {
-            XPathDocument doc = new XPathDocument(new StringReader(source));
+            XPathDocument doc = new(new StringReader(source));
             XPathNavigator namespaceNavigator = doc.CreateNavigator();
             namespaceNavigator.MoveToFollowing(XPathNodeType.Element);
             return namespaceNavigator.GetNamespacesInScope(XmlNamespaceScope.All);
@@ -2442,7 +2442,7 @@ namespace Test
     [System.Xml.Serialization.XmlRootAttribute(""document"", Namespace=""http://local.none"")]
     public partial class Elem
     {{
-        
+
         [System.Xml.Serialization.XmlAttributeAttribute(""Text"")]
         public string Text {{ get; set; }}
     }}

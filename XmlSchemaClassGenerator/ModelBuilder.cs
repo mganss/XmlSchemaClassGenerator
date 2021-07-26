@@ -14,11 +14,11 @@ namespace XmlSchemaClassGenerator
         private readonly XmlSchemaSet _set;
         private readonly Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
         private readonly Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
-        private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new Dictionary<NamespaceKey, NamespaceModel>();
-        private readonly Dictionary<string, TypeModel> Types = new Dictionary<string, TypeModel>();
-        private readonly Dictionary<XmlQualifiedName, HashSet<Substitute>> SubstitutionGroups = new Dictionary<XmlQualifiedName, HashSet<Substitute>>();
+        private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new();
+        private readonly Dictionary<string, TypeModel> Types = new();
+        private readonly Dictionary<XmlQualifiedName, HashSet<Substitute>> SubstitutionGroups = new();
 
-        private static readonly XmlQualifiedName AnyType = new XmlQualifiedName("anyType", XmlSchema.Namespace);
+        private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
         private string BuildKey(XmlSchemaAnnotated annotated, XmlQualifiedName name)
             => $"{annotated.GetType()}:{annotated.SourceUri}:{annotated.LineNumber}:{annotated.LinePosition}:{name}";
@@ -557,7 +557,7 @@ namespace XmlSchemaClassGenerator
         private TypeModel CreateTypeModel(XmlSchemaSimpleType simpleType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
             var restrictions = new List<RestrictionModel>();
-            List<XmlSchemaFacet> facets = new List<XmlSchemaFacet>();
+            List<XmlSchemaFacet> facets = new();
 
             if (simpleType.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
                 facets = typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList();
