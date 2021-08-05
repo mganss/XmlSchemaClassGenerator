@@ -137,7 +137,7 @@ namespace XmlSchemaClassGenerator
 
         private void AddXmlRootAttributeToAmbiguousTypes()
         {
-            var ambiguousTypes = Types.Values.Where(t=>t.RootElementName == null && !(t is InterfaceModel)).GroupBy(t => t.Name);
+            var ambiguousTypes = Types.Values.Where(t => t.RootElementName == null && !t.IsAbstractRoot && !(t is InterfaceModel)).GroupBy(t => t.Name);
             foreach (var ambiguousTypeGroup in ambiguousTypes)
             {
                 var types = ambiguousTypeGroup.ToList();
@@ -253,7 +253,7 @@ namespace XmlSchemaClassGenerator
                 var type = CreateTypeModel(typeSource, rootElement.ElementSchemaType, qualifiedName);
                 ClassModel derivedClassModel = null;
 
-                if (type.RootElementName != null)
+                if (type.RootElementName != null || type.IsAbstractRoot)
                 {
                     if (type is ClassModel classModel)
                     {
@@ -283,6 +283,49 @@ namespace XmlSchemaClassGenerator
                         ((ClassModel)derivedClassModel.BaseClass).DerivedTypes.Add(derivedClassModel);
 
                         derivedClassModel.RootElementName = rootElement.QualifiedName;
+
+                        if (!type.IsAbstractRoot)
+                        {
+                            // Also create an empty derived class for the original root element
+
+                            var originalClassModel = new ClassModel(_configuration)
+                            {
+                                Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(type.RootElementName),
+                                Namespace = classModel.Namespace
+                            };
+
+                            originalClassModel.Documentation.AddRange(classModel.Documentation);
+                            classModel.Documentation.Clear();
+
+                            if (originalClassModel.Namespace != null)
+                            {
+                                originalClassModel.Name = originalClassModel.Namespace.GetUniqueTypeName(originalClassModel.Name);
+                                originalClassModel.Namespace.Types[originalClassModel.Name] = originalClassModel;
+                            }
+
+                            if (classModel.XmlSchemaName != null && !classModel.XmlSchemaName.IsEmpty)
+                            {
+                                key = BuildKey(classModel.RootElement, classModel.XmlSchemaName);
+                                Types[key] = originalClassModel;
+                            }
+
+                            originalClassModel.BaseClass = classModel;
+                            ((ClassModel)originalClassModel.BaseClass).DerivedTypes.Add(originalClassModel);
+
+                            originalClassModel.RootElementName = type.RootElementName;
+
+                            if (classModel.RootElement.SubstitutionGroup != null
+                                && SubstitutionGroups.TryGetValue(classModel.RootElement.SubstitutionGroup, out var substitutes))
+                            {
+                                foreach (var substitute in substitutes.Where(s => s.Element == classModel.RootElement))
+                                {
+                                    substitute.Type = originalClassModel;
+                                }
+                            }
+
+                            classModel.RootElementName = null;
+                            classModel.IsAbstractRoot = true;
+                        }
                     }
                     else
                     {
@@ -297,6 +340,7 @@ namespace XmlSchemaClassGenerator
                         classModel.Documentation.AddRange(GetDocumentation(rootElement));
                     }
 
+                    type.RootElement = rootElement;
                     type.RootElementName = rootElement.QualifiedName;
                 }
 

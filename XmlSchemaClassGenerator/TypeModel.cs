@@ -111,7 +111,9 @@ namespace XmlSchemaClassGenerator
         protected static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
 
         public NamespaceModel Namespace { get; set; }
+        public XmlSchemaElement RootElement { get; set; }
         public XmlQualifiedName RootElementName { get; set; }
+        public bool IsAbstractRoot { get; set; }
         public string Name { get; set; }
         public XmlQualifiedName XmlSchemaName { get; set; }
         public XmlSchemaType XmlSchemaType { get; set; }
