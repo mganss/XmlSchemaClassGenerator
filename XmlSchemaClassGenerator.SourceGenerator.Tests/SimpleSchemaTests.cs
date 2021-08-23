@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace XmlSchemaClassGenerator.SourceGenerator.Tests
@@ -11,7 +10,11 @@ namespace XmlSchemaClassGenerator.SourceGenerator.Tests
             new Sample.Generated.MyRootElement
             {
                 Child1 = true,
-                Child2 = "foo"
+                Child2 = "foo",
+                ComplexChild1 = new Sample.Generated.MyRootElementComplexChild1
+                {
+                    Child11 = null
+                }
             };
         }
     }
