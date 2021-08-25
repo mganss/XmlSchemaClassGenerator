@@ -6,7 +6,7 @@ namespace XmlSchemaClassGenerator.Tests
 {
     internal class MemoryOutputWriter : OutputWriter
     {
-        private readonly List<string> _contents = new List<string>();
+        private readonly List<string> _contents = new();
 
         public IEnumerable<string> Content => _contents;
 

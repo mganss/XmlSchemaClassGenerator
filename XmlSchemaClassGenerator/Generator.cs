@@ -11,7 +11,7 @@ namespace XmlSchemaClassGenerator
 {
     public class Generator
     {
-        private readonly GeneratorConfiguration _configuration = new GeneratorConfiguration();
+        private readonly GeneratorConfiguration _configuration = new();
 
         public GeneratorConfiguration Configuration => _configuration;
 

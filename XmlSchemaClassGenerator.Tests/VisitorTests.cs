@@ -9,7 +9,7 @@ using Xunit;
 namespace XmlSchemaClassGenerator.Tests {
     public class VisitorTests
     {
-        private IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+        private static IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
         {
             if (name is null)
             {

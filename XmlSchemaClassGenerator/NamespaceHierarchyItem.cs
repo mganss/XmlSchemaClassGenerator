@@ -8,9 +8,9 @@ namespace XmlSchemaClassGenerator
 {
     public class NamespaceHierarchyItem
     {
-        private readonly List<NamespaceHierarchyItem> InternalSubNamespaces = new List<NamespaceHierarchyItem>();
-        private readonly List<NamespaceModel> InternalNamespaceModels = new List<NamespaceModel>();
-        private readonly List<TypeModel> InternalTypeModels = new List<TypeModel>();
+        private readonly List<NamespaceHierarchyItem> InternalSubNamespaces = new();
+        private readonly List<NamespaceModel> InternalNamespaceModels = new();
+        private readonly List<TypeModel> InternalTypeModels = new();
 
         private NamespaceHierarchyItem(string name, string fullName)
         {

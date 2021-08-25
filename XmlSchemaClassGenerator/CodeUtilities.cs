@@ -11,7 +11,7 @@ namespace XmlSchemaClassGenerator
     public static class CodeUtilities
     {
         // Match non-letter followed by letter
-        static readonly Regex PascalCaseRegex = new Regex(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
+        static readonly Regex PascalCaseRegex = new(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
 
         // Uppercases first letter and all letters following non-letters.
         // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
@@ -312,14 +312,14 @@ namespace XmlSchemaClassGenerator
             return name;
         }
 
-        static readonly Regex NormalizeNewlinesRegex = new Regex(@"(^|[^\r])\n", RegexOptions.Compiled);
+        static readonly Regex NormalizeNewlinesRegex = new (@"(^|[^\r])\n", RegexOptions.Compiled);
 
         internal static string NormalizeNewlines(string text)
         {
             return NormalizeNewlinesRegex.Replace(text, "$1\r\n");
         }
 
-        static readonly List<string> CSharpKeywords = new List<string>
+        static readonly List<string> CSharpKeywords = new()
         {
             "abstract", "as", "base", "bool",
             "break", "byte", "case", "catch",
@@ -365,7 +365,7 @@ namespace XmlSchemaClassGenerator
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
-        public static readonly List<(string Namespace, Func<GeneratorConfiguration,bool> Condition)> UsingNamespaces = new List<(string, Func<GeneratorConfiguration, bool>)> {
+        public static readonly List<(string Namespace, Func<GeneratorConfiguration,bool> Condition)> UsingNamespaces = new() {
             ("System", c => c.CompactTypeNames),
             ("System.CodeDom.Compiler", c => c.CompactTypeNames),
             ("System.Collections.Generic", c => c.CompactTypeNames),

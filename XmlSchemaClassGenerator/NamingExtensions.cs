@@ -9,7 +9,7 @@ namespace XmlSchemaClassGenerator
     {
         private static readonly CodeDomProvider Provider = new Microsoft.CSharp.CSharpCodeProvider();
 
-        private static readonly Dictionary<char, string> InvalidChars = new Dictionary<char, string>
+        private static readonly Dictionary<char, string> InvalidChars = new()
             {
                 ['\x00'] = "Null",
                 ['\x01'] = "StartOfHeading",

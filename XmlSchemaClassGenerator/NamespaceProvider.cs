@@ -9,7 +9,7 @@ namespace XmlSchemaClassGenerator
 {
     public class NamespaceProvider : IDictionary<NamespaceKey, string>
     {
-        private readonly Dictionary<NamespaceKey, string> InternalDictionary = new Dictionary<NamespaceKey, string>();
+        private readonly Dictionary<NamespaceKey, string> InternalDictionary = new();
 
         public GenerateNamespaceDelegate GenerateNamespace { get; set; }
 

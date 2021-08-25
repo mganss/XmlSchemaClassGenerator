@@ -88,7 +88,7 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        static readonly Regex InvalidCharacters = new Regex($"[{string.Join("", Path.GetInvalidFileNameChars())}]", RegexOptions.Compiled);
+        static readonly Regex InvalidCharacters = new($"[{string.Join("", Path.GetInvalidFileNameChars())}]", RegexOptions.Compiled);
 
         private string ValidateName(string name) => InvalidCharacters.Replace(name, "_");
     }

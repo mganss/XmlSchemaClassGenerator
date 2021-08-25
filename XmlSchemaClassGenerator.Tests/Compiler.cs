@@ -33,7 +33,7 @@ namespace XmlSchemaClassGenerator.Tests
             };
         }
 
-        private static readonly ConcurrentDictionary<string, Assembly> Assemblies = new ConcurrentDictionary<string, Assembly>();
+        private static readonly ConcurrentDictionary<string, Assembly> Assemblies = new();
 
         private static readonly string[] DependencyAssemblies = new[]
         {
