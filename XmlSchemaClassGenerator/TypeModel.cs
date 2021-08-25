@@ -4,8 +4,6 @@ using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -861,7 +859,7 @@ namespace XmlSchemaClassGenerator
             }
 
             var ignoreAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(XmlIgnoreAttribute), Configuration));
-            var notMappedAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(NotMappedAttribute), Configuration));
+            var notMappedAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations.Schema", "NotMappedAttribute", Configuration));
             backingField.CustomAttributes.Add(ignoreAttribute);
 
             if (requiresBackingField)
@@ -949,7 +947,7 @@ namespace XmlSchemaClassGenerator
 
             if (!IsNullable && Configuration.DataAnnotationMode != DataAnnotationMode.None)
             {
-                var requiredAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(RequiredAttribute), Configuration));
+                var requiredAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "RequiredAttribute", Configuration));
                 member.CustomAttributes.Add(requiredAttribute);
             }
 
@@ -1151,7 +1149,7 @@ namespace XmlSchemaClassGenerator
 
             if (IsKey)
             {
-                var keyAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(KeyAttribute), Configuration));
+                var keyAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "KeyAttribute", Configuration));
                 member.CustomAttributes.Add(keyAttribute);
             }
 
@@ -1529,7 +1527,7 @@ namespace XmlSchemaClassGenerator
             if (minInclusive != null && maxInclusive != null)
             {
                 var rangeAttribute = new CodeAttributeDeclaration(
-                    CodeUtilities.CreateTypeReference(typeof(RangeAttribute), Configuration),
+                    CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "RangeAttribute", Configuration),
                     new CodeAttributeArgument(new CodeTypeOfExpression(minInclusive.Type)),
                     new CodeAttributeArgument(new CodePrimitiveExpression(minInclusive.Value)),
                     new CodeAttributeArgument(new CodePrimitiveExpression(maxInclusive.Value)));

@@ -381,6 +381,8 @@ namespace XmlSchemaClassGenerator
 
         public static bool IsUsingNamespace(Type t, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == t.Namespace && n.Condition(conf));
 
+        public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == namespaceName && n.Condition(conf));
+
         public static CodeTypeReference CreateTypeReference(Type t, GeneratorConfiguration conf)
         {
             if (IsUsingNamespace(t, conf))
@@ -398,6 +400,18 @@ namespace XmlSchemaClassGenerator
             }
             else
                 return new CodeTypeReference(t, conf.CodeTypeReferenceOptions);
+        }
+
+        public static CodeTypeReference CreateTypeReference(string namespaceName, string typeName, GeneratorConfiguration conf)
+        {
+            if (IsUsingNamespace(namespaceName, conf))
+            {
+                var typeRef = new CodeTypeReference(typeName, conf.CodeTypeReferenceOptions);
+
+                return typeRef;
+            }
+            else
+                return new CodeTypeReference($"{namespaceName}.{typeName}", conf.CodeTypeReferenceOptions);
         }
 
         /// <summary>

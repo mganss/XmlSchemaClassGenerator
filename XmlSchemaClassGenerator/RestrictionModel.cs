@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -89,7 +88,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            var a = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(StringLengthAttribute), Configuration),
+            var a = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "StringLengthAttribute", Configuration),
                 new CodeAttributeArgument(Max > 0 ? (CodeExpression)new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
             if (Min > 0) { a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min))); }
 
@@ -120,7 +119,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(MaxLengthAttribute), Configuration),
+            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "MaxLengthAttribute", Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
@@ -148,7 +147,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(MinLengthAttribute), Configuration),
+            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "MinLengthAttribute", Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
@@ -220,7 +219,7 @@ namespace XmlSchemaClassGenerator
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(typeof(RegularExpressionAttribute), Configuration),
+            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "RegularExpressionAttribute", Configuration),
                 new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
         }
     }
