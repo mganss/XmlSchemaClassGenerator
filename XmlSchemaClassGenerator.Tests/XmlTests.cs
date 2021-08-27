@@ -59,6 +59,9 @@ namespace XmlSchemaClassGenerator.Tests
                 NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
                 GenerateCommandLineArgumentsComment = generatorPrototype.GenerateCommandLineArgumentsComment,
                 CommandLineArgumentsProvider = generatorPrototype.CommandLineArgumentsProvider,
+                CollectionType = generatorPrototype.CollectionType,
+                CollectionImplementationType = generatorPrototype.CollectionImplementationType,
+                CollectionSettersMode = generatorPrototype.CollectionSettersMode,
             };
 
             gen.CommentLanguages.Clear();
