@@ -2246,9 +2246,10 @@ namespace Test
 
             // act
             dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
+            var xml = Serialize(serializer, deserialized);
 
             // assert
-            var xml = Serialize(serializer, deserialized);
+            Assert.NotNull(xml);
         }
 
         [Fact, TestPriority(1)]
