@@ -59,6 +59,9 @@ namespace XmlSchemaClassGenerator.Tests
                 NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
                 GenerateCommandLineArgumentsComment = generatorPrototype.GenerateCommandLineArgumentsComment,
                 CommandLineArgumentsProvider = generatorPrototype.CommandLineArgumentsProvider,
+                CollectionType = generatorPrototype.CollectionType,
+                CollectionImplementationType = generatorPrototype.CollectionImplementationType,
+                CollectionSettersMode = generatorPrototype.CollectionSettersMode,
             };
 
             gen.CommentLanguages.Clear();
@@ -2206,6 +2209,47 @@ namespace Test
             Assert.NotNull(serializer);
             dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
             //Assert.NotEmpty((System.Collections.IEnumerable)deserialized.D);  //<== oops
+        }
+
+        [Fact]
+        public void TestArrayOfStringsWhenPublicAndNull()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/282
+
+            // arrange
+            var xsd =
+                @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+                    <xs:complexType name=""ArrayOfstring"">
+                        <xs:sequence>
+                             <xs:element name=""testString"" type=""xs:string"" minOccurs=""0"" maxOccurs=""unbounded""/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:schema>
+                ";
+            var validXml =
+                @"<ArrayOfstring xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+                </ArrayOfstring>
+                ";
+            var generator = new Generator
+            {
+                IntegerDataType = typeof(int),
+                NamespacePrefix = "Test_NS1",
+                GenerateNullables = true,
+                CollectionType = typeof(System.Array),
+                CollectionSettersMode = CollectionSettersMode.Public
+            };
+            var contents = ConvertXml(nameof(TestArrayOfStringsWhenPublicAndNull), new[] { xsd }, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
+            var testType = assembly.GetType("Test_NS1.ArrayOfstring");
+            Assert.NotNull(testType);
+            var serializer = new XmlSerializer(testType);
+
+            // act
+            dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
+            var xml = Serialize(serializer, deserialized);
+
+            // assert
+            Assert.NotNull(xml);
         }
 
         [Fact, TestPriority(1)]
