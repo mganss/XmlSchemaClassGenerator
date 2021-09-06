@@ -269,11 +269,6 @@ namespace XmlSchemaClassGenerator
             var i = 0;
             foreach (var prop in classModel.Properties)
             {
-                if (!classModel.Configuration.EnableDataBinding && !(prop.Type is SimpleModel))
-                {
-                    continue;
-                }
-
                 if (propertyModel == prop)
                 {
                     i += 1;
@@ -399,7 +394,20 @@ namespace XmlSchemaClassGenerator
                 return typeRef;
             }
             else
-                return new CodeTypeReference(t, conf.CodeTypeReferenceOptions);
+            {
+                var typeRef = new CodeTypeReference(t, conf.CodeTypeReferenceOptions);
+
+                foreach (var typeArg in typeRef.TypeArguments)
+                {
+                    if (typeArg is CodeTypeReference typeArgRef)
+                    {
+                        typeArgRef.Options = conf.CodeTypeReferenceOptions;
+                    }
+                }
+
+                return typeRef;
+            }
+
         }
 
         public static CodeTypeReference CreateTypeReference(string namespaceName, string typeName, GeneratorConfiguration conf)

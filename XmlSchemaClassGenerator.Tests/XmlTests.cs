@@ -300,12 +300,24 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
+        public static IEnumerable<object[]> TestSimpleData() {
+            foreach (var referenceMode in new[]
+                { CodeTypeReferenceOptions.GlobalReference, /*CodeTypeReferenceOptions.GenericTypeParameter*/ })
+            foreach (var namingScheme in new[] { NamingScheme.Direct, NamingScheme.PascalCase })
+            foreach (var collectionType in new[] { typeof(Collection<>), /*typeof(Array)*/ })
+            {
+                yield return new object[] { referenceMode, namingScheme, collectionType };
+            }
+        }
 
-        [Fact, TestPriority(1)]
+
+        [Theory, TestPriority(1)]
+        [MemberData(nameof(TestSimpleData))]
         [UseCulture("en-US")]
-        public void TestSimple()
+        public void TestSimple(CodeTypeReferenceOptions referenceMode, NamingScheme namingScheme, Type collectionType)
         {
-            Compiler.Generate("Simple", SimplePattern, new Generator
+            var name = $"Simple_{referenceMode}_{namingScheme}_{collectionType}";
+            Compiler.Generate(name, SimplePattern, new Generator
             {
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),
@@ -316,10 +328,13 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateInterfaces = true,
                 NamespacePrefix = "Simple",
                 GenerateDescriptionAttribute = true,
-                CodeTypeReferenceOptions = CodeTypeReferenceOptions.GlobalReference,
-                NetCoreSpecificCode = true
+                CodeTypeReferenceOptions = referenceMode,
+                NetCoreSpecificCode = true,
+                NamingScheme = namingScheme,
+                CollectionType = collectionType,
+                CollectionSettersMode = CollectionSettersMode.Public
             });
-            TestSamples("Simple", SimplePattern);
+            TestSamples(name, SimplePattern);
         }
 
         [Fact, TestPriority(1)]
