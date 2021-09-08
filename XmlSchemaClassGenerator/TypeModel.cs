@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -172,17 +171,32 @@ namespace XmlSchemaClassGenerator
         public virtual CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection = false, bool forInit = false, bool attribute = false)
         {
             string name;
+            var referencingOptions = Configuration.CodeTypeReferenceOptions;
             if (referencingNamespace == Namespace)
+            {
                 name = Name;
+                referencingOptions = CodeTypeReferenceOptions.GenericTypeParameter;
+            }
+            else if ((referencingNamespace ?? Namespace).IsAmbiguous)
+            {
+                name = string.Format("global::{0}.{1}", Namespace.Name, Name);
+                referencingOptions = CodeTypeReferenceOptions.GenericTypeParameter;
+            }
             else
-                name = string.Format("{2}{0}.{1}", Namespace.Name, Name, ((referencingNamespace ?? Namespace).IsAmbiguous ? "global::" : string.Empty));
+            {
+                name = string.Format("{0}.{1}", Namespace.Name, Name);
+            }
 
             if (collection)
             {
                 name = forInit ? SimpleModel.GetCollectionImplementationName(name, Configuration) : SimpleModel.GetCollectionDefinitionName(name, Configuration);
+                if (Configuration.CollectionType == typeof(System.Array))
+                    referencingOptions = CodeTypeReferenceOptions.GenericTypeParameter;
+                else
+                    referencingOptions = Configuration.CodeTypeReferenceOptions;
             }
 
-            return new CodeTypeReference(name, Configuration.CodeTypeReferenceOptions);
+            return new CodeTypeReference(name, referencingOptions);
         }
 
         public virtual CodeExpression GetDefaultValueFor(string defaultString, bool attribute)
@@ -1411,7 +1425,10 @@ namespace XmlSchemaClassGenerator
                 typeRef.ArrayElementType = new CodeTypeReference(typeName);
                 typeRef.ArrayRank = 1;
             }
-            var typeOfExpr = new CodeTypeOfExpression(typeRef);
+            var typeOfExpr = new CodeTypeOfExpression(typeRef)
+            {
+                Type = { Options = CodeTypeReferenceOptions.GenericTypeParameter }
+            };
             var writer = new System.IO.StringWriter();
             CSharpProvider.GenerateCodeFromExpression(typeOfExpr, writer, new CodeGeneratorOptions());
             var fullTypeName = writer.ToString();

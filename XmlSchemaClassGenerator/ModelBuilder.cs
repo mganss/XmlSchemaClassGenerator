@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace XmlSchemaClassGenerator
 {
@@ -577,7 +578,29 @@ namespace XmlSchemaClassGenerator
                 }
             }
 
+            XmlSchemaAnyAttribute anyAttribute = null;
             if (complexType.AnyAttribute != null)
+                anyAttribute = complexType.AnyAttribute;
+            else if (complexType.AttributeWildcard != null)
+            {
+                var hasAnyAttribute = true;
+                for (var baseType = complexType.BaseXmlSchemaType; baseType != null; baseType = baseType.BaseXmlSchemaType)
+                {
+                    if (baseType is not XmlSchemaComplexType baseComplexType)
+                        continue;
+
+                    if (baseComplexType.AttributeWildcard != null)
+                    {
+                        hasAnyAttribute = false;
+                        break;
+                    }
+                }
+
+                if (hasAnyAttribute)
+                    anyAttribute = complexType.AttributeWildcard;
+            }
+
+            if (anyAttribute != null)
             {
                 var property = new PropertyModel(_configuration)
                 {
@@ -589,7 +612,7 @@ namespace XmlSchemaClassGenerator
                     IsAny = true
                 };
 
-                var attributeDocs = GetDocumentation(complexType.AnyAttribute);
+                var attributeDocs = GetDocumentation(anyAttribute);
                 property.Documentation.AddRange(attributeDocs);
 
                 classModel.Properties.Add(property);
