@@ -642,41 +642,42 @@ namespace XmlSchemaClassGenerator.Tests
                     && a.NamedArguments.Any(n => n.MemberName == "Namespace" && (string)n.TypedValue.Value == xmlQualifiedName.Namespace)));
         }
 
-        static readonly string[] Classes = new[] { "ApartmentBuy",
-                "ApartmentRent",
-                "AssistedLiving",
-                "CompulsoryAuction",
-                "GarageBuy",
-                "GarageRent",
-                "Gastronomy",
-                "HouseBuy",
-                "HouseRent",
-                "HouseType",
-                "Industry",
-                "Investment",
-                "LivingBuySite",
-                "LivingRentSite",
-                "Office",
-                "SeniorCare",
-                "ShortTermAccommodation",
-                "SpecialPurpose",
-                "Store",
-                "TradeSite" };
+        public static IEnumerable<object[]> Classes => new List<object[]>
+        {
+            new object[] { "ApartmentBuy" },
+            new object[] { "ApartmentRent" },
+            new object[] { "AssistedLiving" },
+            new object[] { "CompulsoryAuction" },
+            new object[] { "GarageBuy" },
+            new object[] { "GarageRent" },
+            new object[] { "Gastronomy" },
+            new object[] { "HouseBuy" },
+            new object[] { "HouseRent" },
+            new object[] { "HouseType" },
+            new object[] { "Industry" },
+            new object[] { "Investment" },
+            new object[] { "LivingBuySite" },
+            new object[] { "LivingRentSite" },
+            new object[] { "Office" },
+            new object[] { "SeniorCare" },
+            new object[] { "ShortTermAccommodation" },
+            new object[] { "SpecialPurpose" },
+            new object[] { "Store" },
+            new object[] { "TradeSite" },
+        };
 
-        [Fact, TestPriority(2)]
-        public void ProducesSameXmlAsXsd()
+        [Theory, TestPriority(2)]
+        [MemberData(nameof(Classes))]
+        public void ProducesSameXmlAsXsd(string c)
         {
             var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
 
-            foreach (var c in Classes)
-            {
-                var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
-                Assert.NotNull(t1);
-                var t2 = Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace == "IS24RestApi.Xsd");
-                Assert.NotNull(t2);
-                var f = char.ToLower(c[0]) + c[1..];
-                TestCompareToXsd(t1, t2, f);
-            }
+            var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
+            Assert.NotNull(t1);
+            var t2 = Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace == "IS24RestApi.Xsd");
+            Assert.NotNull(t2);
+            var f = char.ToLower(c[0]) + c[1..];
+            TestCompareToXsd(t1, t2, f);
         }
 
         static void TestCompareToXsd(Type t1, Type t2, string file)
@@ -828,18 +829,16 @@ namespace XmlSchemaClassGenerator.Tests
             return namespaceNavigator.GetNamespacesInScope(XmlNamespaceScope.All);
         }
 
-        [Fact, TestPriority(3)]
-        public void CanSerializeAndDeserializeAllExampleXmlFiles()
+        [Theory, TestPriority(3)]
+        [MemberData(nameof(Classes))]
+        public void CanSerializeAndDeserializeAllExampleXmlFiles(string c)
         {
             var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
 
-            foreach (var c in Classes)
-            {
-                var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
-                Assert.NotNull(t1);
-                var f = char.ToLower(c[0]) + c[1..];
-                TestRoundtrip(t1, f);
-            }
+            var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
+            Assert.NotNull(t1);
+            var f = char.ToLower(c[0]) + c[1..];
+            TestRoundtrip(t1, f);
         }
 
         static void TestRoundtrip(Type t, string file)
