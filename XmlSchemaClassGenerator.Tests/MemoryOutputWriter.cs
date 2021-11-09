@@ -1,7 +1,9 @@
 ﻿using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Versioning;
 
+[assembly:UnsupportedOSPlatform("ios")]
 namespace XmlSchemaClassGenerator.Tests
 {
     internal class MemoryOutputWriter : OutputWriter

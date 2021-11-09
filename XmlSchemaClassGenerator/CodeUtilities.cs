@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -360,7 +361,7 @@ namespace XmlSchemaClassGenerator
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
-        public static readonly List<(string Namespace, Func<GeneratorConfiguration,bool> Condition)> UsingNamespaces = new() {
+        public static readonly ImmutableList<(string Namespace, Func<GeneratorConfiguration,bool> Condition)> UsingNamespaces = ImmutableList.Create<(string Namespace, Func<GeneratorConfiguration, bool> Condition)>(
             ("System", c => c.CompactTypeNames),
             ("System.CodeDom.Compiler", c => c.CompactTypeNames),
             ("System.Collections.Generic", c => c.CompactTypeNames),
@@ -372,7 +373,7 @@ namespace XmlSchemaClassGenerator
             ("System.Xml", c => c.CompactTypeNames),
             ("System.Xml.Schema", c => c.CompactTypeNames),
             ("System.Xml.Serialization", c => c.CompactTypeNames)
-        };
+        );
 
         public static bool IsUsingNamespace(Type t, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == t.Namespace && n.Condition(conf));
 
