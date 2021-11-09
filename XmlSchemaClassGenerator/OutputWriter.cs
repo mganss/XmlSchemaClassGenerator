@@ -33,7 +33,7 @@ namespace XmlSchemaClassGenerator
         /// A wrapper around <see cref="TextWriter"/> that removes semicolons after a closing brace
         /// due to a bug in CodeDom and auto-properties
         /// </summary>
-        private class SemicolonRemovalTextWriter : TextWriter
+        private sealed class SemicolonRemovalTextWriter : TextWriter
         {
             private readonly TextWriter _other;
 

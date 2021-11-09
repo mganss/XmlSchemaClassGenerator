@@ -158,14 +158,14 @@ namespace XmlSchemaClassGenerator
             foreach (var interfaceModel in Types.Values.OfType<InterfaceModel>())
             {
                 var parentProperties = interfaceModel.Properties.ToList();
-                foreach (var baseInterfaceType in interfaceModel.AllDerivedReferenceTypes().OfType<InterfaceModel>())
+                foreach (var baseInterfaceTypeProperties in interfaceModel.AllDerivedReferenceTypes().OfType<InterfaceModel>().Select(i => i.Properties))
                 {
                     foreach (var parentProperty in parentProperties)
                     {
-                        var baseProperties = baseInterfaceType.Properties.ToList();
+                        var baseProperties = baseInterfaceTypeProperties.ToList();
                         foreach (var baseProperty in baseProperties.Where(baseProperty => parentProperty.Name == baseProperty.Name && parentProperty.Type.Name == baseProperty.Type.Name))
                         {
-                            baseInterfaceType.Properties.Remove(baseProperty);
+                            baseInterfaceTypeProperties.Remove(baseProperty);
                         }
                     }
                 }
@@ -223,10 +223,10 @@ namespace XmlSchemaClassGenerator
 
             if (imports.Any())
             {
-                foreach (var import in imports)
+                foreach (var importSchema in imports.Select(i => i.Schema))
                 {
-                    if (import.Schema != null)
-                        ResolveDependencies(import.Schema, dependencyOrder, seenSchemas);
+                    if (importSchema != null)
+                        ResolveDependencies(importSchema, dependencyOrder, seenSchemas);
                 }
             }
 
