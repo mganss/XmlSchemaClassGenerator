@@ -624,19 +624,28 @@ namespace XmlSchemaClassGenerator
         private TypeModel CreateTypeModel(XmlSchemaSimpleType simpleType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
             var restrictions = new List<RestrictionModel>();
+            var allBasesHaveEnums = true;
             List<XmlSchemaFacet> facets = new();
 
             if (simpleType.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
+            {
                 facets = typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList();
+            }
             else if (simpleType.Content is XmlSchemaSimpleTypeUnion typeUnion
                 && typeUnion.BaseMemberTypes.All(b => b.Content is XmlSchemaSimpleTypeRestriction r && r.Facets.Count > 0))
-                facets = typeUnion.BaseMemberTypes.SelectMany(b => ((XmlSchemaSimpleTypeRestriction)b.Content).Facets.Cast<XmlSchemaFacet>()).ToList();
+            {
+                var baseFacets = typeUnion.BaseMemberTypes.Select(b => ((XmlSchemaSimpleTypeRestriction)b.Content).Facets.Cast<XmlSchemaFacet>()).ToList();
+                // if a union has enum restrictions, there must be an enum restriction in all parts of the union
+                allBasesHaveEnums = baseFacets.All(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any());
+                facets = baseFacets.SelectMany(f => f).ToList();
+            }
 
             if (facets.Any())
             {
                 var enumFacets = facets.OfType<XmlSchemaEnumerationFacet>().ToList();
                 // If there are other restrictions mixed into the enumeration values, we'll generate a string to play it safe.
-                var isEnum = enumFacets.Count > 0 && enumFacets.Count == facets.Count;
+                var isEnum = enumFacets.Any() && allBasesHaveEnums;
+
                 if (isEnum)
                 {
                     // we got an enum
