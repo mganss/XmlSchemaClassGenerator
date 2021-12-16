@@ -263,7 +263,7 @@ namespace XmlSchemaClassGenerator
 
                         derivedClassModel = new ClassModel(_configuration)
                         {
-                            Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(rootElement.QualifiedName),
+                            Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(rootElement.QualifiedName, rootElement),
                             Namespace = CreateNamespaceModel(elementSource, rootElement.QualifiedName)
                         };
 
@@ -289,7 +289,7 @@ namespace XmlSchemaClassGenerator
 
                             var originalClassModel = new ClassModel(_configuration)
                             {
-                                Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(type.RootElementName),
+                                Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(type.RootElementName, rootElement),
                                 Namespace = classModel.Namespace
                             };
 
@@ -403,7 +403,7 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaGroup group, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
-            var name = "I" + _configuration.NamingProvider.GroupTypeNameFromQualifiedName(qualifiedName);
+            var name = "I" + _configuration.NamingProvider.GroupTypeNameFromQualifiedName(qualifiedName, group);
             if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
 
             var interfaceModel = new InterfaceModel(_configuration)
@@ -437,7 +437,7 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaAttributeGroup attributeGroup, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
-            var name = "I" + _configuration.NamingProvider.AttributeGroupTypeNameFromQualifiedName(qualifiedName);
+            var name = "I" + _configuration.NamingProvider.AttributeGroupTypeNameFromQualifiedName(qualifiedName, attributeGroup);
             if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
 
             var interfaceModel = new InterfaceModel(_configuration)
@@ -469,7 +469,7 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel CreateTypeModel(Uri source, XmlSchemaComplexType complexType, NamespaceModel namespaceModel, XmlQualifiedName qualifiedName, List<DocumentationModel> docs)
         {
-            var name = _configuration.NamingProvider.ComplexTypeNameFromQualifiedName(qualifiedName);
+            var name = _configuration.NamingProvider.ComplexTypeNameFromQualifiedName(qualifiedName, complexType);
             if (namespaceModel != null)
             {
                 name = namespaceModel.GetUniqueTypeName(name);
@@ -648,7 +648,7 @@ namespace XmlSchemaClassGenerator
                 if (isEnum)
                 {
                     // we got an enum
-                    var name = _configuration.NamingProvider.EnumTypeNameFromQualifiedName(qualifiedName);
+                    var name = _configuration.NamingProvider.EnumTypeNameFromQualifiedName(qualifiedName, simpleType);
                     if (namespaceModel != null) { name = namespaceModel.GetUniqueTypeName(name); }
 
                     var enumModel = new EnumModel(_configuration)
@@ -666,7 +666,7 @@ namespace XmlSchemaClassGenerator
                     {
                         var value = new EnumValueModel
                         {
-                            Name = _configuration.NamingProvider.EnumMemberNameFromValue(enumModel.Name, facet.Value),
+                            Name = _configuration.NamingProvider.EnumMemberNameFromValue(enumModel.Name, facet.Value, facet),
                             Value = facet.Value
                         };
 
@@ -698,7 +698,7 @@ namespace XmlSchemaClassGenerator
                 restrictions = GetRestrictions(facets, simpleType).Where(r => r != null).Sanitize().ToList();
             }
 
-            var simpleModelName = _configuration.NamingProvider.SimpleTypeNameFromQualifiedName(qualifiedName);
+            var simpleModelName = _configuration.NamingProvider.SimpleTypeNameFromQualifiedName(qualifiedName, simpleType);
             if (namespaceModel != null) { simpleModelName = namespaceModel.GetUniqueTypeName(simpleModelName); }
 
             var simpleModel = new SimpleModel(_configuration)
@@ -755,7 +755,7 @@ namespace XmlSchemaClassGenerator
                     if (attribute.Use != XmlSchemaUse.Prohibited)
                     {
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
-                        var attributeName = _configuration.NamingProvider.AttributeNameFromQualifiedName(attribute.QualifiedName);
+                        var attributeName = _configuration.NamingProvider.AttributeNameFromQualifiedName(attribute.QualifiedName, attribute);
 
                         if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup
                             && attributeGroup.QualifiedName != typeModel.XmlSchemaName
@@ -775,7 +775,7 @@ namespace XmlSchemaClassGenerator
                                 if (attributeQualifiedName.IsEmpty || string.IsNullOrEmpty(attributeQualifiedName.Namespace))
                                 {
                                     // inner type, have to generate a type name
-                                    var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(typeModel.Name, attribute.QualifiedName.Name);
+                                    var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(typeModel.Name, attribute.QualifiedName.Name, attribute);
                                     attributeQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                                     // try to avoid name clashes
                                     if (NameExists(attributeQualifiedName))
@@ -863,7 +863,7 @@ namespace XmlSchemaClassGenerator
                         {
                             // inner type, have to generate a type name
                             var typeModelName = xmlParticle is XmlSchemaGroupRef groupRef ? groupRef.RefName : typeModel.XmlSchemaName;
-                            var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModelName.Name, element.QualifiedName.Name);
+                            var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModelName.Name, element.QualifiedName.Name, element);
                             elementQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                             // try to avoid name clashes
                             if (NameExists(elementQualifiedName))
@@ -876,7 +876,7 @@ namespace XmlSchemaClassGenerator
                     }
 
                     var effectiveElement = substitute?.Element ?? element;
-                    var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName);
+                    var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName, effectiveElement);
                     var originalPropertyName = propertyName;
                     if (propertyName == typeModel.Name)
                     {
