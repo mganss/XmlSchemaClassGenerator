@@ -237,16 +237,21 @@ namespace XmlSchemaClassGenerator
             return interfaceDeclaration;
         }
 
-        public IEnumerable<ReferenceTypeModel> AllDerivedReferenceTypes()
+        public IEnumerable<ReferenceTypeModel> AllDerivedReferenceTypes(List<ReferenceTypeModel> processedTypeModels = null)
         {
-            foreach (var interfaceModelDerivedType in DerivedTypes)
+            processedTypeModels ??= new();
+
+            foreach (var interfaceModelDerivedType in DerivedTypes.Except(processedTypeModels))
             {
                 yield return interfaceModelDerivedType;
+
+                processedTypeModels.Add(interfaceModelDerivedType);
+
                 switch (interfaceModelDerivedType)
                 {
                     case InterfaceModel derivedInterfaceModel:
                     {
-                        foreach (var referenceTypeModel in derivedInterfaceModel.AllDerivedReferenceTypes())
+                        foreach (var referenceTypeModel in derivedInterfaceModel.AllDerivedReferenceTypes(processedTypeModels))
                         {
                             yield return referenceTypeModel;
                         }
@@ -578,10 +583,12 @@ namespace XmlSchemaClassGenerator
         {
             foreach (var interfaceModel in interfaces)
             {
-                Interfaces.Add(interfaceModel);
-                interfaceModel.DerivedTypes.Add(this);
+                if (!Interfaces.Contains(interfaceModel) && interfaceModel != this)
+                {
+                    Interfaces.Add(interfaceModel);
+                    interfaceModel.DerivedTypes.Add(this);
+                }
             }
-
         }
     }
 

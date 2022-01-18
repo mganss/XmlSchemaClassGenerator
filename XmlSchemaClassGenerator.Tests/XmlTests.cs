@@ -105,6 +105,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
         const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
         const string EppPattern = "xsd/epp/*.xsd";
+        const string XbrlPattern = "xsd/xbrl/xhtml-inlinexbrl-1_1.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -521,6 +522,23 @@ namespace XmlSchemaClassGenerator.Tests
                     }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Epp" }.NamespaceProvider.GenerateNamespace),
                 });
             TestSamples("epp", EppPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestXbrl()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "xbrl"));
+            var generator = new Generator
+            {
+                OutputWriter = output,
+                GenerateInterfaces = false,
+                UniqueTypeNamesAcrossNamespaces = true,
+            };
+            generator.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
+            var assembly = Compiler.Generate("xbrl", XbrlPattern, generator);
+            Assert.NotNull(assembly);
+            //TestSamples("xbrl", XbrlPattern);
         }
 
         private void TestSamples(string name, string pattern)

@@ -744,8 +744,12 @@ namespace XmlSchemaClassGenerator
             return enumModelValues;
         }
 
-        private IEnumerable<PropertyModel> CreatePropertiesForAttributes(Uri source, TypeModel typeModel, IEnumerable<XmlSchemaObject> items)
+        private IEnumerable<PropertyModel> CreatePropertiesForAttributes(Uri source, TypeModel typeModel, IEnumerable<XmlSchemaObject> items,
+            List<XmlSchemaObject> processedItems = null)
         {
+            processedItems ??= new();
+            processedItems.AddRange(items);
+
             var properties = new List<PropertyModel>();
 
             foreach (var item in items)
@@ -831,8 +835,8 @@ namespace XmlSchemaClassGenerator
                         CreateTypeModel(AttributeGroups[attributeGroupRef.RefName], attributeGroupRef.RefName);
                     }
 
-                    var groupItems = AttributeGroups[attributeGroupRef.RefName].Attributes;
-                    var groupProperties = CreatePropertiesForAttributes(source, typeModel, groupItems.Cast<XmlSchemaObject>());
+                    var groupItems = AttributeGroups[attributeGroupRef.RefName].Attributes.Cast<XmlSchemaObject>().Except(processedItems).ToList();
+                    var groupProperties = CreatePropertiesForAttributes(source, typeModel, groupItems, processedItems);
                     properties.AddRange(groupProperties);
                 }
             }
@@ -841,10 +845,13 @@ namespace XmlSchemaClassGenerator
         }
 
         private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel typeModel, Particle particle, IEnumerable<Particle> items,
-            Substitute substitute = null, int order = 0)
+            Substitute substitute = null, int order = 0, List<Particle> processedItems = null)
         {
             var properties = new List<PropertyModel>();
             var xmlParticle = particle.XmlParticle;
+
+            processedItems ??= new();
+            processedItems.AddRange(items);
 
             foreach (var item in items)
             {
@@ -938,8 +945,8 @@ namespace XmlSchemaClassGenerator
                                 CreateTypeModel(group, groupRef.RefName);
                             }
 
-                            var groupItems = GetElements(group.Particle);
-                            var groupProperties = CreatePropertiesForElements(source, typeModel, item, groupItems, order: order).ToList();
+                            var groupItems = GetElements(group.Particle).Where(p => !processedItems.Any(q => p.XmlParticle == q.XmlParticle)).ToList();
+                            var groupProperties = CreatePropertiesForElements(source, typeModel, item, groupItems, order: order, processedItems: processedItems).ToList();
                             if (_configuration.EmitOrder)
                             {
                                 order += groupProperties.Count;
