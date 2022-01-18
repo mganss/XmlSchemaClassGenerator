@@ -246,7 +246,6 @@ namespace XmlSchemaClassGenerator
         {
             foreach (var rootElement in elements)
             {
-                var typeSource = CodeUtilities.CreateUri(rootElement.ElementSchemaType.SourceUri);
                 var qualifiedName = rootElement.ElementSchemaType.QualifiedName;
                 if (qualifiedName.IsEmpty) { qualifiedName = rootElement.QualifiedName; }
                 var type = CreateTypeModel(rootElement.ElementSchemaType, qualifiedName);
