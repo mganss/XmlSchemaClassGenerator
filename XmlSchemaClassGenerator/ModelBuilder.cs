@@ -184,10 +184,7 @@ namespace XmlSchemaClassGenerator
                         {
                             if (implementationClassProperty.Name != implementationClassProperty.OriginalPropertyName
                                 && implementationClassProperty.OriginalPropertyName == interfaceProperty.Name
-                                && implementationClassProperty.XmlSchemaName == interfaceProperty.XmlSchemaName
-                                && implementationClassProperty.XmlParent?.Parent is XmlSchemaGroup implementationGroup
-                                && interfaceProperty.XmlParent?.Parent is XmlSchemaGroup interfaceGroup
-                                && implementationGroup.QualifiedName == interfaceGroup.QualifiedName)
+                                && implementationClassProperty.XmlSchemaName == interfaceProperty.XmlSchemaName)
                             {
                                 RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
                                 interfaceProperty.Name = implementationClassProperty.Name;
@@ -944,7 +941,7 @@ namespace XmlSchemaClassGenerator
                                 CreateTypeModel(group, groupRef.RefName);
                             }
 
-                            var groupItems = GetElements(group.Particle).Where(p => !processedItems.Any(q => p.XmlParticle == q.XmlParticle)).ToList();
+                            var groupItems = GetElements(groupRef.Particle).Where(p => !processedItems.Any(q => p.XmlParticle == q.XmlParticle)).ToList();
                             var groupProperties = CreatePropertiesForElements(source, typeModel, item, groupItems, order: order, processedItems: processedItems).ToList();
                             if (_configuration.EmitOrder)
                             {
