@@ -549,6 +549,7 @@ namespace XmlSchemaClassGenerator.Tests
             var testFiles = new Dictionary<string, string>
             {
                 { "Schaltbau.xhtml", "XhtmlPeriodHtmlPeriodType" },
+                { "GLEIF Annual Accounts.html", "XhtmlPeriodHtmlPeriodType" },
             };
 
             foreach (var testFile in testFiles)
