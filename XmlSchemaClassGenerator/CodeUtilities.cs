@@ -432,5 +432,17 @@ namespace XmlSchemaClassGenerator
             return name != null && name.Namespace == "http://www.w3.org/XML/1998/namespace"
                 && (name.Name == "lang" || name.Name == "space");
         }
+
+        internal static XmlQualifiedName GetQualifiedName(this XmlSchemaObject obj)
+        {
+            var n = obj switch
+            {
+                XmlSchemaAttribute attr => attr.QualifiedName,
+                XmlSchemaAttributeGroup attrGroup => attrGroup.QualifiedName,
+                _ => null
+            };
+
+            return n;
+        }
     }
 }

@@ -105,7 +105,6 @@ namespace XmlSchemaClassGenerator.Tests
         const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
         const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
         const string EppPattern = "xsd/epp/*.xsd";
-        const string XbrlPattern = "xsd/xbrl/xhtml-inlinexbrl-1_1.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -528,17 +527,67 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void TestXbrl()
         {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "xbrl"));
-            var generator = new Generator
+            var outputPath = Path.Combine("output", "xbrl");
+
+            var gen = new Generator
             {
-                OutputWriter = output,
+                OutputFolder = outputPath,
                 GenerateInterfaces = false,
                 UniqueTypeNamesAcrossNamespaces = true,
             };
-            generator.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
-            var assembly = Compiler.Generate("xbrl", XbrlPattern, generator);
+
+            gen.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
+
+            var xsdFiles = new[]
+            {
+                "xhtml-inlinexbrl-1_1.xsd",
+            }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "xbrl", x)).ToList();
+
+            var assembly = Compiler.GenerateFiles("Xbrl", xsdFiles, gen);
             Assert.NotNull(assembly);
-            //TestSamples("xbrl", XbrlPattern);
+
+            var testFiles = new Dictionary<string, string>
+            {
+                { "Schaltbau.xhtml", "XhtmlPeriodHtmlPeriodType" },
+            };
+
+            foreach (var testFile in testFiles)
+            {
+                var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
+                Assert.NotNull(type);
+
+                var serializer = new XmlSerializer(type);
+                serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
+                serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
+                var unknownNodeError = false;
+                var unknownAttrError = false;
+
+                void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
+                {
+                    unknownNodeError = true;
+                }
+
+                void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
+                {
+                    unknownAttrError = true;
+                }
+
+                var xmlString = File.ReadAllText($"xml/xbrl_tests/{testFile.Key}");
+                xmlString = Regex.Replace(xmlString, "xsi:schemaLocation=\"[^\"]*\"", string.Empty);
+                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
+
+                var isDeserializable = serializer.CanDeserialize(reader);
+                Assert.True(isDeserializable);
+
+                var deserializedObject = serializer.Deserialize(reader);
+                Assert.False(unknownNodeError);
+                Assert.False(unknownAttrError);
+
+                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+
+                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+                AssertEx.Equal(deserializedObject, deserializedXml);
+            }
         }
 
         private void TestSamples(string name, string pattern)
