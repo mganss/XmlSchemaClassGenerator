@@ -55,6 +55,7 @@ namespace XmlSchemaClassGenerator.Console
             var createGeneratedCodeAttributeVersion = true;
             var netCoreSpecificCode = false;
             var generateCommandLineArgs = true;
+            var addPrefixToOutputPath = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -87,6 +88,7 @@ If no mapping is found for an XML namespace, a name is generated automatically (
                 { "r|order", "emit order for all class members stored as XML element", v => emitOrder = v != null },
                 { "c|pcl", "PCL compatible output", v => pclCompatible = v != null },
                 { "p|prefix=", "the {PREFIX} to prepend to auto-generated namespace names", v => namespacePrefix = v },
+                { "po|prefixOnOutput", "include the prefix on the path (default is enabled)", v => addPrefixToOutputPath = v != null },
                 { "v|verbose", "print generated file names on stdout", v => verbose = v != null },
                 { "0|nullable", "generate nullable adapter properties for optional elements/attributes w/o default values", v => nullables = v != null },
                 { "f|ef", "generate Entity Framework Code First compatible classes", v => entityFramework = v != null },
@@ -204,6 +206,8 @@ without backing field initialization for collections
                 CreateGeneratedCodeAttributeVersion = createGeneratedCodeAttributeVersion,
                 NetCoreSpecificCode = netCoreSpecificCode,
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
+                NamespacePrefix = namespacePrefix,
+                AddPrefixToOutputPath = addPrefixToOutputPath,
             };
 
             generator.CommentLanguages.AddRange(commentLanguages);

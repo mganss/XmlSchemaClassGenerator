@@ -39,7 +39,13 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
-                var path = Path.Combine(OutputDirectory, cn.Name + ".cs");
+                var fileName = cn.Name;
+                if (Configuration != null && !Configuration.AddPrefixToOutputPath && !string.IsNullOrEmpty(Configuration.NamespacePrefix))
+                {
+                    fileName = cn.Name.Replace($"{Configuration.NamespacePrefix}.", string.Empty);
+                }
+
+                var path = Path.Combine(OutputDirectory, fileName + ".cs");
                 Configuration?.WriteLog(path);
                 WriteFile(path, cu);
             }
@@ -68,7 +74,13 @@ namespace XmlSchemaClassGenerator
 
         private void WriteSeparateFiles(CodeNamespace cn)
         {
-            var dirPath = Path.Combine(OutputDirectory, ValidateName(cn.Name));
+            var dirName = cn.Name;
+            if (Configuration != null && !Configuration.AddPrefixToOutputPath && !string.IsNullOrEmpty(Configuration.NamespacePrefix))
+            {
+                dirName = cn.Name.Replace($"{Configuration.NamespacePrefix}.", string.Empty);
+            }
+
+            var dirPath = Path.Combine(OutputDirectory, ValidateName(dirName));
             var ccu = new CodeCompileUnit();
             var cns = new CodeNamespace(ValidateName(cn.Name));
 

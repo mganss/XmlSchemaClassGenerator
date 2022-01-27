@@ -300,6 +300,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CommandLineArgumentsProvider = value; }
         }
 
+        public bool AddPrefixToOutputPath
+        {
+            get { return _configuration.AddPrefixToOutputPath; }
+            set { _configuration.AddPrefixToOutputPath = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

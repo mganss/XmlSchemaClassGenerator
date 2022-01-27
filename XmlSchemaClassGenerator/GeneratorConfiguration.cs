@@ -39,6 +39,7 @@ namespace XmlSchemaClassGenerator
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
             CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
+            AddPrefixToOutputPath = true;
         }
 
         /// <summary>
@@ -316,5 +317,11 @@ namespace XmlSchemaClassGenerator
         /// A provider to obtain the command line arguments of the tool.
         /// </summary>
         public CommandLineArgumentsProvider CommandLineArgumentsProvider { get; set; }
+
+        /// <summary>
+        /// Adds the Namespace prefix to the Output path
+        /// Default is true.
+        /// </summary>
+        public bool AddPrefixToOutputPath { get; set; }
     }
 }
