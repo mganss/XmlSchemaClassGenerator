@@ -1810,10 +1810,10 @@ namespace Test
             Assert.NotNull(classType);
 
             var directProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "Direct"));
-            Assert.NotEmpty(directProperty.GetCustomAttributes<XmlElementAttribute>());
+            Assert.Equal(XmlSchemaForm.Unqualified, directProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
 
             var viaRefProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "ViaRef"));
-            Assert.Empty(viaRefProperty.GetCustomAttributes<XmlElementAttribute>());
+            Assert.Equal(XmlSchemaForm.None, viaRefProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
         }
 
         [Fact]
