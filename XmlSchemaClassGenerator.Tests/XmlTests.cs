@@ -1766,6 +1766,57 @@ namespace Test
         }
 
         [Fact]
+        public void RefTypesGetNoXmlElementAttributeTest()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""utf-16""?>
+<xs:schema xmlns=""SampleNamespace"" targetNamespace=""SampleNamespace"" version=""1.0"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""SampleRoot"">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name=""Direct"">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name=""Direct1"" type=""xs:string"" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element ref=""ViaRef"" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name=""ViaRef"">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name=""ViaRef1"" type=""xs:string"" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                GenerateInterfaces = true,
+                AssemblyVisible = true
+            };
+            var contents = ConvertXml(nameof(RefTypesGetNoXmlElementAttributeTest), xsd, generator);
+            var content = Assert.Single(contents);
+
+            var assembly = Compiler.Compile(nameof(RefTypesGetNoXmlElementAttributeTest), content);
+            var classType = assembly.GetType("Test.SampleRoot");
+            Assert.NotNull(classType);
+
+            var directProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "Direct"));
+            Assert.NotEmpty(directProperty.GetCustomAttributes<XmlElementAttribute>());
+
+            var viaRefProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "ViaRef"));
+            Assert.Empty(viaRefProperty.GetCustomAttributes<XmlElementAttribute>());
+        }
+
+        [Fact]
         public void DoNotGenerateSamePropertiesInDerivedInterfacesClassTest()
         {
             const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
