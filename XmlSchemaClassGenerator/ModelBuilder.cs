@@ -912,13 +912,22 @@ namespace XmlSchemaClassGenerator
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                         DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && item.XmlParent is not XmlSchemaChoice) ? element.FixedValue : null),
                         FixedValue = element.FixedValue,
-                        Form = element.Form == XmlSchemaForm.None ? element.GetSchema().ElementFormDefault : element.Form,
                         XmlNamespace = !string.IsNullOrEmpty(effectiveElement.QualifiedName.Namespace) && effectiveElement.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace
                             ? effectiveElement.QualifiedName.Namespace : null,
                         XmlParticle = item.XmlParticle,
                         XmlParent = item.XmlParent,
                         Particle = item
                     };
+
+                    if (element.Form == XmlSchemaForm.None)
+                    {
+                        if (element.RefName != null && !element.RefName.IsEmpty)
+                            property.Form = XmlSchemaForm.Qualified;
+                        else
+                            property.Form = element.GetSchema().ElementFormDefault;
+                    }
+                    else
+                        property.Form = element.Form;
 
                     if (property.IsArray && !_configuration.GenerateComplexTypesForCollections)
                     {
