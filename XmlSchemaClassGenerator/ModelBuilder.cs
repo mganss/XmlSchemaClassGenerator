@@ -69,6 +69,7 @@ namespace XmlSchemaClassGenerator
 
             if (configuration.GenerateInterfaces)
             {
+                PromoteInterfacePropertiesToCollection();
                 RenameInterfacePropertiesIfRenamedInDerivedClasses();
                 RemoveDuplicateInterfaceProperties();
             }
@@ -184,12 +185,35 @@ namespace XmlSchemaClassGenerator
                         {
                             if (implementationClassProperty.Name != implementationClassProperty.OriginalPropertyName
                                 && implementationClassProperty.OriginalPropertyName == interfaceProperty.Name
-                                && implementationClassProperty.XmlSchemaName == interfaceProperty.XmlSchemaName)
+                                && implementationClassProperty.XmlSchemaName == interfaceProperty.XmlSchemaName
+                                && implementationClassProperty.IsAttribute == interfaceProperty.IsAttribute)
                             {
                                 RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
                                 interfaceProperty.Name = implementationClassProperty.Name;
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        private void PromoteInterfacePropertiesToCollection()
+        {
+            foreach (var interfaceModel in Types.Values.OfType<InterfaceModel>())
+            {
+                foreach (var interfaceProperty in interfaceModel.Properties)
+                {
+                    var derivedProperties = interfaceModel.AllDerivedReferenceTypes().SelectMany(t => t.Properties)
+                        .Where(p => p.Name == interfaceProperty.Name || p.OriginalPropertyName == interfaceProperty.Name).ToList();
+
+                    if (derivedProperties.Any(p => p.IsCollection))
+                    {
+                        foreach (var derivedProperty in derivedProperties.Where(p => !p.IsCollection))
+                        {
+                            derivedProperty.IsCollection = true;
+                        }
+
+                        interfaceProperty.IsCollection = true;
                     }
                 }
             }
@@ -752,6 +776,7 @@ namespace XmlSchemaClassGenerator
                     {
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
                         var attributeName = _configuration.NamingProvider.AttributeNameFromQualifiedName(attribute.QualifiedName, attribute);
+                        var originalAttributeName = attributeName;
 
                         if (attribute.Parent is XmlSchemaAttributeGroup attributeGroup
                             && attributeGroup.QualifiedName != typeModel.XmlSchemaName
@@ -795,6 +820,7 @@ namespace XmlSchemaClassGenerator
                         {
                             OwningType = typeModel,
                             Name = attributeName,
+                            OriginalPropertyName = originalAttributeName,
                             XmlSchemaName = attribute.QualifiedName,
                             Type = CreateTypeModel(attribute.AttributeSchemaType, attributeQualifiedName),
                             IsAttribute = true,

@@ -298,9 +298,14 @@ namespace XmlSchemaClassGenerator
                 var i = 0;
                 var n = name;
                 var baseClasses = cls.AllBaseClasses.ToList();
+                var props = cls.Properties.ToList();
 
-                while (baseClasses.SelectMany(b => b.Properties).Any(p => p.Name == n))
+                while (baseClasses.SelectMany(b => b.Properties)
+                    .Concat(props)
+                    .Any(p => p.Name == n))
+                {
                     n = name + (++i);
+                }
 
                 return n;
             }

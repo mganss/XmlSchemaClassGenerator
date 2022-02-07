@@ -482,7 +482,7 @@ namespace XmlSchemaClassGenerator.Tests
                 {
                     OutputWriter = output,
                     EmitOrder = true,
-                    GenerateInterfaces = false
+                    GenerateInterfaces = true
                 });
             TestSamples("wfs", WfsPattern);
         }
@@ -992,7 +992,7 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 CodeTypeReferenceOptions = codeTypeReferenceOptions,
                 GenerateNullables = true,
-                GenerateInterfaces = false,
+                GenerateInterfaces = true,
                 NamespaceProvider = new NamespaceProvider
                 {
                     GenerateNamespace = key => "Test"
