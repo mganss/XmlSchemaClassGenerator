@@ -121,7 +121,7 @@ namespace XmlSchemaClassGenerator.Tests
         //        MemberVisitor = (member, model) => { },
         //        GenerateInterfaces = true
         //    });
-        //    TestSamples("Iata", IataPattern);
+        //    SharedTestFunctions.TestSamples(Output, "Iata", IataPattern);
         //}
 
         [Fact, TestPriority(1)]
@@ -129,7 +129,7 @@ namespace XmlSchemaClassGenerator.Tests
         public void TestClient()
         {
             Compiler.Generate("Client", ClientPattern);
-            TestSamples("Client", ClientPattern);
+            SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -137,7 +137,7 @@ namespace XmlSchemaClassGenerator.Tests
         public void TestList()
         {
             Compiler.Generate("List", ListPattern);
-            TestSamples("List", ListPattern);
+            SharedTestFunctions.TestSamples(Output, "List", ListPattern);
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace XmlSchemaClassGenerator.Tests
                 CollectionType = collectionType,
                 CollectionSettersMode = CollectionSettersMode.Public
             });
-            TestSamples(name, SimplePattern);
+            SharedTestFunctions.TestSamples(Output, name, SimplePattern);
         }
 
         [Fact, TestPriority(1)]
@@ -346,7 +346,7 @@ namespace XmlSchemaClassGenerator.Tests
                 NamespacePrefix = "ArrayOrder",
                 EmitOrder = true
             });
-            TestSamples("ArrayOrder", ArrayOrderPattern);
+            SharedTestFunctions.TestSamples(Output, "ArrayOrder", ArrayOrderPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -367,7 +367,7 @@ namespace XmlSchemaClassGenerator.Tests
                 TextValuePropertyName = "Value",
                 CompactTypeNames = true
             });
-            TestSamples("IS24RestApi", IS24Pattern);
+            SharedTestFunctions.TestSamples(Output, "IS24RestApi", IS24Pattern);
         }
 
         [Fact, TestPriority(1)]
@@ -382,7 +382,7 @@ namespace XmlSchemaClassGenerator.Tests
                 GenerateDescriptionAttribute = true,
                 UseShouldSerializePattern = true
             });
-            TestSamples("IS24RestApiShouldSerialize", IS24Pattern);
+            SharedTestFunctions.TestSamples(Output, "IS24RestApiShouldSerialize", IS24Pattern);
         }
 
         [Fact, TestPriority(1)]
@@ -396,7 +396,7 @@ namespace XmlSchemaClassGenerator.Tests
                 NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace),
                 MemberVisitor = (member, model) => { }
             });
-            TestSamples("Wadl", WadlPattern);
+            SharedTestFunctions.TestSamples(Output, "Wadl", WadlPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -404,13 +404,13 @@ namespace XmlSchemaClassGenerator.Tests
         public void TestIS24ImmoTransfer()
         {
             Compiler.Generate("IS24ImmoTransfer", IS24ImmoTransferPattern);
-            TestSamples("IS24ImmoTransfer", IS24ImmoTransferPattern);
+            SharedTestFunctions.TestSamples(Output, "IS24ImmoTransfer", IS24ImmoTransferPattern);
 
             Compiler.Generate("IS24ImmoTransferSeparate", IS24ImmoTransferPattern, new Generator
             {
                 SeparateSubstitutes = true
             });
-            TestSamples("IS24ImmoTransferSeparate", IS24ImmoTransferPattern);
+            SharedTestFunctions.TestSamples(Output, "IS24ImmoTransferSeparate", IS24ImmoTransferPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -418,7 +418,7 @@ namespace XmlSchemaClassGenerator.Tests
         public void TestTableau()
         {
             Compiler.Generate("Tableau", TableauPattern, new Generator { CompactTypeNames = true });
-            TestSamples("Tableau", TableauPattern);
+            SharedTestFunctions.TestSamples(Output, "Tableau", TableauPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -433,7 +433,7 @@ namespace XmlSchemaClassGenerator.Tests
                     SeparateClasses = true,
                     EnableDataBinding = true
                 });
-            TestSamples("Tableau.Separate", TableauPattern);
+            SharedTestFunctions.TestSamples(Output, "Tableau.Separate", TableauPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -449,7 +449,7 @@ namespace XmlSchemaClassGenerator.Tests
                     CollectionType = typeof(System.Array),
                     CollectionSettersMode = CollectionSettersMode.Public
                 });
-            TestSamples("Tableau.Array", TableauPattern);
+            SharedTestFunctions.TestSamples(Output, "Tableau.Array", TableauPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -457,7 +457,7 @@ namespace XmlSchemaClassGenerator.Tests
         public void TestDtsx()
         {
             Compiler.Generate("Dtsx", DtsxPattern, new Generator());
-            TestSamples("Dtsx", DtsxPattern);
+            SharedTestFunctions.TestSamples(Output, "Dtsx", DtsxPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -469,7 +469,7 @@ namespace XmlSchemaClassGenerator.Tests
                 TextValuePropertyName = "TextValue",
                 GenerateComplexTypesForCollections = true
             });
-            TestSamples("VSTst", VSTstPattern);
+            SharedTestFunctions.TestSamples(Output, "VSTst", VSTstPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -484,7 +484,7 @@ namespace XmlSchemaClassGenerator.Tests
                     EmitOrder = true,
                     GenerateInterfaces = true
                 });
-            TestSamples("wfs", WfsPattern);
+            SharedTestFunctions.TestSamples(Output, "wfs", WfsPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -520,7 +520,7 @@ namespace XmlSchemaClassGenerator.Tests
                         { new NamespaceKey("urn:ietf:params:xml:ns:rdePolicy-1.0"), "FoxHillSolutions.Escrow.rdePolicy" },
                     }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Epp" }.NamespaceProvider.GenerateNamespace),
                 });
-            TestSamples("epp", EppPattern);
+            SharedTestFunctions.TestSamples(Output, "epp", EppPattern);
         }
 
         [Fact, TestPriority(1)]
@@ -584,131 +584,14 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.False(unknownNodeError);
                 Assert.False(unknownAttrError);
 
-                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
             }
         }
 
-        private void TestSamples(string name, string pattern)
-        {
-            var assembly = Compiler.GetAssembly(name);
-            Assert.NotNull(assembly);
-            DeserializeSampleXml(pattern, assembly);
-        }
-
-        private bool HandleValidationError(string[] xmlLines, ValidationEventArgs e)
-        {
-            var line = xmlLines[e.Exception.LineNumber - 1][(e.Exception.LinePosition - 1)..];
-            var severity = e.Severity == XmlSeverityType.Error ? "Error" : "Warning";
-            Output.WriteLine($"{severity} at line {e.Exception.LineNumber}, column {e.Exception.LinePosition}: {e.Message}");
-            Output.WriteLine(line);
-            return (e.Severity == XmlSeverityType.Error
-                && !e.Message.Contains("The Pattern constraint failed"));  // generator doesn't generate valid values where pattern restrictions exist, e.g. email
-        }
-
         private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
-
-        private void DeserializeSampleXml(string pattern, Assembly assembly)
-        {
-            var files = Glob.ExpandNames(pattern);
-
-            var set = new XmlSchemaSet();
-            var xmlSchemaReaderSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
-
-            set.XmlResolver = new XmlUrlResolver();
-
-            var readers = files.Select(f => XmlReader.Create(f, xmlSchemaReaderSettings));
-
-            foreach (var reader in readers)
-                set.Add(null, reader);
-
-            set.Compile();
-
-            var anyValidXml = false;
-            var sb = new StringBuilder();
-
-            foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e =>
-                !e.IsAbstract
-                && !(e.ElementSchemaType is XmlSchemaSimpleType)
-                && e.ElementSchemaType.QualifiedName != AnyType))
-            {
-                var type = FindType(assembly, rootElement.QualifiedName);
-                var serializer = new XmlSerializer(type);
-                var generator = new XmlSampleGenerator(set, rootElement.QualifiedName);
-
-                using var xw = XmlWriter.Create(sb, new XmlWriterSettings { Indent = true });
-
-                // generate sample xml
-                generator.WriteXml(xw);
-                var xml = sb.ToString();
-                sb.Clear();
-                File.WriteAllText("xml.xml", xml);
-
-                // validate serialized xml
-                var settings = new XmlReaderSettings
-                {
-                    ValidationType = ValidationType.Schema,
-                    Schemas = set
-                };
-
-                var invalid = false;
-                var xmlLines = xml.Split('\n');
-                void validate(object s, ValidationEventArgs e)
-                {
-                    if (HandleValidationError(xmlLines, e)) invalid = true;
-                }
-
-                settings.ValidationEventHandler += validate;
-
-                var reader = XmlReader.Create(new StringReader(xml), settings);
-                while (reader.Read()) ;
-
-                settings.ValidationEventHandler -= validate;
-
-                // generated xml is not schema valid -> skip
-                if (invalid) continue;
-                anyValidXml = true;
-
-                // deserialize from sample
-                var sr = new StringReader(xml);
-                var o = serializer.Deserialize(sr);
-
-                // serialize back to xml
-                var xml2 = Serialize(serializer, o);
-
-                File.WriteAllText("xml2.xml", xml2);
-                xmlLines = xml2.Split('\n');
-                void validate2(object s, ValidationEventArgs e)
-                {
-                    if (HandleValidationError(xmlLines, e)) throw e.Exception;
-                };
-
-                settings.ValidationEventHandler += validate2;
-
-                reader = XmlReader.Create(new StringReader(xml2), settings);
-                while (reader.Read()) ;
-
-                settings.ValidationEventHandler -= validate2;
-
-                // deserialize again
-                sr = new StringReader(xml2);
-                var o2 = serializer.Deserialize(sr);
-
-                AssertEx.Equal(o, o2);
-            }
-
-            Assert.True(anyValidXml, "No valid generated XML for this test");
-        }
-
-        private static Type FindType(Assembly assembly, XmlQualifiedName xmlQualifiedName)
-        {
-            return assembly.GetTypes()
-                .Single(t => t.CustomAttributes.Any(a => a.AttributeType == typeof(XmlRootAttribute)
-                    && a.ConstructorArguments.Any(n => (string)n.Value == xmlQualifiedName.Name)
-                    && a.NamedArguments.Any(n => n.MemberName == "Namespace" && (string)n.TypedValue.Value == xmlQualifiedName.Namespace)));
-        }
 
         public static IEnumerable<object[]> Classes => new List<object[]>
         {
@@ -757,8 +640,8 @@ namespace XmlSchemaClassGenerator.Tests
                 var xml = ReadXml(string.Format("{0}_{1}", file, suffix));
                 var o1 = serializer1.Deserialize(new StringReader(xml));
                 var o2 = serializer2.Deserialize(new StringReader(xml));
-                var x1 = Serialize(serializer1, o1);
-                var x2 = Serialize(serializer2, o2);
+                var x1 = SharedTestFunctions.Serialize(serializer1, o1);
+                var x2 = SharedTestFunctions.Serialize(serializer2, o2);
 
                 File.WriteAllText("x1.xml", x1);
                 File.WriteAllText("x2.xml", x2);
@@ -882,7 +765,7 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.False(unknownNodeError);
                 Assert.False(unknownAttrError);
 
-                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
@@ -919,31 +802,11 @@ namespace XmlSchemaClassGenerator.Tests
 
                 var deserializedObject = serializer.Deserialize(new StringReader(xml));
 
-                var serializedXml = Serialize(serializer, deserializedObject);
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject);
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
             }
-        }
-
-        static string Serialize(XmlSerializer serializer, object o, IDictionary<string, string> prefixToNsMap = null)
-        {
-            var sw = new StringWriter();
-            var ns = new XmlSerializerNamespaces();
-            if (prefixToNsMap == null)
-            {
-                ns.Add("", null);
-            }
-            else
-            {
-                foreach (var ptns in prefixToNsMap)
-                {
-                    ns.Add(ptns.Key, ptns.Value);
-                }
-            }
-            serializer.Serialize(sw, o, ns);
-            var serializedXml = sw.ToString();
-            return serializedXml;
         }
 
         static string ReadXml(string name)
@@ -1936,7 +1799,7 @@ namespace Test
             propertyInfo.SetValue(testTypeInstance, null);
             var serializer = new XmlSerializer(testType);
 
-            var serializedXml = Serialize(serializer, testTypeInstance);
+            var serializedXml = SharedTestFunctions.Serialize(serializer, testTypeInstance);
             Assert.Contains(
                 @":nil=""true""",
                 serializedXml);
@@ -2379,7 +2242,7 @@ namespace Test
 
             // act
             dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
-            var xml = Serialize(serializer, deserialized);
+            var xml = SharedTestFunctions.Serialize(serializer, deserialized);
 
             // assert
             Assert.NotNull(xml);
@@ -2561,7 +2424,7 @@ namespace Test
                 Assert.False(unknownNodeError);
                 Assert.False(unknownAttrError);
 
-                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
