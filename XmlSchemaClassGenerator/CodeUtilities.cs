@@ -351,7 +351,7 @@ namespace XmlSchemaClassGenerator
             var parts = nsArg.Split(new[] { '=' }, 2);
             if (parts.Length != 2)
             {
-                throw new ArgumentException("XML and C# namespaces should be separated by '='.");
+                throw new ArgumentException("XML and C# namespaces should be separated by '='. You entered: " + nsArg);
             }
 
             var xmlNs = parts[0];
