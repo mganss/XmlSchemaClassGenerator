@@ -752,6 +752,15 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        private bool IsNullableReferenceType 
+        {
+            get 
+            {
+                return DefaultValue == null
+                    && IsNullable && (IsCollection || IsArray || IsList || PropertyType is ClassModel || PropertyType is SimpleModel model && !model.ValueType.IsValueType);
+            }
+        }
+
         private bool IsNillableValueType
         {
             get
@@ -860,6 +869,7 @@ namespace XmlSchemaClassGenerator
             var isArray = IsArray;
             var propertyType = PropertyType;
             var isNullableValueType = IsNullableValueType;
+            var isNullableReferenceType = IsNullableReferenceType;
             var typeReference = TypeReference;
 
             var requiresBackingField = withDataBinding || DefaultValue != null || IsCollection || isArray;
@@ -1113,6 +1123,11 @@ namespace XmlSchemaClassGenerator
 
                 typeDeclaration.Members.Add(specifiedProperty);
             }
+
+            if (isNullableReferenceType && Configuration.EnableNullableReferenceAttributes) 
+            {
+                member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Diagnostics.CodeAnalysis.AllowNullAttribute"));
+			}
 
             var attributes = GetAttributes(isArray).ToArray();
             member.CustomAttributes.AddRange(attributes);

@@ -33,7 +33,7 @@ namespace XmlSchemaClassGenerator.Tests
             };
         }
 
-        private static readonly ConcurrentDictionary<string, Assembly> Assemblies = new();
+        private static readonly ConcurrentDictionary<string, Tuple<List<SyntaxTree>, Assembly>> Assemblies = new();
 
         private static readonly string[] DependencyAssemblies = new[]
         {
@@ -55,21 +55,33 @@ namespace XmlSchemaClassGenerator.Tests
         public static Assembly GetAssembly(string name)
         {
             Assemblies.TryGetValue(name, out var assembly);
+            return assembly.Item2;
+        }
+
+        public static Assembly Generate(string name, string pattern, Generator generatorPrototype = null) 
+        {
+            (_, var assembly) = GenerateVerbose(name, pattern, generatorPrototype);
             return assembly;
         }
 
-        public static Assembly Generate(string name, string pattern, Generator generatorPrototype = null)
+        public static (List<SyntaxTree>, Assembly) GenerateVerbose(string name, string pattern, Generator generatorPrototype = null) 
         {
-            if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+            if (Assemblies.TryGetValue(name, out var assembly)) { return (assembly.Item1, assembly.Item2); }
 
             var files = Glob.ExpandNames(pattern).OrderByDescending(f => f);
 
-            return GenerateFiles(name, files, generatorPrototype);
+            return GenerateFilesVerbose(name, files, generatorPrototype);
         }
 
-        public static Assembly GenerateFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null)
+        public static Assembly GenerateFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null) 
         {
-            if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+            (_, var assembly) = GenerateFilesVerbose(name, files, generatorPrototype);
+            return assembly;
+        }
+
+        public static (List<SyntaxTree>, Assembly) GenerateFilesVerbose(string name, IEnumerable<string> files, Generator generatorPrototype = null) 
+        { 
+            if (Assemblies.TryGetValue(name, out var assembly)) { return (assembly.Item1, assembly.Item2); }
 
             generatorPrototype ??= new Generator
             {
@@ -123,12 +135,18 @@ namespace XmlSchemaClassGenerator.Tests
 
             gen.Generate(files);
 
-            return CompileFiles(name, output.Files);
+            return CompileFilesVerbose(name, output.Files);
         }
 
-        public static Assembly CompileFiles(string name, IEnumerable<string> files)
+        public static Assembly CompileFiles(string name, IEnumerable<string> files) 
         {
-            return Compile(name, files.Select(f => File.ReadAllText(f)).ToArray());
+            (_, var assembly) = CompileFilesVerbose(name, files);
+            return assembly;
+        }
+
+        public static (List<SyntaxTree>, Assembly) CompileFilesVerbose(string name, IEnumerable<string> files) 
+        { 
+            return CompileVerbose(name, files.Select(f => File.ReadAllText(f)).ToArray());
         }
 
         private static readonly LanguageVersion MaxLanguageVersion = Enum
@@ -136,15 +154,21 @@ namespace XmlSchemaClassGenerator.Tests
             .Cast<LanguageVersion>()
             .Max();
 
-        public static Assembly Compile(string name, params string[] contents)
+        public static Assembly Compile(string name, params string[] contents) 
         {
+            (_, var assembly) = CompileVerbose(name, contents);
+            return assembly;
+        }
+
+        public static (List<SyntaxTree>, Assembly) CompileVerbose(string name, params string[] contents) 
+        { 
             var trustedAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
             var references = trustedAssembliesPaths
                 .Where(p => DependencyAssemblies.Contains(Path.GetFileNameWithoutExtension(p)))
                 .Select(p => MetadataReference.CreateFromFile(p))
                 .ToList();
             var options = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: MaxLanguageVersion);
-            var syntaxTrees = contents.Select(c => CSharpSyntaxTree.ParseText(c, options));
+            var syntaxTrees = contents.Select(c => CSharpSyntaxTree.ParseText(c, options)).ToList();
             var compilation = CSharpCompilation.Create(name, syntaxTrees)
                 .AddReferences(references)
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
@@ -155,9 +179,9 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.True(result.Result.Success);
             Assert.NotNull(result.Assembly);
 
-            Assemblies[name] = result.Assembly;
+            Assemblies[name] = Tuple.Create(syntaxTrees, result.Assembly);
 
-            return result.Assembly;
+            return (syntaxTrees, result.Assembly);
         }
     }
 }

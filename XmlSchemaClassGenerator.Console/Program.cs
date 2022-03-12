@@ -54,6 +54,7 @@ namespace XmlSchemaClassGenerator.Console
             var uniqueTypeNamesAcrossNamespaces = false;
             var createGeneratedCodeAttributeVersion = true;
             var netCoreSpecificCode = false;
+            var nullableReferenceAttributes = false;
             var generateCommandLineArgs = true;
 
             var options = new OptionSet {
@@ -127,6 +128,7 @@ without backing field initialization for collections
                 { "un|uniqueTypeNames", "generate type names that are unique across namespaces (default is false)", v => uniqueTypeNamesAcrossNamespaces = v != null },
                 { "gc|generatedCodeAttribute", "add version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
                 { "nc|netCore", "generate .NET Core specific code that might not work with .NET Framework (default is false)", v => netCoreSpecificCode = v != null },
+                { "nr|nullableReferenceAttributes", "generate attributes for nullable references (default is false)", v => nullableReferenceAttributes = v != null },
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
             };
 
@@ -203,6 +205,7 @@ without backing field initialization for collections
                 UniqueTypeNamesAcrossNamespaces = uniqueTypeNamesAcrossNamespaces,
                 CreateGeneratedCodeAttributeVersion = createGeneratedCodeAttributeVersion,
                 NetCoreSpecificCode = netCoreSpecificCode,
+                EnableNullableReferenceAttributes = nullableReferenceAttributes,
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
             };
 
