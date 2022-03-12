@@ -14,6 +14,7 @@ using System.Xml.Serialization;
 using System.Xml.XPath;
 using Ganss.IO;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Xml.XMLGen;
 using Xunit;
 using Xunit.Abstractions;
@@ -105,6 +106,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
         const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
         const string EppPattern = "xsd/epp/*.xsd";
+        const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -2364,6 +2366,43 @@ namespace Test
                 AssertEx.Equal(deserializedObject, deserializedXml);
             }
             */
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestNullableReferenceAttributes() 
+        {
+            var files = Glob.ExpandNames(NullableReferenceAttributesPattern).OrderByDescending(f => f);
+            var generator = new Generator 
+            {
+                EnableNullableReferenceAttributes = true,
+                UseShouldSerializePattern = true,
+                NamespaceProvider = new NamespaceProvider 
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            //Unfortunately, I did not find access to the Attribute "AllowNull" in the generated Assembly.
+            //It is just not accessible via "CustomAttributes".
+            //So I have to parse the Syntax-Tree to find it.
+            (var syntaxTrees, _) = Compiler.GenerateVerbose(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
+            void assertNullable(string typename, bool nullable) 
+            {
+                var root = (CompilationUnitSyntax)syntaxTrees.Single().GetRoot();
+                var ns = (NamespaceDeclarationSyntax)root.Members.Single();
+                var c1 = (ClassDeclarationSyntax)ns.Members.Single(
+                    m => m is ClassDeclarationSyntax c && c.Identifier.ToString() == typename
+                );
+                var p = (PropertyDeclarationSyntax)c1.Members.Single(m => m is PropertyDeclarationSyntax n && n.Identifier.ToString() == "Text");
+                var hasAllowNullAttribute = p.AttributeLists.Any(d => d.Attributes.Any(a => a.GetText().ToString() == "System.Diagnostics.CodeAnalysis.AllowNullAttribute()"));
+                Assert.Equal(nullable, hasAllowNullAttribute);
+            }
+            assertNullable("ElementReferenceNullable", true);
+            assertNullable("ElementReferenceList", true);
+            assertNullable("ElementReferenceNonNullable", false);
+            assertNullable("AttributeReferenceNullable", true);
+            assertNullable("AttributeReferenceNonNullable", false);
+            assertNullable("AttributeValueNullableInt", false);
         }
 
         [Fact, TestPriority(1)]

@@ -76,6 +76,10 @@ namespace XmlSchemaClassGenerator
         /// Use XElement instead of XmlElement for Any nodes?
         /// </summary>
         public bool UseXElementForAny { get; set; }
+        /// <summary>
+        /// Generate attributes for nullable references to avoid compiler-warnings in .NET Core and Standard with nullable-checks.
+        /// </summary>
+        public bool EnableNullableReferenceAttributes { get; set; }
 
         private NamingScheme namingScheme;
 
