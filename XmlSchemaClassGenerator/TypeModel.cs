@@ -1127,7 +1127,8 @@ namespace XmlSchemaClassGenerator
             if (isNullableReferenceType && Configuration.EnableNullableReferenceAttributes) 
             {
                 member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Diagnostics.CodeAnalysis.AllowNullAttribute"));
-			}
+                member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Diagnostics.CodeAnalysis.MaybeNullAttribute"));
+            }
 
             var attributes = GetAttributes(isArray).ToArray();
             member.CustomAttributes.AddRange(attributes);

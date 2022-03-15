@@ -2,6 +2,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -2382,27 +2383,26 @@ namespace Test
                     GenerateNamespace = key => "Test"
                 }
             };
-            //Unfortunately, I did not find access to the Attribute "AllowNull" in the generated Assembly.
-            //It is just not accessible via "CustomAttributes".
-            //So I have to parse the Syntax-Tree to find it.
-            (var syntaxTrees, _) = Compiler.GenerateVerbose(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
+            var assembly = Compiler.Generate(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
             void assertNullable(string typename, bool nullable) 
             {
-                var root = (CompilationUnitSyntax)syntaxTrees.Single().GetRoot();
-                var ns = (NamespaceDeclarationSyntax)root.Members.Single();
-                var c1 = (ClassDeclarationSyntax)ns.Members.Single(
-                    m => m is ClassDeclarationSyntax c && c.Identifier.ToString() == typename
-                );
-                var p = (PropertyDeclarationSyntax)c1.Members.Single(m => m is PropertyDeclarationSyntax n && n.Identifier.ToString() == "Text");
-                var hasAllowNullAttribute = p.AttributeLists.Any(d => d.Attributes.Any(a => a.GetText().ToString() == "System.Diagnostics.CodeAnalysis.AllowNullAttribute()"));
+                Type c = assembly.GetType(typename);
+                var property = c.GetProperty("Text");
+                var setParameter = property.SetMethod.GetParameters();
+                var getReturnParameter = property.GetMethod.ReturnParameter;
+                var allowNullableAttribute = setParameter.Single().CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(AllowNullAttribute));
+                var maybeNullAttribute = getReturnParameter.CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(MaybeNullAttribute));
+                var hasAllowNullAttribute = allowNullableAttribute != null;
+                var hasMaybeNullAttribute = maybeNullAttribute != null;
                 Assert.Equal(nullable, hasAllowNullAttribute);
+                Assert.Equal(nullable, hasMaybeNullAttribute);
             }
-            assertNullable("ElementReferenceNullable", true);
-            assertNullable("ElementReferenceList", true);
-            assertNullable("ElementReferenceNonNullable", false);
-            assertNullable("AttributeReferenceNullable", true);
-            assertNullable("AttributeReferenceNonNullable", false);
-            assertNullable("AttributeValueNullableInt", false);
+            assertNullable("Test.ElementReferenceNullable", true);
+            assertNullable("Test.ElementReferenceList", true);
+            assertNullable("Test.ElementReferenceNonNullable", false);
+            assertNullable("Test.AttributeReferenceNullable", true);
+            assertNullable("Test.AttributeReferenceNonNullable", false);
+            assertNullable("Test.AttributeValueNullableInt", false);
         }
 
         [Fact, TestPriority(1)]
