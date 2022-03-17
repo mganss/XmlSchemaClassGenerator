@@ -2,6 +2,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ using System.Xml.Serialization;
 using System.Xml.XPath;
 using Ganss.IO;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Xml.XMLGen;
 using Xunit;
 using Xunit.Abstractions;
@@ -105,6 +107,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
         const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
         const string EppPattern = "xsd/epp/*.xsd";
+        const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
 
         // IATA test takes too long to perform every time
 
@@ -2364,6 +2367,42 @@ namespace Test
                 AssertEx.Equal(deserializedObject, deserializedXml);
             }
             */
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestNullableReferenceAttributes() 
+        {
+            var files = Glob.ExpandNames(NullableReferenceAttributesPattern).OrderByDescending(f => f);
+            var generator = new Generator 
+            {
+                EnableNullableReferenceAttributes = true,
+                UseShouldSerializePattern = true,
+                NamespaceProvider = new NamespaceProvider 
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var assembly = Compiler.Generate(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
+            void assertNullable(string typename, bool nullable) 
+            {
+                Type c = assembly.GetType(typename);
+                var property = c.GetProperty("Text");
+                var setParameter = property.SetMethod.GetParameters();
+                var getReturnParameter = property.GetMethod.ReturnParameter;
+                var allowNullableAttribute = setParameter.Single().CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(AllowNullAttribute));
+                var maybeNullAttribute = getReturnParameter.CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(MaybeNullAttribute));
+                var hasAllowNullAttribute = allowNullableAttribute != null;
+                var hasMaybeNullAttribute = maybeNullAttribute != null;
+                Assert.Equal(nullable, hasAllowNullAttribute);
+                Assert.Equal(nullable, hasMaybeNullAttribute);
+            }
+            assertNullable("Test.ElementReferenceNullable", true);
+            assertNullable("Test.ElementReferenceList", true);
+            assertNullable("Test.ElementReferenceNonNullable", false);
+            assertNullable("Test.AttributeReferenceNullable", true);
+            assertNullable("Test.AttributeReferenceNonNullable", false);
+            assertNullable("Test.AttributeValueNullableInt", false);
         }
 
         [Fact, TestPriority(1)]

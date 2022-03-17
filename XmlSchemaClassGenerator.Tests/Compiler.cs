@@ -113,6 +113,7 @@ namespace XmlSchemaClassGenerator.Tests
                 UniqueTypeNamesAcrossNamespaces = generatorPrototype.UniqueTypeNamesAcrossNamespaces,
                 CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
                 NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
+                EnableNullableReferenceAttributes = generatorPrototype.EnableNullableReferenceAttributes,
                 NamingScheme = generatorPrototype.NamingScheme
             };
 
