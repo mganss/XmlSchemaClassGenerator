@@ -245,7 +245,7 @@ namespace XmlSchemaClassGenerator
             var n = name;
             var i = 2;
 
-            while (model.Types.ContainsKey(n) && !(model.Types[n] is SimpleModel))
+            while (model.Types.ContainsKey(n) && model.Types[n] is not SimpleModel)
             {
                 n = name + i;
                 i++;

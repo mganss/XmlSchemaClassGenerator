@@ -328,7 +328,7 @@ namespace XmlSchemaClassGenerator
             if (IsAbstract)
                 classDeclaration.TypeAttributes |= System.Reflection.TypeAttributes.Abstract;
 
-            if (Configuration.EnableDataBinding && !(BaseClass is ClassModel))
+            if (Configuration.EnableDataBinding && BaseClass is not ClassModel)
             {
                 var propertyChangedEvent = new CodeMemberEvent()
                 {
@@ -432,7 +432,7 @@ namespace XmlSchemaClassGenerator
                 classDeclaration.BaseTypes.Add(CodeUtilities.CreateTypeReference(typeof(INotifyPropertyChanged), Configuration));
             }
 
-            if (Configuration.EntityFramework && !(BaseClass is ClassModel))
+            if (Configuration.EntityFramework && BaseClass is not ClassModel)
             {
                 // generate key
                 var keyProperty = Properties.FirstOrDefault(p => p.Name.ToLowerInvariant() == "id")
@@ -729,7 +729,8 @@ namespace XmlSchemaClassGenerator
         {
             get
             {
-                return !IsCollection && !IsAttribute && !IsList && TypeClassModel != null
+                return Configuration.UseArrayItemAttribute
+                && !IsCollection && !IsAttribute && !IsList && TypeClassModel != null
                 && TypeClassModel.BaseClass == null
                 && TypeClassModel.Properties.Count == 1
                 && !TypeClassModel.Properties[0].IsAttribute && !TypeClassModel.Properties[0].IsAny
@@ -752,9 +753,9 @@ namespace XmlSchemaClassGenerator
             }
         }
 
-        private bool IsNullableReferenceType 
+        private bool IsNullableReferenceType
         {
-            get 
+            get
             {
                 return DefaultValue == null
                     && IsNullable && (IsCollection || IsArray || IsList || PropertyType is ClassModel || PropertyType is SimpleModel model && !model.ValueType.IsValueType);
@@ -1124,7 +1125,7 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(specifiedProperty);
             }
 
-            if (isNullableReferenceType && Configuration.EnableNullableReferenceAttributes) 
+            if (isNullableReferenceType && Configuration.EnableNullableReferenceAttributes)
             {
                 member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Diagnostics.CodeAnalysis.AllowNullAttribute"));
                 member.CustomAttributes.Add(new CodeAttributeDeclaration("System.Diagnostics.CodeAnalysis.MaybeNullAttribute"));

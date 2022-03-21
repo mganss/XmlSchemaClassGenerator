@@ -56,6 +56,7 @@ namespace XmlSchemaClassGenerator.Console
             var netCoreSpecificCode = false;
             var nullableReferenceAttributes = false;
             var generateCommandLineArgs = true;
+            var useArrayItemAttribute = true;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -129,6 +130,7 @@ without backing field initialization for collections
                 { "gc|generatedCodeAttribute", "add version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
                 { "nc|netCore", "generate .NET Core specific code that might not work with .NET Framework (default is false)", v => netCoreSpecificCode = v != null },
                 { "nr|nullableReferenceAttributes", "generate attributes for nullable reference types (default is false)", v => nullableReferenceAttributes = v != null },
+                { "ar|useArrayItemAttribute", "use ArrayItemAttribute for sequences with single elements (default is true)", v => useArrayItemAttribute = v != null },
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
             };
 
@@ -207,6 +209,7 @@ without backing field initialization for collections
                 NetCoreSpecificCode = netCoreSpecificCode,
                 EnableNullableReferenceAttributes = nullableReferenceAttributes,
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
+                UseArrayItemAttribute = useArrayItemAttribute,
             };
 
             generator.CommentLanguages.AddRange(commentLanguages);

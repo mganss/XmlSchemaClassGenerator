@@ -114,7 +114,8 @@ namespace XmlSchemaClassGenerator.Tests
                 CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
                 NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
                 EnableNullableReferenceAttributes = generatorPrototype.EnableNullableReferenceAttributes,
-                NamingScheme = generatorPrototype.NamingScheme
+                NamingScheme = generatorPrototype.NamingScheme,
+                UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
             };
 
             gen.CommentLanguages.Clear();

@@ -320,5 +320,11 @@ namespace XmlSchemaClassGenerator
         /// A provider to obtain the command line arguments of the tool.
         /// </summary>
         public CommandLineArgumentsProvider CommandLineArgumentsProvider { get; set; }
+
+        /// <summary>
+        /// Enables use of <see cref="System.Xml.Serialization.XmlArrayItemAttribute"/>
+        /// for sequences with single elements. Default is true.
+        /// </summary>
+        public bool UseArrayItemAttribute { get; set; } = true;
     }
 }

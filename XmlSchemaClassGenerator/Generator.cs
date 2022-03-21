@@ -115,7 +115,7 @@ namespace XmlSchemaClassGenerator
             set { _configuration.GenerateNullables = value; }
         }
 
-        public bool EnableNullableReferenceAttributes 
+        public bool EnableNullableReferenceAttributes
         {
             get { return _configuration.EnableNullableReferenceAttributes; }
             set { _configuration.EnableNullableReferenceAttributes = value; }
@@ -292,6 +292,12 @@ namespace XmlSchemaClassGenerator
         {
             get { return _configuration.NetCoreSpecificCode; }
             set { _configuration.NetCoreSpecificCode = value; }
+        }
+
+        public bool UseArrayItemAttribute
+        {
+            get { return _configuration.UseArrayItemAttribute; }
+            set {  _configuration.UseArrayItemAttribute = value;}
         }
 
         public bool GenerateCommandLineArgumentsComment

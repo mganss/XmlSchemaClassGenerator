@@ -64,6 +64,7 @@ namespace XmlSchemaClassGenerator.Tests
                 CollectionType = generatorPrototype.CollectionType,
                 CollectionImplementationType = generatorPrototype.CollectionImplementationType,
                 CollectionSettersMode = generatorPrototype.CollectionSettersMode,
+                UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
             };
 
             gen.CommentLanguages.Clear();
@@ -2371,20 +2372,20 @@ namespace Test
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
-        public void TestNullableReferenceAttributes() 
+        public void TestNullableReferenceAttributes()
         {
             var files = Glob.ExpandNames(NullableReferenceAttributesPattern).OrderByDescending(f => f);
-            var generator = new Generator 
+            var generator = new Generator
             {
                 EnableNullableReferenceAttributes = true,
                 UseShouldSerializePattern = true,
-                NamespaceProvider = new NamespaceProvider 
+                NamespaceProvider = new NamespaceProvider
                 {
                     GenerateNamespace = key => "Test"
                 }
             };
             var assembly = Compiler.Generate(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
-            void assertNullable(string typename, bool nullable) 
+            void assertNullable(string typename, bool nullable)
             {
                 Type c = assembly.GetType(typename);
                 var property = c.GetProperty("Text");
@@ -2527,6 +2528,55 @@ namespace Test
     }}
 }}
 ", csharp);
+        }
+
+        [Fact]
+        public void TestArrayItemAttribute()
+        {
+            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/313
+
+            var xsd =
+@"<?xml version=""1.0"" encoding=""UTF-8""?>
+
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
+	 xmlns=""test_generation_namespace/common.xsd""
+	 xmlns:ct=""test_generation_namespace/commontypes.xsd""
+	 targetNamespace=""test_generation_namespace/common.xsd""
+	 version=""1.1""
+	 elementFormDefault=""qualified""
+	 attributeFormDefault=""unqualified"">
+	<xs:import namespace=""test_generation_namespace/commontypes.xsd"" schemaLocation=""TheCommonTypes.xsd""/>
+	<xs:complexType name=""T_NameValue"">
+		<xs:sequence>
+			<xs:element name=""Name"" type=""xs:string""/>
+			<xs:element name=""Value"" type=""xs:string"" minOccurs=""0""/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name=""T_OptionList"">
+		<xs:sequence>
+			<xs:element name=""Option"" type=""T_NameValue"" minOccurs=""0"" maxOccurs=""unbounded""/>
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name=""T_Application"">
+		<xs:sequence>
+			<xs:element name=""OptionList"" type=""T_OptionList"" minOccurs=""0""/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+            var generator = new Generator
+            {
+                IntegerDataType = typeof(int),
+                GenerateNullables = true,
+                CollectionType = typeof(System.Array),
+                CollectionSettersMode = CollectionSettersMode.Public,
+                UseArrayItemAttribute = false
+            };
+            var contents = ConvertXml(nameof(TestArrayItemAttribute), new[] { xsd }, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(TestArrayItemAttribute), contents);
+            var applicationType = assembly.GetType("Test_Generation_Namespace.T_Application");
+            Assert.NotNull(applicationType);
+            var optionList = applicationType.GetProperty("OptionList");
+            Assert.Equal("Test_Generation_Namespace.T_OptionList", optionList.PropertyType.FullName);
         }
     }
 }
