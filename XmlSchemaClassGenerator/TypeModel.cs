@@ -454,18 +454,19 @@ namespace XmlSchemaClassGenerator
                 keyProperty.IsKey = true;
             }
 
-            foreach (var property in Properties.GroupBy(x => x.Name))
+            foreach (var property in Properties.GroupBy(x => x.Name).Select(g => g.Select((p, i) => (Property: p, Index: i)).ToList()))
             {
-                var propertyIndex = 1;
-
                 foreach (var p in property)
                 {
-                    if (propertyIndex > 1)
+                    if (p.Index > 0)
                     {
-                        p.Name += $"_{propertyIndex}";
+                        p.Property.Name += $"_{p.Index + 1}";
+
+                        if (property.Any(q => p.Property.XmlSchemaName == q.Property.XmlSchemaName && q.Index < p.Index))
+                            continue;
                     }
-                    p.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
-                    propertyIndex++;
+
+                    p.Property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
                 }
             }
 
