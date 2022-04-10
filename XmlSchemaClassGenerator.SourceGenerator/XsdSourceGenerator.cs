@@ -116,13 +116,13 @@ namespace XmlSchemaClassGenerator
 
         static IEnumerable<(AdditionalText SchemaFile, string Namespace)> GetConfigurations(GeneratorExecutionContext context)
         {
-            if (!context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.xscgen_namespace", out var @namespace))
-            {
-                @namespace = "Generated";
-            }
-
             foreach (AdditionalText file in context.AdditionalFiles)
             {
+                if (!context.AnalyzerConfigOptions.GetOptions(file).TryGetValue("build_metadata.AdditionalFiles.xscgen_Namespace", out var @namespace))
+                {
+                    @namespace = "Generated";
+                }
+
                 if (Path.GetExtension(file.Path).Equals(".xsd", StringComparison.OrdinalIgnoreCase))
                 {
                     yield return (file, @namespace);
