@@ -18,12 +18,16 @@ namespace XmlSchemaClassGenerator
         internal class MemoryOutputWriter : OutputWriter
         {
             private readonly bool separateFiles;
+            private readonly string schemaFileName;
+            private readonly string prefix;
 
             public ICollection<(string Name, string Content)> Contents { get; private set; } = new List<(string, string)>();
 
-            public MemoryOutputWriter(bool separateFiles)
+            public MemoryOutputWriter(bool separateFiles, string schemaFileName, string prefix)
             {
                 this.separateFiles = separateFiles;
+                this.schemaFileName = schemaFileName;
+                this.prefix = prefix;
             }
 
             public override void Write(CodeNamespace cn)
@@ -40,14 +44,14 @@ namespace XmlSchemaClassGenerator
                     using (var writer = new StringWriter())
                     {
                         Write(writer, cu);
-                        Contents.Add(("Pocos", writer.ToString()));
+                        Contents.Add(($"{this.prefix ?? string.Empty}{this.schemaFileName}.g.cs", writer.ToString()));
                     }
                 }
             }
 
             private void WriteSeparateFiles(CodeNamespace cn)
             {
-                var validName = ValidateName(cn.Name);
+                var validName = GetSanitizedName(cn.Name);
                 var ccu = new CodeCompileUnit();
                 var cns = new CodeNamespace(validName);
 
@@ -63,14 +67,14 @@ namespace XmlSchemaClassGenerator
                     using (var writer = new StringWriter())
                     {
                         Write(writer, ccu);
-                        Contents.Add((contentName, writer.ToString()));
+                        Contents.Add(($"{this.prefix ?? string.Empty}{contentName}.g.cs", writer.ToString()));
                     }
                 }
             }
 
             static readonly Regex InvalidCharacters = new Regex($"[{string.Join("", Path.GetInvalidFileNameChars())}]", RegexOptions.Compiled);
 
-            private string ValidateName(string name) => InvalidCharacters.Replace(name, "_");
+            private string GetSanitizedName(string name) => InvalidCharacters.Replace(name, "_");
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -81,24 +85,23 @@ namespace XmlSchemaClassGenerator
                 // Debugger.Launch();
             }
 #endif
-            var configurations = GetConfigurations(context);
-            bool generateSeparateFiles =
-                context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.xscgen_separatefiles", out var generateSeparateFilesStr) &&
-                bool.TryParse(generateSeparateFilesStr, out var parsedGenerateSeparateFiles) &&
-                parsedGenerateSeparateFiles;
+            var sources = GetConfigurations(context);
 
-            foreach (var (schemaFile, @namespace) in configurations)
+            foreach (var source in sources)
             {
-                var schemaStr = schemaFile.GetText().ToString();
+                var schemaStr = source.AdditionalText.GetText().ToString();
                 var stringReader = new StringReader(schemaStr);
 
                 var schemaSet = new XmlSchemaSet();
                 schemaSet.Add(null, XmlReader.Create(stringReader));
 
                 var generator = new Generator();
-                generator.NamespaceProvider.Add(new NamespaceKey(), @namespace);
-                generator.SeparateClasses = generateSeparateFiles;
-                MemoryOutputWriter memoryOutputWriter = new MemoryOutputWriter(generateSeparateFiles);
+                generator.NamespaceProvider.Add(new NamespaceKey(), source.Namespace);
+                generator.SeparateClasses = source.GenerateSeparateFiles;
+                MemoryOutputWriter memoryOutputWriter = new MemoryOutputWriter(
+                    source.GenerateSeparateFiles,
+                    Path.GetFileNameWithoutExtension(source.AdditionalText.Path),
+                    source.Prefix);
                 generator.OutputWriter = memoryOutputWriter;
                 generator.Generate(schemaSet);
 
@@ -114,20 +117,55 @@ namespace XmlSchemaClassGenerator
             // do nothing
         }
 
-        static IEnumerable<(AdditionalText SchemaFile, string Namespace)> GetConfigurations(GeneratorExecutionContext context)
+        static IEnumerable<GenerationSource> GetConfigurations(GeneratorExecutionContext context)
         {
             foreach (AdditionalText file in context.AdditionalFiles)
             {
-                if (!context.AnalyzerConfigOptions.GetOptions(file).TryGetValue("build_metadata.AdditionalFiles.xscgen_Namespace", out var @namespace))
+                AnalyzerConfigOptions fileOptions = context.AnalyzerConfigOptions.GetOptions(file);
+                if (!fileOptions.TryGetValue("build_metadata.AdditionalFiles.xscgen_namespace", out var @namespace))
                 {
                     @namespace = "Generated";
                 }
 
+                if (!fileOptions.TryGetValue("build_metadata.AdditionalFiles.xscgen_prefix", out var prefix))
+                {
+                    prefix = null;
+                }
+
+                bool generateSeparateFiles =
+                    fileOptions.TryGetValue("build_metadata.AdditionalFiles.xscgen_separatefiles", out var generateSeparateFilesStr) &&
+                    bool.TryParse(generateSeparateFilesStr, out var parsedGenerateSeparateFiles) &&
+                    parsedGenerateSeparateFiles;
+
                 if (Path.GetExtension(file.Path).Equals(".xsd", StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return (file, @namespace);
+                    yield return new GenerationSource(
+                        file,
+                        @namespace,
+                        generateSeparateFiles,
+                        prefix);
                 }
             }
+        }
+
+        sealed class GenerationSource
+        {
+            public GenerationSource(
+                AdditionalText additionalText,
+                string @namespace,
+                bool generateSeparateFiles,
+                string prefix)
+            {
+                AdditionalText = additionalText;
+                Namespace = @namespace;
+                GenerateSeparateFiles = generateSeparateFiles;
+                Prefix = prefix;
+            }
+
+            public AdditionalText AdditionalText { get; }
+            public string Namespace { get; }
+            public bool GenerateSeparateFiles { get; }
+            public string Prefix { get; }
         }
     }
 }
