@@ -144,13 +144,21 @@ Options:
                              generate type names that are unique across
                                namespaces (default is false)
       --gc, --generatedCodeAttribute
-                             add version information to GeneratedCodeAttribute
-                               (default is true)
+                             add version information to GeneratedCodeAttribute (
+                               default is true)
       --nc, --netCore        generate .NET Core specific code that might not
                                work with .NET Framework (default is false)
+      --nr, --nullableReferenceAttributes
+                             generate attributes for nullable reference types (
+                               default is false)
       --ar, --useArrayItemAttribute
                              use ArrayItemAttribute for sequences with single
                                elements (default is true)
+      --se, --useStringAsEnum
+                             use String Properties instead of Enum types (
+                               default is false)
+      --dam, --dataAnnotationMode=VALUE
+                             All, Partial, None (default is All)
       --ca, --commandArgs    generate a comment with the exact command line
                                arguments that were used to generate the source
                                code (default is true)
