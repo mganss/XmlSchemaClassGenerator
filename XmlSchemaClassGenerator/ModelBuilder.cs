@@ -663,9 +663,9 @@ namespace XmlSchemaClassGenerator
             {
                 var enumFacets = facets.OfType<XmlSchemaEnumerationFacet>().ToList();
                 // If there are other restrictions mixed into the enumeration values, we'll generate a string to play it safe.
-                var isEnum = false; //we need strings here - enumFacets.Any() && allBasesHaveEnums;
+                var isEnum = enumFacets.Any() && allBasesHaveEnums;
 
-                if (isEnum)
+                if (isEnum && !_configuration.UseStringInsteadOfEnum)
                 {
                     // we got an enum
                     var name = _configuration.NamingProvider.EnumTypeNameFromQualifiedName(qualifiedName, simpleType);

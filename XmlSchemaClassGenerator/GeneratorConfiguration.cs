@@ -36,7 +36,7 @@ namespace XmlSchemaClassGenerator
             MemberVisitor = (member, model) => { };
             TypeVisitor = (type, model) => { };
             NamingProvider = new NamingProvider(NamingScheme);
-            Version = VersionProvider.CreateFromAssembly();
+            Version = new VersionProvider("XmlSchemaClassGenerator", "2.0.566.0");//VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
             CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         }
@@ -326,5 +326,10 @@ namespace XmlSchemaClassGenerator
         /// for sequences with single elements. Default is true.
         /// </summary>
         public bool UseArrayItemAttribute { get; set; } = true;
+        
+        /// <summary>
+        /// Generates a string Property for Enum types
+        /// </summary>
+        public bool UseStringInsteadOfEnum { get; set; } = false;
     }
 }
