@@ -781,6 +781,15 @@ namespace XmlSchemaClassGenerator
             }
         }
 
+        private bool IsPrivateSetter
+        {
+            get
+            {
+                return Configuration.CollectionSettersMode == CollectionSettersMode.Private
+                    && (IsCollection || IsArray || (IsList && IsAttribute));
+            }
+        }
+
         private CodeTypeReference TypeReference
         {
             get
@@ -825,9 +834,9 @@ namespace XmlSchemaClassGenerator
         {
             CodeTypeMember member;
 
-            var isArray = IsArray;
             var propertyType = PropertyType;
             var isNullableValueType = IsNullableValueType;
+            var isPrivateSetter = IsPrivateSetter;
             var typeReference = TypeReference;
 
             if (isNullableValueType && Configuration.GenerateNullables)
@@ -842,7 +851,7 @@ namespace XmlSchemaClassGenerator
                 Name = Name,
                 Type = typeReference,
                 HasGet = true,
-                HasSet = !IsCollection && !isArray
+                HasSet = !isPrivateSetter
             };
 
             if (DefaultValue != null && IsNullable)
@@ -872,6 +881,7 @@ namespace XmlSchemaClassGenerator
             var propertyType = PropertyType;
             var isNullableValueType = IsNullableValueType;
             var isNullableReferenceType = IsNullableReferenceType;
+            var isPrivateSetter = IsPrivateSetter;
             var typeReference = TypeReference;
 
             var requiresBackingField = withDataBinding || DefaultValue != null || IsCollection || isArray;
@@ -934,8 +944,6 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                     member = new CodeMemberField(typeReference, propertyName);
-
-                var isPrivateSetter = (IsCollection || isArray || (IsList && IsAttribute)) && Configuration.CollectionSettersMode == CollectionSettersMode.Private;
 
                 if (requiresBackingField)
                 {

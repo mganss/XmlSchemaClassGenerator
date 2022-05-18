@@ -2578,5 +2578,91 @@ namespace Test
             var optionList = applicationType.GetProperty("OptionList");
             Assert.Equal("Test_Generation_Namespace.T_OptionList", optionList.PropertyType.FullName);
         }
+
+        [Fact]
+        public void CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""Element"">
+    <xs:complexType>
+      <xs:attributeGroup ref=""AttrGroup""/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name=""AttrGroup"">
+    <xs:attribute name=""Attr"">
+      <xs:simpleType>
+        <xs:list itemType=""xs:int""/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateInterfaces = true,
+                CollectionSettersMode = CollectionSettersMode.Private
+            };
+            var contents = ConvertXml(nameof(CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate), xsd, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate), contents);
+
+            var interfaceProperty = assembly.GetType("Test.IAttrGroup")?.GetProperty("Attr");
+            var implementerProperty = assembly.GetType("Test.Element")?.GetProperty("Attr");
+            Assert.NotNull(interfaceProperty);
+            Assert.NotNull(implementerProperty);
+
+            var interfaceHasPublicSetter = interfaceProperty.GetSetMethod() != null;
+            var implementerHasPublicSetter = implementerProperty.GetSetMethod() != null;
+            Assert.False(interfaceHasPublicSetter);
+            Assert.False(implementerHasPublicSetter);
+        }
+
+        [Fact]
+        public void CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""Element"">
+    <xs:complexType>
+      <xs:attributeGroup ref=""AttrGroup""/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attributeGroup name=""AttrGroup"">
+    <xs:attribute name=""Attr"">
+      <xs:simpleType>
+        <xs:list itemType=""xs:int""/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateInterfaces = true,
+                CollectionSettersMode = CollectionSettersMode.Public
+            };
+            var contents = ConvertXml(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), xsd, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), contents);
+
+            var interfaceProperty = assembly.GetType("Test.IAttrGroup")?.GetProperty("Attr");
+            var implementerProperty = assembly.GetType("Test.Element")?.GetProperty("Attr");
+            Assert.NotNull(interfaceProperty);
+            Assert.NotNull(implementerProperty);
+
+            var interfaceHasPublicSetter = interfaceProperty.GetSetMethod() != null;
+            var implementerHasPublicSetter = implementerProperty.GetSetMethod() != null;
+            Assert.True(interfaceHasPublicSetter);
+            Assert.True(implementerHasPublicSetter);
+        }
     }
 }
