@@ -1550,7 +1550,13 @@ namespace XmlSchemaClassGenerator
                 //  is used alone. Casting the value to the same type to work around this issue.
                 var rv = new CodeCastExpression(typeof(byte[]), new CodeArrayCreateExpression(typeof(byte), byteValues));
                 return rv;
-
+            }
+            else if (type == typeof(double) && !string.IsNullOrWhiteSpace(defaultString))
+            {
+                if (defaultString.Equals("inf", StringComparison.OrdinalIgnoreCase))
+                    return new CodePrimitiveExpression(double.NegativeInfinity);
+                else if (defaultString.Equals("-inf", StringComparison.OrdinalIgnoreCase))
+                    return new CodePrimitiveExpression(double.NegativeInfinity);
             }
 
             return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
