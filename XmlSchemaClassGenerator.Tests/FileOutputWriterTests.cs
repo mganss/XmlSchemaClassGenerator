@@ -43,7 +43,8 @@
         [UseCulture("en-US")]
         public void TestDefaultProviderGeneratorPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "DefaultProviderGeneratorPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "DefaultProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "DefaultProviderGeneratorPrefix",
@@ -57,7 +58,7 @@
 
             SharedTestFunctions.TestSamples(_output, "DefaultProviderGeneratorPrefix", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\DefaultProviderGeneratorPrefix\Generator.Prefix.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "Generator.Prefix.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -65,7 +66,8 @@
         [UseCulture("en-US")]
         public void TestEmptyKeyProvider()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProvider"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProvider");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "EmptyKeyProvider",
@@ -82,7 +84,7 @@
 
             SharedTestFunctions.TestSamples(_output, "EmptyKeyProvider", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\EmptyKeyProvider\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -90,7 +92,8 @@
         [UseCulture("en-US")]
         public void TestEmptyKeyProviderGeneratorPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProviderGeneratorPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "EmptyKeyProviderGeneratorPrefix",
@@ -108,18 +111,19 @@
 
             SharedTestFunctions.TestSamples(_output, "EmptyKeyProviderGeneratorPrefix", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\EmptyKeyProviderGeneratorPrefix\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
         [TestPriority(1)]
         [UseCulture("en-US")]
-        public void TestEmptyKeyProviderGeneratorConfiruationPrefix()
+        public void TestEmptyKeyProviderGeneratorConfigurationPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProviderGeneratorConfiruationPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProviderGeneratorConfigurationPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
-                "EmptyKeyProviderGeneratorConfiruationPrefix",
+                "EmptyKeyProviderGeneratorConfigurationPrefix",
                 PrefixPattern,
                 new Generator
                 {
@@ -131,9 +135,9 @@
                     }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GeneratorConfiguration.Prefix" }.NamespaceProvider.GenerateNamespace),
                 });
 
-            SharedTestFunctions.TestSamples(_output, "EmptyKeyProviderGeneratorConfiruationPrefix", PrefixPattern);
+            SharedTestFunctions.TestSamples(_output, "EmptyKeyProviderGeneratorConfigurationPrefix", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\EmptyKeyProviderGeneratorConfiruationPrefix\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -141,7 +145,8 @@
         [UseCulture("en-US")]
         public void TestEmptyKeyProviderBothPrefixes()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProviderBothPrefixes"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "EmptyKeyProviderBothPrefixes");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "EmptyKeyProviderBothPrefixes",
@@ -159,7 +164,7 @@
 
             SharedTestFunctions.TestSamples(_output, "EmptyKeyProviderBothPrefixes", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\EmptyKeyProviderBothPrefixes\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -167,7 +172,8 @@
         [UseCulture("en-US")]
         public void TestFullKeyProvider()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "FullKeyProvider"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "FullKeyProvider");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "FullKeyProvider",
@@ -184,7 +190,7 @@
 
             SharedTestFunctions.TestSamples(_output, "FullKeyProvider", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\FullKeyProvider\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -192,7 +198,8 @@
         [UseCulture("en-US")]
         public void TestFullKeyProviderGeneratorPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "FullKeyProviderGeneratorPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "FullKeyProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "FullKeyProviderGeneratorPrefix",
@@ -210,18 +217,19 @@
 
             SharedTestFunctions.TestSamples(_output, "FullKeyProviderGeneratorPrefix", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\FullKeyProviderGeneratorPrefix\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
         [TestPriority(1)]
         [UseCulture("en-US")]
-        public void TestFullKeyProviderGeneratorConfiruationPrefix()
+        public void TestFullKeyProviderGeneratorConfigurationPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "FullKeyProviderGeneratorConfiruationPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "FullKeyProviderGeneratorConfigurationPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
-                "FullKeyProviderGeneratorConfiruationPrefix",
+                "FullKeyProviderGeneratorConfigurationPrefix",
                 PrefixPattern,
                 new Generator
                 {
@@ -233,9 +241,9 @@
                     }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GeneratorConfiguration.Prefix" }.NamespaceProvider.GenerateNamespace),
                 });
 
-            SharedTestFunctions.TestSamples(_output, "FullKeyProviderGeneratorConfiruationPrefix", PrefixPattern);
+            SharedTestFunctions.TestSamples(_output, "FullKeyProviderGeneratorConfigurationPrefix", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\FullKeyProviderGeneratorConfiruationPrefix\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -243,7 +251,8 @@
         [UseCulture("en-US")]
         public void TestFullKeyProviderBothPrefixes()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "FullKeyProviderBothPrefixes"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "FullKeyProviderBothPrefixes");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "FullKeyProviderBothPrefixes",
@@ -261,7 +270,7 @@
 
             SharedTestFunctions.TestSamples(_output, "FullKeyProviderBothPrefixes", PrefixPattern);
             Assert.Single(outputWriter.Files);
-            Assert.Equal(@"output\FileOutputWriterTests\FullKeyProviderBothPrefixes\NamedNamespace.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -269,7 +278,8 @@
         [UseCulture("en-US")]
         public void TestSeparateDefaultProvider_ThrowsArgumentException()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateDefaultProvider"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateDefaultProvider");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             void Action() => Compiler.Generate(
                 "SeparateDefaultProvider",
@@ -290,7 +300,8 @@
         [UseCulture("en-US")]
         public void TestSeparateDefaultProviderGeneratorPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateDefaultProviderGeneratorPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateDefaultProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateDefaultProviderGeneratorPrefix",
@@ -305,7 +316,7 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateDefaultProviderGeneratorPrefix", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateDefaultProviderGeneratorPrefix\Generator.Prefix\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "Generator.Prefix", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -313,7 +324,8 @@
         [UseCulture("en-US")]
         public void TestSeparateEmptyKeyProvider()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProvider"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProvider");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateEmptyKeyProvider",
@@ -331,7 +343,7 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateEmptyKeyProvider", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateEmptyKeyProvider\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -339,7 +351,8 @@
         [UseCulture("en-US")]
         public void TestSeparateEmptyKeyProviderGeneratorPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProviderGeneratorPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateEmptyKeyProviderGeneratorPrefix",
@@ -358,18 +371,19 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateEmptyKeyProviderGeneratorPrefix", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateEmptyKeyProviderGeneratorPrefix\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
         [TestPriority(1)]
         [UseCulture("en-US")]
-        public void TestSeparateEmptyKeyProviderGeneratorConfiruationPrefix()
+        public void TestSeparateEmptyKeyProviderGeneratorConfigurationPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProviderGeneratorConfiruationPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProviderGeneratorConfigurationPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
-                "SeparateEmptyKeyProviderGeneratorConfiruationPrefix",
+                "SeparateEmptyKeyProviderGeneratorConfigurationPrefix",
                 PrefixPattern,
                 new Generator
                 {
@@ -382,9 +396,9 @@
                     }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GeneratorConfiguration.Prefix" }.NamespaceProvider.GenerateNamespace),
                 });
 
-            SharedTestFunctions.TestSamples(_output, "SeparateEmptyKeyProviderGeneratorConfiruationPrefix", PrefixPattern);
+            SharedTestFunctions.TestSamples(_output, "SeparateEmptyKeyProviderGeneratorConfigurationPrefix", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateEmptyKeyProviderGeneratorConfiruationPrefix\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -392,7 +406,8 @@
         [UseCulture("en-US")]
         public void TestSeparateEmptyKeyProviderBothPrefixes()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProviderBothPrefixes"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateEmptyKeyProviderBothPrefixes");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateEmptyKeyProviderBothPrefixes",
@@ -411,7 +426,7 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateEmptyKeyProviderBothPrefixes", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateEmptyKeyProviderBothPrefixes\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -419,7 +434,8 @@
         [UseCulture("en-US")]
         public void TestSeparateFullKeyProvider()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProvider"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProvider");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateFullKeyProvider",
@@ -437,7 +453,7 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateFullKeyProvider", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateFullKeyProvider\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -445,7 +461,8 @@
         [UseCulture("en-US")]
         public void TestSeparateFullKeyProviderGeneratorPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProviderGeneratorPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateFullKeyProviderGeneratorPrefix",
@@ -464,18 +481,19 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateFullKeyProviderGeneratorPrefix", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateFullKeyProviderGeneratorPrefix\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
         [TestPriority(1)]
         [UseCulture("en-US")]
-        public void TestSeparateFullKeyProviderGeneratorConfiruationPrefix()
+        public void TestSeparateFullKeyProviderGeneratorConfigurationPrefix()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProviderGeneratorConfiruationPrefix"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProviderGeneratorConfigurationPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
-                "SeparateFullKeyProviderGeneratorConfiruationPrefix",
+                "SeparateFullKeyProviderGeneratorConfigurationPrefix",
                 PrefixPattern,
                 new Generator
                 {
@@ -488,9 +506,9 @@
                     }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GeneratorConfiguration.Prefix" }.NamespaceProvider.GenerateNamespace),
                 });
 
-            SharedTestFunctions.TestSamples(_output, "SeparateFullKeyProviderGeneratorConfiruationPrefix", PrefixPattern);
+            SharedTestFunctions.TestSamples(_output, "SeparateFullKeyProviderGeneratorConfigurationPrefix", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateFullKeyProviderGeneratorConfiruationPrefix\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]
@@ -498,7 +516,8 @@
         [UseCulture("en-US")]
         public void TestSeparateFullKeyProviderBothPrefixes()
         {
-            var outputWriter = new FileWatcherOutputWriter(Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProviderBothPrefixes"));
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateFullKeyProviderBothPrefixes");
+            var outputWriter = new FileWatcherOutputWriter(directory);
 
             Compiler.Generate(
                 "SeparateFullKeyProviderBothPrefixes",
@@ -517,7 +536,7 @@
 
             SharedTestFunctions.TestSamples(_output, "SeparateFullKeyProviderBothPrefixes", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
-            Assert.Equal(@"output\FileOutputWriterTests\SeparateFullKeyProviderBothPrefixes\NamedNamespace\PurchaseOrderType.cs", outputWriter.Files.First());
+            Assert.Equal(Path.Combine(directory, "NamedNamespace", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
     }
 }
