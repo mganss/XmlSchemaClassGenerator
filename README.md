@@ -29,6 +29,7 @@ from schema restrictions
 * Optional support for Entity Framework Code First (automatically generate key properties)
 * Optionally generate interfaces for groups and attribute groups
 * Optionally generate one file per class
+* Support for nullable reference types (NRTs) through [`AllowNullAttribute`](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.codeanalysis.allownullattribute) and [`MaybeNullAttribute`](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.codeanalysis.maybenullattribute)
 
 Unsupported:
 
