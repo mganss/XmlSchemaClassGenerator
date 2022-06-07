@@ -174,8 +174,7 @@ namespace XmlSchemaClassGenerator
             var classModel = typeModel as ClassModel;
             var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.PrivateMemberPrefix);
 
-            if (!CSharp.IsValidIdentifier(propBackingFieldName.ToLower()))
-                propBackingFieldName = "@" + propBackingFieldName;
+            propBackingFieldName = CSharp.CreateEscapedIdentifier(propBackingFieldName);
 
             if (classModel == null)
                 return propBackingFieldName;
@@ -257,8 +256,8 @@ namespace XmlSchemaClassGenerator
 
         public static CodeTypeReference CreateTypeReference(Type type, GeneratorConfiguration conf)
         {
-            // If the type is a keyword it will prefix it with an underscore to make it a valid identifier.
-            var isKeyword = CSharp.CreateValidIdentifier(CSharp.GetTypeOutput(new(type)))[0] == '_';
+            // If the type is a keyword it will prefix it with an @ to make it a valid identifier.
+            var isKeyword = CSharp.CreateEscapedIdentifier(CSharp.GetTypeOutput(new(type)))[0] == '@';
             if (!isKeyword && IsUsingNamespace(type.Namespace, conf))
             {
                 var typeRef = new CodeTypeReference(type.Name, conf.CodeTypeReferenceOptions);
