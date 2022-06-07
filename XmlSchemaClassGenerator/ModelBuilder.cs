@@ -29,7 +29,7 @@ namespace XmlSchemaClassGenerator
             _configuration = configuration;
             _set = set;
 
-            DocumentationModel.DisableComments = _configuration.DisableComments;
+            GeneratorModel.DisableComments = _configuration.DisableComments;
             var objectModel = new SimpleModel(_configuration)
             {
                 Name = "AnyType",

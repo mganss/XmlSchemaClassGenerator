@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
@@ -12,165 +13,88 @@ namespace XmlSchemaClassGenerator
     public static class CodeUtilities
     {
         // Match non-letter followed by letter
-        static readonly Regex PascalCaseRegex = new(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
+        private static readonly Regex PascalCaseRegex = new(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
 
         // Uppercases first letter and all letters following non-letters.
         // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
-        public static string ToPascalCase(this string s)
-        {
-            if (string.IsNullOrEmpty(s)) { return s; }
-            return char.ToUpperInvariant(s[0])
-                + PascalCaseRegex.Replace(s.Substring(1), m => m.Value[0] + char.ToUpperInvariant(m.Value[1]).ToString());
-        }
+        public static string ToPascalCase(this string s) => string.IsNullOrEmpty(s) ? s
+            : char.ToUpperInvariant(s[0]) + PascalCaseRegex.Replace(s.Substring(1), m => m.Value[0] + char.ToUpperInvariant(m.Value[1]).ToString());
 
-        public static string ToCamelCase(this string s)
-        {
-            if (string.IsNullOrEmpty(s)) { return s; }
-            return char.ToLowerInvariant(s[0]) + s.Substring(1);
-        }
+        public static string ToCamelCase(this string s) => string.IsNullOrEmpty(s) ? s
+            : char.ToLowerInvariant(s[0]) + s.Substring(1);
 
         public static string ToBackingField(this string propertyName, string privateFieldPrefix)
+            => string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
+
+        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type) => type.TypeCode switch
         {
-            return string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
-        }
+            XmlTypeCode.AnyAtomicType => false,// union
+            XmlTypeCode.DateTime or XmlTypeCode.Time or XmlTypeCode.Date or XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
+            _ => false,
+        };
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type)
-        {
-            bool? result = type.TypeCode switch
-            {
-                XmlTypeCode.AnyAtomicType => false,// union
-                XmlTypeCode.DateTime or XmlTypeCode.Time or XmlTypeCode.Date or XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
-                _ => false,
-            };
-
-            return result;
-        }
-
-        private static Type GetIntegerDerivedType(XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions)
+        private static Type GetIntegerDerivedType(XmlSchemaDatatype xml, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions)
         {
             if (configuration.IntegerDataType != null && !configuration.UseIntegerDataTypeAsFallback) return configuration.IntegerDataType;
 
-            var xmlTypeCode = type.TypeCode;
+            decimal? maxInclusive = (restrictions.OfType<MaxInclusiveRestrictionModel>().SingleOrDefault(), xml.TypeCode) switch
+            {
+                (null, XmlTypeCode.NegativeInteger) => -1,
+                (null, XmlTypeCode.NonPositiveInteger) => 0,
+                ({ Value: var str }, _) when decimal.TryParse(str, out decimal value) => value,
+                _ => null,
+            };
 
-            Type result = null;
-
-            var maxInclusive = restrictions.OfType<MaxInclusiveRestrictionModel>().SingleOrDefault();
-            var minInclusive = restrictions.OfType<MinInclusiveRestrictionModel>().SingleOrDefault();
-
-            decimal? maxInclusiveValue = null;
-            if (maxInclusive is null && xmlTypeCode == XmlTypeCode.NegativeInteger)
+            decimal? minInclusive = (restrictions.OfType<MinInclusiveRestrictionModel>().SingleOrDefault(), xml.TypeCode) switch
             {
-                maxInclusiveValue = -1;
-            }
-            else if (maxInclusive is null && xmlTypeCode == XmlTypeCode.NonPositiveInteger)
-            {
-                maxInclusiveValue = 0;
-            }
-            else if (maxInclusive != null && decimal.TryParse(maxInclusive.Value, out decimal value))
-            {
-                maxInclusiveValue = value;
-            }
-
-            decimal? minInclusiveValue = null;
-            if (minInclusive is null && xmlTypeCode == XmlTypeCode.PositiveInteger)
-            {
-                minInclusiveValue = 1;
-            }
-            else if (minInclusive is null && xmlTypeCode == XmlTypeCode.NonNegativeInteger)
-            {
-                minInclusiveValue = 0;
-            }
-            else if (minInclusive != null && decimal.TryParse(minInclusive.Value, out decimal value))
-            {
-                minInclusiveValue = value;
-            }
+                (null, XmlTypeCode.PositiveInteger) => 1,
+                (null, XmlTypeCode.NonNegativeInteger) => 0,
+                ({ Value: var str }, _) when decimal.TryParse(str, out decimal value) => value,
+                _ => null,
+            };
 
             // If either value is null, then that value is either unbounded or too large to fit in any numeric type.
-            if (minInclusiveValue != null && maxInclusiveValue != null) {
-                if (minInclusiveValue >= byte.MinValue && maxInclusiveValue <= byte.MaxValue)
-                    result = typeof(byte);
-                else if (minInclusiveValue >= sbyte.MinValue && maxInclusiveValue <= sbyte.MaxValue)
-                    result = typeof(sbyte);
-                else if (minInclusiveValue >= ushort.MinValue && maxInclusiveValue <= ushort.MaxValue)
-                    result = typeof(ushort);
-                else if (minInclusiveValue >= short.MinValue && maxInclusiveValue <= short.MaxValue)
-                    result = typeof(short);
-                else if (minInclusiveValue >= uint.MinValue && maxInclusiveValue <= uint.MaxValue)
-                    result = typeof(uint);
-                else if (minInclusiveValue >= int.MinValue && maxInclusiveValue <= int.MaxValue)
-                    result = typeof(int);
-                else if (minInclusiveValue >= ulong.MinValue && maxInclusiveValue <= ulong.MaxValue)
-                    result = typeof(ulong);
-                else if (minInclusiveValue >= long.MinValue && maxInclusiveValue <= long.MaxValue)
-                    result = typeof(long);
-                else // If it didn't fit in a decimal, we could not have gotten here.
-                    result = typeof(decimal);
+            return FromMinMax() ?? FromDigitRestriction(restrictions.OfType<TotalDigitsRestrictionModel>().SingleOrDefault()) ?? FromFallback();
 
-                return result;
-            }
-
-            if (restrictions.SingleOrDefault(r => r is TotalDigitsRestrictionModel) is not TotalDigitsRestrictionModel totalDigits
-                || ((xmlTypeCode == XmlTypeCode.PositiveInteger
-                     || xmlTypeCode == XmlTypeCode.NonNegativeInteger) && totalDigits.Value >= 30)
-                || ((xmlTypeCode == XmlTypeCode.Integer
-                     || xmlTypeCode == XmlTypeCode.NegativeInteger
-                     || xmlTypeCode == XmlTypeCode.NonPositiveInteger) && totalDigits.Value >= 29))
+            Type FromMinMax() => (minInclusive, maxInclusive) switch
             {
-                if (configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null)
-                    return configuration.IntegerDataType;
-                return typeof(string);
-            }
+                (null, _) => null,
+                (_, null) => null,
+                ( >= byte.MinValue, <= byte.MaxValue) => typeof(byte),
+                ( >= sbyte.MinValue, <= sbyte.MaxValue) => typeof(sbyte),
+                ( >= ushort.MinValue, <= ushort.MaxValue) => typeof(ushort),
+                ( >= short.MinValue, <= short.MaxValue) => typeof(short),
+                ( >= uint.MinValue, <= uint.MaxValue) => typeof(uint),
+                ( >= int.MinValue, <= int.MaxValue) => typeof(int),
+                ( >= ulong.MinValue, <= ulong.MaxValue) => typeof(ulong),
+                ( >= long.MinValue, <= long.MaxValue) => typeof(long),
+                _ => typeof(decimal),
+            };
 
-            switch (xmlTypeCode)
+            Type FromDigitRestriction(TotalDigitsRestrictionModel totalDigits) => xml.TypeCode switch
             {
-                case XmlTypeCode.PositiveInteger:
-                case XmlTypeCode.NonNegativeInteger:
-                    switch (totalDigits.Value)
-                    {
-                        case int n when (n < 3):
-                            result = typeof(byte);
-                            break;
-                        case int n when (n < 5):
-                            result = typeof(ushort);
-                            break;
-                        case int n when (n < 10):
-                            result = typeof(uint);
-                            break;
-                        case int n when (n < 20):
-                            result = typeof(ulong);
-                            break;
-                        case int n when (n < 30):
-                            result = typeof(decimal);
-                            break;
-                    }
+                XmlTypeCode.PositiveInteger or XmlTypeCode.NonNegativeInteger => totalDigits?.Value switch
+                {
+                    < 3 => typeof(byte),
+                    < 5 => typeof(ushort),
+                    < 10 => typeof(uint),
+                    < 20 => typeof(ulong),
+                    < 30 => typeof(decimal),
+                    _ => null
+                },
+                XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonPositiveInteger => totalDigits?.Value switch
+                {
+                    < 3 => typeof(sbyte),
+                    < 5 => typeof(short),
+                    < 10 => typeof(int),
+                    < 19 => typeof(long),
+                    < 29 => typeof(decimal),
+                    _ => null
+                },
+                _ => null,
+            };
 
-                    break;
-
-                case XmlTypeCode.Integer:
-                case XmlTypeCode.NegativeInteger:
-                case XmlTypeCode.NonPositiveInteger:
-                    switch (totalDigits.Value)
-                    {
-                        case int n when (n < 3):
-                            result = typeof(sbyte);
-                            break;
-                        case int n when (n < 5):
-                            result = typeof(short);
-                            break;
-                        case int n when (n < 10):
-                            result = typeof(int);
-                            break;
-                        case int n when (n < 19):
-                            result = typeof(long);
-                            break;
-                        case int n when (n < 29):
-                            result = typeof(decimal);
-                            break;
-                    }
-                    break;
-            }
-
-            return result;
+            Type FromFallback() => configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null ? configuration.IntegerDataType : typeof(string);
         }
 
         public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions, bool attribute = false)
@@ -217,21 +141,14 @@ namespace XmlSchemaClassGenerator
             XmlQualifiedName qualifiedName;
             if (typeModel is not SimpleModel simpleTypeModel)
             {
-                if (typeModel.IsAnonymous)
-                {
-                    qualifiedName = typeModel.XmlSchemaName;
-                }
-                else
-                {
-                    qualifiedName = typeModel.XmlSchemaType.GetQualifiedName();
-                }
+                qualifiedName = typeModel.IsAnonymous ? typeModel.XmlSchemaName
+                    : typeModel.XmlSchemaType.GetQualifiedName();
             }
             else
             {
                 qualifiedName = simpleTypeModel.XmlSchemaType.GetQualifiedName();
                 var xmlSchemaType = simpleTypeModel.XmlSchemaType;
-                while (qualifiedName.Namespace != XmlSchema.Namespace &&
-                       xmlSchemaType.BaseXmlSchemaType != null)
+                while (qualifiedName.Namespace != XmlSchema.Namespace && xmlSchemaType.BaseXmlSchemaType != null)
                 {
                     xmlSchemaType = xmlSchemaType.BaseXmlSchemaType;
                     qualifiedName = xmlSchemaType.GetQualifiedName();
@@ -243,13 +160,9 @@ namespace XmlSchemaClassGenerator
         public static string GetUniqueTypeName(this NamespaceModel model, string name)
         {
             var n = name;
-            var i = 2;
 
-            while (model.Types.ContainsKey(n) && model.Types[n] is not SimpleModel)
-            {
+            for (var i = 2; model.Types.ContainsKey(n) && model.Types[n] is not SimpleModel; i++)
                 n = name + i;
-                i++;
-            }
 
             return n;
         }
@@ -259,90 +172,49 @@ namespace XmlSchemaClassGenerator
             var classModel = typeModel as ClassModel;
             var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.PrivateMemberPrefix);
 
-            if (CSharpKeywords.Contains(propBackingFieldName.ToLower()))
+            if (!IsValidIdentifier(propBackingFieldName.ToLower()))
                 propBackingFieldName = "@" + propBackingFieldName;
 
             if (classModel == null)
-            {
                 return propBackingFieldName;
-            }
 
             var i = 0;
             foreach (var prop in classModel.Properties)
             {
                 if (propertyModel == prop)
                 {
-                    i += 1;
+                    i++;
                     break;
                 }
 
                 var backingFieldName = prop.Name.ToBackingField(classModel.Configuration.PrivateMemberPrefix);
                 if (backingFieldName == propBackingFieldName)
-                {
-                    i += 1;
-                }
+                    i++;
             }
 
-            if (i <= 1)
-            {
-                return propBackingFieldName;
-            }
-
-            return string.Format("{0}{1}", propBackingFieldName, i);
+            return i <= 1 ? propBackingFieldName : $"{propBackingFieldName}{i}";
         }
 
         public static string GetUniquePropertyName(this TypeModel tm, string name)
         {
-            if (tm is ClassModel cls)
-            {
-                var i = 0;
-                var n = name;
-                var baseClasses = cls.AllBaseClasses.ToList();
-                var props = cls.Properties.ToList();
+            if (tm is not ClassModel cls) return name;
 
-                while (baseClasses.SelectMany(b => b.Properties)
-                    .Concat(props)
-                    .Any(p => p.Name == n))
-                {
-                    n = name + (++i);
-                }
+            var i = 0;
+            var n = name;
+            var baseProps = cls.AllBaseClasses.SelectMany(b => b.Properties).ToList();
+            var props = cls.Properties.ToList();
 
-                return n;
-            }
+            while (baseProps.Concat(props).Any(p => p.Name == n))
+                n = name + (++i);
 
-            return name;
+            return n;
         }
 
-        static readonly Regex NormalizeNewlinesRegex = new (@"(^|[^\r])\n", RegexOptions.Compiled);
+        private static readonly Regex NormalizeNewlinesRegex = new(@"(^|[^\r])\n", RegexOptions.Compiled);
 
-        internal static string NormalizeNewlines(string text)
-        {
-            return NormalizeNewlinesRegex.Replace(text, "$1\r\n");
-        }
+        internal static string NormalizeNewlines(string text) => NormalizeNewlinesRegex.Replace(text, "$1\r\n");
 
-        static readonly List<string> CSharpKeywords = new()
-        {
-            "abstract", "as", "base", "bool",
-            "break", "byte", "case", "catch",
-            "char", "checked", "class", "const",
-            "continue", "decimal", "default", "delegate",
-            "do", "double", "else", "enum",
-            "event", " explicit", "extern", "false",
-            "finally", "fixed", "float", "for",
-            "foreach", "goto", "if", "implicit",
-            "in", "int", "interface", "internal",
-            "is", "lock", "long", "namespace",
-            "new", "null", "object", "operator",
-            "out", "override", "params", "private",
-            "protected", "public", "readonly", "ref",
-            "return", "sbyte", "sealed", "short",
-            "sizeof", "stackalloc", "static", "string",
-            "struct", "switch", "this", "throw",
-            "true", "try", "typeof", "uint",
-            "ulong", "unchecked", "unsafe", "ushort",
-            "using", "using static", "virtual", "void",
-            "volatile", "while"
-        };
+        private static readonly Predicate<string> IsValidIdentifier = new Microsoft.CSharp.CSharpCodeProvider().IsValidIdentifier;
 
         internal static Uri CreateUri(string uri) => string.IsNullOrEmpty(uri) ? null : new Uri(uri);
 
@@ -350,9 +222,7 @@ namespace XmlSchemaClassGenerator
         {
             var parts = nsArg.Split(new[] { '=' }, 2);
             if (parts.Length != 2)
-            {
                 throw new ArgumentException("XML and C# namespaces should be separated by '='. You entered: " + nsArg);
-            }
 
             var xmlNs = parts[0];
             var netNs = parts[1];
@@ -360,13 +230,12 @@ namespace XmlSchemaClassGenerator
             var source = parts2.Length == 2 ? new Uri(parts2[1], UriKind.RelativeOrAbsolute) : null;
             xmlNs = parts2[0];
             if (!string.IsNullOrEmpty(namespacePrefix))
-            {
                 netNs = namespacePrefix + "." + netNs;
-            }
+
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
-        public static readonly ImmutableList<(string Namespace, Func<GeneratorConfiguration,bool> Condition)> UsingNamespaces = ImmutableList.Create<(string Namespace, Func<GeneratorConfiguration, bool> Condition)>(
+        public static readonly ImmutableList<(string Namespace, Func<GeneratorConfiguration, bool> Condition)> UsingNamespaces = ImmutableList.Create<(string, Func<GeneratorConfiguration, bool>)>(
             ("System", c => c.CompactTypeNames),
             ("System.CodeDom.Compiler", c => c.CompactTypeNames),
             ("System.Collections.Generic", c => c.CompactTypeNames),
@@ -374,26 +243,25 @@ namespace XmlSchemaClassGenerator
             ("System.ComponentModel", c => c.CompactTypeNames),
             ("System.ComponentModel.DataAnnotations", c => c.CompactTypeNames && (c.DataAnnotationMode != DataAnnotationMode.None || c.EntityFramework)),
             ("System.Diagnostics", c => c.CompactTypeNames && c.GenerateDebuggerStepThroughAttribute),
+            ("System.Diagnostics.CodeAnalysis", c => c.CompactTypeNames && c.EnableNullableReferenceAttributes),
             ("System.Linq", c => c.EnableDataBinding),
             ("System.Xml", c => c.CompactTypeNames),
             ("System.Xml.Schema", c => c.CompactTypeNames),
             ("System.Xml.Serialization", c => c.CompactTypeNames)
         );
 
-        public static bool IsUsingNamespace(Type t, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == t.Namespace && n.Condition(conf));
+        public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf)
+            => UsingNamespaces.Any(n => n.Namespace == namespaceName && n.Condition(conf));
 
-        public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf) => UsingNamespaces.Any(n => n.Namespace == namespaceName && n.Condition(conf));
-
-        public static CodeTypeReference CreateTypeReference(Type t, GeneratorConfiguration conf)
+        public static CodeTypeReference CreateTypeReference(Type type, GeneratorConfiguration conf)
         {
-            if (IsUsingNamespace(t, conf))
+            if (IsUsingNamespace(type.Namespace, conf))
             {
-                var name = t.Name;
-                var typeRef = new CodeTypeReference(name, conf.CodeTypeReferenceOptions);
+                var typeRef = new CodeTypeReference(type.Name, conf.CodeTypeReferenceOptions);
 
-                if (t.IsConstructedGenericType)
+                if (type.IsConstructedGenericType)
                 {
-                    var typeArgs = t.GenericTypeArguments.Select(a => CreateTypeReference(a, conf)).ToArray();
+                    var typeArgs = type.GenericTypeArguments.Select(a => CreateTypeReference(a, conf)).ToArray();
                     typeRef.TypeArguments.AddRange(typeArgs);
                 }
 
@@ -401,31 +269,20 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
-                var typeRef = new CodeTypeReference(t, conf.CodeTypeReferenceOptions);
+                var typeRef = new CodeTypeReference(type, conf.CodeTypeReferenceOptions);
 
-                foreach (var typeArg in typeRef.TypeArguments)
-                {
-                    if (typeArg is CodeTypeReference typeArgRef)
-                    {
-                        typeArgRef.Options = conf.CodeTypeReferenceOptions;
-                    }
-                }
+                foreach (var typeArgRef in typeRef.TypeArguments.OfType<CodeTypeReference>())
+                    typeArgRef.Options = conf.CodeTypeReferenceOptions;
 
                 return typeRef;
             }
-
         }
 
-        public static CodeTypeReference CreateTypeReference(string namespaceName, string typeName, GeneratorConfiguration conf)
+        public static CodeTypeReference CreateTypeReference(TypeInfo type, GeneratorConfiguration conf)
         {
-            if (IsUsingNamespace(namespaceName, conf))
-            {
-                var typeRef = new CodeTypeReference(typeName, conf.CodeTypeReferenceOptions);
-
-                return typeRef;
-            }
-            else
-                return new CodeTypeReference($"{namespaceName}.{typeName}", conf.CodeTypeReferenceOptions);
+            return IsUsingNamespace(type.Namespace, conf)
+                ? new CodeTypeReference(type.Name, conf.CodeTypeReferenceOptions)
+                : new CodeTypeReference($"{type.Namespace}.{type.Name}", conf.CodeTypeReferenceOptions);
         }
 
         /// <summary>
@@ -433,21 +290,42 @@ namespace XmlSchemaClassGenerator
         /// and https://docs.microsoft.com/en-us/dotnet/api/system.xml.serialization.xmlattributeattribute#remarks
         /// </summary>
         public static bool IsXmlLangOrSpace(XmlQualifiedName name)
-        {
-            return name != null && name.Namespace == "http://www.w3.org/XML/1998/namespace"
-                && (name.Name == "lang" || name.Name == "space");
-        }
+            => name?.Namespace == "http://www.w3.org/XML/1998/namespace" && (name.Name == "lang" || name.Name == "space");
 
-        internal static XmlQualifiedName GetQualifiedName(this XmlSchemaObject obj)
+        internal static XmlQualifiedName GetQualifiedName(this XmlSchemaObject obj) => obj switch
         {
-            var n = obj switch
-            {
-                XmlSchemaAttribute attr => attr.QualifiedName,
-                XmlSchemaAttributeGroup attrGroup => attrGroup.QualifiedName,
-                _ => null
-            };
+            XmlSchemaAttribute attr => attr.QualifiedName,
+            XmlSchemaAttributeGroup attrGroup => attrGroup.QualifiedName,
+            _ => null
+        };
+    }
 
-            return n;
-        }
+    public readonly record struct TypeInfo(string Namespace, string Name);
+
+    /// <summary>
+    /// For attributes which can't be referenced by <c>typeof(<see cref="Type"/>)</c>
+    /// </summary>
+    internal static class Attributes
+    {
+        private const string DataAnnotations = "System.ComponentModel.DataAnnotations";
+        private const string CodeAnalysis = "System.Diagnostics.CodeAnalysis";
+
+        private static TypeInfo Make(string @namespace, [CallerMemberName] string name = null)
+            => new(@namespace, name + "Attribute");
+
+        public static TypeInfo Required { get; } = Make(DataAnnotations);
+        public static TypeInfo Key { get; } = Make(DataAnnotations);
+        public static TypeInfo Range { get; } = Make(DataAnnotations);
+        public static TypeInfo MinLength { get; } = Make(DataAnnotations);
+        public static TypeInfo MaxLength { get; } = Make(DataAnnotations);
+        public static TypeInfo StringLength { get; } = Make(DataAnnotations);
+        public static TypeInfo RegularExpression { get; } = Make(DataAnnotations);
+        public static TypeInfo NotMapped { get; } = Make($"{DataAnnotations}.Schema");
+
+        public static TypeInfo AllowNull { get; } = Make(CodeAnalysis);
+        public static TypeInfo MaybeNull { get; } = Make(CodeAnalysis);
     }
 }
+
+//Fixes a bug with VS2019 (https://developercommunity.visualstudio.com/content/problem/1244809/error-cs0518-predefined-type-systemruntimecompiler.html)
+namespace System.Runtime.CompilerServices { internal static class IsExternalInit { } }

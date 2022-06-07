@@ -1,28 +1,13 @@
 ﻿using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace XmlSchemaClassGenerator
 {
-    public abstract class RestrictionModel
+    public abstract class RestrictionModel : GeneratorModel
     {
-        public GeneratorConfiguration Configuration { get; private set; }
+        protected RestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        protected RestrictionModel(GeneratorConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public bool IsSupported
-        {
-            get
-            {
-                return MinimumDataAnnotationMode >= Configuration.DataAnnotationMode;
-            }
-        }
+        public bool IsSupported => MinimumDataAnnotationMode >= Configuration.DataAnnotationMode;
 
         /// <summary>
         /// The DataAnnotationMode required to be able to emit this restriction
@@ -34,281 +19,126 @@ namespace XmlSchemaClassGenerator
 
     public abstract class ValueRestrictionModel<T> : RestrictionModel
     {
-        protected ValueRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
-
-        }
+        protected ValueRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
         public T Value { get; set; }
 
-        public override CodeAttributeDeclaration GetAttribute()
-        {
-            return null;
-        }
+        public override CodeAttributeDeclaration GetAttribute() => null;
     }
 
-    public abstract class ValueTypeRestrictionModel: ValueRestrictionModel<string>
+    public abstract class ValueTypeRestrictionModel : ValueRestrictionModel<string>
     {
-        protected ValueTypeRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
-
-        }
+        protected ValueTypeRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
         public Type Type { get; set; }
     }
 
     public class MinMaxLengthRestrictionModel : RestrictionModel
     {
-        public MinMaxLengthRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
-
-        }
+        public MinMaxLengthRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
         public int Min { get; set; }
         public int Max { get; set; }
 
-        public override string Description
-        {
-            get
-            {
-                var s = "";
-                if (Min > 0) { s += string.Format("Minimum length: {0}. ", Min); }
-                if (Max > 0) { s += string.Format("Maximum length: {0}.", Max); }
-                return s.Trim();
-            }
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.Partial;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.Partial; }
-        }
+        public override string Description => ((Min > 0 ? $"Minimum length: {Min}. " : string.Empty) + (Max > 0 ? $"Maximum length: {Max}." : string.Empty)).Trim();
 
         public override CodeAttributeDeclaration GetAttribute()
         {
-            var a = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "StringLengthAttribute", Configuration),
-                new CodeAttributeArgument(Max > 0 ? (CodeExpression)new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
-            if (Min > 0) { a.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(Min))); }
-
+            var a = AttributeDecl(Attributes.StringLength, new(Max > 0 ? new CodePrimitiveExpression(Max) : new CodeSnippetExpression("int.MaxValue")));
+            if (Min > 0) { a.Arguments.Add(new("MinimumLength", new CodePrimitiveExpression(Min))); }
             return a;
         }
     }
 
     public class MaxLengthRestrictionModel : ValueRestrictionModel<int>
     {
-        public MaxLengthRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public MaxLengthRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Maximum length: {0}.", Value);
-            }
-        }
-
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
+        public override string Description => string.Format("Maximum length: {0}.", Value);
 
         public override CodeAttributeDeclaration GetAttribute()
-        {
-            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "MaxLengthAttribute", Configuration),
-                new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
-        }
+            => AttributeDecl(Attributes.MaxLength, new(new CodePrimitiveExpression(Value)));
     }
 
     public class MinLengthRestrictionModel : ValueRestrictionModel<int>
     {
-        public MinLengthRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public MinLengthRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Minimum length: {0}.", Value);
-            }
-        }
-
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
+        public override string Description => string.Format("Minimum length: {0}.", Value);
 
         public override CodeAttributeDeclaration GetAttribute()
-        {
-            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "MinLengthAttribute", Configuration),
-                new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
-        }
+            => AttributeDecl(Attributes.MinLength, new(new CodePrimitiveExpression(Value)));
     }
 
     public class TotalDigitsRestrictionModel : ValueRestrictionModel<int>
     {
-        public TotalDigitsRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public TotalDigitsRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Total number of digits: {0}.", Value);
-            }
-        }
+        public override string Description => string.Format("Total number of digits: {0}.", Value);
     }
 
     public class FractionDigitsRestrictionModel : ValueRestrictionModel<int>
     {
-        public FractionDigitsRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public FractionDigitsRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Total number of digits in fraction: {0}.", Value);
-            }
-        }
+        public override string Description => $"Total number of digits in fraction: {Value}.";
     }
 
     public class PatternRestrictionModel : ValueRestrictionModel<string>
     {
-        public PatternRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public PatternRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.Partial;
 
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Pattern: {0}.", Value);
-            }
-        }
-
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.Partial; }
-        }
+        public override string Description => $"Pattern: {Value}.";
 
         public override CodeAttributeDeclaration GetAttribute()
-        {
-            return new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference("System.ComponentModel.DataAnnotations", "RegularExpressionAttribute", Configuration),
-                new CodeAttributeArgument(new CodePrimitiveExpression(Value)));
-        }
+            => AttributeDecl(Attributes.RegularExpression, new(new CodePrimitiveExpression(Value)));
     }
 
-    public class MinInclusiveRestrictionModel: ValueTypeRestrictionModel
+    public class MinInclusiveRestrictionModel : ValueTypeRestrictionModel
     {
-        public MinInclusiveRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public MinInclusiveRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Minimum inclusive value: {0}.", Value);
-            }
-        }
+        public override string Description => $"Minimum inclusive value: {Value}.";
     }
 
-    public class MinExclusiveRestrictionModel: ValueTypeRestrictionModel
+    public class MinExclusiveRestrictionModel : ValueTypeRestrictionModel
     {
-        public MinExclusiveRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public MinExclusiveRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Minimum exclusive value: {0}.", Value);
-            }
-        }
+        public override string Description => $"Minimum exclusive value: {Value}.";
     }
 
-    public class MaxInclusiveRestrictionModel: ValueTypeRestrictionModel
+    public class MaxInclusiveRestrictionModel : ValueTypeRestrictionModel
     {
-        public MaxInclusiveRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public MaxInclusiveRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Maximum inclusive value: {0}.", Value);
-            }
-        }
+        public override string Description => $"Maximum inclusive value: {Value}.";
     }
 
-    public class MaxExclusiveRestrictionModel: ValueTypeRestrictionModel
+    public class MaxExclusiveRestrictionModel : ValueTypeRestrictionModel
     {
-        public MaxExclusiveRestrictionModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
+        public MaxExclusiveRestrictionModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        }
+        public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
-        public override DataAnnotationMode MinimumDataAnnotationMode
-        {
-            get { return DataAnnotationMode.All; }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return string.Format("Maximum exclusive value: {0}.", Value);
-            }
-        }
+        public override string Description => $"Maximum exclusive value: {Value}.";
     }
 }
