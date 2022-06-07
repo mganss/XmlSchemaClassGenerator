@@ -149,6 +149,9 @@ Options:
                                (default is true)
       --nc, --netCore        generate .NET Core specific code that might not
                                work with .NET Framework (default is false)
+      --nr, --nullableReferenceAttributes
+                             generate attributes for nullable reference types (
+                               default is false)
       --ar, --useArrayItemAttribute
                              use ArrayItemAttribute for sequences with single
                                elements (default is true)

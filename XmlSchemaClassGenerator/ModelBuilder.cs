@@ -29,7 +29,7 @@ namespace XmlSchemaClassGenerator
             _configuration = configuration;
             _set = set;
 
-            DocumentationModel.DisableComments = _configuration.DisableComments;
+            GeneratorModel.DisableComments = _configuration.DisableComments;
             var objectModel = new SimpleModel(_configuration)
             {
                 Name = "AnyType",
@@ -380,7 +380,7 @@ namespace XmlSchemaClassGenerator
         {
             if (SubstitutionGroups.TryGetValue(name, out var substitutes))
             {
-                foreach (var substitute in substitutes)
+                foreach (var substitute in substitutes.Where(s => s.Element.QualifiedName != name))
                 {
                     yield return substitute;
                     foreach (var recursiveSubstitute in GetSubstitutedElements(substitute.Element.QualifiedName))
