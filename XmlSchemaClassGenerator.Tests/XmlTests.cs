@@ -2399,7 +2399,7 @@ namespace Test
                 Assert.Equal(nullable, hasMaybeNullAttribute);
             }
             assertNullable("Test.ElementReferenceNullable", true);
-            assertNullable("Test.ElementReferenceList", true);
+            assertNullable("Test.ElementReferenceList", false);
             assertNullable("Test.ElementReferenceNonNullable", false);
             assertNullable("Test.AttributeReferenceNullable", true);
             assertNullable("Test.AttributeReferenceNonNullable", false);
