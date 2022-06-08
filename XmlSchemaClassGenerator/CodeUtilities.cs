@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.CSharp;
+
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -172,8 +174,7 @@ namespace XmlSchemaClassGenerator
             var classModel = typeModel as ClassModel;
             var propBackingFieldName = propertyModel.Name.ToBackingField(classModel?.Configuration.PrivateMemberPrefix);
 
-            if (!IsValidIdentifier(propBackingFieldName.ToLower()))
-                propBackingFieldName = "@" + propBackingFieldName;
+            propBackingFieldName = CSharp.CreateEscapedIdentifier(propBackingFieldName);
 
             if (classModel == null)
                 return propBackingFieldName;
@@ -214,7 +215,7 @@ namespace XmlSchemaClassGenerator
 
         internal static string NormalizeNewlines(string text) => NormalizeNewlinesRegex.Replace(text, "$1\r\n");
 
-        private static readonly Predicate<string> IsValidIdentifier = new Microsoft.CSharp.CSharpCodeProvider().IsValidIdentifier;
+        private static readonly CSharpCodeProvider CSharp = new();
 
         internal static Uri CreateUri(string uri) => string.IsNullOrEmpty(uri) ? null : new Uri(uri);
 
@@ -255,7 +256,9 @@ namespace XmlSchemaClassGenerator
 
         public static CodeTypeReference CreateTypeReference(Type type, GeneratorConfiguration conf)
         {
-            if (IsUsingNamespace(type.Namespace, conf))
+            // If the type is a keyword it will prefix it with an @ to make it a valid identifier.
+            var isKeyword = CSharp.CreateEscapedIdentifier(CSharp.GetTypeOutput(new(type)))[0] == '@';
+            if (!isKeyword && IsUsingNamespace(type.Namespace, conf))
             {
                 var typeRef = new CodeTypeReference(type.Name, conf.CodeTypeReferenceOptions);
 
