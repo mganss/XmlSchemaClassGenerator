@@ -739,9 +739,16 @@ namespace XmlSchemaClassGenerator
                     member.Type = typeReference;
                 }
 
-                member.Name += backingField != null
-                    ? GetAccessors(member.Name, backingField.Name, IsCollection || isArray ? PropertyValueTypeCode.Array : propertyType.GetPropertyValueTypeCode(), isPrivateSetter, withDataBinding)
-                    : $" {{ get; {(isPrivateSetter ? "private " : string.Empty)}set; }}"; // hack to generate automatic property
+                if (backingField != null)
+                {
+                    var propertyValueTypeCode = IsCollection || isArray ? PropertyValueTypeCode.Array : propertyType.GetPropertyValueTypeCode();
+                    member.Name += GetAccessors(member.Name, backingField.Name, propertyValueTypeCode, isPrivateSetter, withDataBinding);
+                }
+                else
+                {
+                    var privateSetter = isPrivateSetter ? "private " : string.Empty;
+                    member.Name += $" {{ get; {privateSetter}set; }}"; // hack to generate automatic property
+                }
             }
             else
             {
@@ -1105,7 +1112,7 @@ namespace XmlSchemaClassGenerator
     public class EnumModel : TypeModel
     {
         public List<EnumValueModel> Values { get; set; } = new();
-        
+
         public EnumModel(GeneratorConfiguration configuration) : base(configuration) { }
         public override CodeTypeDeclaration Generate()
         {
@@ -1232,8 +1239,21 @@ namespace XmlSchemaClassGenerator
             {
                 var collectionType = forInit ? (Configuration.CollectionImplementationType ?? Configuration.CollectionType) : Configuration.CollectionType;
 
-                type = collectionType.IsGenericType ? collectionType.MakeGenericType(type)
-                     : collectionType == typeof(Array) ? type.MakeArrayType() : collectionType;
+                if (collectionType.IsGenericType)
+                {
+                    type = collectionType.MakeGenericType(type);
+                }
+                else
+                {
+                    if (collectionType == typeof(Array))
+                    {
+                        type = type.MakeArrayType();
+                    }
+                    else
+                    {
+                        type = collectionType;
+                    }
+                }
             }
 
             return CodeUtilities.CreateTypeReference(type, Configuration);
@@ -1270,7 +1290,13 @@ namespace XmlSchemaClassGenerator
             }
             else if (type == typeof(bool) && !string.IsNullOrWhiteSpace(defaultString))
             {
-                return new CodePrimitiveExpression(defaultString == "0" ? false : defaultString == "1" ? true : Convert.ChangeType(defaultString, ValueType));
+                var val = defaultString switch
+                {
+                    "0" => false,
+                    "1" => true,
+                    _ => Convert.ChangeType(defaultString, ValueType)
+                };
+                return new CodePrimitiveExpression(val);
             }
             else if (type == typeof(byte[]) && defaultString != null)
             {
