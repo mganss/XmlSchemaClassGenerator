@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
@@ -12,31 +9,18 @@ namespace XmlSchemaClassGenerator
     {
         public static XmlSchema GetSchema(this XmlSchemaObject xmlSchemaObject)
         {
-            while (xmlSchemaObject != null && !(xmlSchemaObject is XmlSchema))
+            while (xmlSchemaObject is not null and not XmlSchema)
                 xmlSchemaObject = xmlSchemaObject.Parent;
             return (XmlSchema)xmlSchemaObject;
         }
 
-        public static PropertyValueTypeCode GetPropertyValueTypeCode(this TypeModel model)
+        public static PropertyValueTypeCode GetPropertyValueTypeCode(this TypeModel model) => model switch
         {
-            if (model is not SimpleModel simpleType)
-            {
-                if (!(model is EnumModel))
-                {
-                    return PropertyValueTypeCode.Other;
-                }
-                return PropertyValueTypeCode.ValueType;
-            }
-            if (simpleType.ValueType.IsArray)
-            {
-                return PropertyValueTypeCode.Array;
-            }
-            if (simpleType.ValueType.IsValueType)
-            {
-                return PropertyValueTypeCode.ValueType;
-            }
-            return PropertyValueTypeCode.Other;
-        }
+            SimpleModel { ValueType.IsArray: true } => PropertyValueTypeCode.Array,
+            SimpleModel { ValueType.IsValueType: true } => PropertyValueTypeCode.ValueType,
+            SimpleModel or not EnumModel => PropertyValueTypeCode.Other,
+            _ => PropertyValueTypeCode.ValueType
+        };
 
         public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> propertySelector)
         {
@@ -45,17 +29,9 @@ namespace XmlSchemaClassGenerator
 
         public static string QuoteIfNeeded(this string text)
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return text;
-            }
-
-            if (text.Contains(" "))
-            {
-                return "\"" + text + "\"";
-            }
-
-            return text;
+            return string.IsNullOrEmpty(text) ? text
+                 : text.Contains(" ") ? "\"" + text + "\""
+                 : text;
         }
     }
 }
