@@ -755,9 +755,9 @@ namespace XmlSchemaClassGenerator
 
             foreach (var item in items)
             {
-                if (item is XmlSchemaAttribute node)
+                if (item is XmlSchemaAttribute xs)
                 {
-                    XmlSchemaAttributeEx attribute = node;
+                    XmlSchemaAttributeEx attribute = xs;
                     if (attribute.Use != XmlSchemaUse.Prohibited)
                     {
                         var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
@@ -806,10 +806,10 @@ namespace XmlSchemaClassGenerator
                         var property = new PropertyModel(_configuration, name, typeModel, owningTypeModel)
                         {
                             IsAttribute = true,
-                            IsRequired = node.Use == XmlSchemaUse.Required
+                            IsRequired = attribute.Use == XmlSchemaUse.Required
                         };
 
-                        property.SetFromNode(originalName, () => node.Use != XmlSchemaUse.Optional, attribute);
+                        property.SetFromNode(originalName, () => attribute.Use != XmlSchemaUse.Optional, attribute);
                         property.SetSchemaNameAndNamespace(owningTypeModel, attribute);
                         property.Documentation.AddRange(GetDocumentation(attribute));
 
@@ -865,7 +865,7 @@ namespace XmlSchemaClassGenerator
                 if (item.XmlParticle is XmlSchemaElement xs && xs.ElementSchemaType != null)
                 {
                     XmlSchemaElementEx element = xs;
-                    XmlSchemaElementEx effectiveElement = substitute?.Element ?? xs;
+                    XmlSchemaElementEx effectiveElement = substitute?.Element ?? element;
                     var name = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName, effectiveElement);
                     var originalName = name;
                     if (name == owningTypeModel.Name)
@@ -873,9 +873,9 @@ namespace XmlSchemaClassGenerator
 
                     name = owningTypeModel.GetUniquePropertyName(name);
 
-                    var typeModel = substitute?.Type ?? CreateTypeModel(GetQualifiedName(owningTypeModel, xmlParticle, xs), xs.ElementSchemaType);
+                    var typeModel = substitute?.Type ?? CreateTypeModel(GetQualifiedName(owningTypeModel, xmlParticle, element), element.ElementSchemaType);
 
-                    property = new PropertyModel(_configuration, name, typeModel, owningTypeModel) { IsNillable = xs.IsNillable };
+                    property = new PropertyModel(_configuration, name, typeModel, owningTypeModel) { IsNillable = element.IsNillable };
                     property.SetFromParticles(particle, item);
                     property.SetFromNode(originalName, () => item.MinOccurs >= 1.0m && item.XmlParent is not XmlSchemaChoice, element);
                     property.SetSchemaNameAndNamespace(owningTypeModel, effectiveElement);
