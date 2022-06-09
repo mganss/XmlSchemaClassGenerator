@@ -601,26 +601,28 @@ namespace XmlSchemaClassGenerator
                 && !TypeClassModel.Properties[0].IsAttribute && !TypeClassModel.Properties[0].IsAny
                 && TypeClassModel.Properties[0].IsCollection;
 
+        private bool IsEnumerable => IsCollection || IsArray;
+
         private TypeModel PropertyType => !IsArray ? Type : TypeClassModel.Properties[0].Type;
 
         private bool IsNullableValueType => DefaultValue == null
-                    && IsNullable && !(IsCollection || IsArray) && !IsList
+                    && IsNullable && !IsEnumerable && !IsList
                     && ((PropertyType is EnumModel) || (PropertyType is SimpleModel model && model.ValueType.IsValueType));
 
         private bool IsNullableReferenceType => DefaultValue == null
-                    && IsNullable && (IsCollection || IsArray || IsList || PropertyType is ClassModel || (PropertyType is SimpleModel model && !model.ValueType.IsValueType));
+                    && IsNullable && (IsEnumerable || IsList || PropertyType is ClassModel || (PropertyType is SimpleModel model && !model.ValueType.IsValueType));
 
         private bool IsNillableValueType => IsNillable
-                    && !(IsCollection || IsArray)
+                    && !IsEnumerable
                     && ((PropertyType is EnumModel) || (PropertyType is SimpleModel model && model.ValueType.IsValueType));
 
         private bool IsList => Type.XmlSchemaType?.Datatype?.Variety == XmlSchemaDatatypeVariety.List;
 
         private bool IsPrivateSetter => Configuration.CollectionSettersMode == CollectionSettersMode.Private
-                    && (IsCollection || IsArray || (IsList && IsAttribute));
+                    && (IsEnumerable || (IsList && IsAttribute));
 
         private CodeTypeReference TypeReference => PropertyType.GetReferenceFor(OwningType.Namespace,
-                    collection: IsCollection || IsArray || (IsList && IsAttribute),
+                    collection: IsEnumerable || (IsList && IsAttribute),
                     attribute: IsAttribute);
 
         private void AddDocs(CodeTypeMember member)
@@ -694,6 +696,7 @@ namespace XmlSchemaClassGenerator
 
             var typeClassModel = TypeClassModel;
             var isArray = IsArray;
+            var isEnumerable = IsEnumerable;
             var propertyType = PropertyType;
             var isNullableValueType = IsNullableValueType;
             var isNullableReferenceType = IsNullableReferenceType;
@@ -704,7 +707,7 @@ namespace XmlSchemaClassGenerator
             CodeAttributeDeclaration notMappedAttribute = new(CodeUtilities.CreateTypeReference(Attributes.NotMapped, Configuration));
 
             CodeMemberField backingField = null;
-            if (withDataBinding || DefaultValue != null || IsCollection || isArray)
+            if (withDataBinding || DefaultValue != null || isEnumerable)
             {
                 backingField = IsNillableValueType
                     ? new CodeMemberField(NullableTypeRef(typeReference), OwningType.GetUniqueFieldName(this))
@@ -713,7 +716,7 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(backingField);
             }
 
-            if (DefaultValue == null || ((IsCollection || isArray || (IsList && IsAttribute)) && IsNullable))
+            if (DefaultValue == null || ((isEnumerable || (IsList && IsAttribute)) && IsNullable))
             {
                 if (isNullableValueType && Configuration.GenerateNullables && !(Configuration.UseShouldSerializePattern && !IsAttribute))
                     member.Name += Value;
@@ -739,16 +742,9 @@ namespace XmlSchemaClassGenerator
                     member.Type = typeReference;
                 }
 
-                if (backingField != null)
-                {
-                    var propertyValueTypeCode = IsCollection || isArray ? PropertyValueTypeCode.Array : propertyType.GetPropertyValueTypeCode();
-                    member.Name += GetAccessors(member.Name, backingField.Name, propertyValueTypeCode, isPrivateSetter, withDataBinding);
-                }
-                else
-                {
-                    var privateSetter = isPrivateSetter ? "private " : string.Empty;
-                    member.Name += $" {{ get; {privateSetter}set; }}"; // hack to generate automatic property
-                }
+                member.Name += backingField != null
+                    ? GetAccessors(member.Name, backingField.Name, isEnumerable ? PropertyValueTypeCode.Array : propertyType.GetPropertyValueTypeCode(), isPrivateSetter, withDataBinding)
+                    : $" {{ get; {(isPrivateSetter ? "private " : string.Empty)}set; }}"; // hack to generate automatic property
             }
             else
             {
@@ -878,7 +874,7 @@ namespace XmlSchemaClassGenerator
                     Configuration.MemberVisitor(nullableMember, this);
                 }
             }
-            else if ((IsCollection || isArray || (IsList && IsAttribute)) && IsNullable)
+            else if ((isEnumerable || (IsList && IsAttribute)) && IsNullable)
             {
                 var specifiedProperty = new CodeMemberProperty
                 {
@@ -915,7 +911,7 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(specifiedProperty);
             }
 
-            if (!IsCollection && isNullableReferenceType && Configuration.EnableNullableReferenceAttributes)
+            if (!IsEnumerable && isNullableReferenceType && Configuration.EnableNullableReferenceAttributes)
             {
                 member.CustomAttributes.Add(new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.AllowNull, Configuration)));
                 member.CustomAttributes.Add(new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.MaybeNull, Configuration)));
@@ -925,7 +921,7 @@ namespace XmlSchemaClassGenerator
             member.CustomAttributes.AddRange(attributes);
 
             // initialize List<>
-            if ((IsCollection || isArray || (IsList && IsAttribute)) && Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
+            if ((isEnumerable || (IsList && IsAttribute)) && Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
             {
                 var constructor = typeDeclaration.Members.OfType<CodeConstructor>().FirstOrDefault();
 
