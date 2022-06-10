@@ -149,14 +149,9 @@ namespace XmlSchemaClassGenerator
 
     public class InterfaceModel : ReferenceTypeModel
     {
-        public InterfaceModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
-            Properties = new List<PropertyModel>();
-            DerivedTypes = new List<ReferenceTypeModel>();
-        }
+        public InterfaceModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        public List<ReferenceTypeModel> DerivedTypes { get; set; }
+        public List<ReferenceTypeModel> DerivedTypes { get; } = new();
 
         public override CodeTypeDeclaration Generate()
         {
@@ -219,14 +214,10 @@ namespace XmlSchemaClassGenerator
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
         public TypeModel BaseClass { get; set; }
-        public List<ClassModel> DerivedTypes { get; set; }
+        public List<ClassModel> DerivedTypes { get; set; } = new();
         public override bool IsSubtype => BaseClass != null;
 
-        public ClassModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
-            DerivedTypes = new List<ClassModel>();
-        }
+        public ClassModel(GeneratorConfiguration configuration) : base(configuration) { }
 
         public IEnumerable<ClassModel> AllBaseClasses
         {
@@ -476,15 +467,10 @@ namespace XmlSchemaClassGenerator
 
     public class ReferenceTypeModel : TypeModel
     {
-        public ReferenceTypeModel(GeneratorConfiguration configuration)
-            : base(configuration)
-        {
-            Properties = new List<PropertyModel>();
-            Interfaces = new List<InterfaceModel>();
-        }
+        public ReferenceTypeModel(GeneratorConfiguration configuration) : base(configuration) { }
 
-        public List<PropertyModel> Properties { get; set; }
-        public List<InterfaceModel> Interfaces { get; }
+        public List<PropertyModel> Properties { get; } = new();
+        public List<InterfaceModel> Interfaces { get; } = new();
 
         public void AddInterfaces(IEnumerable<InterfaceModel> interfaces)
         {
