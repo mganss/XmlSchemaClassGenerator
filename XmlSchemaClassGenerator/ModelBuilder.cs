@@ -917,6 +917,7 @@ namespace XmlSchemaClassGenerator
                     }
 
                     var effectiveElement = substitute?.Element ?? element;
+                    var isNullableByChoice = IsNullableByChoice(item.XmlParent);
                     var propertyName = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName, effectiveElement);
                     var originalPropertyName = propertyName;
                     if (propertyName == typeModel.Name)
@@ -934,9 +935,9 @@ namespace XmlSchemaClassGenerator
                         OriginalPropertyName = originalPropertyName,
                         Type = substitute?.Type ?? CreateTypeModel(element.ElementSchemaType, elementQualifiedName),
                         IsNillable = element.IsNillable,
-                        IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),
+                        IsNullable = item.MinOccurs < 1.0m || isNullableByChoice,
                         IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
-                        DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && item.XmlParent is not XmlSchemaChoice) ? element.FixedValue : null),
+                        DefaultValue = element.DefaultValue ?? ((item.MinOccurs >= 1.0m && !isNullableByChoice) ? element.FixedValue : null),
                         FixedValue = element.FixedValue,
                         XmlNamespace = !string.IsNullOrEmpty(effectiveElement.QualifiedName.Namespace) && effectiveElement.QualifiedName.Namespace != typeModel.XmlSchemaName.Namespace
                             ? effectiveElement.QualifiedName.Namespace : null,
@@ -969,7 +970,7 @@ namespace XmlSchemaClassGenerator
                             OwningType = typeModel,
                             Name = "Any",
                             Type = new SimpleModel(_configuration) { ValueType = (_configuration.UseXElementForAny ? typeof(XElement) : typeof(XmlElement)), UseDataTypeAttribute = false },
-                            IsNullable = item.MinOccurs < 1.0m || (item.XmlParent is XmlSchemaChoice),
+                            IsNullable = item.MinOccurs < 1.0m || IsNullableByChoice(item.XmlParent),
                             IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m, // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
                             IsAny = true,
                             XmlParticle = item.XmlParticle,
@@ -1018,6 +1019,27 @@ namespace XmlSchemaClassGenerator
             }
 
             return properties;
+        }
+
+        private static bool IsNullableByChoice(XmlSchemaObject parent)
+        {
+            while (parent != null)
+            {
+                switch (parent)
+                {
+                    case XmlSchemaChoice:
+                        return true;
+                    // Any ancestor element between the current item and the
+                    // choice would already have been forced to nullable.
+                    case XmlSchemaElement:
+                    case XmlSchemaParticle p when p.MinOccurs < 1.0m:
+                        return false;
+                    default:
+                        break;
+                }
+                parent = parent.Parent;
+            }
+            return false;
         }
 
         private NamespaceModel CreateNamespaceModel(Uri source, XmlQualifiedName qualifiedName)
