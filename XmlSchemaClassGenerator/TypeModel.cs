@@ -527,11 +527,11 @@ namespace XmlSchemaClassGenerator
             OwningType = owningType;
         }
 
-        public void SetFromNode(string originalName, Func<bool> useFixedIfNoDefault, IXmlSchemaNode xs)
+        public void SetFromNode(string originalName, bool useFixedIfNoDefault, IXmlSchemaNode xs)
         {
             OriginalPropertyName = originalName;
 
-            DefaultValue = xs.DefaultValue ?? (useFixedIfNoDefault() ? xs.FixedValue : null);
+            DefaultValue = xs.DefaultValue ?? (useFixedIfNoDefault ? xs.FixedValue : null);
             FixedValue = xs.FixedValue;
             Form = xs.Form switch
             {
@@ -540,13 +540,13 @@ namespace XmlSchemaClassGenerator
             };
         }
 
-        public void SetFromParticles(Particle particle, Particle item)
+        public void SetFromParticles(Particle particle, Particle item, bool isRequired)
         {
             Particle = item;
             XmlParticle = item.XmlParticle;
             XmlParent = item.XmlParent;
 
-            IsRequired = item.MinOccurs >= 1.0m && (item.XmlParent is not XmlSchemaChoice);
+            IsRequired = isRequired;
             IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m; // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
         }
 
@@ -1230,9 +1230,21 @@ namespace XmlSchemaClassGenerator
             {
                 var collectionType = forInit ? (Configuration.CollectionImplementationType ?? Configuration.CollectionType) : Configuration.CollectionType;
 
-                type = collectionType.IsGenericType ? collectionType.MakeGenericType(type)
-                     : collectionType == typeof(Array) ? type.MakeArrayType()
-                     : collectionType;
+                if (collectionType.IsGenericType)
+                {
+                    type = collectionType.MakeGenericType(type);
+                }
+                else
+                {
+                    if (collectionType == typeof(Array))
+                    {
+                        type = type.MakeArrayType();
+                    }
+                    else
+                    {
+                        type = collectionType;
+                    }
+                }
             }
 
             return CodeUtilities.CreateTypeReference(type, Configuration);

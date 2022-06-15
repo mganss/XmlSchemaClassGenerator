@@ -866,7 +866,7 @@ namespace XmlSchemaClassGenerator
                 IsRequired = attribute.Use == XmlSchemaUse.Required
             };
 
-            property.SetFromNode(originalName, () => attribute.Use != XmlSchemaUse.Optional, attribute);
+            property.SetFromNode(originalName, attribute.Use != XmlSchemaUse.Optional, attribute);
             property.SetSchemaNameAndNamespace(owningTypeModel, attribute);
             property.Documentation.AddRange(GetDocumentation(attribute));
 
@@ -895,7 +895,7 @@ namespace XmlSchemaClassGenerator
                             UseDataTypeAttribute = false
                         };
                         property = new PropertyModel(_configuration, "Any", typeModel, owningTypeModel) { IsAny = true };
-                        property.SetFromParticles(particle, item);
+                        property.SetFromParticles(particle, item, item.MinOccurs >= 1.0m && !IsNullableByChoice(item.XmlParent));
                         break;
                     case XmlSchemaGroupRef groupRef:
                         var group = Groups[groupRef.RefName];
@@ -932,6 +932,27 @@ namespace XmlSchemaClassGenerator
             return properties;
         }
 
+        private static bool IsNullableByChoice(XmlSchemaObject parent)
+        {
+            while (parent != null)
+            {
+                switch (parent)
+                {
+                    case XmlSchemaChoice:
+                        return true;
+                    // Any ancestor element between the current item and the
+                    // choice would already have been forced to nullable.
+                    case XmlSchemaElement:
+                    case XmlSchemaParticle p when p.MinOccurs < 1.0m:
+                        return false;
+                    default:
+                        break;
+                }
+                parent = parent.Parent;
+            }
+            return false;
+        }
+
         private PropertyModel PropertyFromElement(TypeModel owningTypeModel, XmlSchemaElementEx element, Particle particle, Particle item, Substitute substitute)
         {
             PropertyModel property;
@@ -946,8 +967,9 @@ namespace XmlSchemaClassGenerator
             var typeModel = substitute?.Type ?? CreateTypeModel(GetQualifiedName(owningTypeModel, particle.XmlParticle, element), element.ElementSchemaType);
 
             property = new PropertyModel(_configuration, name, typeModel, owningTypeModel) { IsNillable = element.IsNillable };
-            property.SetFromParticles(particle, item);
-            property.SetFromNode(originalName, () => item.MinOccurs >= 1.0m && item.XmlParent is not XmlSchemaChoice, element);
+            var isRequired = item.MinOccurs >= 1.0m && !IsNullableByChoice(item.XmlParent);
+            property.SetFromParticles(particle, item, isRequired);
+            property.SetFromNode(originalName, isRequired, element);
             property.SetSchemaNameAndNamespace(owningTypeModel, effectiveElement);
 
             if (property.IsArray && !_configuration.GenerateComplexTypesForCollections)
