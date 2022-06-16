@@ -27,11 +27,6 @@ namespace XmlSchemaClassGenerator
             return source.GroupBy(propertySelector).Select(x => x.First());
         }
 
-        public static string QuoteIfNeeded(this string text)
-        {
-            return string.IsNullOrEmpty(text) ? text
-                 : text.Contains(" ") ? "\"" + text + "\""
-                 : text;
-        }
+        public static string QuoteIfNeeded(this string text) => !string.IsNullOrEmpty(text) && text.Contains(" ") ? "\"" + text + "\"" : text;
     }
 }

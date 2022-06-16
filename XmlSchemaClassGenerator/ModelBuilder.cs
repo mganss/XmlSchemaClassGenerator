@@ -380,7 +380,7 @@ namespace XmlSchemaClassGenerator
             return typeModelBuilder.Create(type);
         }
 
-        private class TypeModelBuilder
+        private sealed class TypeModelBuilder
         {
             private readonly ModelBuilder builder;
             private readonly GeneratorConfiguration _configuration;

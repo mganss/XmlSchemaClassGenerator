@@ -560,13 +560,14 @@ namespace XmlSchemaClassGenerator
 
         internal static string GetAccessors(CodeMemberField backingField = null, bool withDataBinding = false, PropertyValueTypeCode typeCode = PropertyValueTypeCode.Other, bool privateSetter = false)
         {
+            var privateString = privateSetter ? "private " : string.Empty;
             return backingField == null ? " { get; set; }" : CodeUtilities.NormalizeNewlines($@"
         {{
             get
             {{
                 return {backingField.Name};
             }}
-            {(privateSetter ? "private " : string.Empty)}set
+            {privateString}set
             {{{(typeCode, withDataBinding) switch
             {
                 (PropertyValueTypeCode.ValueType, true) => $@"
