@@ -1101,6 +1101,89 @@ namespace Test
         }
 
         [Fact]
+        public void NestedElementInChoiceIsNullable()
+        {
+            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+            // as a proxy.
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""Root"">
+    <xs:complexType>
+      <xs:choice>
+        <xs:sequence>
+          <xs:element name=""ElementA"" type=""xs:int""/>
+        </xs:sequence>
+        <xs:group ref=""Group""/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:group name=""Group"">
+    <xs:sequence>
+      <xs:element name=""ElementB"" type=""xs:int""/>
+    </xs:sequence>
+  </xs:group>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(NestedElementInChoiceIsNullable), xsd, generator);
+            var content = Assert.Single(contents);
+
+            Assert.Contains("ElementASpecified", content);
+            Assert.Contains("ElementBSpecified", content);
+        }
+
+        [Fact]
+        public void OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice()
+        {
+            // Because nullability isn't directly exposed in the generated C#, we use the "RequiredAttribute"
+            // as a proxy.
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:element name=""Root"">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name=""ElementWithChild"">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name=""NestedChild"" type=""xs:int""/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                }
+            };
+            var contents = ConvertXml(nameof(OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice), xsd, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice), contents);
+
+            var elementWithChildProperty = assembly.GetType("Test.Root")?.GetProperty("ElementWithChild");
+            var nestedChildProperty = assembly.GetType("Test.RootElementWithChild")?.GetProperty("NestedChild");
+            Assert.NotNull(elementWithChildProperty);
+            Assert.NotNull(nestedChildProperty);
+
+            Type requiredType = typeof(System.ComponentModel.DataAnnotations.RequiredAttribute);
+            bool elementWithChildIsRequired = Attribute.GetCustomAttribute(elementWithChildProperty, requiredType) != null;
+            bool nestedChildIsRequired = Attribute.GetCustomAttribute(nestedChildProperty, requiredType) != null;
+            Assert.False(elementWithChildIsRequired);
+            Assert.True(nestedChildIsRequired);
+        }
+
+        [Fact]
         public void AssemblyVisibleIsInternalClass()
         {
             // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
