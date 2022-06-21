@@ -243,18 +243,19 @@ without backing field initialization for collections
                     .Select((l, i) => (Line: l.Trim(), Number: i + 1))
                     .Where(l => !string.IsNullOrWhiteSpace(l.Line) && !l.Line.StartsWith("#")))
                 {
-                    var parts = line.Split();
+                    var parts = line.Split('=');
 
-                    if (parts.Length < 2 || parts.Length > 3)
+                    if (parts.Length != 2)
                     {
-                        System.Console.WriteLine($"{namespaceFile}:{number}: Must contain XML namespace, C# namespace, and optionally filename, separated by whitespace");
+                        System.Console.WriteLine($"{namespaceFile}:{number}: Line format is XML namespace = C# namespace [file name]");
                         Environment.Exit(1);
                     }
 
-                    var ns = $"{parts[0]}={parts[1]}";
-
-                    if (parts.Length == 3)
-                        ns += $"={parts[2]}";
+                    var xmlns = parts[0].Trim();
+                    var parts2 = parts[1].Trim().Split();
+                    var csns = parts2[0];
+                    var source = parts2.Length > 1 ? $"|{parts2[1].Trim()}" : string.Empty;
+                    var ns = $"{xmlns}{source}={csns}";
 
                     namespaces.Add(ns);
                 }
