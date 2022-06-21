@@ -57,6 +57,7 @@ namespace XmlSchemaClassGenerator.Console
             var nullableReferenceAttributes = false;
             var generateCommandLineArgs = true;
             var useArrayItemAttribute = true;
+            var namespaceFiles = new List<string>();
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -65,6 +66,9 @@ Separate XML namespace and C# namespace by '='.
 One option must be given for each namespace to be mapped.
 A file name may be given by appending a pipe sign (|) followed by a file name (like schema.xsd) to the XML namespace.
 If no mapping is found for an XML namespace, a name is generated automatically (may fail).", v => namespaces.Add(v) },
+                { "nf|namespaceFile=", @"file containing mapppings from XML namespaces to C# namespaces
+The format is one mapping per line, whitespace separated, XML namespace, C# namespace, and optionally file name.
+Lines starting with # are ignored.", v => namespaceFiles.Add(v) },
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
                 { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of automatic approximation
 {TYPE} can be i[nt], l[ong], or d[ecimal]", v => {
@@ -161,6 +165,8 @@ without backing field initialization for collections
                 uris.AddRange(expandedGlob);
             }
 
+            ParseNamespaceFiles(namespaces, namespaceFiles);
+
             var namespaceMap = namespaces.Select(n => CodeUtilities.ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
             {
                 var xn = key.XmlSchemaNamespace;
@@ -187,7 +193,7 @@ without backing field initialization for collections
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
-                AssemblyVisible=assembly,
+                AssemblyVisible = assembly,
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
                 CodeTypeReferenceOptions = codeTypeReferenceOptions,
@@ -227,6 +233,32 @@ without backing field initialization for collections
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
             generator.Generate(uris);
+        }
+
+        private static void ParseNamespaceFiles(List<string> namespaces, List<string> namespaceFiles)
+        {
+            foreach (var namespaceFile in namespaceFiles)
+            {
+                foreach (var (line, number) in File.ReadAllLines(namespaceFile)
+                    .Select((l, i) => (Line: l.Trim(), Number: i + 1))
+                    .Where(l => !string.IsNullOrWhiteSpace(l.Line) && !l.Line.StartsWith("#")))
+                {
+                    var parts = line.Split();
+
+                    if (parts.Length < 2 || parts.Length > 3)
+                    {
+                        System.Console.WriteLine($"{namespaceFile}:{number}: Must contain XML namespace, C# namespace, and optionally filename, separated by whitespace");
+                        Environment.Exit(1);
+                    }
+
+                    var ns = $"{parts[0]}={parts[1]}";
+
+                    if (parts.Length == 3)
+                        ns += $"={parts[2]}";
+
+                    namespaces.Add(ns);
+                }
+            }
         }
 
         static void ShowHelp(OptionSet p)
