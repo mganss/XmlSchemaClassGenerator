@@ -65,6 +65,13 @@ Options:
                                xsd) to the XML namespace.
                                If no mapping is found for an XML namespace, a
                                name is generated automatically (may fail).
+      --nf, --namespaceFile=VALUE
+                             file containing mapppings from XML namespaces to C#
+                                namespaces
+                               The line format is one mapping per line: XML
+                               namespace = C# namespace [optional file name].
+                               Lines starting with # and empty lines are
+                               ignored.
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of automatic approximation
@@ -207,6 +214,20 @@ xscgen -n =Example example.xsd
 ```
 
 Note the space between `-n` and `=Example`.
+
+#### Using mapping files
+
+Instead of specifying the namespace mappings on the command line you can also use a mapping file which should contain one mapping per line in the following format:
+
+```
+# Comment
+
+http://example.com = Example.NamespaceA a.xsd
+http://example.com = Example.NamespaceB b.xsd
+= Empty
+```
+
+Use the `--nf` option to specify the mapping file.
 
 Nullables<a name="nullables"></a>
 ---------------------------------
