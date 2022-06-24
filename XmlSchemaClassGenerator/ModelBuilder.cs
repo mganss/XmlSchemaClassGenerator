@@ -549,7 +549,7 @@ namespace XmlSchemaClassGenerator
                     classModel.Properties.AddRange(attributeProperties);
 
                     if (_configuration.GenerateInterfaces)
-                        AddInterfaces(classModel, items);
+                        AddInterfaces(classModel, attributes);
                 }
 
                 XmlSchemaAnyAttribute anyAttribute = null;

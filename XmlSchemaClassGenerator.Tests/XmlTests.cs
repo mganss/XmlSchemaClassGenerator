@@ -2747,5 +2747,51 @@ namespace Test
             Assert.True(interfaceHasPublicSetter);
             Assert.True(implementerHasPublicSetter);
         }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void SimpleInterface(bool generateInterface)
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+  <xs:attributeGroup name=""Common"">
+    <xs:attribute name=""name"" type=""xs:string""></xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:complexType name=""A"">
+    <xs:attributeGroup ref=""Common""/>
+  </xs:complexType>
+
+  <xs:complexType name=""B"">
+    <xs:attributeGroup ref=""Common""/>
+  </xs:complexType>
+</xs:schema>";
+
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateInterfaces = generateInterface,
+            };
+            var contents = ConvertXml(nameof(SimpleInterface) + $"({generateInterface})", xsd, generator).ToArray();
+            var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), contents);
+
+            var interfaceCommon = assembly.GetType("Test.ICommon");
+            var typeA = assembly.GetType("Test.A");
+            var typeB = assembly.GetType("Test.B");
+            if(generateInterface)
+            {
+                Assert.True(interfaceCommon.IsInterface);
+                Assert.True(interfaceCommon.IsAssignableFrom(typeA));
+                Assert.True(interfaceCommon.IsAssignableFrom(typeB));
+            }
+            else
+            {
+                Assert.Null(interfaceCommon);
+            }
+        }
     }
 }
