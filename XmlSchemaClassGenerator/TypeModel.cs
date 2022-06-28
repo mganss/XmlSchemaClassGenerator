@@ -361,7 +361,8 @@ namespace XmlSchemaClassGenerator
                         Documentation = {
                             new() { Language = English, Text = "Gets or sets a value uniquely identifying this entity." },
                             new() { Language = German, Text = "Ruft einen Wert ab, der diese Entität eindeutig identifiziert, oder legt diesen fest." }
-                        }
+                        },
+                        IsRequired = true
                     };
                     Properties.Insert(0, keyProperty);
                 }
