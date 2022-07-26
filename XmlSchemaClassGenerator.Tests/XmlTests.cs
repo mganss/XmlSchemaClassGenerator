@@ -108,6 +108,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
         const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
         const string EppPattern = "xsd/epp/*.xsd";
+        const string GraphMLPattern = "xsd/graphml/ygraphml.xsd";
         const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
 
         // IATA test takes too long to perform every time
@@ -127,6 +128,23 @@ namespace XmlSchemaClassGenerator.Tests
         //    });
         //    SharedTestFunctions.TestSamples(Output, "Iata", IataPattern);
         //}
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestGraphML()
+        {
+            Compiler.Generate("GraphML", GraphMLPattern, new Generator
+            {
+                NamespaceProvider = new Dictionary<NamespaceKey, string> {
+                    { new NamespaceKey(new Uri("graphml.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Main" },
+                    { new NamespaceKey(new Uri("graphml-structure.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Structure" },
+                    { new NamespaceKey(new Uri("ygraphxml.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Y" },
+                    { new NamespaceKey("http://www.w3.org/1999/xlink"), "XLink" },
+                    { new NamespaceKey("http://www.yworks.com/xml/graphml"), "YEd" },
+                }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GraphML" }.NamespaceProvider.GenerateNamespace),
+            });
+            SharedTestFunctions.TestSamples(Output, "GraphML", GraphMLPattern);
+        }
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]

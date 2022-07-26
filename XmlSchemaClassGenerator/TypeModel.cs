@@ -91,7 +91,8 @@ namespace XmlSchemaClassGenerator
 
         protected void GenerateTypeAttribute(CodeTypeDeclaration typeDeclaration)
         {
-            if (XmlSchemaName == null) return;
+            if (XmlSchemaName == null
+                || (this is ClassModel cm && cm.IsRedefined)) return;
 
             var typeAttribute = AttributeDecl<XmlTypeAttribute>(
                 new(new CodePrimitiveExpression(XmlSchemaName.Name)),
@@ -210,6 +211,7 @@ namespace XmlSchemaClassGenerator
 
     public class ClassModel : ReferenceTypeModel
     {
+        public bool IsRedefined => DerivedTypes.Any(d => d.XmlSchemaType?.Parent is XmlSchemaRedefine);
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }

@@ -12,8 +12,8 @@ namespace XmlSchemaClassGenerator
     {
         private readonly GeneratorConfiguration _configuration;
         private readonly XmlSchemaSet _set;
-        private readonly Dictionary<XmlQualifiedName, XmlSchemaAttributeGroup> AttributeGroups;
-        private readonly Dictionary<XmlQualifiedName, XmlSchemaGroup> Groups;
+        private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaAttributeGroup>> AttributeGroups = new();
+        private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaGroup>> Groups = new();
         private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new();
         private readonly Dictionary<string, TypeModel> Types = new();
         private readonly Dictionary<XmlQualifiedName, HashSet<Substitute>> SubstitutionGroups = new();
@@ -44,17 +44,39 @@ namespace XmlSchemaClassGenerator
 
             SetType(new XmlSchemaComplexType(), AnyType, objectModel);
 
-            AttributeGroups = set.Schemas().Cast<XmlSchema>().SelectMany(s => s.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>())
-                .DistinctBy(g => g.QualifiedName.ToString())
-                .ToDictionary(g => g.QualifiedName);
-            Groups = set.Schemas().Cast<XmlSchema>().SelectMany(s => s.Groups.Values.Cast<XmlSchemaGroup>())
-                .DistinctBy(g => g.QualifiedName.ToString())
-                .ToDictionary(g => g.QualifiedName);
-
             var dependencyOrder = new List<XmlSchema>();
             var seenSchemas = new HashSet<XmlSchema>();
             foreach (var schema in set.Schemas().Cast<XmlSchema>())
                 ResolveDependencies(schema, dependencyOrder, seenSchemas);
+
+            foreach (var schema in dependencyOrder)
+            {
+                var currentAttributeGroups = schema.AttributeGroups.Values.Cast<XmlSchemaAttributeGroup>()
+                    .DistinctBy(g => g.QualifiedName.ToString());
+
+                foreach (var currentAttributeGroup in currentAttributeGroups)
+                {
+                    if (!AttributeGroups.ContainsKey(currentAttributeGroup.QualifiedName))
+                    {
+                        AttributeGroups.Add(currentAttributeGroup.QualifiedName, new HashSet<XmlSchemaAttributeGroup>());
+                    }
+
+                    AttributeGroups[currentAttributeGroup.QualifiedName].Add(currentAttributeGroup);
+                }
+
+                var currentSchemaGroups = schema.Groups.Values.Cast<XmlSchemaGroup>()
+                    .DistinctBy(g => g.QualifiedName.ToString());
+
+                foreach (var currentSchemaGroup in currentSchemaGroups)
+                {
+                    if (!Groups.ContainsKey(currentSchemaGroup.QualifiedName))
+                    {
+                        Groups.Add(currentSchemaGroup.QualifiedName, new HashSet<XmlSchemaGroup>());
+                    }
+
+                    Groups[currentSchemaGroup.QualifiedName].Add(currentSchemaGroup);
+                }
+            }
 
             foreach (var schema in dependencyOrder)
             {
@@ -769,14 +791,14 @@ namespace XmlSchemaClassGenerator
             private void AddInterfaces(ReferenceTypeModel refTypeModel, IEnumerable<Particle> items)
             {
                 var interfaces = items.Select(i => i.XmlParticle).OfType<XmlSchemaGroupRef>()
-                    .Select(i => (InterfaceModel)builder.CreateTypeModel(i.RefName, builder.Groups[i.RefName]));
+                    .Select(i => (InterfaceModel)builder.CreateTypeModel(i.RefName, builder.Groups[i.RefName].First()));
                 refTypeModel.AddInterfaces(interfaces);
             }
 
             private void AddInterfaces(ReferenceTypeModel refTypeModel, XmlSchemaObjectCollection attributes)
             {
                 var interfaces = attributes.OfType<XmlSchemaAttributeGroupRef>()
-                    .Select(a => (InterfaceModel)builder.CreateTypeModel(a.RefName, builder.AttributeGroups[a.RefName]));
+                    .Select(a => (InterfaceModel)builder.CreateTypeModel(a.RefName, builder.AttributeGroups[a.RefName].First()));
                 refTypeModel.AddInterfaces(interfaces);
             }
         }
@@ -790,31 +812,43 @@ namespace XmlSchemaClassGenerator
                 switch (item)
                 {
                     case XmlSchemaAttribute attribute when attribute.Use != XmlSchemaUse.Prohibited:
+
                         properties.Add(PropertyFromAttribute(owningTypeModel, attribute));
                         break;
+
                     case XmlSchemaAttributeGroupRef attributeGroupRef:
-                        if (_configuration.GenerateInterfaces)
-                            CreateTypeModel(attributeGroupRef.RefName, AttributeGroups[attributeGroupRef.RefName]);
 
-                        var attributeGroup = AttributeGroups[attributeGroupRef.RefName];
-                        var attributes = attributeGroup.Attributes.Cast<XmlSchemaObject>()
-                            .Where(a => !(a is XmlSchemaAttributeGroupRef agr && agr.RefName == attributeGroupRef.RefName))
-                            .ToList();
-
-                        if (attributeGroup.RedefinedAttributeGroup != null)
+                        foreach (var attributeGroup in AttributeGroups[attributeGroupRef.RefName])
                         {
-                            foreach (var attr in attributeGroup.RedefinedAttributeGroup.Attributes.Cast<XmlSchemaObject>())
+                            if (_configuration.GenerateInterfaces)
+                                CreateTypeModel(attributeGroupRef.RefName, attributeGroup);
+
+                            var attributes = attributeGroup.Attributes.Cast<XmlSchemaObject>()
+                                .Where(a => !(a is XmlSchemaAttributeGroupRef agr && agr.RefName == attributeGroupRef.RefName))
+                                .ToList();
+
+                            if (attributeGroup.RedefinedAttributeGroup != null)
                             {
-                                var n = attr.GetQualifiedName();
+                                var attrs = attributeGroup.RedefinedAttributeGroup.Attributes.Cast<XmlSchemaObject>()
+                                    .Where(a => !(a is XmlSchemaAttributeGroupRef agr && agr.RefName == attributeGroupRef.RefName)).ToList();
 
-                                if (n != null)
-                                    attributes.RemoveAll(a => a.GetQualifiedName() == n);
+                                if (attrs.Any(a => (a is XmlSchemaAttributeGroupRef agr && agr.RefName == attributeGroupRef.RefName))) { }
 
-                                attributes.Add(attr);
+                                foreach (var attr in attrs)
+                                {
+                                    var n = attr.GetQualifiedName();
+
+                                    if (n != null)
+                                        attributes.RemoveAll(a => a.GetQualifiedName() == n);
+
+                                    attributes.Add(attr);
+                                }
                             }
+
+                            var newProperties = CreatePropertiesForAttributes(source, owningTypeModel, attributes);
+                            properties.AddRange(newProperties);
                         }
 
-                        properties.AddRange(CreatePropertiesForAttributes(source, owningTypeModel, attributes));
                         break;
                 }
             }
@@ -901,7 +935,7 @@ namespace XmlSchemaClassGenerator
                         var group = Groups[groupRef.RefName];
 
                         if (_configuration.GenerateInterfaces)
-                            CreateTypeModel(groupRef.RefName, group);
+                            CreateTypeModel(groupRef.RefName, group.First());
 
                         var groupItems = GetElements(groupRef.Particle).ToList();
                         var groupProperties = CreatePropertiesForElements(source, owningTypeModel, item, groupItems, order: order).ToList();
