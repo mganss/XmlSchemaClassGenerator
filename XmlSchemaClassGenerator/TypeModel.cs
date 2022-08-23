@@ -664,7 +664,7 @@ namespace XmlSchemaClassGenerator
             var isPrivateSetter = IsPrivateSetter;
             var typeReference = TypeReference;
 
-            if (isNullableValueType && Configuration.GenerateNullables)
+            if ((isNullableValueType || IsNillableValueType) && Configuration.GenerateNullables)
                 typeReference = NullableTypeRef(typeReference);
 
             member = new CodeMemberProperty
