@@ -125,16 +125,24 @@ namespace XmlSchemaClassGenerator.Tests {
           Assert.Contains(expectedProperty, generatedType.First());
         }
 
-        [Theory]
-        [InlineData(1, 100, "byte")]
-        [InlineData(-100, 100, "sbyte")]
-        [InlineData(1, 1000, "ushort")]
-        [InlineData(-1000, 1000, "short")]
-        [InlineData(1, 100000, "uint")]
-        [InlineData(-100000, 100000, "int")]
-        [InlineData(1, 10000000000, "ulong")]
-        [InlineData(-10000000000, 10000000000, "long")]
-        public void TestInclusiveRange(long minInclusive, long maxInclusive, string expectedType)
+		[Theory]
+		[InlineData(1, 100, "byte")]
+		[InlineData(byte.MinValue, byte.MaxValue, "byte")]
+		[InlineData(-100, 100, "sbyte")]
+		[InlineData(sbyte.MinValue, sbyte.MaxValue, "byte")]
+		[InlineData(1, 1000, "ushort")]
+		[InlineData(ushort.MinValue, ushort.MaxValue, "byte")]
+		[InlineData(-1000, 1000, "short")]
+		[InlineData(short.MinValue, short.MaxValue, "byte")]
+		[InlineData(1, 100000, "uint")]
+		[InlineData(uint.MinValue, uint.MaxValue, "byte")]
+		[InlineData(-100000, 100000, "int")]
+		[InlineData(int.MinValue, int.MaxValue, "byte")]
+		[InlineData(1, 10000000000, "ulong")]
+		[InlineData(ulong.MinValue, ulong.MaxValue, "ulong")]
+		[InlineData(-10000000000, 10000000000, "long")]
+		[InlineData(long.MinValue, long.MaxValue, "ulong")]
+		public void TestInclusiveRange(long minInclusive, long maxInclusive, string expectedType)
         {
             var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
