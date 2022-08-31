@@ -9,6 +9,7 @@
     using System.Xml;
     using System.Xml.Schema;
     using System.Xml.Serialization;
+    using System.Xml.XPath;
     using Ganss.IO;
     using Microsoft.CodeAnalysis;
     using Microsoft.Xml.XMLGen;
@@ -28,7 +29,8 @@
 
         internal static string Serialize(XmlSerializer serializer, object o, IDictionary<string, string> prefixToNsMap = null)
         {
-            var sw = new StringWriter();
+            using var sw = new StringWriter();
+            using var xw = XmlWriter.Create(sw, new XmlWriterSettings { Indent = true });
             var ns = new XmlSerializerNamespaces();
             if (prefixToNsMap == null)
             {
@@ -42,7 +44,7 @@
                 }
             }
 
-            serializer.Serialize(sw, o, ns);
+            serializer.Serialize(xw, o, ns);
             var serializedXml = sw.ToString();
             return serializedXml;
         }
@@ -116,7 +118,7 @@
                 var o = serializer.Deserialize(sr);
 
                 // serialize back to xml
-                var xml2 = Serialize(serializer, o);
+                var xml2 = Serialize(serializer, o, GetNamespacesFromSource(xml));
 
                 File.WriteAllText("xml2.xml", xml2);
                 xmlLines = xml2.Split('\n');
@@ -142,6 +144,31 @@
             }
 
             Assert.True(anyValidXml, "No valid generated XML for this test");
+        }
+
+        public static IDictionary<string, string> GetNamespacesFromSource(string source)
+        {
+            XPathDocument doc = new(new StringReader(source));
+            XPathNavigator namespaceNavigator = doc.CreateNavigator();
+            var namespaces = new Dictionary<string, string>();
+            var namespaceNames = new HashSet<string>();
+            var nodeIterator = namespaceNavigator.Select("//*");
+            var i = 1;
+
+            while (nodeIterator.MoveNext())
+            {
+                foreach (var (k, v) in nodeIterator.Current.GetNamespacesInScope(XmlNamespaceScope.All))
+                {
+                    if (!namespaceNames.Contains(v))
+                    {
+                        namespaceNames.Add(v);
+                        namespaces[$"ns{i}"] = v;
+                        i++;
+                    }
+                }
+            }
+
+            return namespaces;
         }
 
         private static Type FindType(Assembly assembly, XmlQualifiedName xmlQualifiedName)

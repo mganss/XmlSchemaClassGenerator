@@ -606,7 +606,7 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.False(unknownNodeError);
                 Assert.False(unknownAttrError);
 
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
@@ -787,19 +787,11 @@ namespace XmlSchemaClassGenerator.Tests
                 Assert.False(unknownNodeError);
                 Assert.False(unknownAttrError);
 
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
             }
-        }
-
-        private static IDictionary<string, string> GetNamespacesFromSource(string source)
-        {
-            XPathDocument doc = new(new StringReader(source));
-            XPathNavigator namespaceNavigator = doc.CreateNavigator();
-            namespaceNavigator.MoveToFollowing(XPathNodeType.Element);
-            return namespaceNavigator.GetNamespacesInScope(XmlNamespaceScope.All);
         }
 
         [Theory, TestPriority(3)]
@@ -2565,7 +2557,7 @@ namespace Test
                 Assert.False(unknownNodeError);
                 Assert.False(unknownAttrError);
 
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
 
                 var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
                 AssertEx.Equal(deserializedObject, deserializedXml);
