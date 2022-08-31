@@ -832,8 +832,6 @@ namespace XmlSchemaClassGenerator
                                 var attrs = attributeGroup.RedefinedAttributeGroup.Attributes.Cast<XmlSchemaObject>()
                                     .Where(a => !(a is XmlSchemaAttributeGroupRef agr && agr.RefName == attributeGroupRef.RefName)).ToList();
 
-                                if (attrs.Any(a => (a is XmlSchemaAttributeGroupRef agr && agr.RefName == attributeGroupRef.RefName))) { }
-
                                 foreach (var attr in attrs)
                                 {
                                     var n = attr.GetQualifiedName();

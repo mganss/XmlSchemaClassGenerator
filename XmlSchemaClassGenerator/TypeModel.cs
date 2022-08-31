@@ -70,6 +70,7 @@ namespace XmlSchemaClassGenerator
         public List<DocumentationModel> Documentation { get; } = new();
         public bool IsAnonymous { get; set; }
         public virtual bool IsSubtype => false;
+        public virtual bool IsRedefined => false;
 
         protected TypeModel(GeneratorConfiguration configuration) : base(configuration) { }
 
@@ -91,8 +92,7 @@ namespace XmlSchemaClassGenerator
 
         protected void GenerateTypeAttribute(CodeTypeDeclaration typeDeclaration)
         {
-            if (XmlSchemaName == null
-                || (this is ClassModel cm && cm.IsRedefined)) return;
+            if (XmlSchemaName == null || IsRedefined) return;
 
             var typeAttribute = AttributeDecl<XmlTypeAttribute>(
                 new(new CodePrimitiveExpression(XmlSchemaName.Name)),
@@ -211,7 +211,7 @@ namespace XmlSchemaClassGenerator
 
     public class ClassModel : ReferenceTypeModel
     {
-        public bool IsRedefined => DerivedTypes.Any(d => d.XmlSchemaType?.Parent is XmlSchemaRedefine);
+        public override bool IsRedefined => DerivedTypes.Any(d => d.XmlSchemaType?.Parent is XmlSchemaRedefine);
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
