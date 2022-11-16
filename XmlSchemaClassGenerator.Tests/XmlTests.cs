@@ -1368,7 +1368,7 @@ namespace Test
 
             var assembly = Compiler.Compile(nameof(DoNotGenerateIntermediaryClassForArrayElements), content);
 
-            var fooType = Assert.Single(assembly.DefinedTypes);
+            var fooType = assembly.DefinedTypes.Single(t => t.FullName == "Test.Foo");
             Assert.NotNull(fooType);
             Assert.True(fooType.FullName == "Test.Foo");
         }
@@ -1413,7 +1413,6 @@ namespace Test
 
             var assembly = Compiler.Compile(nameof(GenerateIntermediaryClassForArrayElements), content);
 
-            Assert.True(assembly.DefinedTypes.Count() == 2);
             Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.Foo");
             Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.FooBar");
         }
