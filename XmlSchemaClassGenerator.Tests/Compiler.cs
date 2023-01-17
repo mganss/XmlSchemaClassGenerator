@@ -116,6 +116,7 @@ namespace XmlSchemaClassGenerator.Tests
                 EnableNullableReferenceAttributes = generatorPrototype.EnableNullableReferenceAttributes,
                 NamingScheme = generatorPrototype.NamingScheme,
                 UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
+                EnumAsString = generatorPrototype.EnumAsString,
             };
 
             gen.CommentLanguages.Clear();

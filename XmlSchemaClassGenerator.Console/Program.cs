@@ -57,6 +57,7 @@ namespace XmlSchemaClassGenerator.Console
             var nullableReferenceAttributes = false;
             var generateCommandLineArgs = true;
             var useArrayItemAttribute = true;
+            var enumAsString = false;
             var namespaceFiles = new List<string>();
 
             var options = new OptionSet {
@@ -135,6 +136,7 @@ without backing field initialization for collections
                 { "nc|netCore", "generate .NET Core specific code that might not work with .NET Framework (default is false)", v => netCoreSpecificCode = v != null },
                 { "nr|nullableReferenceAttributes", "generate attributes for nullable reference types (default is false)", v => nullableReferenceAttributes = v != null },
                 { "ar|useArrayItemAttribute", "use ArrayItemAttribute for sequences with single elements (default is true)", v => useArrayItemAttribute = v != null },
+                { "es|enumAsString", "Use string instead of enum for enumeration", v => enumAsString = v != null },
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
             };
 
@@ -216,6 +218,7 @@ without backing field initialization for collections
                 EnableNullableReferenceAttributes = nullableReferenceAttributes,
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
                 UseArrayItemAttribute = useArrayItemAttribute,
+                EnumAsString = enumAsString,
             };
 
             generator.CommentLanguages.AddRange(commentLanguages);

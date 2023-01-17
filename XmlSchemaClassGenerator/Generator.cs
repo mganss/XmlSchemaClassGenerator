@@ -33,6 +33,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.OutputWriter = value; }
         }
 
+        public bool EnumAsString
+        {
+            get { return _configuration.EnumAsString; }
+            set { _configuration.EnumAsString = value; }
+        }
+
         public bool GenerateComplexTypesForCollections
         {
             get { return _configuration.GenerateComplexTypesForCollections; }

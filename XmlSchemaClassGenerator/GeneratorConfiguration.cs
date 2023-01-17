@@ -41,6 +41,8 @@ namespace XmlSchemaClassGenerator
             CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         }
 
+        public bool EnumAsString { get; set; }
+
         /// <summary>
         /// The writer to be used to generate the code files
         /// </summary>
