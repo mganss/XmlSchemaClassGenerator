@@ -50,7 +50,7 @@ For command line use, choose your preferred installation:
 ```
 Usage: xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 2.0.522.0
+Version 2.0.792.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -162,6 +162,7 @@ Options:
       --ar, --useArrayItemAttribute
                              use ArrayItemAttribute for sequences with single
                                elements (default is true)
+      --es, --enumAsString   Use string instead of enum for enumeration
       --ca, --commandArgs    generate a comment with the exact command line
                                arguments that were used to generate the source
                                code (default is true)
