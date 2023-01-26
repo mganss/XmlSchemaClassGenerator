@@ -65,6 +65,7 @@ namespace XmlSchemaClassGenerator.Tests
                 CollectionImplementationType = generatorPrototype.CollectionImplementationType,
                 CollectionSettersMode = generatorPrototype.CollectionSettersMode,
                 UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
+                EnumAsString = generatorPrototype.EnumAsString,
             };
 
             gen.CommentLanguages.Clear();
@@ -973,6 +974,43 @@ namespace XmlSchemaClassGenerator.Tests
 
             Assert.Contains(@"public partial class MyType", generatedType);
             Assert.Contains(@"public enum MyType2", generatedType);
+        }
+
+        [Fact]
+        public void EnumAsStringOption()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding = ""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"">
+	<xs:element name=""Authorisation"">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name=""type"">
+					<xs:simpleType>
+						<xs:restriction base=""xs:string"">
+							<xs:enumeration value=""C019""/>
+							<xs:enumeration value=""C512""/>
+							<xs:enumeration value=""C513""/>
+							<xs:enumeration value=""C514""/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                EnumAsString = true
+            };
+
+            var generatedType = ConvertXml(nameof(EnumAsStringOption), xsd, generator).First();
+
+            Assert.Contains(@"public string Type", generatedType);
         }
 
         [Fact]

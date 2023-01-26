@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace XmlSchemaClassGenerator
 {
@@ -632,10 +633,10 @@ namespace XmlSchemaClassGenerator
                 if (facets.Count > 0)
                 {
                     var enumFacets = facets.OfType<XmlSchemaEnumerationFacet>().ToList();
-
+                    
                     // If a union has enum restrictions, there must be an enum restriction in all parts of the union
                     // If there are other restrictions mixed into the enumeration values, we'll generate a string to play it safe.
-                    if (enumFacets.Count > 0 && (baseFacets is null || baseFacets.All(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any())))
+                    if (enumFacets.Count > 0 && (baseFacets is null || baseFacets.All(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any())) && !_configuration.EnumAsString)
                         return CreateEnumModel(simpleType, enumFacets);
 
                     restrictions = GetRestrictions(facets, simpleType).Where(r => r != null).Sanitize().ToList();
