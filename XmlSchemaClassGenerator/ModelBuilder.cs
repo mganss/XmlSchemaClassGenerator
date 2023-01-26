@@ -633,7 +633,7 @@ namespace XmlSchemaClassGenerator
                 if (facets.Count > 0)
                 {
                     var enumFacets = facets.OfType<XmlSchemaEnumerationFacet>().ToList();
-                    
+
                     // If a union has enum restrictions, there must be an enum restriction in all parts of the union
                     // If there are other restrictions mixed into the enumeration values, we'll generate a string to play it safe.
                     if (enumFacets.Count > 0 && (baseFacets is null || baseFacets.All(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any())) && !_configuration.EnumAsString)
@@ -921,7 +921,7 @@ namespace XmlSchemaClassGenerator
                     case XmlSchemaElement element when element.ElementSchemaType != null:
                         property = PropertyFromElement(owningTypeModel, element, particle, item, substitute);
                         break;
-                    case XmlSchemaAny any:
+                    case XmlSchemaAny:
                         SimpleModel typeModel = new(_configuration)
                         {
                             ValueType = _configuration.UseXElementForAny ? typeof(XElement) : typeof(XmlElement),
