@@ -814,7 +814,7 @@ namespace XmlSchemaClassGenerator
                 {
                     case XmlSchemaAttribute attribute when attribute.Use != XmlSchemaUse.Prohibited:
 
-                        properties.Add(PropertyFromAttribute(owningTypeModel, attribute));
+                        properties.Add(PropertyFromAttribute(owningTypeModel, attribute, properties));
                         break;
 
                     case XmlSchemaAttributeGroupRef attributeGroupRef:
@@ -854,7 +854,7 @@ namespace XmlSchemaClassGenerator
             return properties;
         }
 
-        private PropertyModel PropertyFromAttribute(TypeModel owningTypeModel, XmlSchemaAttributeEx attribute)
+        private PropertyModel PropertyFromAttribute(TypeModel owningTypeModel, XmlSchemaAttributeEx attribute, IList<PropertyModel> properties)
         {
             var attributeQualifiedName = attribute.AttributeSchemaType.QualifiedName;
             var name = _configuration.NamingProvider.AttributeNameFromQualifiedName(attribute.QualifiedName, attribute);
@@ -890,7 +890,7 @@ namespace XmlSchemaClassGenerator
                     name += "Property";
             }
 
-            name = owningTypeModel.GetUniquePropertyName(name);
+            name = owningTypeModel.GetUniquePropertyName(name, properties);
 
             var typeModel = CreateTypeModel(attributeQualifiedName, attribute.AttributeSchemaType);
             var property = new PropertyModel(_configuration, name, typeModel, owningTypeModel)
@@ -907,7 +907,7 @@ namespace XmlSchemaClassGenerator
         }
 
         private IEnumerable<PropertyModel> CreatePropertiesForElements(Uri source, TypeModel owningTypeModel, Particle particle, IEnumerable<Particle> items,
-            Substitute substitute = null, int order = 0)
+            Substitute substitute = null, int order = 0, bool passProperties = true)
         {
             var properties = new List<PropertyModel>();
 
@@ -919,7 +919,7 @@ namespace XmlSchemaClassGenerator
                 {
                     // ElementSchemaType must be non-null. This is not the case when maxOccurs="0".
                     case XmlSchemaElement element when element.ElementSchemaType != null:
-                        property = PropertyFromElement(owningTypeModel, element, particle, item, substitute);
+                        property = PropertyFromElement(owningTypeModel, element, particle, item, substitute, passProperties ? properties : new List<PropertyModel>());
                         break;
                     case XmlSchemaAny:
                         SimpleModel typeModel = new(_configuration)
@@ -937,7 +937,7 @@ namespace XmlSchemaClassGenerator
                             CreateTypeModel(groupRef.RefName, group.First());
 
                         var groupItems = GetElements(groupRef.Particle).ToList();
-                        var groupProperties = CreatePropertiesForElements(source, owningTypeModel, item, groupItems, order: order).ToList();
+                        var groupProperties = CreatePropertiesForElements(source, owningTypeModel, item, groupItems, order: order, passProperties: false).ToList();
                         if (_configuration.EmitOrder)
                             order += groupProperties.Count;
 
@@ -986,7 +986,8 @@ namespace XmlSchemaClassGenerator
             return false;
         }
 
-        private PropertyModel PropertyFromElement(TypeModel owningTypeModel, XmlSchemaElementEx element, Particle particle, Particle item, Substitute substitute)
+        private PropertyModel PropertyFromElement(TypeModel owningTypeModel, XmlSchemaElementEx element, Particle particle, Particle item, Substitute substitute,
+            IList<PropertyModel> properties)
         {
             PropertyModel property;
             XmlSchemaElementEx effectiveElement = substitute?.Element ?? element;
@@ -995,7 +996,7 @@ namespace XmlSchemaClassGenerator
             if (name == owningTypeModel.Name)
                 name += "Property"; // member names cannot be the same as their enclosing type
 
-            name = owningTypeModel.GetUniquePropertyName(name);
+            name = owningTypeModel.GetUniquePropertyName(name, properties);
 
             var typeModel = substitute?.Type ?? CreateTypeModel(GetQualifiedName(owningTypeModel, particle.XmlParticle, element), element.ElementSchemaType);
 
