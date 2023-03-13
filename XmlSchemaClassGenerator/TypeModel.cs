@@ -716,7 +716,7 @@ namespace XmlSchemaClassGenerator
                 typeDeclaration.Members.Add(backingField);
             }
 
-            if (DefaultValue == null || (isEnumerable && !IsRequired))
+            if (DefaultValue == null || isEnumerable)
             {
                 if (isNullableValueType && Configuration.GenerateNullables && !(Configuration.UseShouldSerializePattern && !IsAttribute))
                     member.Name += Value;
