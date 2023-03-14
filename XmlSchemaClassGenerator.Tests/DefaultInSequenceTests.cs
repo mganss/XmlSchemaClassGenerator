@@ -13,8 +13,8 @@ namespace XmlSchemaClassGenerator.Tests
 		/// <summary>
 		/// In case a element which is defined as a sequence, has a default value,
 		/// the default value shall be ignored (it was wrong to initialize a collection with int value, for example).
-		/// bakcing field was like: private Collection<int> _someElementWithDefaultValue = 0;
-		/// In such case, the syntax breaks compliation.
+		/// backing field was like: private Collection<int> _someElementWithDefaultValue = 0;
+		/// In such case, the syntax breaks compilation.
 		/// We would like to verify the default is ignored.
 		/// </summary>
 		[Fact]
