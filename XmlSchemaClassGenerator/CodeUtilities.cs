@@ -196,7 +196,7 @@ namespace XmlSchemaClassGenerator
             return i <= 1 ? propBackingFieldName : $"{propBackingFieldName}{i}";
         }
 
-        public static string GetUniquePropertyName(this TypeModel tm, string name)
+        public static string GetUniquePropertyName(this TypeModel tm, string name, IList<PropertyModel> properties)
         {
             if (tm is not ClassModel cls) return name;
 
@@ -205,7 +205,7 @@ namespace XmlSchemaClassGenerator
             var baseProps = cls.AllBaseClasses.SelectMany(b => b.Properties).ToList();
             var props = cls.Properties.ToList();
 
-            while (baseProps.Concat(props).Any(p => p.Name == n))
+            while (baseProps.Concat(props).Concat(properties).Any(p => p.Name == n))
                 n = name + (++i);
 
             return n;
