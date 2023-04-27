@@ -24,6 +24,24 @@
         string PropertyNameFromElement(string typeModelName, string elementName, XmlSchemaElement element);
 
         /// <summary>
+        /// Creates a name for an inner type from an attribute name
+        /// </summary>
+        /// <param name="typeModelName">Name of the typeModel</param>
+        /// <param name="attributeName">Attribute name</param>
+        /// <param name="attribute">Original XSD attribute</param>
+        /// <returns>Name of the inner type</returns>
+        string TypeNameFromAttribute(string typeModelName, string attributeName, XmlSchemaAttribute attribute);
+
+        /// <summary>
+        /// Creates a name for an inner type from an element name
+        /// </summary>
+        /// <param name="typeModelName">Name of the typeModel</param>
+        /// <param name="elementName">Element name</param>
+        /// <param name="element">Original XSD element</param>
+        /// <returns>Name of the inner type</returns>
+        string TypeNameFromElement(string typeModelName, string elementName, XmlSchemaElement element);
+
+        /// <summary>
         /// Creates a name for an enum member based on a value
         /// </summary>
         /// <param name="enumName">Name of the enum</param>
