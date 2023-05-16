@@ -878,7 +878,7 @@ namespace XmlSchemaClassGenerator
                     if (attributeQualifiedName.IsEmpty || string.IsNullOrEmpty(attributeQualifiedName.Namespace))
                     {
                         // inner type, have to generate a type name
-                        var typeName = _configuration.NamingProvider.PropertyNameFromAttribute(owningTypeModel.Name, attribute.QualifiedName.Name, attribute);
+                        var typeName = _configuration.NamingProvider.TypeNameFromAttribute(owningTypeModel.Name, attribute.QualifiedName.Name, attribute);
                         attributeQualifiedName = new XmlQualifiedName(typeName, owningTypeModel.XmlSchemaName.Namespace);
                         // try to avoid name clashes
                         if (NameExists(attributeQualifiedName))
@@ -1024,7 +1024,7 @@ namespace XmlSchemaClassGenerator
                 {
                     // inner type, have to generate a type name
                     var typeModelName = xmlParticle is XmlSchemaGroupRef groupRef ? groupRef.RefName : typeModel.XmlSchemaName;
-                    var typeName = _configuration.NamingProvider.PropertyNameFromElement(typeModelName.Name, element.QualifiedName.Name, element);
+                    var typeName = _configuration.NamingProvider.TypeNameFromElement(typeModelName.Name, element.QualifiedName.Name, element);
                     elementQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                     // try to avoid name clashes
                     if (NameExists(elementQualifiedName))

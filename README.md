@@ -66,10 +66,24 @@ Options:
                                If no mapping is found for an XML namespace, a
                                name is generated automatically (may fail).
       --nf, --namespaceFile=VALUE
-                             file containing mapppings from XML namespaces to C#
-                                namespaces
+                             file containing mappings from XML namespaces to C#
+                               namespaces
                                The line format is one mapping per line: XML
                                namespace = C# namespace [optional file name].
+                               Lines starting with # and empty lines are
+                               ignored.
+      --tns, --typeNameSubstitute=VALUE
+                             substitute a generated type/member name
+                               Separate type/member name and substitute name by
+                               '='.
+                               Prefix type/member name with an appropriate kind
+                               ID as documented at: https://t.ly/HHEI.
+                               Prefix with 'A:' to substitute any type/member.
+      --tnsf, --typeNameSubstituteFile=VALUE
+                             file containing generated type/member name
+                               substitute mappings
+                               The line format is one mapping per line:
+                               prefixed type/member name = substitute name.
                                Lines starting with # and empty lines are
                                ignored.
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
@@ -229,6 +243,37 @@ http://example.com = Example.NamespaceB b.xsd
 ```
 
 Use the `--nf` option to specify the mapping file.
+
+### Substituting generated C# type and member names
+
+If a xsd file specifies obscure names for their types (classes, enums) or members (properties), you can substitute these using the `--tns`/`--typeNameSubstitute=` parameter:
+
+```
+xscgen --tns T:Example_RootType=Example --tns T:Example_RootTypeExampleScope=ExampleScope --tns P:StartDateDateTimeValue=StartDate example.xsd
+```
+
+The syntax for substitution is: `{kindId}:{generatedName}={substituteName}`
+
+The `{kindId}` is a single character identifier based on [documentation/analysis ID format](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d42-id-string-format), where valid values are:
+
+| ID | Scope |
+| -  | - |
+| `P` | Property |
+| `T` | Type: `class`, `enum`, `interface` |
+| `A` | Any property and/or type |
+
+#### Using substitution files
+
+Instead of specifying the substitutions on the command line you can also use a substitution file which should contain one substitution per line in the following format:
+
+```
+# Comment
+T:Example_RootType = Example
+T:Example_RootTypeExampleScope = ExampleScope
+P:StartDateDateTimeValue = StartDate
+```
+
+Use the `--tnsf`/`--typeNameSubstituteFile` option to specify the substitution file.
 
 Nullables<a name="nullables"></a>
 ---------------------------------

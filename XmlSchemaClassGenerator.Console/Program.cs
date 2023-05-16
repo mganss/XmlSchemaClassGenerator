@@ -1,4 +1,5 @@
 ﻿using XmlSchemaClassGenerator;
+using XmlSchemaClassGenerator.NamingProviders;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace XmlSchemaClassGenerator.Console
         {
             var showHelp = args.Length == 0;
             var namespaces = new List<string>();
+            var nameSubstitutes = new List<string>();
             var outputFolder = (string)null;
             Type integerType = null;
             var useIntegerTypeAsFallback = false;
@@ -59,6 +61,7 @@ namespace XmlSchemaClassGenerator.Console
             var useArrayItemAttribute = true;
             var enumAsString = false;
             var namespaceFiles = new List<string>();
+            var nameSubstituteFiles = new List<string>();
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -67,9 +70,16 @@ Separate XML namespace and C# namespace by '='.
 One option must be given for each namespace to be mapped.
 A file name may be given by appending a pipe sign (|) followed by a file name (like schema.xsd) to the XML namespace.
 If no mapping is found for an XML namespace, a name is generated automatically (may fail).", v => namespaces.Add(v) },
-                { "nf|namespaceFile=", @"file containing mapppings from XML namespaces to C# namespaces
+                { "nf|namespaceFile=", @"file containing mappings from XML namespaces to C# namespaces
 The line format is one mapping per line: XML namespace = C# namespace [optional file name].
 Lines starting with # and empty lines are ignored.", v => namespaceFiles.Add(v) },
+                { "tns|typeNameSubstitute=", @"substitute a generated type/member name
+Separate type/member name and substitute name by '='.
+Prefix type/member name with an appropriate kind ID as documented at: https://t.ly/HHEI.
+Prefix with 'A:' to substitute any type/member.", v => nameSubstitutes.Add(v) },
+                { "tnsf|typeNameSubstituteFile=", @"file containing generated type/member name substitute mappings
+The line format is one mapping per line: prefixed type/member name = substitute name.
+Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Add(v) },
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
                 { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of automatic approximation
 {TYPE} can be i[nt], l[ong], or d[ecimal]", v => {
@@ -178,6 +188,9 @@ without backing field initialization for collections
                 return name;
             });
 
+            ParseNameSubstituteFiles(nameSubstitutes, nameSubstituteFiles);
+            var nameSubstituteMap = nameSubstitutes.ToDictionary();
+
             if (!string.IsNullOrEmpty(outputFolder))
             {
                 outputFolder = Path.GetFullPath(outputFolder);
@@ -221,6 +234,11 @@ without backing field initialization for collections
                 EnumAsString = enumAsString,
             };
 
+            if (nameSubstituteMap.Any())
+            {
+                generator.NamingProvider = new SubstituteNamingProvider(nameSubstituteMap);
+            }
+
             generator.CommentLanguages.AddRange(commentLanguages);
 
             if (pclCompatible)
@@ -261,6 +279,31 @@ without backing field initialization for collections
                     var ns = $"{xmlns}{source}={csns}";
 
                     namespaces.Add(ns);
+                }
+            }
+        }
+
+        private static void ParseNameSubstituteFiles(List<string> nameSubstitutes, List<string> nameSubstituteFiles)
+        {
+            foreach (var nameSubstituteFile in nameSubstituteFiles)
+            {
+                foreach (var (line, number) in File.ReadAllLines(nameSubstituteFile)
+                    .Select((l, i) => (Line: l.Trim(), Number: i + 1))
+                    .Where(l => !string.IsNullOrWhiteSpace(l.Line) && !l.Line.StartsWith("#")))
+                {
+                    var parts = line.Split('=');
+
+                    if (parts.Length != 2)
+                    {
+                        System.Console.WriteLine($"{nameSubstituteFile}:{number}: Line format is prefixed type/member name = substitute name");
+                        Environment.Exit(2);
+                    }
+
+                    var generatedName = parts[0].Trim();
+                    var substituteName = parts[1].Trim();
+                    var nameSubstitute = $"{generatedName}={substituteName}";
+
+                    nameSubstitutes.Add(nameSubstitute);
                 }
             }
         }

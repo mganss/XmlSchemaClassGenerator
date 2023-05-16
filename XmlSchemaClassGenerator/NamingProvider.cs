@@ -1,6 +1,7 @@
 ﻿namespace XmlSchemaClassGenerator
 {
     using System.Xml;
+    using System.Xml.Linq;
     using System.Xml.Schema;
 
     /// <summary>
@@ -43,6 +44,14 @@
         {
             return typeModelName.ToTitleCase(_namingScheme) + elementName.ToTitleCase(_namingScheme);
         }
+
+        /// <inheritdoc/>
+        public virtual string TypeNameFromAttribute(string typeModelName, string attributeName, XmlSchemaAttribute attribute)
+            => PropertyNameFromAttribute(typeModelName, attributeName, attribute);
+
+        /// <inheritdoc/>
+        public virtual string TypeNameFromElement(string typeModelName, string elementName, XmlSchemaElement element)
+            => PropertyNameFromElement(typeModelName, elementName, element);
 
         /// <summary>
         /// Creates a name for an enum member based on a value

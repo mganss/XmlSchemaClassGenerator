@@ -97,5 +97,23 @@ namespace XmlSchemaClassGenerator
                 yield return hierarchyItem;
             }
         }
+
+        /// <summary>
+        /// Creates a <see cref="Dictionary{TKey,TValue}" /> from an <see cref="IEnumerable{T}" /> splitting the values into key and value pairs based on the <paramref name="delimiter"/>.
+        /// </summary>
+        /// <param name="source">An <see cref="IEnumerable{T}" /> to create a <see cref="Dictionary{TKey,TValue}" /> from.</param>
+        /// <param name="delimiter">An optional value that supplies the delimiter to use to create the key and value from the <paramref name="source"/>.</param>
+        /// <returns>A <see cref="Dictionary{TKey,TValue}" /> that contains keys and values. The values within each group are in the same order as in <paramref name="source" />.</returns>
+        public static Dictionary<string, string> ToDictionary(this IEnumerable<string> source, string delimiter = "=")
+        {
+            var result = new Dictionary<string, string>();
+            foreach (string value in source ?? Enumerable.Empty<string>())
+            {
+                var pair = value.Split(new string[] { delimiter ?? "=" }, 2, StringSplitOptions.None);
+                result.Add(pair[0], pair[1]);
+            }
+
+            return result;
+        }
     }
 }
