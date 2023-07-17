@@ -150,18 +150,18 @@ namespace XmlSchemaClassGenerator
             if (baseMemberEffectiveTypes.Distinct().Count() == 1) return baseMemberEffectiveTypes[0];
 
             // all member types are integer types
-            if (baseMemberEffectiveTypes.All(t => intTypes.Contains(t)))
+            if (baseMemberEffectiveTypes.TrueForAll(t => intTypes.Contains(t)))
             {
                 var maxTypeIndex = baseMemberEffectiveTypes.Max(t => Array.IndexOf(intTypes, t));
                 var maxType = intTypes[maxTypeIndex];
                 // if the max type is signed and the corresponding unsigned type is also in the set we have to use the next higher type
-                if (maxTypeIndex % 2 == 1 && baseMemberEffectiveTypes.Any(t => Array.IndexOf(intTypes, t) == maxTypeIndex - 1))
+                if (maxTypeIndex % 2 == 1 && baseMemberEffectiveTypes.Exists(t => Array.IndexOf(intTypes, t) == maxTypeIndex - 1))
                     return intTypes[maxTypeIndex + 1];
                 return maxType;
             }
 
             // all member types are float/double/decimal
-            if (baseMemberEffectiveTypes.All(t => decimalTypes.Contains(t)))
+            if (baseMemberEffectiveTypes.TrueForAll(t => decimalTypes.Contains(t)))
             {
                 var maxTypeIndex = baseMemberEffectiveTypes.Max(t => Array.IndexOf(decimalTypes, t));
                 var maxType = decimalTypes[maxTypeIndex];
@@ -342,7 +342,7 @@ namespace XmlSchemaClassGenerator
         );
 
         public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf)
-            => UsingNamespaces.Any(n => n.Namespace == namespaceName && n.Condition(conf));
+            => UsingNamespaces.Exists(n => n.Namespace == namespaceName && n.Condition(conf));
 
         public static CodeTypeReference CreateTypeReference(Type type, GeneratorConfiguration conf)
         {

@@ -211,7 +211,7 @@ namespace XmlSchemaClassGenerator
 
     public class ClassModel : ReferenceTypeModel
     {
-        public override bool IsRedefined => DerivedTypes.Any(d => d.XmlSchemaType?.Parent is XmlSchemaRedefine);
+        public override bool IsRedefined => DerivedTypes.Exists(d => d.XmlSchemaType?.Parent is XmlSchemaRedefine);
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
@@ -391,7 +391,7 @@ namespace XmlSchemaClassGenerator
                 var propName = "Text";
 
                 // To not collide with any existing members
-                for (var propertyIndex = 1; Properties.Any(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
+                for (var propertyIndex = 1; Properties.Exists(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
                 {
                     propName = $"Text_{propertyIndex}";
                 }
@@ -748,7 +748,9 @@ namespace XmlSchemaClassGenerator
             else
             {
                 var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue, IsAttribute);
-                backingField.InitExpression = defaultValueExpression;
+
+                if (backingField != null)
+                    backingField.InitExpression = defaultValueExpression;
 
                 member.Type = IsNillableValueType ? NullableTypeRef(typeReference) : typeReference;
 
@@ -1384,7 +1386,7 @@ namespace XmlSchemaClassGenerator
             yield return new CodeCommentStatement("<summary>", true);
 
             foreach (var doc in docs
-                .Where(d => string.IsNullOrEmpty(d.Language) || Configuration.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+                .Where(d => string.IsNullOrEmpty(d.Language) || Configuration.CommentLanguages.Exists(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(d => d.Language))
             {
                 var text = doc.Text;
@@ -1399,7 +1401,7 @@ namespace XmlSchemaClassGenerator
         {
             if (!Configuration.GenerateDescriptionAttribute || DisableComments || !docs.Any()) return;
 
-            var doc = GetSingleDoc(docs.Where(d => string.IsNullOrEmpty(d.Language) || Configuration.CommentLanguages.Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase))));
+            var doc = GetSingleDoc(docs.Where(d => string.IsNullOrEmpty(d.Language) || Configuration.CommentLanguages.Exists(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase))));
 
             if (doc != null)
             {

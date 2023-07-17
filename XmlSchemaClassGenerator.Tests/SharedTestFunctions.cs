@@ -70,7 +70,7 @@
 
             foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e =>
                 !e.IsAbstract
-                && !(e.ElementSchemaType is XmlSchemaSimpleType)
+                && e.ElementSchemaType is not XmlSchemaSimpleType
                 && e.ElementSchemaType.QualifiedName != AnyType))
             {
                 var type = FindType(assembly, rootElement.QualifiedName);

@@ -225,7 +225,7 @@ namespace XmlSchemaClassGenerator
                     var derivedProperties = interfaceModel.AllDerivedReferenceTypes().SelectMany(t => t.Properties)
                         .Where(p => p.Name == interfaceProperty.Name || p.OriginalPropertyName == interfaceProperty.Name).ToList();
 
-                    if (derivedProperties.Any(p => p.IsCollection))
+                    if (derivedProperties.Exists(p => p.IsCollection))
                     {
                         foreach (var derivedProperty in derivedProperties.Where(p => !p.IsCollection))
                             derivedProperty.IsCollection = true;
@@ -636,7 +636,7 @@ namespace XmlSchemaClassGenerator
 
                     // If a union has enum restrictions, there must be an enum restriction in all parts of the union
                     // If there are other restrictions mixed into the enumeration values, we'll generate a string to play it safe.
-                    if (enumFacets.Count > 0 && (baseFacets is null || baseFacets.All(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any())) && !_configuration.EnumAsString)
+                    if (enumFacets.Count > 0 && (baseFacets is null || baseFacets.TrueForAll(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any())) && !_configuration.EnumAsString)
                         return CreateEnumModel(simpleType, enumFacets);
 
                     restrictions = CodeUtilities.GetRestrictions(facets, simpleType, _configuration).Where(r => r != null).Sanitize().ToList();
@@ -698,7 +698,7 @@ namespace XmlSchemaClassGenerator
                     value.Documentation.AddRange(valueDocs);
 
                     value.IsDeprecated = facet.Annotation?.Items.OfType<XmlSchemaAppInfo>()
-                        .Any(a => a.Markup.Any(m => m.Name == "annox:annotate" && m.HasChildNodes && m.FirstChild.Name == "jl:Deprecated")) == true;
+                        .Any(a => Array.Exists(a.Markup, m => m.Name == "annox:annotate" && m.HasChildNodes && m.FirstChild.Name == "jl:Deprecated")) == true;
 
                     enumModel.Values.Add(value);
                 }
@@ -898,7 +898,7 @@ namespace XmlSchemaClassGenerator
                 // Discard duplicate property names. This is most likely due to:
                 // - Choice or
                 // - Element and attribute with the same name
-                if (property != null && !properties.Any(p => p.Name == property.Name))
+                if (property != null && !properties.Exists(p => p.Name == property.Name))
                 {
                     var itemDocs = GetDocumentation(item.XmlParticle);
                     property.Documentation.AddRange(itemDocs);
@@ -906,7 +906,7 @@ namespace XmlSchemaClassGenerator
                     if (_configuration.EmitOrder)
                         property.Order = order++;
 
-                    property.IsDeprecated = itemDocs.Any(d => d.Text.StartsWith("DEPRECATED"));
+                    property.IsDeprecated = itemDocs.Exists(d => d.Text.StartsWith("DEPRECATED"));
 
                     properties.Add(property);
                 }
