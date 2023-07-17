@@ -99,11 +99,11 @@ namespace XmlSchemaClassGenerator
             Type FromFallback() => configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null ? configuration.IntegerDataType : typeof(string);
         }
 
-        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions, bool attribute = false)
+        public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions, XmlSchemaType schemaType, bool attribute = false)
         {
             var resultType = type.TypeCode switch
             {
-                XmlTypeCode.AnyAtomicType => typeof(string),// union
+                XmlTypeCode.AnyAtomicType => GetUnionType(configuration, schemaType, attribute), // union
                 XmlTypeCode.AnyUri or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
                 XmlTypeCode.Duration => configuration.NetCoreSpecificCode ? type.ValueType : typeof(string),
                 XmlTypeCode.Time => typeof(DateTime),
@@ -129,6 +129,96 @@ namespace XmlSchemaClassGenerator
             }
 
             return resultType;
+        }
+
+        static readonly Type[] intTypes = new[] { typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(uint), typeof(int), typeof(ulong), typeof(long), typeof(decimal) };
+        static readonly Type[] decimalTypes = new[] { typeof(float), typeof(double), typeof(decimal) };
+
+        private static Type GetUnionType(GeneratorConfiguration configuration, XmlSchemaType schemaType, bool attribute)
+        {
+            if (schemaType is not XmlSchemaSimpleType simpleType || simpleType.Content is not XmlSchemaSimpleTypeUnion unionType) return typeof(string);
+
+            var baseMemberEffectiveTypes = unionType.BaseMemberTypes.Select(t =>
+            {
+                var restriction = t.Content as XmlSchemaSimpleTypeRestriction;
+                var facets = restriction?.Facets.OfType<XmlSchemaFacet>().ToList();
+                var restrictions = GetRestrictions(facets, t, configuration).Where(r => r != null).Sanitize().ToList();
+                return GetEffectiveType(t.Datatype, configuration, restrictions, t, attribute);
+            }).ToList();
+
+            // all member types are the same
+            if (baseMemberEffectiveTypes.Distinct().Count() == 1) return baseMemberEffectiveTypes[0];
+
+            // all member types are integer types
+            if (baseMemberEffectiveTypes.All(t => intTypes.Contains(t)))
+            {
+                var maxTypeIndex = baseMemberEffectiveTypes.Max(t => Array.IndexOf(intTypes, t));
+                var maxType = intTypes[maxTypeIndex];
+                // if the max type is signed and the corresponding unsigned type is also in the set we have to use the next higher type
+                if (maxTypeIndex % 2 == 1 && baseMemberEffectiveTypes.Any(t => Array.IndexOf(intTypes, t) == maxTypeIndex - 1))
+                    return intTypes[maxTypeIndex + 1];
+                return maxType;
+            }
+
+            // all member types are float/double/decimal
+            if (baseMemberEffectiveTypes.All(t => decimalTypes.Contains(t)))
+            {
+                var maxTypeIndex = baseMemberEffectiveTypes.Max(t => Array.IndexOf(decimalTypes, t));
+                var maxType = decimalTypes[maxTypeIndex];
+                return maxType;
+            }
+
+            return typeof(string);
+        }
+
+        public static IEnumerable<RestrictionModel> GetRestrictions(IEnumerable<XmlSchemaFacet> facets, XmlSchemaSimpleType type, GeneratorConfiguration _configuration)
+        {
+            var min = facets.OfType<XmlSchemaMinLengthFacet>().Select(f => int.Parse(f.Value)).DefaultIfEmpty().Max();
+            var max = facets.OfType<XmlSchemaMaxLengthFacet>().Select(f => int.Parse(f.Value)).DefaultIfEmpty().Min();
+
+            if (_configuration.DataAnnotationMode == DataAnnotationMode.All)
+            {
+                if (min > 0) yield return new MinLengthRestrictionModel(_configuration) { Value = min };
+                if (max > 0) yield return new MaxLengthRestrictionModel(_configuration) { Value = max };
+            }
+            else if (min > 0 || max > 0)
+            {
+                yield return new MinMaxLengthRestrictionModel(_configuration) { Min = min, Max = max };
+            }
+
+            foreach (var facet in facets)
+            {
+                var valueType = type.Datatype.ValueType;
+                switch (facet)
+                {
+                    case XmlSchemaLengthFacet:
+                        var value = int.Parse(facet.Value);
+                        if (_configuration.DataAnnotationMode == DataAnnotationMode.All)
+                        {
+                            yield return new MinLengthRestrictionModel(_configuration) { Value = value };
+                            yield return new MaxLengthRestrictionModel(_configuration) { Value = value };
+                        }
+                        else
+                        {
+                            yield return new MinMaxLengthRestrictionModel(_configuration) { Min = value, Max = value };
+                        }
+                        break;
+                    case XmlSchemaTotalDigitsFacet:
+                        yield return new TotalDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) }; break;
+                    case XmlSchemaFractionDigitsFacet:
+                        yield return new FractionDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) }; break;
+                    case XmlSchemaPatternFacet:
+                        yield return new PatternRestrictionModel(_configuration) { Value = facet.Value }; break;
+                    case XmlSchemaMinInclusiveFacet:
+                        yield return new MinInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType }; break;
+                    case XmlSchemaMinExclusiveFacet:
+                        yield return new MinExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType }; break;
+                    case XmlSchemaMaxInclusiveFacet:
+                        yield return new MaxInclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType }; break;
+                    case XmlSchemaMaxExclusiveFacet:
+                        yield return new MaxExclusiveRestrictionModel(_configuration) { Value = facet.Value, Type = valueType }; break;
+                }
+            }
         }
 
         public static XmlQualifiedName GetQualifiedName(this XmlSchemaType schemaType)

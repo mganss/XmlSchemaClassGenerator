@@ -1226,7 +1226,7 @@ namespace XmlSchemaClassGenerator
                 // http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlelementattribute.datatype(v=vs.110).aspx
                 // XmlSerializer is inconsistent: maps xs:decimal to decimal but xs:integer to string,
                 // even though xs:integer is a restriction of xs:decimal
-                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, attribute);
+                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, XmlSchemaType, attribute);
                 UseDataTypeAttribute = XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? UseDataTypeAttribute;
             }
 
@@ -1260,7 +1260,7 @@ namespace XmlSchemaClassGenerator
 
             if (XmlSchemaType != null)
             {
-                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, attribute);
+                type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, XmlSchemaType, attribute);
             }
 
             if (type == typeof(XmlQualifiedName))

@@ -110,6 +110,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
         const string EppPattern = "xsd/epp/*.xsd";
         const string GraphMLPattern = "xsd/graphml/ygraphml.xsd";
+        const string UnionPattern = "xsd/union/union.xsd";
         const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
 
         // IATA test takes too long to perform every time
@@ -153,6 +154,31 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("Client", ClientPattern);
             SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestUnion()
+        {
+            var assembly = Compiler.Generate("Union", UnionPattern);
+            Assert.NotNull(assembly);
+
+            SharedTestFunctions.TestSamples(Output, "Union", UnionPattern);
+
+            var snapshotType = assembly.GetType("Union.Snapshot");
+            Assert.NotNull(snapshotType);
+
+            var date = snapshotType.GetProperty("Date");
+            Assert.NotNull(date);
+            Assert.Equal(typeof(DateTime), date.PropertyType);
+
+            var count = snapshotType.GetProperty("Count");
+            Assert.NotNull(count);
+            Assert.Equal(typeof(int), count.PropertyType);
+
+            var num = snapshotType.GetProperty("Num");
+            Assert.NotNull(num);
+            Assert.Equal(typeof(decimal), num.PropertyType);
         }
 
         [Fact, TestPriority(1)]
