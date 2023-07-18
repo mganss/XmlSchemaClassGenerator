@@ -30,6 +30,7 @@ from schema restrictions
 * Optionally generate interfaces for groups and attribute groups
 * Optionally generate one file per class
 * Support for nullable reference types (NRTs) through [`AllowNullAttribute`](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.codeanalysis.allownullattribute) and [`MaybeNullAttribute`](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.codeanalysis.maybenullattribute)
+* Optionally generate a common specific type for union member types
 
 Unsupported:
 
@@ -180,6 +181,9 @@ Options:
       --ca, --commandArgs    generate a comment with the exact command line
                                arguments that were used to generate the source
                                code (default is true)
+      --uc, --unionCommonType
+                             generate a common type for unions if possible (
+                               default is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
@@ -431,6 +435,14 @@ If the range specified by `minInclusive` and `maxInclusive` does not fit in any 
   <tr><td>&lt;29</td><td>decimal</td></tr>
   <tr><td>&gt;=29</td><td>string</td></tr>
 </table>
+
+Unions
+------
+
+If you specify `--unionCommonType`, XmlSchemaClassGenerator will try to determine a common type for a union's member types. If, for example, the member types
+are all integer types, then the narrowest integer type will be used that can fit all member types.
+
+Note that semantic issues might arise with this approach. For example, `DateTime` values are serialized with both date and time information included. See discussion at [#397](https://github.com/mganss/XmlSchemaClassGenerator/issues/397).
 
 Contributing
 ------------
