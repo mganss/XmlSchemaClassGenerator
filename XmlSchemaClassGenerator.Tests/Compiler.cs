@@ -117,6 +117,7 @@ namespace XmlSchemaClassGenerator.Tests
                 NamingScheme = generatorPrototype.NamingScheme,
                 UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
                 EnumAsString = generatorPrototype.EnumAsString,
+                MapUnionToWidestCommonType = generatorPrototype.MapUnionToWidestCommonType
             };
 
             gen.CommentLanguages.Clear();

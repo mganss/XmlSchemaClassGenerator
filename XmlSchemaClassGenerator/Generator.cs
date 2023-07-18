@@ -318,6 +318,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CommandLineArgumentsProvider = value; }
         }
 
+        public bool MapUnionToWidestCommonType
+        {
+            get { return _configuration.MapUnionToWidestCommonType; }
+            set { _configuration.MapUnionToWidestCommonType = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

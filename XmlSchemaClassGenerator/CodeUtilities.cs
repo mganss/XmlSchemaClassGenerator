@@ -103,7 +103,7 @@ namespace XmlSchemaClassGenerator
         {
             var resultType = type.TypeCode switch
             {
-                XmlTypeCode.AnyAtomicType => GetUnionType(configuration, schemaType, attribute), // union
+                XmlTypeCode.AnyAtomicType => configuration.MapUnionToWidestCommonType ? GetUnionType(configuration, schemaType, attribute) : typeof(string), // union
                 XmlTypeCode.AnyUri or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
                 XmlTypeCode.Duration => configuration.NetCoreSpecificCode ? type.ValueType : typeof(string),
                 XmlTypeCode.Time => typeof(DateTime),

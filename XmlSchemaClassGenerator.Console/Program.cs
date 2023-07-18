@@ -62,6 +62,7 @@ namespace XmlSchemaClassGenerator.Console
             var enumAsString = false;
             var namespaceFiles = new List<string>();
             var nameSubstituteFiles = new List<string>();
+            var unionCommonType = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -148,6 +149,7 @@ without backing field initialization for collections
                 { "ar|useArrayItemAttribute", "use ArrayItemAttribute for sequences with single elements (default is true)", v => useArrayItemAttribute = v != null },
                 { "es|enumAsString", "Use string instead of enum for enumeration", v => enumAsString = v != null },
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
+                { "uc|unionCommonType", "generate a common type for unions if possible (default is false)", v => unionCommonType = v != null },
             };
 
             var globsAndUris = options.Parse(args);
@@ -232,6 +234,7 @@ without backing field initialization for collections
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
                 UseArrayItemAttribute = useArrayItemAttribute,
                 EnumAsString = enumAsString,
+                MapUnionToWidestCommonType = unionCommonType
             };
 
             if (nameSubstituteMap.Any())

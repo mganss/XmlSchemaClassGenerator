@@ -208,7 +208,7 @@ namespace XmlSchemaClassGenerator
         public Action<CodeTypeDeclaration, TypeModel> TypeVisitor { get; set; }
 
         /// <summary>
-        /// Provides options to customize Elementnamens with own logik
+        /// Provides options to customize Elementnamens with own logic
         /// </summary>
         public INamingProvider NamingProvider { get; set; }
 
@@ -328,5 +328,11 @@ namespace XmlSchemaClassGenerator
         /// for sequences with single elements. Default is true.
         /// </summary>
         public bool UseArrayItemAttribute { get; set; } = true;
+
+        /// <summary>
+        /// Tries to determine a common specific type for union member types, e.g. if a union has member types that are all integers
+        /// a numeric C# type is generated. If this is disabled, a union's type will default to string. Default is false.
+        /// </summary>
+        public bool MapUnionToWidestCommonType { get; set; }
     }
 }

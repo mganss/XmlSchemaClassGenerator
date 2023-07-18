@@ -160,7 +160,13 @@ namespace XmlSchemaClassGenerator.Tests
         [UseCulture("en-US")]
         public void TestUnion()
         {
-            var assembly = Compiler.Generate("Union", UnionPattern);
+            var assembly = Compiler.Generate("Union", UnionPattern, new Generator
+            {
+                NamespacePrefix = "Union",
+                IntegerDataType = typeof(int),
+                MapUnionToWidestCommonType = true
+            });
+
             Assert.NotNull(assembly);
 
             SharedTestFunctions.TestSamples(Output, "Union", UnionPattern);
