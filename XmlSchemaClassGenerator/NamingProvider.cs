@@ -10,7 +10,7 @@
     public class NamingProvider
         : INamingProvider
     {
-        private readonly NamingScheme _namingScheme;
+        protected readonly NamingScheme _namingScheme;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NamingProvider"/> class.
