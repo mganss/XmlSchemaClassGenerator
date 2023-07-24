@@ -941,6 +941,15 @@ namespace XmlSchemaClassGenerator
         {
             PropertyModel property;
             XmlSchemaElementEx effectiveElement = substitute?.Element ?? element;
+
+            property = properties.FirstOrDefault(p => element.QualifiedName == p.XmlSchemaName && p.Type.XmlSchemaType == element.ElementSchemaType);
+
+            if (property != null)
+            {
+                property.IsCollection = true;
+                return property;
+            }
+
             var name = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName, effectiveElement);
             var originalName = name;
             if (name == owningTypeModel.Name)
