@@ -99,6 +99,8 @@ namespace XmlSchemaClassGenerator
             Type FromFallback() => configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null ? configuration.IntegerDataType : typeof(string);
         }
 
+        private static readonly XmlQualifiedName GuidQualifiedName = new("guid", "http://microsoft.com/wsdl/types/");
+
         public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions, XmlSchemaType schemaType, bool attribute = false)
         {
             var resultType = type.TypeCode switch
@@ -111,6 +113,11 @@ namespace XmlSchemaClassGenerator
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
                 _ => type.ValueType,
             };
+
+            if (schemaType.QualifiedName == GuidQualifiedName)
+            {
+                resultType = typeof(Guid);
+            }
 
             if (type.Variety == XmlSchemaDatatypeVariety.List)
             {

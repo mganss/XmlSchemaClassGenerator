@@ -111,6 +111,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string EppPattern = "xsd/epp/*.xsd";
         const string GraphMLPattern = "xsd/graphml/ygraphml.xsd";
         const string UnionPattern = "xsd/union/union.xsd";
+        const string GuidPattern = "xsd/guid/*.xsd";
         const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
 
         // IATA test takes too long to perform every time
@@ -154,6 +155,40 @@ namespace XmlSchemaClassGenerator.Tests
         {
             Compiler.Generate("Client", ClientPattern);
             SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestGuid()
+        {
+            var assembly = Compiler.Generate("Guid", GuidPattern);
+            var testType = assembly.GetType("Guid.Test");
+            var idProperty = testType.GetProperty("Id");
+            var elementIdProperty = testType.GetProperty("ElementId");
+
+            Assert.Equal(typeof(Nullable<>).MakeGenericType(typeof(Guid)), idProperty.PropertyType);
+            Assert.Equal(typeof(Guid), elementIdProperty.PropertyType);
+
+            var serializer = new XmlSerializer(testType);
+
+            var test = Activator.CreateInstance(testType);
+            var idGuid = Guid.NewGuid();
+            var elementGuid = Guid.NewGuid();
+
+            idProperty.SetValue(test, idGuid);
+            elementIdProperty.SetValue(test, elementGuid);
+
+            var sw = new StringWriter();
+
+            serializer.Serialize(sw, test);
+
+            var xml = sw.ToString();
+            var sr = new StringReader(xml);
+
+            var o = serializer.Deserialize(sr);
+
+            Assert.Equal(idGuid, idProperty.GetValue(o));
+            Assert.Equal(elementGuid, elementIdProperty.GetValue(o));
         }
 
         [Fact, TestPriority(1)]
