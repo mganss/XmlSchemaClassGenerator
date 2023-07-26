@@ -165,9 +165,12 @@ namespace XmlSchemaClassGenerator.Tests
             var testType = assembly.GetType("Guid.Test");
             var idProperty = testType.GetProperty("Id");
             var elementIdProperty = testType.GetProperty("ElementId");
+            var headerType = assembly.GetType("Guid.V1.Header");
+            var referenceProperty = headerType.GetProperty("Reference");
 
             Assert.Equal(typeof(Nullable<>).MakeGenericType(typeof(Guid)), idProperty.PropertyType);
             Assert.Equal(typeof(Guid), elementIdProperty.PropertyType);
+            Assert.Equal(typeof(Guid), referenceProperty.PropertyType);
 
             var serializer = new XmlSerializer(testType);
 

@@ -114,7 +114,7 @@ namespace XmlSchemaClassGenerator
                 _ => type.ValueType,
             };
 
-            if (schemaType.QualifiedName == GuidQualifiedName)
+            if (schemaType.IsDerivedFrom(GuidQualifiedName))
             {
                 resultType = typeof(Guid);
             }

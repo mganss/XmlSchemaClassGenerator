@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
@@ -28,5 +29,16 @@ namespace XmlSchemaClassGenerator
         }
 
         public static string QuoteIfNeeded(this string text) => !string.IsNullOrEmpty(text) && text.Contains(" ") ? "\"" + text + "\"" : text;
+
+        public static bool IsDerivedFrom(this XmlSchemaType type, XmlQualifiedName qualifiedName)
+        {
+            while (type != null)
+            {
+                if (type.QualifiedName == qualifiedName) return true;
+                type = type.BaseXmlSchemaType;
+            }
+
+            return false;
+        }
     }
 }
