@@ -112,6 +112,7 @@ namespace XmlSchemaClassGenerator.Tests
         const string GraphMLPattern = "xsd/graphml/ygraphml.xsd";
         const string UnionPattern = "xsd/union/union.xsd";
         const string GuidPattern = "xsd/guid/*.xsd";
+        const string Guid2Pattern = "xsd/guid2/*.xsd";
         const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
 
         // IATA test takes too long to perform every time
@@ -157,11 +158,13 @@ namespace XmlSchemaClassGenerator.Tests
             SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
         }
 
-        [Fact, TestPriority(1)]
+        [Theory, TestPriority(1)]
+        [InlineData(GuidPattern)]
+        [InlineData(Guid2Pattern)]
         [UseCulture("en-US")]
-        public void TestGuid()
+        public void TestGuid(string pattern)
         {
-            var assembly = Compiler.Generate("Guid", GuidPattern);
+            var assembly = Compiler.Generate("Guid", pattern);
             var testType = assembly.GetType("Guid.Test");
             var idProperty = testType.GetProperty("Id");
             var elementIdProperty = testType.GetProperty("ElementId");
