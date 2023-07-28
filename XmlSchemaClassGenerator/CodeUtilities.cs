@@ -99,7 +99,11 @@ namespace XmlSchemaClassGenerator
             Type FromFallback() => configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null ? configuration.IntegerDataType : typeof(string);
         }
 
-        private static readonly XmlQualifiedName GuidQualifiedName = new("guid", "http://microsoft.com/wsdl/types/");
+        private static readonly XmlQualifiedName[] GuidQualifiedNames =
+        {
+            new("guid", "http://microsoft.com/wsdl/types/"),
+            new("guid", "http://schemas.microsoft.com/2003/10/Serialization/")
+        };
 
         public static Type GetEffectiveType(this XmlSchemaDatatype type, GeneratorConfiguration configuration, IEnumerable<RestrictionModel> restrictions, XmlSchemaType schemaType, bool attribute = false)
         {
@@ -114,7 +118,7 @@ namespace XmlSchemaClassGenerator
                 _ => type.ValueType,
             };
 
-            if (schemaType.IsDerivedFrom(GuidQualifiedName))
+            if (GuidQualifiedNames.Any(schemaType.IsDerivedFrom))
             {
                 resultType = typeof(Guid);
             }
