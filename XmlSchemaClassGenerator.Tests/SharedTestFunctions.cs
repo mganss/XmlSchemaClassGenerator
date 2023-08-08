@@ -126,7 +126,7 @@
                 {
                     if (HandleValidationError(output, xmlLines, e))
                         throw e.Exception;
-                }
+                };
 
                 settings.ValidationEventHandler += validate2;
 

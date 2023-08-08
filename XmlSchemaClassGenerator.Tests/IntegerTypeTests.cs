@@ -65,15 +65,15 @@ namespace XmlSchemaClassGenerator.Tests {
             var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 	<xs:complexType name=""document"">
-		<xs:sequence>
-			<xs:element name=""someValue"">
-				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
-						<xs:totalDigits value=""{totalDigits}""/>
-					</xs:restriction>
-			</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
+    <xs:sequence>
+		  <xs:element name=""someValue"">
+			  <xs:simpleType>
+				  <xs:restriction base=""xs:integer"">
+            <xs:totalDigits value=""{totalDigits}""/>
+				  </xs:restriction>
+			  </xs:simpleType>
+		  </xs:element>
+    </xs:sequence>
 	</xs:complexType>
 </xs:schema>";
 
@@ -99,15 +99,15 @@ namespace XmlSchemaClassGenerator.Tests {
             var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 	<xs:complexType name=""document"">
-		<xs:sequence>
-			<xs:element name=""someValue"">
-				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
-						<xs:totalDigits value=""{totalDigits}""/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
+    <xs:sequence>
+		  <xs:element name=""someValue"">
+			  <xs:simpleType>
+				  <xs:restriction base=""xs:integer"">
+            <xs:totalDigits value=""{totalDigits}""/>
+				  </xs:restriction>
+			  </xs:simpleType>
+		  </xs:element>
+    </xs:sequence>
 	</xs:complexType>
 </xs:schema>";
 
@@ -147,16 +147,16 @@ namespace XmlSchemaClassGenerator.Tests {
             var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 	<xs:complexType name=""document"">
-		<xs:sequence>
-			<xs:element name=""someValue"">
-				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
-						<xs:minInclusive value=""{minInclusive}""/>
-						<xs:maxInclusive value=""{maxInclusive}""/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
+    <xs:sequence>
+		  <xs:element name=""someValue"">
+			  <xs:simpleType>
+				  <xs:restriction base=""xs:integer"">
+            <xs:minInclusive value=""{minInclusive}""/>
+            <xs:maxInclusive value=""{maxInclusive}""/>
+				  </xs:restriction>
+			  </xs:simpleType>
+		  </xs:element>
+    </xs:sequence>
 	</xs:complexType>
 </xs:schema>";
 
@@ -173,129 +173,5 @@ namespace XmlSchemaClassGenerator.Tests {
 
           Assert.Contains(expectedProperty, generatedProperty);
         }
-
-		[Theory]
-		[InlineData(2, "sbyte")]
-		[InlineData(4, "short")]
-		[InlineData(9, "int")]
-		[InlineData(18, "long")]
-		[InlineData(28, "decimal")]
-		[InlineData(29, "string")]
-		public void TestDecimalFractionDigitsZeroTotalDigits(int totalDigits, string expectedType)
-		{
-			var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
-<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
-	<xs:complexType name=""document"">
-		<xs:sequence>
-			<xs:element name=""someValue"">
-				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
-						<xs:totalDigits value=""{totalDigits}""/>
-					</xs:restriction>
-			</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>";
-
-			var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
-			{
-				NamespaceProvider = new NamespaceProvider
-				{
-					GenerateNamespace = key => "Test"
-				}
-			});
-
-			var expectedProperty = $"public {expectedType} SomeValue";
-			Assert.Contains(expectedProperty, generatedType.First());
-		}
-
-
-		[Theory]
-		[InlineData(4, false, "long")]
-		[InlineData(30, false, "long")]
-		[InlineData(4, true, "short")]
-		[InlineData(30, true, "long")]
-		public void TestDecimalFractionDigitsFallbackType(int totalDigits, bool useTypeAsFallback, string expectedType)
-		{
-			var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
-<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
-	<xs:complexType name=""document"">
-		<xs:sequence>
-			<xs:element name=""someValue"">
-				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
-						<xs:totalDigits value=""{totalDigits}""/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>";
-
-			var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
-			{
-				NamespaceProvider = new NamespaceProvider
-				{
-					GenerateNamespace = key => "Test"
-				},
-				IntegerDataType = typeof(long),
-				UseIntegerDataTypeAsFallback = useTypeAsFallback
-			});
-
-			var expectedProperty = $"public {expectedType} SomeValue";
-			Assert.Contains(expectedProperty, generatedType.First());
-		}
-
-		[Theory]
-		[InlineData(1, 100, "byte")]
-		[InlineData(byte.MinValue, byte.MaxValue, "byte")]
-		[InlineData(-100, 100, "sbyte")]
-		[InlineData(sbyte.MinValue, sbyte.MaxValue, "sbyte")]
-		[InlineData(1, 1000, "ushort")]
-		[InlineData(ushort.MinValue, ushort.MaxValue, "ushort")]
-		[InlineData(-1000, 1000, "short")]
-		[InlineData(short.MinValue, short.MaxValue, "short")]
-		[InlineData(1, 100000, "uint")]
-		[InlineData(uint.MinValue, uint.MaxValue, "uint")]
-		[InlineData(-100000, 100000, "int")]
-		[InlineData(int.MinValue, int.MaxValue, "int")]
-		[InlineData(1, 10000000000, "ulong")]
-		[InlineData(ulong.MinValue, ulong.MaxValue, "ulong")]
-		[InlineData(-10000000000, 10000000000, "long")]
-		[InlineData(long.MinValue, long.MaxValue, "long")]
-		public void TestDecimalFractionDigitsZeroInclusiveRange(long minInclusive, ulong maxInclusive, string expectedType)
-		{
-			var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
-<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
-	<xs:complexType name=""document"">
-		<xs:sequence>
-			<xs:element name=""someValue"">
-				<xs:simpleType>
-					<xs:restriction base=""xs:decimal"">
-						<xs:minInclusive value=""{minInclusive}""/>
-						<xs:maxInclusive value=""{maxInclusive}""/>
-						<xs:fractionDigits value=""0""/>
-					</xs:restriction>
-				</xs:simpleType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-</xs:schema>";
-
-			var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
-			{
-				NamespaceProvider = new NamespaceProvider
-				{
-					GenerateNamespace = key => "Test"
-				}
-			});
-
-			var expectedProperty = $"public {expectedType} SomeValue";
-			var generatedProperty = generatedType.First();
-
-			Assert.Contains(expectedProperty, generatedProperty);
-		}
-	}
-
+    }
 }

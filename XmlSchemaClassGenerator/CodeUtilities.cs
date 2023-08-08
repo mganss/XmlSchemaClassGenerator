@@ -111,8 +111,7 @@ namespace XmlSchemaClassGenerator
                 XmlTypeCode.Time => typeof(DateTime),
                 XmlTypeCode.Idref => typeof(string),
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
-				XmlTypeCode.Decimal when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => GetIntegerDerivedType(type, configuration, restrictions),
-				_ => type.ValueType,
+                _ => type.ValueType,
             };
 
             if (schemaType.IsDerivedFrom(GuidQualifiedName))
