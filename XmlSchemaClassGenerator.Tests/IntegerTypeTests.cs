@@ -7,21 +7,16 @@ using System.Xml.Schema;
 using Xunit;
 
 namespace XmlSchemaClassGenerator.Tests {
-    public class IntegerTypeTests
+    public sealed class IntegerTypeTests
     {
-        private static IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+        private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
         {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
             var writer = new MemoryOutputWriter();
 
             var gen = new Generator
             {
                 OutputWriter = writer,
-                Version = new VersionProvider("Tests", "1.0.0.1"),
+                Version = new("Tests", "1.0.0.1"),
                 NamespaceProvider = generatorPrototype.NamespaceProvider,
                 GenerateNullables = generatorPrototype.GenerateNullables,
                 IntegerDataType = generatorPrototype.IntegerDataType,
@@ -40,11 +35,8 @@ namespace XmlSchemaClassGenerator.Tests {
 
             using (var stringReader = new StringReader(xsd))
             {
-                var schema = XmlSchema.Read(stringReader, (s, e) =>
-                {
-                  throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception);
-                });
-
+                var schema = XmlSchema.Read(stringReader, (_, e) => throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception));
+				ArgumentNullException.ThrowIfNull(schema);
                 set.Add(schema);
             }
 
@@ -77,16 +69,19 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-            var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
+            var generatedType = ConvertXml(
+	            xsd, new()
             {
-                NamespaceProvider = new NamespaceProvider
+                NamespaceProvider = new()
                 {
-                    GenerateNamespace = key => "Test"
+                    GenerateNamespace = _ => "Test"
                 }
             });
 
             var expectedProperty = $"public {expectedType} SomeValue";
-            Assert.Contains(expectedProperty, generatedType.First());
+            var generatedProperty = generatedType.First();
+
+			Assert.Contains(expectedProperty, generatedProperty);
         }
 
         [Theory]
@@ -111,18 +106,21 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-          var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
+          var generatedType = ConvertXml(
+	          xsd, new()
           {
-              NamespaceProvider = new NamespaceProvider
+              NamespaceProvider = new()
               {
-                  GenerateNamespace = key => "Test"
+                  GenerateNamespace = _ => "Test"
               },
               IntegerDataType = typeof(long),
               UseIntegerDataTypeAsFallback = useTypeAsFallback
           });
 
           var expectedProperty = $"public {expectedType} SomeValue";
-          Assert.Contains(expectedProperty, generatedType.First());
+          var generatedProperty = generatedType.First();
+
+          Assert.Contains(expectedProperty, generatedProperty);
         }
 
 		[Theory]
@@ -160,11 +158,12 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-          var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
+          var generatedType = ConvertXml(
+	          xsd, new()
           {
-              NamespaceProvider = new NamespaceProvider
+              NamespaceProvider = new()
               {
-                  GenerateNamespace = key => "Test"
+                  GenerateNamespace = _ => "Test"
               }
           });
 
@@ -189,8 +188,9 @@ namespace XmlSchemaClassGenerator.Tests {
 		<xs:sequence>
 			<xs:element name=""someValue"">
 				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
+					<xs:restriction base=""xs:decimal"">
 						<xs:totalDigits value=""{totalDigits}""/>
+						<xs:fractionDigits value=""0""/>
 					</xs:restriction>
 			</xs:simpleType>
 			</xs:element>
@@ -198,16 +198,18 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-			var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
+			var generatedType = ConvertXml(xsd, new()
 			{
-				NamespaceProvider = new NamespaceProvider
+				NamespaceProvider = new()
 				{
-					GenerateNamespace = key => "Test"
+					GenerateNamespace = _ => "Test"
 				}
 			});
 
 			var expectedProperty = $"public {expectedType} SomeValue";
-			Assert.Contains(expectedProperty, generatedType.First());
+			var generatedProperty = generatedType.First();
+
+			Assert.Contains(expectedProperty, generatedProperty);
 		}
 
 
@@ -224,8 +226,9 @@ namespace XmlSchemaClassGenerator.Tests {
 		<xs:sequence>
 			<xs:element name=""someValue"">
 				<xs:simpleType>
-					<xs:restriction base=""xs:integer"">
+					<xs:restriction base=""xs:decimal"">
 						<xs:totalDigits value=""{totalDigits}""/>
+						<xs:fractionDigits value=""0""/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
@@ -233,18 +236,21 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-			var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
+			var generatedType = ConvertXml(
+				xsd, new()
 			{
-				NamespaceProvider = new NamespaceProvider
+				NamespaceProvider = new()
 				{
-					GenerateNamespace = key => "Test"
+					GenerateNamespace = _ => "Test"
 				},
 				IntegerDataType = typeof(long),
 				UseIntegerDataTypeAsFallback = useTypeAsFallback
 			});
 
 			var expectedProperty = $"public {expectedType} SomeValue";
-			Assert.Contains(expectedProperty, generatedType.First());
+			var generatedProperty = generatedType.First();
+
+			Assert.Contains(expectedProperty, generatedProperty);
 		}
 
 		[Theory]
@@ -283,11 +289,12 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-			var generatedType = ConvertXml(nameof(TestTotalDigits), xsd, new Generator
+			var generatedType = ConvertXml(
+				xsd, new()
 			{
-				NamespaceProvider = new NamespaceProvider
+				NamespaceProvider = new()
 				{
-					GenerateNamespace = key => "Test"
+					GenerateNamespace = _ => "Test"
 				}
 			});
 

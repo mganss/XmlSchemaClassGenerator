@@ -73,27 +73,40 @@ namespace XmlSchemaClassGenerator
                 _ => typeof(decimal),
             };
 
-            Type FromDigitRestriction(TotalDigitsRestrictionModel totalDigits) => xml.TypeCode switch
+            Type FromDigitRestriction(TotalDigitsRestrictionModel totalDigits
+            ) => xml.TypeCode switch
             {
-                XmlTypeCode.PositiveInteger or XmlTypeCode.NonNegativeInteger => totalDigits?.Value switch
-                {
-                    < 3 => typeof(byte),
-                    < 5 => typeof(ushort),
-                    < 10 => typeof(uint),
-                    < 20 => typeof(ulong),
-                    < 30 => typeof(decimal),
-                    _ => null
-                },
-                XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonPositiveInteger => totalDigits?.Value switch
-                {
-                    < 3 => typeof(sbyte),
-                    < 5 => typeof(short),
-                    < 10 => typeof(int),
-                    < 19 => typeof(long),
-                    < 29 => typeof(decimal),
-                    _ => null
-                },
-                _ => null,
+	            XmlTypeCode.PositiveInteger or XmlTypeCode.NonNegativeInteger => totalDigits?.Value switch
+	            {
+		            < 3 => typeof(byte),
+		            < 5 => typeof(ushort),
+		            < 10 => typeof(uint),
+		            < 20 => typeof(ulong),
+		            < 30 => typeof(decimal),
+		            _ => null
+	            },
+	            XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonPositiveInteger => totalDigits
+			            ?.Value switch
+		            {
+			            < 3 => typeof(sbyte),
+			            < 5 => typeof(short),
+			            < 10 => typeof(int),
+			            < 19 => typeof(long),
+			            < 29 => typeof(decimal),
+			            _ => null
+		            },
+	            XmlTypeCode.Decimal 
+		            when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => totalDigits
+			            ?.Value switch
+		            {
+			            < 3 => typeof(sbyte),
+			            < 5 => typeof(short),
+			            < 10 => typeof(int),
+			            < 19 => typeof(long),
+			            < 29 => typeof(decimal),
+			            _ => null
+		            },
+				_ => null
             };
 
             Type FromFallback() => configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null ? configuration.IntegerDataType : typeof(string);
