@@ -245,6 +245,8 @@ Instead of specifying the namespace mappings on the command line you can also us
 
 http://example.com = Example.NamespaceA a.xsd
 http://example.com = Example.NamespaceB b.xsd
+Empty
+# or alternatively
 = Empty
 ```
 
