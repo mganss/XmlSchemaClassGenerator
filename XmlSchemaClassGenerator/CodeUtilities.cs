@@ -333,6 +333,15 @@ namespace XmlSchemaClassGenerator
         public static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
         {
             var parts = nsArg.Split(new[] { '=' }, 2);
+
+            if (parts.Length == 1)
+            {
+                var ns = parts[0];
+                if (!string.IsNullOrEmpty(namespacePrefix))
+                    ns = namespacePrefix + "." + ns;
+                return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(), ns);
+            }
+
             if (parts.Length != 2)
                 throw new ArgumentException("XML and C# namespaces should be separated by '='. You entered: " + nsArg);
 

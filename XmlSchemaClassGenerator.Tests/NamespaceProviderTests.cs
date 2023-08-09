@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Xunit;
 
 namespace XmlSchemaClassGenerator.Tests
@@ -100,6 +101,20 @@ namespace XmlSchemaClassGenerator.Tests
             var actual = CodeUtilities.ParseNamespace(string.Format(customNsPattern, xmlSchema, netNs), netPrefix);
 
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void TestParseNamespaceUtilityMethodWithDefault()
+        {
+            var netPrefix = "Test";
+            var netNs = "MyNamespace";
+            var actual = CodeUtilities.ParseNamespace(netNs, null);
+
+            Assert.Equal(new KeyValuePair<NamespaceKey, string>(new NamespaceKey(), netNs), actual);
+
+            actual = CodeUtilities.ParseNamespace(netNs, netPrefix);
+
+            Assert.Equal(new KeyValuePair<NamespaceKey, string>(new NamespaceKey(), string.Join(".", netPrefix, netNs)), actual);
         }
     }
 }
