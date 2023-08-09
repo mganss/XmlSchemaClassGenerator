@@ -68,6 +68,7 @@ namespace XmlSchemaClassGenerator.Console
                 { "h|help", "show this message and exit", v => showHelp = v != null },
                 { "n|namespace=", @"map an XML namespace to a C# namespace
 Separate XML namespace and C# namespace by '='.
+A single value (no '=') is taken as the C# namespace the empty XML namespace is mapped to.
 One option must be given for each namespace to be mapped.
 A file name may be given by appending a pipe sign (|) followed by a file name (like schema.xsd) to the XML namespace.
 If no mapping is found for an XML namespace, a name is generated automatically (may fail).", v => namespaces.Add(v) },
@@ -268,6 +269,9 @@ without backing field initialization for collections
                     .Where(l => !string.IsNullOrWhiteSpace(l.Line) && !l.Line.StartsWith("#")))
                 {
                     var parts = line.Split('=');
+
+                    if (parts.Length == 1)
+                        parts = new[] { string.Empty, parts[0] };
 
                     if (parts.Length != 2)
                     {
