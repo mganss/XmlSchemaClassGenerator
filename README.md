@@ -51,7 +51,7 @@ For command line use, choose your preferred installation:
 ```
 Usage: xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 2.0.792.0
+Version 2.0.877.0
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -59,6 +59,8 @@ Options:
   -h, --help                 show this message and exit
   -n, --namespace=VALUE      map an XML namespace to a C# namespace
                                Separate XML namespace and C# namespace by '='.
+                               A single value (no '=') is taken as the C#
+                               namespace the empty XML namespace is mapped to.
                                One option must be given for each namespace to
                                be mapped.
                                A file name may be given by appending a pipe
@@ -229,10 +231,10 @@ xscgen -n "|a.xsd=Example.NamespaceA" -n "|b.xsd=Example.NamespaceB" a.xsd b.xsd
 In order to provide a C# namespace name for an empty XML namespace you can specify it on the command line like this:
 
 ```
-xscgen -n =Example example.xsd
+xscgen -n Example example.xsd
 ```
 
-Note the space between `-n` and `=Example`.
+An alternative form that is also valid is `-n =Example`. Note the space between `-n` and `=Example`.
 
 #### Using mapping files
 
