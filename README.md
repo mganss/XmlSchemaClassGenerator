@@ -451,7 +451,7 @@ Note that semantic issues might arise with this approach. For example, `DateTime
 Contributing
 ------------
 
-Contrbutions are welcome. Here are some guidelines:
+Contributions are welcome. Here are some guidelines:
 
 - If it's not a trivial fix, please submit an issue first
 - Try and blend new code with the existing code's style
