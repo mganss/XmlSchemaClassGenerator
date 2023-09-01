@@ -14,16 +14,55 @@ namespace XmlSchemaClassGenerator
 {
     public static class CodeUtilities
     {
-        // Match non-letter followed by letter
-        private static readonly Regex PascalCaseRegex = new(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
+        private static readonly Regex invalidCharsRgx = new Regex("[^_a-zA-Z0-9]");
+        private static readonly Regex whiteSpace = new Regex(@"(?<=\s)");
+        private static readonly Regex startsWithLowerCaseChar = new Regex("^[a-z]");
+        private static readonly Regex firstCharFollowedByUpperCasesOnly = new Regex("(?<=[A-Z])[A-Z0-9]+$");
+        private static readonly Regex lowerCaseNextToNumber = new Regex("(?<=[0-9])[a-z]");
+        private static readonly Regex upperCaseInside = new Regex("(?<=[A-Z])[A-Z]+?((?=[A-Z][a-z])|(?=[0-9]))");
 
-        // Uppercases first letter and all letters following non-letters.
-        // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
-        public static string ToPascalCase(this string s) => string.IsNullOrEmpty(s) ? s
-            : char.ToUpperInvariant(s[0]) + PascalCaseRegex.Replace(s.Substring(1), m => m.Value[0] + char.ToUpperInvariant(m.Value[1]).ToString());
+        // Credits: chviLadislav
+        // https://stackoverflow.com/questions/18627112/how-can-i-convert-text-to-pascal-case
+        // Example output:
+        //   "WARD_VS_VITAL_SIGNS"          "WardVsVitalSigns"
+        //   "Who am I?"                    "WhoAmI"
+        //   "I ate before you got here"    "IAteBeforeYouGotHere"
+        //   "Hello|Who|Am|I?"              "HelloWhoAmI"
+        //   "Live long and prosper"        "LiveLongAndProsper"
+        //   "Lorem ipsum dolor..."         "LoremIpsumDolor"
+        //   "CoolSP"                       "CoolSp"
+        //   "AB9CD"                        "Ab9Cd"
+        //   "CCCTrigger"                   "CccTrigger"
+        //   "CIRC"                         "Circ"
+        //   "ID_SOME"                      "IdSome"
+        //   "ID_SomeOther"                 "IdSomeOther"
+        //   "ID_SOMEOther"                 "IdSomeOther"
+        //   "CCC_SOME_2Phases"             "CccSome2Phases"
+        //   "AlreadyGoodPascalCase"        "AlreadyGoodPascalCase"
+        //   "999 999 99 9 "                "999999999"
+        //   "1 2 3 "                       "123"
+        //   "1 AB cd EFDDD 8"              "1AbCdEfddd8"
+        //   "INVALID VALUE AND _2THINGS"   "InvalidValueAnd2Things"
+        public static string ToPascalCase(this string original)
+        {
+            // replace white spaces with undescore, then replace all invalid chars with empty string
+            var pascalCase = invalidCharsRgx.Replace(whiteSpace.Replace(original, "_"), string.Empty)
+                // split by underscores
+                .Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
+                // set first letter to uppercase
+                .Select(w => startsWithLowerCaseChar.Replace(w, m => m.Value.ToUpper()))
+                // replace second and all following upper case letters to lower if there is no next lower (ABC -> Abc)
+                .Select(w => firstCharFollowedByUpperCasesOnly.Replace(w, m => m.Value.ToLower()))
+                // set upper case the first lower case following a number (Ab9cd -> Ab9Cd)
+                .Select(w => lowerCaseNextToNumber.Replace(w, m => m.Value.ToUpper()))
+                // lower second and next upper case letters except the last if it follows by any lower (ABcDEf -> AbcDef)
+                .Select(w => upperCaseInside.Replace(w, m => m.Value.ToLower()));
+
+            return string.Concat(pascalCase);
+        }
 
         public static string ToCamelCase(this string s) => string.IsNullOrEmpty(s) ? s
-            : char.ToLowerInvariant(s[0]) + s.Substring(1);
+                : char.ToLowerInvariant(s[0]) + s.Substring(1);
 
         public static string ToBackingField(this string propertyName, string privateFieldPrefix)
             => string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
@@ -76,37 +115,37 @@ namespace XmlSchemaClassGenerator
             Type FromDigitRestriction(TotalDigitsRestrictionModel totalDigits
             ) => xml.TypeCode switch
             {
-	            XmlTypeCode.PositiveInteger or XmlTypeCode.NonNegativeInteger => totalDigits?.Value switch
-	            {
-		            < 3 => typeof(byte),
-		            < 5 => typeof(ushort),
-		            < 10 => typeof(uint),
-		            < 20 => typeof(ulong),
-		            < 30 => typeof(decimal),
-		            _ => null
-	            },
-	            XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonPositiveInteger => totalDigits
-			            ?.Value switch
-		            {
-			            < 3 => typeof(sbyte),
-			            < 5 => typeof(short),
-			            < 10 => typeof(int),
-			            < 19 => typeof(long),
-			            < 29 => typeof(decimal),
-			            _ => null
-		            },
-	            XmlTypeCode.Decimal 
-		            when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => totalDigits
-			            ?.Value switch
-		            {
-			            < 3 => typeof(sbyte),
-			            < 5 => typeof(short),
-			            < 10 => typeof(int),
-			            < 19 => typeof(long),
-			            < 29 => typeof(decimal),
-			            _ => null
-		            },
-				_ => null
+                XmlTypeCode.PositiveInteger or XmlTypeCode.NonNegativeInteger => totalDigits?.Value switch
+                {
+                    < 3 => typeof(byte),
+                    < 5 => typeof(ushort),
+                    < 10 => typeof(uint),
+                    < 20 => typeof(ulong),
+                    < 30 => typeof(decimal),
+                    _ => null
+                },
+                XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonPositiveInteger => totalDigits
+              ?.Value switch
+                {
+                    < 3 => typeof(sbyte),
+                    < 5 => typeof(short),
+                    < 10 => typeof(int),
+                    < 19 => typeof(long),
+                    < 29 => typeof(decimal),
+                    _ => null
+                },
+                XmlTypeCode.Decimal
+            when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => totalDigits
+              ?.Value switch
+            {
+                < 3 => typeof(sbyte),
+                < 5 => typeof(short),
+                < 10 => typeof(int),
+                < 19 => typeof(long),
+                < 29 => typeof(decimal),
+                _ => null
+            },
+                _ => null
             };
 
             Type FromFallback() => configuration.UseIntegerDataTypeAsFallback && configuration.IntegerDataType != null ? configuration.IntegerDataType : typeof(string);
@@ -124,8 +163,8 @@ namespace XmlSchemaClassGenerator
                 XmlTypeCode.Time => typeof(DateTime),
                 XmlTypeCode.Idref => typeof(string),
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
-				XmlTypeCode.Decimal when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => GetIntegerDerivedType(type, configuration, restrictions),
-				_ => type.ValueType,
+                XmlTypeCode.Decimal when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => GetIntegerDerivedType(type, configuration, restrictions),
+                _ => type.ValueType,
             };
 
             if (schemaType.IsDerivedFrom(GuidQualifiedName))
