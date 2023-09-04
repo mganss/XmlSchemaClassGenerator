@@ -45,8 +45,8 @@ namespace XmlSchemaClassGenerator
         //   "INVALID VALUE AND _2THINGS"   "InvalidValueAnd2Things"
         public static string ToPascalCase(this string original)
         {
-            // replace white spaces with undescore, then replace all invalid chars with empty string
-            var pascalCase = invalidCharsRgx.Replace(whiteSpace.Replace(original, "_"), string.Empty)
+            // replace white spaces with undescore, then replace all invalid chars with undescore
+            var pascalCase = invalidCharsRgx.Replace(whiteSpace.Replace(original, "_"), "_")
                 // split by underscores
                 .Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
                 // set first letter to uppercase

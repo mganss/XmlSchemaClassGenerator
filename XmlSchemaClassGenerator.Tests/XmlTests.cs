@@ -641,8 +641,8 @@ namespace XmlSchemaClassGenerator.Tests
 
             var testFiles = new Dictionary<string, string>
             {
-                { "Schaltbau.xhtml", "XhtmlPeriodHtmlPeriodType" },
-                { "GLEIF Annual Accounts.html", "XhtmlPeriodHtmlPeriodType" },
+                { "Schaltbau.xhtml", "XhtmlHtmlType" },
+                { "GLEIF Annual Accounts.html", "XhtmlHtmlType" },
             };
 
             foreach (var testFile in testFiles)
@@ -767,7 +767,7 @@ namespace XmlSchemaClassGenerator.Tests
             {
                 { bpmnXsd, "TDefinitions" },
                 { semantXsd, "TActivity" },
-                { bpmndiXsd, "BPMNDiagram" },
+                { bpmndiXsd, "BpmnDiagram" },
                 { dcXsd, "Font" },
                 { diXsd, "DiagramElement" }
             };
@@ -1139,7 +1139,7 @@ namespace Test
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(""group-name"", Namespace="""")]
     [System.ComponentModel.DesignerCategoryAttribute(""code"")]
-    public partial class Group_Name
+    public partial class GroupName
     {
 
         /// <summary>
@@ -1743,11 +1743,11 @@ namespace Test
             var durationEnumType = assembly.GetType("Test.TestEnum");
             Assert.NotNull(durationEnumType);
 
-            var expectedEnumValues = new[] {"Test_Case", "Test_Case1", "Test_Case2", "Test_Case3"};
+            var expectedEnumValues = new[] {"TestCase", "TestCase1", "TestCase2", "TestCase3"};
             var enumValues = durationEnumType.GetEnumNames().OrderBy(n => n).ToList();
             Assert.Equal(expectedEnumValues, enumValues);
 
-            var mEnumValue = durationEnumType.GetMembers().First(mi => mi.Name == "Test_Case1");
+            var mEnumValue = durationEnumType.GetMembers().First(mi => mi.Name == "TestCase1");
             var xmlEnumAttribute = mEnumValue.GetCustomAttributes<XmlEnumAttribute>().FirstOrDefault();
             Assert.NotNull(xmlEnumAttribute);
             Assert.Equal("test_Case", xmlEnumAttribute.Name);
@@ -2398,13 +2398,13 @@ namespace Test
             var generator = new Generator
             {
                 IntegerDataType = typeof(int),
-                NamespacePrefix = "Test_NS1",
+                NamespacePrefix = "TestNS1",
                 GenerateNullables = true,
                 CollectionType = typeof(System.Collections.Generic.List<>)
             };
             var contents = ConvertXml(nameof(TestArrayOfMsTypeGeneration), new[] { xsd0, xsd1 }, generator).ToArray();
             var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
-            var testType = assembly.GetType("Test_NS1.C_Ai");
+            var testType = assembly.GetType("TestNS1.CAi");
             var serializer = new XmlSerializer(testType);
             Assert.NotNull(serializer);
             dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
@@ -2773,10 +2773,10 @@ namespace Test
             };
             var contents = ConvertXml(nameof(TestArrayItemAttribute), new[] { xsd }, generator).ToArray();
             var assembly = Compiler.Compile(nameof(TestArrayItemAttribute), contents);
-            var applicationType = assembly.GetType("Test_Generation_Namespace.T_Application");
+            var applicationType = assembly.GetType("TestGenerationNamespace.TApplication");
             Assert.NotNull(applicationType);
             var optionList = applicationType.GetProperty("OptionList");
-            Assert.Equal("Test_Generation_Namespace.T_OptionList", optionList.PropertyType.FullName);
+            Assert.Equal("TestGenerationNamespace.TOptionList", optionList.PropertyType.FullName);
         }
 
         [Fact]
