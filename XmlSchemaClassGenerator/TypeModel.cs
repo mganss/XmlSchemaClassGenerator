@@ -92,11 +92,16 @@ namespace XmlSchemaClassGenerator
 
         protected void GenerateTypeAttribute(CodeTypeDeclaration typeDeclaration)
         {
-            if (XmlSchemaName == null || IsRedefined) return;
+            var xmlSchemaName = XmlSchemaName;
+
+            if (xmlSchemaName == null && RootElementName != null && typeDeclaration.Name != RootElementName.Name)
+                xmlSchemaName = RootElementName;
+
+            if (xmlSchemaName == null || IsRedefined) return;
 
             var typeAttribute = AttributeDecl<XmlTypeAttribute>(
-                new(new CodePrimitiveExpression(XmlSchemaName.Name)),
-                new(nameof(XmlRootAttribute.Namespace), new CodePrimitiveExpression(XmlSchemaName.Namespace)));
+                new(new CodePrimitiveExpression(xmlSchemaName.Name)),
+                new(nameof(XmlRootAttribute.Namespace), new CodePrimitiveExpression(xmlSchemaName.Namespace)));
 
             // don't generate AnonymousType if it's derived class, otherwise XmlSerializer will
             // complain with "InvalidOperationException: Cannot include anonymous type '...'"

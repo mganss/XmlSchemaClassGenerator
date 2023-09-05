@@ -2617,7 +2617,8 @@ namespace Test
                 CollectionSettersMode = CollectionSettersMode.Public,
                 EmitOrder = true,
                 SeparateSubstitutes = true,
-                GenerateInterfaces = false
+                GenerateInterfaces = false,
+                UniqueTypeNamesAcrossNamespaces = true,
             };
             var xsdFiles = new[]
             {

@@ -14,12 +14,12 @@ namespace XmlSchemaClassGenerator
 {
     public static class CodeUtilities
     {
-        private static readonly Regex invalidCharsRgx = new Regex("[^_a-zA-Z0-9]");
-        private static readonly Regex whiteSpace = new Regex(@"(?<=\s)");
-        private static readonly Regex startsWithLowerCaseChar = new Regex("^[a-z]");
-        private static readonly Regex firstCharFollowedByUpperCasesOnly = new Regex("(?<=[A-Z])[A-Z0-9]+$");
-        private static readonly Regex lowerCaseNextToNumber = new Regex("(?<=[0-9])[a-z]");
-        private static readonly Regex upperCaseInside = new Regex("(?<=[A-Z])[A-Z]+?((?=[A-Z][a-z])|(?=[0-9]))");
+        private static readonly Regex invalidCharsRgx = new("[^_a-zA-Z0-9]");
+        private static readonly Regex whiteSpace = new(@"(?<=\s)");
+        private static readonly Regex startsWithLowerCaseChar = new("^[a-z]");
+        private static readonly Regex firstCharFollowedByUpperCasesOnly = new("(?<=[A-Z])[A-Z0-9]+$");
+        private static readonly Regex lowerCaseNextToNumber = new("(?<=[0-9])[a-z]");
+        private static readonly Regex upperCaseInside = new("(?<=[A-Z])[A-Z]+?((?=[A-Z][a-z])|(?=[0-9]))");
 
         // Credits: chviLadislav
         // https://stackoverflow.com/questions/18627112/how-can-i-convert-text-to-pascal-case
