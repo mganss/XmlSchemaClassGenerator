@@ -312,7 +312,7 @@
                     EnableDataBinding = true,
                     SeparateClasses = true,
                     NamespacePrefix = "Generator.Prefix",
-                    SeparateNamespaceHierarchy = true,
+                    SeparateNamespaceHierarchy = false,
                 });
 
             SharedTestFunctions.TestSamples(_output, "SeparateDefaultProviderGeneratorPrefix", PrefixPattern);
