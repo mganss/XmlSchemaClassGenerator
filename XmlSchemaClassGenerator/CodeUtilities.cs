@@ -14,12 +14,12 @@ namespace XmlSchemaClassGenerator
 {
     public static class CodeUtilities
     {
-        private static readonly Regex invalidCharsRgx = new("[^_a-zA-Z0-9]");
+        private static readonly Regex invalidCharsRgx = new(@"[^_\p{L}\p{N}]");
         private static readonly Regex whiteSpace = new(@"(?<=\s)");
-        private static readonly Regex startsWithLowerCaseChar = new("^[a-z]");
-        private static readonly Regex firstCharFollowedByUpperCasesOnly = new("(?<=[A-Z])[A-Z0-9]+$", RegexOptions.None, TimeSpan.FromSeconds(1));
-        private static readonly Regex lowerCaseNextToNumber = new("(?<=[0-9])[a-z]");
-        private static readonly Regex upperCaseInside = new("(?<=[A-Z])[A-Z]+?((?=[A-Z][a-z])|(?=[0-9]))", RegexOptions.None, TimeSpan.FromSeconds(1));
+        private static readonly Regex startsWithLowerCaseChar = new(@"^\p{Ll}");
+        private static readonly Regex firstCharFollowedByUpperCasesOnly = new(@"(?<=\p{Lu})[\p{Lu}\p{N}]+$", RegexOptions.None, TimeSpan.FromSeconds(1));
+        private static readonly Regex lowerCaseNextToNumber = new(@"(?<=\p{N})\p{Ll}");
+        private static readonly Regex upperCaseInside = new(@"(?<=\p{Lu})\p{Lu}+?((?=\p{Lu}\p{Ll})|(?=\p{N}))", RegexOptions.None, TimeSpan.FromSeconds(1));
 
         // Credits: chviLadislav
         // https://stackoverflow.com/questions/18627112/how-can-i-convert-text-to-pascal-case
