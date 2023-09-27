@@ -334,5 +334,10 @@ namespace XmlSchemaClassGenerator
         /// a numeric C# type is generated. If this is disabled, a union's type will default to string. Default is false.
         /// </summary>
         public bool MapUnionToWidestCommonType { get; set; }
+
+        /// <summary>
+        /// Separates namespace hierarchy by folder. Default is false.
+        /// </summary>
+        public bool SeparateNamespaceHierarchy { get; set; } = false;
     }
 }
