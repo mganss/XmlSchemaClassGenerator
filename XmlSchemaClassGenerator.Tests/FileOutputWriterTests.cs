@@ -312,11 +312,37 @@
                     EnableDataBinding = true,
                     SeparateClasses = true,
                     NamespacePrefix = "Generator.Prefix",
+                    SeparateNamespaceHierarchy = false,
                 });
 
             SharedTestFunctions.TestSamples(_output, "SeparateDefaultProviderGeneratorPrefix", PrefixPattern);
             Assert.Equal(2, outputWriter.Files.Count());
             Assert.Equal(Path.Combine(directory, "Generator.Prefix", "PurchaseOrderType.cs"), outputWriter.Files.First());
+        }
+
+        [Fact]
+        [TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestSeparateWithNamespaceProviderGeneratorPrefix()
+        {
+            var directory = Path.Combine("output", "FileOutputWriterTests", "SeparateWithNamespaceProviderGeneratorPrefix");
+            var outputWriter = new FileWatcherOutputWriter(directory);
+
+            Compiler.Generate(
+                "SeparateWithNamespaceProviderGeneratorPrefix",
+                PrefixPattern,
+                new Generator
+                {
+                    OutputWriter = outputWriter,
+                    EnableDataBinding = true,
+                    SeparateClasses = true,
+                    NamespacePrefix = "Generator.Prefix",
+                    SeparateNamespaceHierarchy = true,
+                });
+
+            SharedTestFunctions.TestSamples(_output, "SeparateWithNamespaceProviderGeneratorPrefix", PrefixPattern);
+            Assert.Equal(2, outputWriter.Files.Count());
+            Assert.Equal(Path.Combine(directory, "Generator", "Prefix", "PurchaseOrderType.cs"), outputWriter.Files.First());
         }
 
         [Fact]

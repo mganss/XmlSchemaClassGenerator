@@ -324,6 +324,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.MapUnionToWidestCommonType = value; }
         }
 
+        public bool SeparateNamespaceHierarchy
+        {
+            get { return _configuration.SeparateNamespaceHierarchy; }
+            set { _configuration.SeparateNamespaceHierarchy = value; }
+        }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
