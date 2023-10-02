@@ -139,7 +139,7 @@ without backing field initialization for collections
                 { "cc|complexTypesForCollections", "generate complex types for collections (default is true)", v => generateComplexTypesForCollections = v != null },
                 { "s|useShouldSerialize", "use ShouldSerialize pattern instead of Specified pattern (default is false)", v => useShouldSerialize = v != null },
                 { "sf|separateFiles", "generate a separate file for each class (default is false)", v => separateClasses = v != null },
-                { "nh|namespaceHierarchy", "generate a separate folder for namespace hierarchy. Accepted only if \"separateFiles\" is true (default is false)", v=> separateNamespaceHierarchy = v != null },
+                { "nh|namespaceHierarchy", "generate a separate folder for namespace hierarchy. Implies \"separateFiles\" if true (default is false)", v=> separateNamespaceHierarchy = v != null },
                 { "sg|separateSubstitutes", "generate a separate property for each element of a substitution group (default is false)", v => separateSubstitutes = v != null },
                 { "dnfin|doNotForceIsNullable", "do not force generator to emit IsNullable = true in XmlElement annotation for nillable elements when element is nullable (minOccurs < 1 or parent element is choice) (default is false)", v => doNotForceIsNullable = v != null },
                 { "cn|compactTypeNames", "use type names without namespace qualifier for types in the using list (default is false)", v => compactTypeNames = v != null },

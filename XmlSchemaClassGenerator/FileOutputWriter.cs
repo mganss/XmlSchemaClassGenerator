@@ -33,7 +33,7 @@ namespace XmlSchemaClassGenerator
             var cu = new CodeCompileUnit();
             cu.Namespaces.Add(cn);
 
-            if (Configuration?.SeparateClasses == true)
+            if (Configuration?.SeparateClasses == true || Configuration?.SeparateNamespaceHierarchy == true)
             {
                 WriteSeparateFiles(cn);
             }
@@ -71,7 +71,7 @@ namespace XmlSchemaClassGenerator
             var validatedNamespaceName = ValidateName(cn.Name);
 
             var namespacePath = validatedNamespaceName;
-            
+
             if (Configuration?.SeparateNamespaceHierarchy == true)
             {
                 namespacePath = Path.Combine(validatedNamespaceName.Split('.'));
