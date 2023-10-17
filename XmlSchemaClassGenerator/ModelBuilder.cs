@@ -618,6 +618,7 @@ namespace XmlSchemaClassGenerator
                 return classModel;
             }
 
+
             private TypeModel CreateTypeModel(XmlSchemaSimpleType simpleType)
             {
                 List<RestrictionModel> restrictions = null;
@@ -625,9 +626,8 @@ namespace XmlSchemaClassGenerator
 
                 var facets = simpleType.Content switch
                 {
-                    XmlSchemaSimpleTypeRestriction typeRestriction => typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList(),
                     XmlSchemaSimpleTypeUnion typeUnion when AllMembersHaveFacets(typeUnion, out baseFacets) => baseFacets.SelectMany(f => f).ToList(),
-                    _ => new(),
+                    _ => MergeRestrictions(simpleType)
                 };
 
                 if (facets.Count > 0)
@@ -650,6 +650,27 @@ namespace XmlSchemaClassGenerator
                     var retval = members.All(r => r?.Facets.Count > 0);
                     baseFacets = !retval ? null : members.Select(r => r.Facets.Cast<XmlSchemaFacet>()).ToList();
                     return retval;
+                }
+
+                static List<XmlSchemaFacet> MergeRestrictions(XmlSchemaSimpleType type)
+                {
+                    if (type == null) return new();
+                    var baseFacets = MergeRestrictions(type.BaseXmlSchemaType as XmlSchemaSimpleType);
+                    if (type.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
+                    {
+                        var facets = typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList();
+                        foreach (var facet in facets)
+                        {
+                            var baseFacet = baseFacets
+                                .Where(f => f is not XmlSchemaEnumerationFacet
+                                    && f.GetType() == facet.GetType())
+                                .SingleOrDefault();
+                            if (baseFacet != null)
+                                baseFacets.Remove(baseFacet);
+                            baseFacets.Add(facet);
+                        }
+                    }
+                    return baseFacets;
                 }
             }
 
