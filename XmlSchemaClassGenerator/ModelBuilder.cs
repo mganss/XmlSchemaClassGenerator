@@ -1075,12 +1075,13 @@ namespace XmlSchemaClassGenerator
 
         public static List<DocumentationModel> GetDocumentation(XmlSchemaAnnotated annotated)
         {
-            return annotated.Annotation == null ? new List<DocumentationModel>()
-                : annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
-                .Where(d => d.Markup?.Length > 0)
-                .Select(d => new DocumentationModel { Language = d.Language, Text = new XText(d.Markup[0].InnerText).ToString() })
-                .Where(d => !string.IsNullOrEmpty(d.Text))
-                .ToList();
+	        return annotated.Annotation == null ? new List<DocumentationModel>()
+		        : annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
+		        .Where(d => d.Markup?.Length > 0)
+		        .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = new XText($"{m.Name}: {m.InnerText}").ToString() }))
+		        .SelectMany(d => d)
+		        .Where(d => !string.IsNullOrEmpty(d.Text))
+		        .ToList();
         }
 
         public IEnumerable<CodeNamespace> GenerateCode()
