@@ -74,7 +74,6 @@ public sealed class DocumentationTests
 		                   		</xs:sequence>
 		                   	</xs:complexType>
 		                   </xs:schema>
-
 		                   """;
 
 		var code = ConvertXml(xsd, new() {NamespacePrefix = "Test"})
@@ -134,30 +133,30 @@ public sealed class DocumentationTests
 		                   <xs:schema targetNamespace="urn:customs.ru:Envelope:ApplicationInf:1.0" elementFormDefault="qualified" version="1.0.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:app="urn:customs.ru:Envelope:ApplicationInf:1.0">
 		                   	<xs:element name="ApplicationInf" type="app:ApplicationInfType"/>
 		                   	<xs:complexType name="ApplicationInfType">
-		                   		<xs:annotation>
-		                   			<xs:documentation>Заголовок конверта.</xs:documentation>
-		                   			<xs:documentation>Информация приложения</xs:documentation>
-		                   		</xs:annotation>
-		                   		<xs:sequence>
-		                   			<xs:element name="SoftKind" type="xs:string" minOccurs="0">
-		                   				<xs:annotation>
-		                   					<xs:documentation>Тип программного обеспечения</xs:documentation>
-		                   				</xs:annotation>
-		                   			</xs:element>
-		                   			<xs:element name="SoftVersion" type="xs:string" minOccurs="0">
-		                   				<xs:annotation>
-		                   					<xs:documentation>Версия программного обеспечения</xs:documentation>
-		                   				</xs:annotation>
-		                   			</xs:element>
-		                   			<xs:element name="MessageKind" type="xs:string" minOccurs="0">
-		                   				<xs:annotation>
-		                   					<xs:documentation>Тип сообщения</xs:documentation>
-		                   				</xs:annotation>
-		                   			</xs:element>
-		                   		</xs:sequence>
+		                      		<xs:annotation>
+		                         			<xs:documentation>Заголовок конверта.</xs:documentation>
+		                         			<xs:documentation>Информация приложения</xs:documentation>
+		                      		</xs:annotation>
+		                      		<xs:sequence>
+		                         			<xs:element name="SoftKind" type="xs:string" minOccurs="0">
+		                            				<xs:annotation>
+		                               					<xs:documentation>Тип программного обеспечения</xs:documentation>
+		                            				</xs:annotation>
+		                         			</xs:element>
+		                         			<xs:element name="SoftVersion" type="xs:string" minOccurs="0">
+		                            				<xs:annotation>
+		                               					<xs:documentation>Версия программного</xs:documentation>
+		                               					<xs:documentation>обеспечения</xs:documentation>
+		                            				</xs:annotation>
+		                         			</xs:element>
+		                         			<xs:element name="MessageKind" type="xs:string" minOccurs="0">
+		                            				<xs:annotation>
+		                               					<xs:documentation>Тип сообщения</xs:documentation>
+		                            				</xs:annotation>
+		                         			</xs:element>
+		                      		</xs:sequence>
 		                   	</xs:complexType>
 		                   </xs:schema>
-
 		                   """;
 
 		var code = ConvertXml(xsd, new() { NamespacePrefix = "Test", GenerateDescriptionAttribute = true })
