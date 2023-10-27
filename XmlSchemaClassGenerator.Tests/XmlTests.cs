@@ -69,7 +69,7 @@ namespace XmlSchemaClassGenerator.Tests
             };
 
             gen.CommentLanguages.Clear();
-            gen.CommentLanguages.AddRange(generatorPrototype.CommentLanguages);
+            gen.CommentLanguages.UnionWith(generatorPrototype.CommentLanguages);
 
             var set = new XmlSchemaSet();
 

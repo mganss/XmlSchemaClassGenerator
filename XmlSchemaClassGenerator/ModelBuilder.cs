@@ -1078,7 +1078,7 @@ namespace XmlSchemaClassGenerator
 	        return annotated.Annotation == null ? new List<DocumentationModel>()
 		        : annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
 		        .Where(d => d.Markup?.Length > 0)
-		        .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = new XText($"{m.Name}: {m.InnerText}").ToString() }))
+		        .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = m.Value }))
 		        .SelectMany(d => d)
 		        .Where(d => !string.IsNullOrEmpty(d.Text))
 		        .ToList();
