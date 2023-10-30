@@ -5,11 +5,16 @@ using System.Linq;
 using System.Xml.Schema;
 
 using Xunit;
+using Xunit.Abstractions;
 
 namespace XmlSchemaClassGenerator.Tests;
 
 public sealed class DocumentationTests
 {
+	private readonly ITestOutputHelper _testOutputHelper;
+
+	public DocumentationTests(ITestOutputHelper testOutputHelper) => _testOutputHelper = testOutputHelper;
+
 	private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
 	{
 		var writer = new MemoryOutputWriter();
@@ -78,7 +83,7 @@ public sealed class DocumentationTests
 
 		var code = ConvertXml(xsd, new() {NamespacePrefix = "Test"})
 			.Single();
-
+		_testOutputHelper.WriteLine(code);
 		Assert.Contains
 		(
 			"""
