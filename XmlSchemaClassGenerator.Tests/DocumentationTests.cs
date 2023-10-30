@@ -5,16 +5,11 @@ using System.Linq;
 using System.Xml.Schema;
 
 using Xunit;
-using Xunit.Abstractions;
 
 namespace XmlSchemaClassGenerator.Tests;
 
 public sealed class DocumentationTests
 {
-	private readonly ITestOutputHelper _testOutputHelper;
-
-	public DocumentationTests(ITestOutputHelper testOutputHelper) => _testOutputHelper = testOutputHelper;
-
 	private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
 	{
 		var writer = new MemoryOutputWriter();
@@ -81,16 +76,21 @@ public sealed class DocumentationTests
 		                   </xs:schema>
 		                   """;
 
-		var code = ConvertXml(xsd, new() {NamespacePrefix = "Test"})
-			.Single();
-		_testOutputHelper.WriteLine(code);
+		var code = string.Join
+		(
+			"\r\n",
+			ConvertXml(xsd, new() {NamespacePrefix = "Test"})
+				.Single()
+				.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.TrimEntries)
+		);
+
 		Assert.Contains
 		(
 			"""
-			    /// <summary>
-			    /// <para>Заголовок конверта.</para>
-			    /// <para>Информация приложения</para>
-			    /// </summary>
+			/// <summary>
+			/// <para>Заголовок конверта.</para>
+			/// <para>Информация приложения</para>
+			/// </summary>
 			""",
 			code,
 			StringComparison.Ordinal
@@ -99,20 +99,9 @@ public sealed class DocumentationTests
 		Assert.Contains
 		(
 			"""
-			        /// <summary>
-			        /// <para>Тип программного обеспечения</para>
-			        /// </summary>
-			""",
-			code,
-			StringComparison.Ordinal
-		);
-		Assert.Contains
-		(
-			"""
-			        /// <summary>
-			        /// <para>Версия программного</para>
-			        /// <para>обеспечения</para>
-			        /// </summary>
+			/// <summary>
+			/// <para>Тип программного обеспечения</para>
+			/// </summary>
 			""",
 			code,
 			StringComparison.Ordinal
@@ -121,9 +110,21 @@ public sealed class DocumentationTests
 		Assert.Contains
 		(
 			"""
-			        /// <summary>
-			        /// <para>Тип сообщения</para>
-			        /// </summary>
+			/// <summary>
+			/// <para>Версия программного</para>
+			/// <para>обеспечения</para>
+			/// </summary>
+			""",
+			code,
+			StringComparison.Ordinal
+		);
+
+		Assert.Contains
+		(
+			"""
+			/// <summary>
+			/// <para>Тип сообщения</para>
+			/// </summary>
 			""",
 			code,
 			StringComparison.Ordinal
@@ -164,7 +165,7 @@ public sealed class DocumentationTests
 		                   </xs:schema>
 		                   """;
 
-		var code = ConvertXml(xsd, new() { NamespacePrefix = "Test", GenerateDescriptionAttribute = true })
+		var code = ConvertXml(xsd, new() {NamespacePrefix = "Test", GenerateDescriptionAttribute = true})
 			.Single();
 
 		Assert.Contains
@@ -180,6 +181,7 @@ public sealed class DocumentationTests
 			code,
 			StringComparison.Ordinal
 		);
+
 		Assert.Contains
 		(
 			"""[System.ComponentModel.DescriptionAttribute("Версия программного обеспечения")]""",
