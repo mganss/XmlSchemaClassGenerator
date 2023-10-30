@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Schema;
 
 using Xunit;
@@ -10,6 +11,8 @@ namespace XmlSchemaClassGenerator.Tests;
 
 public sealed class DocumentationTests
 {
+	static DocumentationTests() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
 	private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
 	{
 		var writer = new MemoryOutputWriter();
@@ -86,46 +89,28 @@ public sealed class DocumentationTests
 
 		Assert.Contains
 		(
-			"""
-			/// <summary>
-			/// <para>Заголовок конверта.</para>
-			/// <para>Информация приложения</para>
-			/// </summary>
-			""",
+			"/// <summary>\r\n/// <para>Заголовок конверта.</para>\r\n/// <para>Информация приложения</para>\r\n/// </summary>",
 			code,
 			StringComparison.Ordinal
 		);
 
 		Assert.Contains
 		(
-			"""
-			/// <summary>
-			/// <para>Тип программного обеспечения</para>
-			/// </summary>
-			""",
+			"/// <summary>\r\n/// <para>Тип программного обеспечения</para>\r\n/// </summary>",
 			code,
 			StringComparison.Ordinal
 		);
 
 		Assert.Contains
 		(
-			"""
-			/// <summary>
-			/// <para>Версия программного</para>
-			/// <para>обеспечения</para>
-			/// </summary>
-			""",
+			"/// <summary>\r\n/// <para>Версия программного</para>\r\n/// <para>обеспечения</para>\r\n/// </summary>",
 			code,
 			StringComparison.Ordinal
 		);
 
 		Assert.Contains
 		(
-			"""
-			/// <summary>
-			/// <para>Тип сообщения</para>
-			/// </summary>
-			""",
+			"/// <summary>\r\n/// <para>Тип сообщения</para>\r\n/// </summary>",
 			code,
 			StringComparison.Ordinal
 		);
