@@ -882,17 +882,6 @@ namespace XmlSchemaClassGenerator
             }
             else if (isEnumerable && !IsRequired)
             {
-                var specifiedProperty = new CodeMemberProperty
-                {
-                    Type = TypeRef<bool>(),
-                    Name = Name + Specified,
-                    HasSet = false,
-                    HasGet = true,
-                };
-                specifiedProperty.CustomAttributes.Add(ignoreAttribute);
-                if (Configuration.EntityFramework) { specifiedProperty.CustomAttributes.Add(notMappedAttribute); }
-                specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-
                 var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
                 var collectionType = Configuration.CollectionImplementationType ?? Configuration.CollectionType;
                 var countProperty = collectionType == typeof(Array) ? nameof(Array.Length) : nameof(List<int>.Count);
@@ -904,17 +893,46 @@ namespace XmlSchemaClassGenerator
                     notZeroExpression = new CodeBinaryOperatorExpression(notNullExpression, CodeBinaryOperatorType.BooleanAnd, notZeroExpression);
                 }
                 var returnStatement = new CodeMethodReturnStatement(notZeroExpression);
-                specifiedProperty.GetStatements.Add(returnStatement);
 
-                var specifiedDocs = new DocumentationModel[] {
-                    new() { Language = English, Text = $"Gets a value indicating whether the {Name} collection is empty." },
-                    new() { Language = German, Text = $"Ruft einen Wert ab, der angibt, ob die {Name}-Collection leer ist." }
-                };
-                specifiedProperty.Comments.AddRange(GetComments(specifiedDocs).ToArray());
+                if (Configuration.UseShouldSerializePattern)
+                {
+                    var shouldSerializeMethod = new CodeMemberMethod
+                    {
+                        Attributes = MemberAttributes.Public,
+                        Name = "ShouldSerialize" + Name,
+                        ReturnType = new CodeTypeReference(typeof(bool)),
+                        Statements = { returnStatement }
+                    };
 
-                Configuration.MemberVisitor(specifiedProperty, this);
+                    Configuration.MemberVisitor(shouldSerializeMethod, this);
 
-                typeDeclaration.Members.Add(specifiedProperty);
+                    typeDeclaration.Members.Add(shouldSerializeMethod);
+                }
+                else
+                {
+                    var specifiedProperty = new CodeMemberProperty
+                    {
+                        Type = TypeRef<bool>(),
+                        Name = Name + Specified,
+                        HasSet = false,
+                        HasGet = true,
+                    };
+                    specifiedProperty.CustomAttributes.Add(ignoreAttribute);
+                    if (Configuration.EntityFramework) { specifiedProperty.CustomAttributes.Add(notMappedAttribute); }
+                    specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+
+                    specifiedProperty.GetStatements.Add(returnStatement);
+
+                    var specifiedDocs = new DocumentationModel[] {
+                        new() { Language = English, Text = $"Gets a value indicating whether the {Name} collection is empty." },
+                        new() { Language = German, Text = $"Ruft einen Wert ab, der angibt, ob die {Name}-Collection leer ist." }
+                    };
+                    specifiedProperty.Comments.AddRange(GetComments(specifiedDocs).ToArray());
+
+                    Configuration.MemberVisitor(specifiedProperty, this);
+
+                    typeDeclaration.Members.Add(specifiedProperty);
+                }
             }
 
             if (IsNullableReferenceType && Configuration.EnableNullableReferenceAttributes)
