@@ -246,7 +246,7 @@ without backing field initialization for collections
                 generator.NamingProvider = new SubstituteNamingProvider(nameSubstituteMap);
             }
 
-            generator.CommentLanguages.AddRange(commentLanguages);
+            generator.CommentLanguages.UnionWith(commentLanguages);
 
             if (pclCompatible)
             {

@@ -277,7 +277,7 @@ namespace XmlSchemaClassGenerator
             set { _configuration.CompactTypeNames = value; }
         }
 
-        public List<string> CommentLanguages
+        public HashSet<string> CommentLanguages
         {
             get { return _configuration.CommentLanguages; }
         }

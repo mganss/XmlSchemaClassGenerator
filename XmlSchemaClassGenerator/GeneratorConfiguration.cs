@@ -291,7 +291,7 @@ namespace XmlSchemaClassGenerator
         /// <summary>
         /// The language identifiers comments will be generated for, e.g. "en", "de-DE".
         /// </summary>
-        public List<string> CommentLanguages { get; } = new List<string>();
+        public HashSet<string> CommentLanguages { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Create unique type names across all namespaces. See https://github.com/mganss/XmlSchemaClassGenerator/issues/240

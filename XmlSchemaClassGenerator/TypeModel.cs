@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace XmlSchemaClassGenerator
 {
@@ -1401,43 +1402,64 @@ namespace XmlSchemaClassGenerator
         }
         public static bool DisableComments { get; set; }
 
-        protected IEnumerable<CodeCommentStatement> GetComments(IList<DocumentationModel> docs)
+        protected IEnumerable<CodeCommentStatement> GetComments(IReadOnlyList<DocumentationModel> docs)
         {
             if (DisableComments || docs.Count == 0)
                 yield break;
 
             yield return new CodeCommentStatement("<summary>", true);
 
-            foreach (var doc in docs
-                .Where(d => string.IsNullOrEmpty(d.Language) || Configuration.CommentLanguages.Exists(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
-                .OrderBy(d => d.Language))
+            foreach (var doc in docs.Where
+	            (
+		            d => !string.IsNullOrWhiteSpace(d.Text)
+		                 && (string.IsNullOrEmpty(d.Language)
+		                     || Configuration.CommentLanguages.Count is 0
+		                     || Configuration.CommentLanguages.Contains(d.Language)
+		                     || Configuration.CommentLanguages
+			                     .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+	            )
+	            .OrderBy(d => d.Language))
             {
-                var text = doc.Text;
-                var comment = $"<para{(string.IsNullOrEmpty(doc.Language) ? "" : $@" xml:lang=""{doc.Language}""")}>{CodeUtilities.NormalizeNewlines(text).Trim()}</para>";
-                yield return new CodeCommentStatement(comment, true);
+	            var text = doc.Text;
+	            var comment = $"<para{(string.IsNullOrEmpty(doc.Language) ? "" : $@" xml:lang=""{doc.Language}""")}>{CodeUtilities.NormalizeNewlines(text).Trim()}</para>";
+
+	            yield return new(comment, true);
             }
 
             yield return new CodeCommentStatement("</summary>", true);
         }
 
-        protected void AddDescription(CodeAttributeDeclarationCollection attributes, IEnumerable<DocumentationModel> docs)
+        protected void AddDescription(CodeAttributeDeclarationCollection attributes, IReadOnlyList<DocumentationModel> docs)
         {
-            if (!Configuration.GenerateDescriptionAttribute || DisableComments || !docs.Any()) return;
+            if (!Configuration.GenerateDescriptionAttribute || DisableComments || docs.Count is 0) return;
 
-            var doc = GetSingleDoc(docs.Where(d => string.IsNullOrEmpty(d.Language) || Configuration.CommentLanguages.Exists(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase))));
+            var docText = GetSingleDoc(docs);
 
-            if (doc != null)
+            if (string.IsNullOrWhiteSpace(docText) is false)
             {
-                var descriptionAttribute = AttributeDecl<DescriptionAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(Regex.Replace(doc.Text, @"\s+", " ").Trim())));
+                var descriptionAttribute = AttributeDecl<DescriptionAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(Regex.Replace(docText, @"\s+", " ").Trim())));
                 attributes.Add(descriptionAttribute);
             }
         }
 
-        private static DocumentationModel GetSingleDoc(IEnumerable<DocumentationModel> docs)
-        {
-            return docs.Count() == 1 ? docs.Single()
-                 : docs.FirstOrDefault(d => string.IsNullOrEmpty(d.Language) || d.Language.StartsWith(English, StringComparison.OrdinalIgnoreCase))
-                 ?? docs.FirstOrDefault();
-        }
+        private string GetSingleDoc(IReadOnlyList<DocumentationModel> docs) => string.Join
+        (
+	        " ",
+	        docs.Where
+		        (
+			        d => !string.IsNullOrWhiteSpace(d.Text)
+			             && (string.IsNullOrEmpty(d.Language)
+			                 || Configuration.CommentLanguages.Count is 0
+			                 || Configuration.CommentLanguages.Contains(d.Language)
+			                 || Configuration.CommentLanguages
+				                 .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+		        )
+		        .Where
+		        (
+			        d => string.IsNullOrEmpty(d.Language)
+			             || d.Language.StartsWith(English, StringComparison.OrdinalIgnoreCase)
+		        )
+		        .Select(x => x.Text)
+        );
     }
 }
