@@ -1435,7 +1435,7 @@ namespace XmlSchemaClassGenerator
 
             var docText = GetSingleDoc(docs);
 
-            if (string.IsNullOrWhiteSpace(docText) is false)
+            if (!string.IsNullOrWhiteSpace(docText))
             {
                 var descriptionAttribute = AttributeDecl<DescriptionAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(Regex.Replace(docText, @"\s+", " ").Trim())));
                 attributes.Add(descriptionAttribute);

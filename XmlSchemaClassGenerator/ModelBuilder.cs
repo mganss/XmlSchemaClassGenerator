@@ -662,9 +662,8 @@ namespace XmlSchemaClassGenerator
                         foreach (var facet in facets)
                         {
                             var baseFacet = baseFacets
-                                .Where(f => f is not XmlSchemaEnumerationFacet
-                                    && f.GetType() == facet.GetType())
-                                .SingleOrDefault();
+                                .SingleOrDefault(f => f is not XmlSchemaEnumerationFacet
+                                    && f.GetType() == facet.GetType());
                             if (baseFacet != null)
                                 baseFacets.Remove(baseFacet);
                             baseFacets.Add(facet);
