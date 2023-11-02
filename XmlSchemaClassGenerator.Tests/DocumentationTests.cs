@@ -56,11 +56,17 @@ public sealed class DocumentationTests
 		                   		<xs:annotation>
 		                   			<xs:documentation>Заголовок конверта.</xs:documentation>
 		                   			<xs:documentation>Информация приложения</xs:documentation>
+		                            <xs:documentation>
+		                                <Arbitrary>text</Arbitrary>
+		                            </xs:documentation>
 		                   		</xs:annotation>
 		                   		<xs:sequence>
 		                   			<xs:element name="SoftKind" type="xs:string" minOccurs="0">
 		                   				<xs:annotation>
 		                   					<xs:documentation>Тип программного обеспечения</xs:documentation>
+		                                    <xs:documentation>
+		                                        <Arbitrary>text</Arbitrary>
+		                                    </xs:documentation>
 		                   				</xs:annotation>
 		                   			</xs:element>
 		                   			<xs:element name="SoftVersion" type="xs:string" minOccurs="0">
@@ -89,14 +95,14 @@ public sealed class DocumentationTests
 
 		Assert.Contains
 		(
-			"/// <summary>\r\n/// <para>Заголовок конверта.</para>\r\n/// <para>Информация приложения</para>\r\n/// </summary>",
+			"/// <summary>\r\n/// <para>Заголовок конверта.</para>\r\n/// <para>Информация приложения</para>\r\n/// <para><Arbitrary>text</Arbitrary></para>\r\n/// </summary>",
 			code,
 			StringComparison.Ordinal
 		);
 
 		Assert.Contains
 		(
-			"/// <summary>\r\n/// <para>Тип программного обеспечения</para>\r\n/// </summary>",
+			"/// <summary>\r\n/// <para>Тип программного обеспечения</para>\r\n/// <para><Arbitrary>text</Arbitrary></para>\r\n/// </summary>",
 			code,
 			StringComparison.Ordinal
 		);
@@ -127,11 +133,17 @@ public sealed class DocumentationTests
 		                      		<xs:annotation>
 		                         			<xs:documentation>Заголовок конверта.</xs:documentation>
 		                         			<xs:documentation>Информация приложения</xs:documentation>
+		                                    <xs:documentation>
+		                                        <Arbitrary>text</Arbitrary>
+		                                    </xs:documentation>
 		                      		</xs:annotation>
 		                      		<xs:sequence>
 		                         			<xs:element name="SoftKind" type="xs:string" minOccurs="0">
 		                            				<xs:annotation>
 		                               					<xs:documentation>Тип программного обеспечения</xs:documentation>
+		                                                <xs:documentation>
+		                                                    <Arbitrary>text</Arbitrary>
+		                                                </xs:documentation>
 		                            				</xs:annotation>
 		                         			</xs:element>
 		                         			<xs:element name="SoftVersion" type="xs:string" minOccurs="0">
@@ -155,14 +167,14 @@ public sealed class DocumentationTests
 
 		Assert.Contains
 		(
-			"""[System.ComponentModel.DescriptionAttribute("Заголовок конверта. Информация приложения")]""",
+			"""[System.ComponentModel.DescriptionAttribute("Заголовок конверта. Информация приложения <Arbitrary>text</Arbitrary>")]""",
 			code,
 			StringComparison.Ordinal
 		);
 
 		Assert.Contains
 		(
-			"""[System.ComponentModel.DescriptionAttribute("Тип программного обеспечения")]""",
+			"""[System.ComponentModel.DescriptionAttribute("Тип программного обеспечения <Arbitrary>text</Arbitrary>")]""",
 			code,
 			StringComparison.Ordinal
 		);
