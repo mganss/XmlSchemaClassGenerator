@@ -21,9 +21,7 @@ namespace XmlSchemaClassGenerator.Tests
                 Version = new("Tests", "1.0.0.1"),
                 NamespaceProvider = generatorPrototype.NamespaceProvider,
                 GenerateNullables = generatorPrototype.GenerateNullables,
-                IntegerDataType = generatorPrototype.IntegerDataType,
-                UseIntegerDataTypeAsFallback = generatorPrototype.UseIntegerDataTypeAsFallback,
-                DateTimeDataType = generatorPrototype.DateTimeDataType,
+                DateTimeWithTimeZone = generatorPrototype.DateTimeWithTimeZone,
                 DataAnnotationMode = generatorPrototype.DataAnnotationMode,
                 GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
                 GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
@@ -49,9 +47,9 @@ namespace XmlSchemaClassGenerator.Tests
         }
 
         [Theory]
-        [InlineData(typeof(DateTime), "System.DateTime")]
-        [InlineData(typeof(DateTimeOffset), "System.DateTimeOffset")]
-        public void TestFallbackType(Type dateTimeType, string expectedType)
+        [InlineData(false, "System.DateTime")]
+        [InlineData(true, "System.DateTimeOffset")]
+        public void TestFallbackType(bool dateTimeWithTimeZone, string expectedType)
         {
             var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
@@ -69,7 +67,7 @@ namespace XmlSchemaClassGenerator.Tests
                     {
                         GenerateNamespace = _ => "Test"
                     },
-                    DateTimeDataType = dateTimeType
+                    DateTimeWithTimeZone = dateTimeWithTimeZone
                 });
 
             var expectedProperty = $"public {expectedType} SomeDate";

@@ -23,9 +23,9 @@ namespace XmlSchemaClassGenerator.Console
             var namespaces = new List<string>();
             var nameSubstitutes = new List<string>();
             var outputFolder = (string)null;
+            bool dateTimeWithTimeZone = false;
             Type integerType = null;
             var useIntegerTypeAsFallback = false;
-            Type dateTimeType = typeof(DateTime);
             var namespacePrefix = "";
             var verbose = false;
             var nullables = false;
@@ -85,6 +85,7 @@ Prefix with 'A:' to substitute any type/member.", v => nameSubstitutes.Add(v) },
 The line format is one mapping per line: prefixed type/member name = substitute name.
 Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Add(v) },
                 { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
+                { "d|datetime-offset", "map xs:datetime and derived types to System.DateTimeOffset instead of System.DateTime", v => dateTimeWithTimeZone = v != null },
                 { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of automatic approximation
 {TYPE} can be i[nt], l[ong], or d[ecimal]", v => {
                                          switch (v)
@@ -104,7 +105,6 @@ Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Ad
                                          }
                                      } },
                 { "fb|fallback|use-integer-type-as-fallback", "use integer type specified via -i only if no type can be deduced", v => useIntegerTypeAsFallback = v != null },
-                { "dto|datetime-offset=", "map xs:datetime and derived types to System.DateTimeOffset instead of System.DataTime", v => dateTimeType = typeof(DateTimeOffset)},
                 { "e|edb|enable-data-binding", "enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
                 { "r|order", "emit order for all class members stored as XML element", v => emitOrder = v != null },
                 { "c|pcl", "PCL compatible output", v => pclCompatible = v != null },
@@ -212,7 +212,7 @@ without backing field initialization for collections
                 EmitOrder = emitOrder,
                 IntegerDataType = integerType,
                 UseIntegerDataTypeAsFallback = useIntegerTypeAsFallback,
-                DateTimeDataType = dateTimeType,
+                DateTimeWithTimeZone = dateTimeWithTimeZone,
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
