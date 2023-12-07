@@ -148,6 +148,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public bool UseIntegerDataTypeAsFallback { get; set; }
         /// <summary>
+        /// Default date type for DateTime fields.
+        /// </summary>
+        public Type DateTimeDataType { get; set; } = typeof(DateTime);
+        /// <summary>
         /// Generate Entity Framework Code First compatible classes
         /// </summary>
         public bool EntityFramework { get; set; }

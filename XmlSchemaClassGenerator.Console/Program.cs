@@ -25,6 +25,7 @@ namespace XmlSchemaClassGenerator.Console
             var outputFolder = (string)null;
             Type integerType = null;
             var useIntegerTypeAsFallback = false;
+            Type dateTimeType = typeof(DateTime);
             var namespacePrefix = "";
             var verbose = false;
             var nullables = false;
@@ -103,6 +104,7 @@ Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Ad
                                          }
                                      } },
                 { "fb|fallback|use-integer-type-as-fallback", "use integer type specified via -i only if no type can be deduced", v => useIntegerTypeAsFallback = v != null },
+                { "dto|datetime-offset=", "map xs:datetime and derived types to System.DateTimeOffset instead of System.DataTime", v => dateTimeType = typeof(DateTimeOffset)},
                 { "e|edb|enable-data-binding", "enable INotifyPropertyChanged data binding", v => enableDataBinding = v != null },
                 { "r|order", "emit order for all class members stored as XML element", v => emitOrder = v != null },
                 { "c|pcl", "PCL compatible output", v => pclCompatible = v != null },
@@ -210,6 +212,7 @@ without backing field initialization for collections
                 EmitOrder = emitOrder,
                 IntegerDataType = integerType,
                 UseIntegerDataTypeAsFallback = useIntegerTypeAsFallback,
+                DateTimeDataType = dateTimeType,
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
                 NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,

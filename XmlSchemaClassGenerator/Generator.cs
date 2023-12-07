@@ -175,6 +175,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.UseIntegerDataTypeAsFallback = value; }
         }
 
+        public Type DateTimeDataType
+        {
+            get { return _configuration.DateTimeDataType; }
+            set { _configuration.DateTimeDataType = value; }
+        }
+
         public bool EntityFramework
         {
             get { return _configuration.EntityFramework; }
