@@ -51,7 +51,7 @@ For command line use, choose your preferred installation:
 ```
 Usage: xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
-Version 2.0.877.0
+Version ...
 xsdFiles may contain globs, e.g. "content\{schema,xsd}\**\*.xsd", and URLs.
 Append - to option to disable it, e.g. --interface-.
 
@@ -90,8 +90,8 @@ Options:
                                Lines starting with # and empty lines are
                                ignored.
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
-  -d, --datetime-offset      map x:datetime to System.DateTimeOffset 
-                               instead of System.DateTime
+  -d, --datetime-offset      map xs:datetime and derived types to System.
+                               DateTimeOffset instead of System.DateTime
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of automatic approximation
                                TYPE can be i[nt], l[ong], or d[ecimal]
@@ -125,12 +125,12 @@ Options:
       --cit, --collectionImplementationType=VALUE
                              the default collection type implementation to use (
                                default is null)
-      --csm, --collectionSettersMode=Private, Public, PublicWithoutConstructorInitialization
+      --csm, --collectionSettersMode=Private, Public, PublicWithoutConstructorInitialization, Init
                              generate a private, public or public setters
                                without backing field initialization for
                                collections
                                (default is Private; can be: Private, Public,
-                               PublicWithoutConstructorInitialization)
+                               PublicWithoutConstructorInitialization, Init)
       --ctro, --codeTypeReferenceOptions=GlobalReference, GenericTypeParameter
                              the default CodeTypeReferenceOptions Flags to use (
                                default is unset; can be: GlobalReference,
@@ -153,6 +153,10 @@ Options:
                                pattern (default is false)
       --sf, --separateFiles  generate a separate file for each class (default
                                is false)
+      --nh, --namespaceHierarchy
+                             generate a separate folder for namespace hierarchy.
+                                Implies "separateFiles" if true (default is
+                               false)
       --sg, --separateSubstitutes
                              generate a separate property for each element of a
                                substitution group (default is false)
@@ -171,8 +175,8 @@ Options:
                              generate type names that are unique across
                                namespaces (default is false)
       --gc, --generatedCodeAttribute
-                             add version information to GeneratedCodeAttribute
-                               (default is true)
+                             add version information to GeneratedCodeAttribute (
+                               default is true)
       --nc, --netCore        generate .NET Core specific code that might not
                                work with .NET Framework (default is false)
       --nr, --nullableReferenceAttributes
