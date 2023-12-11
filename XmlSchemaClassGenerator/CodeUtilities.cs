@@ -191,8 +191,8 @@ namespace XmlSchemaClassGenerator
             return resultType;
         }
 
-        static readonly Type[] intTypes = new[] { typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(uint), typeof(int), typeof(ulong), typeof(long), typeof(decimal) };
-        static readonly Type[] decimalTypes = new[] { typeof(float), typeof(double), typeof(decimal) };
+        static readonly Type[] intTypes = [typeof(byte), typeof(sbyte), typeof(ushort), typeof(short), typeof(uint), typeof(int), typeof(ulong), typeof(long), typeof(decimal)];
+        static readonly Type[] decimalTypes = [typeof(float), typeof(double), typeof(decimal)];
 
         private static Type GetUnionType(GeneratorConfiguration configuration, XmlSchemaType schemaType, bool attribute)
         {
@@ -371,17 +371,17 @@ namespace XmlSchemaClassGenerator
 
         public static KeyValuePair<NamespaceKey, string> ParseNamespace(string nsArg, string namespacePrefix)
         {
-            var parts = nsArg.Split(new[] { '=' }, 2);
+            var parts = nsArg.Split(['='], 2);
 
             if (parts.Length == 1)
-                parts = new[] { string.Empty, parts[0] };
+                parts = [string.Empty, parts[0]];
 
             if (parts.Length != 2)
                 throw new ArgumentException("XML and C# namespaces should be separated by '='. You entered: " + nsArg);
 
             var xmlNs = parts[0];
             var netNs = parts[1];
-            var parts2 = xmlNs.Split(new[] { '|' }, 2);
+            var parts2 = xmlNs.Split(['|'], 2);
             var source = parts2.Length == 2 ? new Uri(parts2[1], UriKind.RelativeOrAbsolute) : null;
             xmlNs = parts2[0];
             if (!string.IsNullOrEmpty(namespacePrefix))

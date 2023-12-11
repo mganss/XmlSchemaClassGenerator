@@ -14,21 +14,15 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace XmlSchemaClassGenerator
 {
-    public class NamespaceModel : GeneratorModel
+    public class NamespaceModel(NamespaceKey key, GeneratorConfiguration configuration) : GeneratorModel(configuration)
     {
         public string Name { get; set; }
-        public NamespaceKey Key { get; }
-        public Dictionary<string, TypeModel> Types { get; set; }
+        public NamespaceKey Key { get; } = key;
+        public Dictionary<string, TypeModel> Types { get; set; } = [];
         /// <summary>
         /// Does the namespace of this type clashes with a class in the same or upper namespace?
         /// </summary>
         public bool IsAmbiguous { get; set; }
-
-        public NamespaceModel(NamespaceKey key, GeneratorConfiguration configuration) : base(configuration)
-        {
-            Key = key;
-            Types = new Dictionary<string, TypeModel>();
-        }
 
         public static CodeNamespace Generate(string namespaceName, IEnumerable<NamespaceModel> parts, GeneratorConfiguration conf)
         {
@@ -68,7 +62,7 @@ namespace XmlSchemaClassGenerator
         public string Name { get; set; }
         public XmlQualifiedName XmlSchemaName { get; set; }
         public XmlSchemaType XmlSchemaType { get; set; }
-        public List<DocumentationModel> Documentation { get; } = new();
+        public List<DocumentationModel> Documentation { get; } = [];
         public bool IsAnonymous { get; set; }
         public virtual bool IsSubtype => false;
         public virtual bool IsRedefined => false;
@@ -154,11 +148,9 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class InterfaceModel : ReferenceTypeModel
+    public class InterfaceModel(GeneratorConfiguration configuration) : ReferenceTypeModel(configuration)
     {
-        public InterfaceModel(GeneratorConfiguration configuration) : base(configuration) { }
-
-        public List<ReferenceTypeModel> DerivedTypes { get; } = new();
+        public List<ReferenceTypeModel> DerivedTypes { get; } = [];
 
         public override CodeTypeDeclaration Generate()
         {
@@ -182,7 +174,7 @@ namespace XmlSchemaClassGenerator
 
         public IEnumerable<ReferenceTypeModel> AllDerivedReferenceTypes(List<ReferenceTypeModel> processedTypeModels = null)
         {
-            processedTypeModels ??= new();
+            processedTypeModels ??= [];
 
             foreach (var interfaceModelDerivedType in DerivedTypes.Except(processedTypeModels))
             {
@@ -215,17 +207,15 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class ClassModel : ReferenceTypeModel
+    public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeModel(configuration)
     {
         public override bool IsRedefined => DerivedTypes.Exists(d => d.XmlSchemaType?.Parent is XmlSchemaRedefine);
         public bool IsAbstract { get; set; }
         public bool IsMixed { get; set; }
         public bool IsSubstitution { get; set; }
         public TypeModel BaseClass { get; set; }
-        public List<ClassModel> DerivedTypes { get; set; } = new();
+        public List<ClassModel> DerivedTypes { get; set; } = [];
         public override bool IsSubtype => BaseClass != null;
-
-        public ClassModel(GeneratorConfiguration configuration) : base(configuration) { }
 
         public IEnumerable<ClassModel> AllBaseClasses
         {
@@ -474,12 +464,10 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class ReferenceTypeModel : TypeModel
+    public class ReferenceTypeModel(GeneratorConfiguration configuration) : TypeModel(configuration)
     {
-        public ReferenceTypeModel(GeneratorConfiguration configuration) : base(configuration) { }
-
-        public List<PropertyModel> Properties { get; } = new();
-        public List<InterfaceModel> Interfaces { get; } = new();
+        public List<PropertyModel> Properties { get; } = [];
+        public List<InterfaceModel> Interfaces { get; } = [];
 
         public void AddInterfaces(IEnumerable<InterfaceModel> interfaces)
         {
@@ -495,18 +483,18 @@ namespace XmlSchemaClassGenerator
     }
 
     [DebuggerDisplay("{Name}")]
-    public class PropertyModel : GeneratorModel
+    public class PropertyModel(GeneratorConfiguration configuration, string name, TypeModel type, TypeModel owningType) : GeneratorModel(configuration)
     {
         private const string Value = nameof(Value);
         private const string Specified = nameof(Specified);
         private const string Namespace = nameof(XmlRootAttribute.Namespace);
 
         // ctor
-        public List<DocumentationModel> Documentation { get; } = new();
-        public List<Substitute> Substitutes { get; } = new();
-        public TypeModel OwningType { get; }
-        public TypeModel Type { get; }
-        public string Name { get; set; } // Only set when renaming interfaces.
+        public List<DocumentationModel> Documentation { get; } = [];
+        public List<Substitute> Substitutes { get; } = [];
+        public TypeModel OwningType { get; } = owningType;
+        public TypeModel Type { get; } = type;
+        public string Name { get; set; } = name;
 
         // private
         public string OriginalPropertyName { get; private set; }
@@ -528,13 +516,6 @@ namespace XmlSchemaClassGenerator
         public bool IsAny { get; set; }
         public int? Order { get; set; }
         public bool IsKey { get; set; }
-
-        public PropertyModel(GeneratorConfiguration configuration, string name, TypeModel type, TypeModel owningType) : base(configuration)
-        {
-            Name = name;
-            Type = type;
-            OwningType = owningType;
-        }
 
         public void SetFromNode(string originalName, bool useFixedIfNoDefault, IXmlSchemaNode xs)
         {
@@ -655,7 +636,7 @@ namespace XmlSchemaClassGenerator
             var defaultValueAttribute = AttributeDecl<DefaultValueAttribute>();
 
             defaultValueAttribute.Arguments.AddRange(typeReference.BaseType == typeof(decimal).FullName
-                ? new CodeAttributeArgument[] { new(new CodeTypeOfExpression(typeof(decimal))), new(new CodePrimitiveExpression(DefaultValue)) }
+                ? [new(new CodeTypeOfExpression(typeof(decimal))), new(new CodePrimitiveExpression(DefaultValue))]
                 : new CodeAttributeArgument[] { new(defaultValueExpression) });
 
             return defaultValueAttribute;
@@ -829,8 +810,8 @@ namespace XmlSchemaClassGenerator
                     var specifiedExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), specifiedName + Specified);
                     var valueExpression = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name + Value);
                     var conditionStatement = new CodeConditionStatement(specifiedExpression,
-                        new CodeStatement[] { new CodeMethodReturnStatement(valueExpression) },
-                        new CodeStatement[] { new CodeMethodReturnStatement(new CodePrimitiveExpression(null)) });
+                        [new CodeMethodReturnStatement(valueExpression)],
+                        [new CodeMethodReturnStatement(new CodePrimitiveExpression(null))]);
                     nullableMember.GetStatements.Add(conditionStatement);
 
                     var getValueOrDefaultExpression = new CodeMethodInvokeExpression(new CodePropertySetValueReferenceExpression(), nameof(Nullable<int>.GetValueOrDefault));
@@ -1127,14 +1108,13 @@ namespace XmlSchemaClassGenerator
         public string Name { get; set; }
         public string Value { get; set; }
         public bool IsDeprecated { get; set; }
-        public List<DocumentationModel> Documentation { get; } = new();
+        public List<DocumentationModel> Documentation { get; } = [];
     }
 
-    public class EnumModel : TypeModel
+    public class EnumModel(GeneratorConfiguration configuration) : TypeModel(configuration)
     {
-        public List<EnumValueModel> Values { get; set; } = new();
+        public List<EnumValueModel> Values { get; set; } = [];
 
-        public EnumModel(GeneratorConfiguration configuration) : base(configuration) { }
         public override CodeTypeDeclaration Generate()
         {
             var enumDeclaration = base.Generate();
@@ -1192,13 +1172,11 @@ namespace XmlSchemaClassGenerator
         }
     }
 
-    public class SimpleModel : TypeModel
+    public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(configuration)
     {
         public Type ValueType { get; set; }
-        public List<RestrictionModel> Restrictions { get; } = new();
+        public List<RestrictionModel> Restrictions { get; } = [];
         public bool UseDataTypeAttribute { get; set; } = true;
-
-        public SimpleModel(GeneratorConfiguration configuration) : base(configuration) { }
 
         public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
         {
