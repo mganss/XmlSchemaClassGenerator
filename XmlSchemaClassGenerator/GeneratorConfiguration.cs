@@ -148,6 +148,10 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         public bool UseIntegerDataTypeAsFallback { get; set; }
         /// <summary>
+        /// Generate DateTimeOffset properties for xs:dateTime elements
+        /// </summary>
+        public bool DateTimeWithTimeZone { get; set; } = false;
+        /// <summary>
         /// Generate Entity Framework Code First compatible classes
         /// </summary>
         public bool EntityFramework { get; set; }

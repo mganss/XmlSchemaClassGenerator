@@ -160,7 +160,7 @@ namespace XmlSchemaClassGenerator
                 XmlTypeCode.AnyAtomicType => configuration.MapUnionToWidestCommonType ? GetUnionType(configuration, schemaType, attribute) : typeof(string), // union
                 XmlTypeCode.AnyUri or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
                 XmlTypeCode.Duration => configuration.NetCoreSpecificCode ? type.ValueType : typeof(string),
-                XmlTypeCode.Time => typeof(DateTime),
+                XmlTypeCode.Time or XmlTypeCode.DateTime => configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime),
                 XmlTypeCode.Idref => typeof(string),
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
                 XmlTypeCode.Decimal when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => GetIntegerDerivedType(type, configuration, restrictions),
