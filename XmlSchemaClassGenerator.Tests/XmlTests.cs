@@ -23,14 +23,9 @@ using Xunit.Abstractions;
 namespace XmlSchemaClassGenerator.Tests
 {
     [TestCaseOrderer("XmlSchemaClassGenerator.Tests.PriorityOrderer", "XmlSchemaClassGenerator.Tests")]
-    public class XmlTests
+    public class XmlTests(ITestOutputHelper output)
     {
-        private readonly ITestOutputHelper Output;
-
-        public XmlTests(ITestOutputHelper output)
-        {
-            Output = output;
-        }
+        private readonly ITestOutputHelper Output = output;
 
         private static IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
         {
@@ -300,7 +295,8 @@ namespace XmlSchemaClassGenerator.Tests
         [Fact]
         public void TestListWithPublicPropertySettersWithoutConstructors()
         {
-            var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator {
+            var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator
+            {
                 GenerateNullables = true,
                 IntegerDataType = typeof(int),
                 DataAnnotationMode = DataAnnotationMode.All,
@@ -317,10 +313,45 @@ namespace XmlSchemaClassGenerator.Tests
             var myClassType = assembly.GetType("List.MyClass");
             Assert.NotNull(myClassType);
             var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p=>p.Name).ToList();
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
             Assert.NotEmpty(collectionPropertyInfos);
             Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+            var myClassInstance = Activator.CreateInstance(myClassType);
+            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+            {
+                Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
+            }
+        }
+
+        [Fact]
+        public void TestListWithInitPropertySettersWithoutConstructors()
+        {
+            var assembly = Compiler.Generate("ListInitWithoutConstructorInitialization", ListPattern, new Generator
+            {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "List",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CollectionSettersMode = CollectionSettersMode.Init
+            });
+            Assert.NotNull(assembly);
+            var myClassType = assembly.GetType("List.MyClass");
+            Assert.NotNull(myClassType);
+            var iListType = typeof(Collection<>);
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+            Assert.NotEmpty(collectionPropertyInfos);
+            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+            var requiredCustomModifiers = collectionPropertyInfos.Select(p => p.SetMethod.ReturnParameter.GetRequiredCustomModifiers()).ToList();
+            Assert.Equal(collectionPropertyInfos.Count, requiredCustomModifiers.Count);
+            Assert.All(requiredCustomModifiers, m => Assert.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit), m));
             var myClassInstance = Activator.CreateInstance(myClassType);
             foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
             {
@@ -393,14 +424,16 @@ namespace XmlSchemaClassGenerator.Tests
             }
         }
 
-        public static IEnumerable<object[]> TestSimpleData() {
+        public static TheoryData<CodeTypeReferenceOptions, NamingScheme, Type> TestSimpleData() {
+            var theoryData = new TheoryData<CodeTypeReferenceOptions, NamingScheme, Type>();
             foreach (var referenceMode in new[]
                 { CodeTypeReferenceOptions.GlobalReference, /*CodeTypeReferenceOptions.GenericTypeParameter*/ })
             foreach (var namingScheme in new[] { NamingScheme.Direct, NamingScheme.PascalCase })
             foreach (var collectionType in new[] { typeof(Collection<>), /*typeof(Array)*/ })
             {
-                yield return new object[] { referenceMode, namingScheme, collectionType };
+                theoryData.Add(referenceMode, namingScheme, collectionType);
             }
+            return theoryData;
         }
 
 
@@ -686,28 +719,28 @@ namespace XmlSchemaClassGenerator.Tests
 
         private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
-        public static IEnumerable<object[]> Classes => new List<object[]>
+        public static TheoryData<string> Classes => new()
         {
-            new object[] { "ApartmentBuy" },
-            new object[] { "ApartmentRent" },
-            new object[] { "AssistedLiving" },
-            new object[] { "CompulsoryAuction" },
-            new object[] { "GarageBuy" },
-            new object[] { "GarageRent" },
-            new object[] { "Gastronomy" },
-            new object[] { "HouseBuy" },
-            new object[] { "HouseRent" },
-            new object[] { "HouseType" },
-            new object[] { "Industry" },
-            new object[] { "Investment" },
-            new object[] { "LivingBuySite" },
-            new object[] { "LivingRentSite" },
-            new object[] { "Office" },
-            new object[] { "SeniorCare" },
-            new object[] { "ShortTermAccommodation" },
-            new object[] { "SpecialPurpose" },
-            new object[] { "Store" },
-            new object[] { "TradeSite" },
+            "ApartmentBuy",
+            "ApartmentRent",
+            "AssistedLiving",
+            "CompulsoryAuction",
+            "GarageBuy",
+            "GarageRent",
+            "Gastronomy",
+            "HouseBuy",
+            "HouseRent",
+            "HouseType",
+            "Industry",
+            "Investment",
+            "LivingBuySite",
+            "LivingRentSite",
+            "Office",
+            "SeniorCare",
+            "ShortTermAccommodation",
+            "SpecialPurpose",
+            "Store",
+            "TradeSite",
         };
 
         [Theory, TestPriority(2)]
@@ -772,7 +805,7 @@ namespace XmlSchemaClassGenerator.Tests
                 { diXsd, "DiagramElement" }
             };
 
-            List<string> customNamespaceConfig = new();
+            List<string> customNamespaceConfig = [];
 
             foreach (var ns in xsdToCsharpNsMap)
                 customNamespaceConfig.Add(string.Format(customNsPattern, ns.Key, ns.Value));
@@ -1478,7 +1511,7 @@ namespace Test
 
             var fooType = assembly.DefinedTypes.Single(t => t.FullName == "Test.Foo");
             Assert.NotNull(fooType);
-            Assert.True(fooType.FullName == "Test.Foo");
+            Assert.Equal("Test.Foo", fooType.FullName);
         }
 
         [Fact]

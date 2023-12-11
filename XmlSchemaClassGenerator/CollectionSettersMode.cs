@@ -18,8 +18,12 @@ namespace XmlSchemaClassGenerator
         /// </summary>
         Public,
         /// <summary>
-        /// All collection setters are public and baking collections fields not initialized in constructors
+        /// All collection setters are public and backing collections fields are not initialized in constructors
         /// </summary>
-        PublicWithoutConstructorInitialization
+        PublicWithoutConstructorInitialization,
+        /// <summary>
+        /// All collections setters are init-only
+        /// </summary>
+        Init
     }
 }

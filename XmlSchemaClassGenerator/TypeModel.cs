@@ -548,16 +548,15 @@ namespace XmlSchemaClassGenerator
                             : xs.QualifiedName.Namespace;
         }
 
-        internal static string GetAccessors(CodeMemberField backingField = null, bool withDataBinding = false, PropertyValueTypeCode typeCode = PropertyValueTypeCode.Other, bool privateSetter = false)
+        internal static string GetAccessors(CodeMemberField backingField = null, bool withDataBinding = false, PropertyValueTypeCode typeCode = PropertyValueTypeCode.Other, string setter = "set")
         {
-            var privateString = privateSetter ? "private " : string.Empty;
             return backingField == null ? " { get; set; }" : CodeUtilities.NormalizeNewlines($@"
         {{
             get
             {{
                 return {backingField.Name};
             }}
-            {privateString}set
+            {setter}
             {{{(typeCode, withDataBinding) switch
             {
                 (PropertyValueTypeCode.ValueType, true) => $@"
@@ -730,7 +729,13 @@ namespace XmlSchemaClassGenerator
                 }
 
                 var propertyValueTypeCode = IsCollection || isArray ? PropertyValueTypeCode.Array : propertyType.GetPropertyValueTypeCode();
-                member.Name += GetAccessors(backingField, withDataBinding, propertyValueTypeCode, IsPrivateSetter);
+                var setter = Configuration.CollectionSettersMode switch
+                {
+                    CollectionSettersMode.Private when IsEnumerable => "private set",
+                    CollectionSettersMode.Init when IsEnumerable => "init",
+                    _ => "set"
+                };
+                member.Name += GetAccessors(backingField, withDataBinding, propertyValueTypeCode, setter);
             }
             else
             {
@@ -869,7 +874,7 @@ namespace XmlSchemaClassGenerator
                 var countProperty = collectionType == typeof(Array) ? nameof(Array.Length) : nameof(List<int>.Count);
                 var countReference = new CodePropertyReferenceExpression(listReference, countProperty);
                 var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
-                if (Configuration.CollectionSettersMode is CollectionSettersMode.PublicWithoutConstructorInitialization or CollectionSettersMode.Public)
+                if (Configuration.CollectionSettersMode is CollectionSettersMode.PublicWithoutConstructorInitialization or CollectionSettersMode.Public or CollectionSettersMode.Init)
                 {
                     var notNullExpression = new CodeBinaryOperatorExpression(listReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null));
                     notZeroExpression = new CodeBinaryOperatorExpression(notNullExpression, CodeBinaryOperatorType.BooleanAnd, notZeroExpression);
@@ -927,7 +932,8 @@ namespace XmlSchemaClassGenerator
             member.CustomAttributes.AddRange(attributes);
 
             // initialize List<>
-            if (isEnumerable && Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
+            if (isEnumerable && (Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
+                && (Configuration.CollectionSettersMode != CollectionSettersMode.Init))
             {
                 var constructor = typeDeclaration.Members.OfType<CodeConstructor>().FirstOrDefault();
 
