@@ -1092,7 +1092,9 @@ namespace XmlSchemaClassGenerator
                     while (xmlSchemaType != null)
                     {
                         var qualifiedName = xmlSchemaType.GetQualifiedName();
-                        if (qualifiedName.Namespace == XmlSchema.Namespace && qualifiedName.Name != "anySimpleType")
+
+                        if ((qualifiedName.Namespace == XmlSchema.Namespace && qualifiedName.Name != "anySimpleType") &&
+                            (xmlSchemaType.Datatype.ValueType == typeof(DateTime) && configuration.DateTimeWithTimeZone) == false)
                         {
                             args.Add(new("DataType", new CodePrimitiveExpression(qualifiedName.Name)));
                             break;
