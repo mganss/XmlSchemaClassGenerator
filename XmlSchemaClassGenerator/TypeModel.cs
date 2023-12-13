@@ -1091,10 +1091,10 @@ namespace XmlSchemaClassGenerator
                     var xmlSchemaType = Type.XmlSchemaType;
                     while (xmlSchemaType != null)
                     {
-                        var name = xmlSchemaType.GetQualifiedName();
-                        if (name.Namespace == XmlSchema.Namespace && name.Name != "anySimpleType")
+                        var qualifiedName = xmlSchemaType.GetQualifiedName();
+                        if (qualifiedName.Namespace == XmlSchema.Namespace && qualifiedName.Name != "anySimpleType")
                         {
-                            args.Add(new("DataType", new CodePrimitiveExpression(name.Name)));
+                            args.Add(new("DataType", new CodePrimitiveExpression(qualifiedName.Name)));
                             break;
                         }
                         else
