@@ -125,12 +125,13 @@ Options:
       --cit, --collectionImplementationType=VALUE
                              the default collection type implementation to use (
                                default is null)
-      --csm, --collectionSettersMode=Private, Public, PublicWithoutConstructorInitialization, Init
-                             generate a private, public or public setters
-                               without backing field initialization for
+      --csm, --collectionSettersMode=Private, Public, PublicWithoutConstructorInitialization, Init, InitiWithoutConstructorInitialization
+                             generate a private, public, or init-only setter
+                               with or without backing field initialization for
                                collections
                                (default is Private; can be: Private, Public,
-                               PublicWithoutConstructorInitialization, Init)
+                               PublicWithoutConstructorInitialization, Init,
+                               InitiWithoutConstructorInitialization)
       --ctro, --codeTypeReferenceOptions=GlobalReference, GenericTypeParameter
                              the default CodeTypeReferenceOptions Flags to use (
                                default is unset; can be: GlobalReference,
