@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
@@ -46,10 +47,66 @@ namespace XmlSchemaClassGenerator.Tests
             return writer.Content;
         }
 
+        [Fact]
+        public void WhenDateTimeOffsetIsUsed_NoDataTypePropertyIsPresent()
+        {
+            var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+			<xs:element name=""someDate"" type=""xs:dateTime"" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+            var generatedType = ConvertXml(
+                xsd, new()
+                {
+                    NamespaceProvider = new()
+                    {
+                        GenerateNamespace = _ => "Test"
+                    },
+                    DateTimeWithTimeZone = true
+                });
+
+            var expectedXmlSerializationAttribute = "[System.Xml.Serialization.XmlElementAttribute(\"someDate\")]";
+            var generatedProperty = generatedType.First();
+
+            Assert.Contains(expectedXmlSerializationAttribute, generatedProperty);
+        }
+
+        [Fact]
+        public void WhenDateTimeOffsetIsNotUsed_DataTypePropertyIsPresent()
+        {
+            var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+			<xs:element name=""someDate"" type=""xs:dateTime"" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+            var generatedType = ConvertXml(
+                xsd, new()
+                {
+                    NamespaceProvider = new()
+                    {
+                        GenerateNamespace = _ => "Test"
+                    },
+                    DateTimeWithTimeZone = false
+                });
+
+            var expectedXmlSerializationAttribute = "[System.Xml.Serialization.XmlElementAttribute(\"someDate\", DataType=\"dateTime\")]";
+            var generatedProperty = generatedType.First();
+
+            Assert.Contains(expectedXmlSerializationAttribute, generatedProperty);
+        }
+
         [Theory]
         [InlineData(false, "System.DateTime")]
         [InlineData(true, "System.DateTimeOffset")]
-        public void TestFallbackType(bool dateTimeWithTimeZone, string expectedType)
+        public void TestCorrectDateTimeDataType(bool dateTimeWithTimeZone, string expectedType)
         {
             var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
