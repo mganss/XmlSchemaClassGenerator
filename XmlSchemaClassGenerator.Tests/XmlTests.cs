@@ -325,6 +325,42 @@ namespace XmlSchemaClassGenerator.Tests
         }
 
         [Fact]
+        public void TestListWithInitPropertySetters()
+        {
+            var assembly = Compiler.Generate("ListPublic", ListPattern, new Generator
+            {
+                GenerateNullables = true,
+                IntegerDataType = typeof(int),
+                DataAnnotationMode = DataAnnotationMode.All,
+                GenerateDesignerCategoryAttribute = false,
+                GenerateComplexTypesForCollections = true,
+                EntityFramework = false,
+                GenerateInterfaces = true,
+                NamespacePrefix = "List",
+                GenerateDescriptionAttribute = true,
+                TextValuePropertyName = "Value",
+                CollectionSettersMode = CollectionSettersMode.Init
+            });
+            Assert.NotNull(assembly);
+            var myClassType = assembly.GetType("List.MyClass");
+            Assert.NotNull(myClassType);
+            var iListType = typeof(Collection<>);
+            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+            Assert.NotEmpty(collectionPropertyInfos);
+            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+            var requiredCustomModifiers = collectionPropertyInfos.Select(p => p.SetMethod.ReturnParameter.GetRequiredCustomModifiers()).ToList();
+            Assert.Equal(collectionPropertyInfos.Count, requiredCustomModifiers.Count);
+            Assert.All(requiredCustomModifiers, m => Assert.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit), m));
+
+            var myClassInstance = Activator.CreateInstance(myClassType);
+            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+            {
+                Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
+            }
+        }
+
+        [Fact]
         public void TestListWithInitPropertySettersWithoutConstructors()
         {
             var assembly = Compiler.Generate("ListInitWithoutConstructorInitialization", ListPattern, new Generator
@@ -339,7 +375,7 @@ namespace XmlSchemaClassGenerator.Tests
                 NamespacePrefix = "List",
                 GenerateDescriptionAttribute = true,
                 TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.Init
+                CollectionSettersMode = CollectionSettersMode.InitWithoutConstructorInitialization
             });
             Assert.NotNull(assembly);
             var myClassType = assembly.GetType("List.MyClass");

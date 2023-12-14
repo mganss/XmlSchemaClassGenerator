@@ -130,6 +130,8 @@ without backing field initialization for collections
                                                 "puwci" or "PublicWithoutConstructorInitialization" =>
                                                     CollectionSettersMode.PublicWithoutConstructorInitialization,
                                                 "in" or "Init" => CollectionSettersMode.Init,
+                                                "inwci" or "InitWithoutConstructorInitialization" =>
+                                                    CollectionSettersMode.InitWithoutConstructorInitialization,
                                                 _ => CollectionSettersMode.Private
                                             };
                                         }},

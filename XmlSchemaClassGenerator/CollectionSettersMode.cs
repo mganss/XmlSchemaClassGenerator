@@ -24,6 +24,10 @@ namespace XmlSchemaClassGenerator
         /// <summary>
         /// All collections setters are init-only
         /// </summary>
-        Init
+        Init,
+        /// <summary>
+        /// All collections setters are init-only and backing collections fields are not initialized in constructors
+        /// </summary>
+        InitWithoutConstructorInitialization
     }
 }
