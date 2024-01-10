@@ -120,7 +120,7 @@ Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Ad
                 { "cit|collectionImplementationType=", "the default collection type implementation to use (default is null)", v => collectionImplementationType = v == null ? null : Type.GetType(v, true) },
                 { "csm|collectionSettersMode=", @"generate a private, public, or init-only setter
 with or without backing field initialization for collections
-(default is Private; can be: {Private, Public, PublicWithoutConstructorInitialization, Init, InitiWithoutConstructorInitialization})",
+(default is Private; can be: {Private, Public, PublicWithoutConstructorInitialization, Init, InitWithoutConstructorInitialization})",
                                         v =>
                                         {
                                             collectionSettersMode = v switch
