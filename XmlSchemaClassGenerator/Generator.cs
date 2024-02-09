@@ -336,6 +336,8 @@ namespace XmlSchemaClassGenerator
             set { _configuration.SeparateNamespaceHierarchy = value; }
         }
 
+        public bool ValidationError { get; private set; }
+
         static Generator()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -347,12 +349,15 @@ namespace XmlSchemaClassGenerator
             var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
             var readers = files.Select(f => XmlReader.Create(f, settings));
 
+            ValidationError = false;
+
             set.XmlResolver = new XmlUrlResolver();
             set.ValidationEventHandler += (s, e) =>
             {
                 var ex = e.Exception as Exception;
                 while (ex != null)
                 {
+                    ValidationError = true;
                     Log?.Invoke(ex.Message);
                     ex = ex.InnerException;
                 }

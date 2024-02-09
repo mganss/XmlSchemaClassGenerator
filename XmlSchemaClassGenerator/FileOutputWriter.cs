@@ -61,8 +61,7 @@ namespace XmlSchemaClassGenerator
             }
             finally
             {
-                if (fs != null)
-                    fs.Dispose();
+                fs?.Dispose();
             }
         }
 

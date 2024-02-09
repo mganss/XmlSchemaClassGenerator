@@ -17,7 +17,7 @@ namespace XmlSchemaClassGenerator.Console
 {
     static class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             var showHelp = args.Length == 0;
             var namespaces = new List<string>();
@@ -165,7 +165,7 @@ with or without backing field initialization for collections
             if (showHelp)
             {
                 ShowHelp(options);
-                return;
+                return 0;
             }
 
             var uris = new List<string>();
@@ -181,7 +181,7 @@ with or without backing field initialization for collections
                 if (expandedGlob.Count == 0)
                 {
                     System.Console.WriteLine($"No files found for '{globOrUri}'");
-                    Environment.Exit(1);
+                    Environment.Exit((int)ExitCodes.FileNotFound);
                 }
 
                 uris.AddRange(expandedGlob);
@@ -267,6 +267,17 @@ with or without backing field initialization for collections
             if (verbose) { generator.Log = s => System.Console.Out.WriteLine(s); }
 
             generator.Generate(uris);
+
+            return !generator.ValidationError ? (int)ExitCodes.Ok : (int)ExitCodes.ValidationError;
+        }
+
+        enum ExitCodes
+        {
+            Ok = 0,
+            FileNotFound = 1,
+            InvalidNameSubstitutionFile = 2,
+            InvalidNamespaceFile = 3,
+            ValidationError = 4
         }
 
         private static void ParseNamespaceFiles(List<string> namespaces, List<string> namespaceFiles)
@@ -280,12 +291,12 @@ with or without backing field initialization for collections
                     var parts = line.Split('=');
 
                     if (parts.Length == 1)
-                        parts = new[] { string.Empty, parts[0] };
+                        parts = [string.Empty, parts[0]];
 
                     if (parts.Length != 2)
                     {
                         System.Console.WriteLine($"{namespaceFile}:{number}: Line format is XML namespace = C# namespace [file name]");
-                        Environment.Exit(1);
+                        Environment.Exit((int)ExitCodes.InvalidNamespaceFile);
                     }
 
                     var xmlns = parts[0].Trim();
@@ -312,7 +323,7 @@ with or without backing field initialization for collections
                     if (parts.Length != 2)
                     {
                         System.Console.WriteLine($"{nameSubstituteFile}:{number}: Line format is prefixed type/member name = substitute name");
-                        Environment.Exit(2);
+                        Environment.Exit((int)ExitCodes.InvalidNameSubstitutionFile);
                     }
 
                     var generatedName = parts[0].Trim();
