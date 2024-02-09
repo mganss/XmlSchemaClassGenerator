@@ -353,7 +353,14 @@ namespace XmlSchemaClassGenerator
                 var ex = e.Exception as Exception;
                 while (ex != null)
                 {
-                    Log?.Invoke(ex.Message);
+                    if(ex is XmlSchemaException xmlException)
+                    {
+                        Log?.Invoke(FormatXmlSchemaExeption(xmlException));
+                    }
+                    else
+                    {
+                        Log?.Invoke(ex.Message);
+                    }
                     ex = ex.InnerException;
                 }
             };
@@ -395,6 +402,28 @@ namespace XmlSchemaClassGenerator
 
                 writer.Write(ns);
             }
+        }
+
+        private string FormatXmlSchemaExeption(XmlSchemaException e)
+        {
+            StringBuilder sb = new StringBuilder(e.Message);
+
+            if(!string.IsNullOrEmpty(e.SourceUri))
+            {
+                sb.AppendFormat(" at {0}:{1}:{2}",
+                    e.SourceUri,
+                    e.LineNumber, 
+                    e.LinePosition);
+            }
+            else if(e.SourceSchemaObject != null)
+            {
+                sb.AppendFormat(" at {0}:{1}:{2}",
+                    e.SourceSchemaObject.SourceUri,
+                    e.SourceSchemaObject.LineNumber,
+                    e.SourceSchemaObject.LinePosition);
+            }
+
+            return sb.ToString();
         }
     }
 }
