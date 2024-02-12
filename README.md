@@ -9,7 +9,7 @@ XmlSchemaClassGenerator
 
 A console program and library to generate 
 [XmlSerializer](http://msdn.microsoft.com/en-us/library/system.xml.serialization.xmlserializer.aspx) compatible C# classes
-from <a href="http://en.wikipedia.org/wiki/XML_Schema_(W3C)">XML Schema</a> files.
+from [XML Schema](http://en.wikipedia.org/wiki/XML_Schema_(W3C)) files.
 
 Features
 --------
