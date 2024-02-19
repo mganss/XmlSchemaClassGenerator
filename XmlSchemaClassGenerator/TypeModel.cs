@@ -869,56 +869,65 @@ namespace XmlSchemaClassGenerator
             }
             else if (isEnumerable && !IsRequired)
             {
-                var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
-                var collectionType = Configuration.CollectionImplementationType ?? Configuration.CollectionType;
-                var countProperty = collectionType == typeof(Array) ? nameof(Array.Length) : nameof(List<int>.Count);
-                var countReference = new CodePropertyReferenceExpression(listReference, countProperty);
-                var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
-                if (Configuration.CollectionSettersMode is CollectionSettersMode.PublicWithoutConstructorInitialization or CollectionSettersMode.Public or CollectionSettersMode.Init or CollectionSettersMode.InitWithoutConstructorInitialization)
-                {
-                    var notNullExpression = new CodeBinaryOperatorExpression(listReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null));
-                    notZeroExpression = new CodeBinaryOperatorExpression(notNullExpression, CodeBinaryOperatorType.BooleanAnd, notZeroExpression);
-                }
-                var returnStatement = new CodeMethodReturnStatement(notZeroExpression);
+                var canBeNull = Configuration.CollectionSettersMode is CollectionSettersMode.PublicWithoutConstructorInitialization or CollectionSettersMode.Public or CollectionSettersMode.Init or CollectionSettersMode.InitWithoutConstructorInitialization;
 
-                if (Configuration.UseShouldSerializePattern)
+                if (canBeNull || !Configuration.SerializeEmptyCollections)
                 {
-                    var shouldSerializeMethod = new CodeMemberMethod
+                    var listReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), Name);
+                    var collectionType = Configuration.CollectionImplementationType ?? Configuration.CollectionType;
+                    var countProperty = collectionType == typeof(Array) ? nameof(Array.Length) : nameof(List<int>.Count);
+                    var countReference = new CodePropertyReferenceExpression(listReference, countProperty);
+                    var notZeroExpression = new CodeBinaryOperatorExpression(countReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(0));
+                    var returnExpression = notZeroExpression;
+
+                    if (canBeNull)
                     {
-                        Attributes = MemberAttributes.Public,
-                        Name = "ShouldSerialize" + Name,
-                        ReturnType = new CodeTypeReference(typeof(bool)),
-                        Statements = { returnStatement }
-                    };
+                        var notNullExpression = new CodeBinaryOperatorExpression(listReference, CodeBinaryOperatorType.IdentityInequality, new CodePrimitiveExpression(null));
+                        var notNullOrEmptyExpression = new CodeBinaryOperatorExpression(notNullExpression, CodeBinaryOperatorType.BooleanAnd, notZeroExpression);
+                        returnExpression = Configuration.SerializeEmptyCollections ? notNullExpression : notNullOrEmptyExpression;
+                    }
 
-                    Configuration.MemberVisitor(shouldSerializeMethod, this);
+                    var returnStatement = new CodeMethodReturnStatement(returnExpression);
 
-                    typeDeclaration.Members.Add(shouldSerializeMethod);
-                }
-                else
-                {
-                    var specifiedProperty = new CodeMemberProperty
+                    if (Configuration.UseShouldSerializePattern)
                     {
-                        Type = TypeRef<bool>(),
-                        Name = Name + Specified,
-                        HasSet = false,
-                        HasGet = true,
-                    };
-                    specifiedProperty.CustomAttributes.Add(ignoreAttribute);
-                    if (Configuration.EntityFramework) { specifiedProperty.CustomAttributes.Add(notMappedAttribute); }
-                    specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+                        var shouldSerializeMethod = new CodeMemberMethod
+                        {
+                            Attributes = MemberAttributes.Public,
+                            Name = "ShouldSerialize" + Name,
+                            ReturnType = new CodeTypeReference(typeof(bool)),
+                            Statements = { returnStatement }
+                        };
 
-                    specifiedProperty.GetStatements.Add(returnStatement);
+                        Configuration.MemberVisitor(shouldSerializeMethod, this);
 
-                    var specifiedDocs = new DocumentationModel[] {
+                        typeDeclaration.Members.Add(shouldSerializeMethod);
+                    }
+                    else
+                    {
+                        var specifiedProperty = new CodeMemberProperty
+                        {
+                            Type = TypeRef<bool>(),
+                            Name = Name + Specified,
+                            HasSet = false,
+                            HasGet = true,
+                        };
+                        specifiedProperty.CustomAttributes.Add(ignoreAttribute);
+                        if (Configuration.EntityFramework) { specifiedProperty.CustomAttributes.Add(notMappedAttribute); }
+                        specifiedProperty.Attributes = MemberAttributes.Public | MemberAttributes.Final;
+
+                        specifiedProperty.GetStatements.Add(returnStatement);
+
+                        var specifiedDocs = new DocumentationModel[] {
                         new() { Language = English, Text = $"Gets a value indicating whether the {Name} collection is empty." },
                         new() { Language = German, Text = $"Ruft einen Wert ab, der angibt, ob die {Name}-Collection leer ist." }
                     };
-                    specifiedProperty.Comments.AddRange(GetComments(specifiedDocs).ToArray());
+                        specifiedProperty.Comments.AddRange(GetComments(specifiedDocs).ToArray());
 
-                    Configuration.MemberVisitor(specifiedProperty, this);
+                        Configuration.MemberVisitor(specifiedProperty, this);
 
-                    typeDeclaration.Members.Add(specifiedProperty);
+                        typeDeclaration.Members.Add(specifiedProperty);
+                    }
                 }
             }
 

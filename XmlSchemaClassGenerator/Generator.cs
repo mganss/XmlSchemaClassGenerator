@@ -336,6 +336,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.SeparateNamespaceHierarchy = value; }
         }
 
+        public bool SerializeEmptyCollections
+        {
+            get { return _configuration.SerializeEmptyCollections; }
+            set { _configuration.SerializeEmptyCollections = value; }
+        }
+
         public bool ValidationError { get; private set; }
 
         static Generator()

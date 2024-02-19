@@ -343,5 +343,10 @@ namespace XmlSchemaClassGenerator
         /// Separates namespace hierarchy by folder. Default is false.
         /// </summary>
         public bool SeparateNamespaceHierarchy { get; set; } = false;
+
+        /// <summary>
+        /// Determines whether empty collections should be serialized as empty elements. Default is false.
+        /// </summary>
+        public bool SerializeEmptyCollections { get; set; } = false;
     }
 }

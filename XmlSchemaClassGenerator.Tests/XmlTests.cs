@@ -616,6 +616,38 @@ namespace XmlSchemaClassGenerator.Tests
 
         [Fact, TestPriority(1)]
         [UseCulture("en-US")]
+        public void TestSerializeEmptyCollection()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.EmptyCollection"));
+            Compiler.Generate("Tableau.EmptyCollection", TableauPattern,
+                new Generator
+                {
+                    OutputWriter = output,
+                    EnableDataBinding = true,
+                    CollectionSettersMode = CollectionSettersMode.Private,
+                    SerializeEmptyCollections = true
+                });
+            SharedTestFunctions.TestSamples(Output, "Tableau.EmptyCollection", TableauPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
+        public void TestSerializeEmptyPublicCollection()
+        {
+            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.EmptyPublicCollection"));
+            Compiler.Generate("Tableau.EmptyPublicCollection", TableauPattern,
+                new Generator
+                {
+                    OutputWriter = output,
+                    EnableDataBinding = true,
+                    CollectionSettersMode = CollectionSettersMode.Public,
+                    SerializeEmptyCollections = true
+                });
+            SharedTestFunctions.TestSamples(Output, "Tableau.EmptyPublicCollection", TableauPattern);
+        }
+
+        [Fact, TestPriority(1)]
+        [UseCulture("en-US")]
         public void TestDtsx()
         {
             Compiler.Generate("Dtsx", DtsxPattern, new Generator());
