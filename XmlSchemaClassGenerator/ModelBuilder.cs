@@ -237,16 +237,16 @@ namespace XmlSchemaClassGenerator
                         interfaceProperty.IsCollection = false;
                     }
 
-                    if (derivedProperties.Exists(p => p.IsRequired))
+                    if (derivedProperties.Exists(p => !p.IsRequired))
                     {
                         foreach (var derivedProperty in derivedProperties.Where(p => !p.IsRequired))
-                            derivedProperty.IsRequired = true;
+                            derivedProperty.IsRequired = false;
 
-                        interfaceProperty.IsRequired = true;
+                        interfaceProperty.IsRequired = false;
                     }
                     else
                     {
-                        interfaceProperty.IsRequired = false;
+                        interfaceProperty.IsRequired = true;
                     }
                 }
             }
