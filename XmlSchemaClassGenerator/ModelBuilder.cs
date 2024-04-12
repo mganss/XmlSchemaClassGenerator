@@ -232,6 +232,22 @@ namespace XmlSchemaClassGenerator
 
                         interfaceProperty.IsCollection = true;
                     }
+                    else
+                    {
+                        interfaceProperty.IsCollection = false;
+                    }
+
+                    if (derivedProperties.Exists(p => p.IsRequired))
+                    {
+                        foreach (var derivedProperty in derivedProperties.Where(p => !p.IsRequired))
+                            derivedProperty.IsRequired = true;
+
+                        interfaceProperty.IsRequired = true;
+                    }
+                    else
+                    {
+                        interfaceProperty.IsRequired = false;
+                    }
                 }
             }
         }
