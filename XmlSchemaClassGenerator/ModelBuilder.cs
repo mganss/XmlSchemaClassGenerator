@@ -11,6 +11,9 @@ namespace XmlSchemaClassGenerator
 {
     internal class ModelBuilder
     {
+        private const string ItemName = "Item";
+        private const string PropertyName = "Property";
+        private const string ElementName = "Element";
         private readonly GeneratorConfiguration _configuration;
         private readonly XmlSchemaSet _set;
         private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaAttributeGroup>> AttributeGroups = new();
@@ -868,12 +871,12 @@ namespace XmlSchemaClassGenerator
                         attributeQualifiedName = new XmlQualifiedName(typeName, owningTypeModel.XmlSchemaName.Namespace);
                         // try to avoid name clashes
                         if (NameExists(attributeQualifiedName))
-                            attributeQualifiedName = new[] { "Item", "Property", "Element" }.Select(s => new XmlQualifiedName(attributeQualifiedName.Name + s, attributeQualifiedName.Namespace)).First(n => !NameExists(n));
+                            attributeQualifiedName = new[] { ItemName, PropertyName, ElementName }.Select(s => new XmlQualifiedName(attributeQualifiedName.Name + s, attributeQualifiedName.Namespace)).First(n => !NameExists(n));
                     }
                 }
 
                 if (name == owningTypeModel.Name)
-                    name += "Property";
+                    name += PropertyName;
             }
 
             name = owningTypeModel.GetUniquePropertyName(name, properties);
@@ -989,7 +992,7 @@ namespace XmlSchemaClassGenerator
             var name = _configuration.NamingProvider.ElementNameFromQualifiedName(effectiveElement.QualifiedName, effectiveElement);
             var originalName = name;
             if (name == owningTypeModel.Name)
-                name += "Property"; // member names cannot be the same as their enclosing type
+                name += PropertyName; // member names cannot be the same as their enclosing type
 
             name = owningTypeModel.GetUniquePropertyName(name, properties);
 
@@ -1023,7 +1026,7 @@ namespace XmlSchemaClassGenerator
                     elementQualifiedName = new XmlQualifiedName(typeName, typeModel.XmlSchemaName.Namespace);
                     // try to avoid name clashes
                     if (NameExists(elementQualifiedName))
-                        elementQualifiedName = new[] { "Item", "Property", "Element" }.Select(s => new XmlQualifiedName(elementQualifiedName.Name + s, elementQualifiedName.Namespace)).First(n => !NameExists(n));
+                        elementQualifiedName = new[] { ItemName, PropertyName, ElementName }.Select(s => new XmlQualifiedName(elementQualifiedName.Name + s, elementQualifiedName.Namespace)).First(n => !NameExists(n));
                 }
             }
 

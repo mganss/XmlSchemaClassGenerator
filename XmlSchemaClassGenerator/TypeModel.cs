@@ -385,11 +385,13 @@ namespace XmlSchemaClassGenerator
             if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
             {
                 var propName = "Text";
+                var propertyIndex = 1;
 
                 // To not collide with any existing members
-                for (var propertyIndex = 1; Properties.Exists(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal); propertyIndex++)
+                while (Properties.Exists(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal))
                 {
                     propName = $"Text_{propertyIndex}";
+                    propertyIndex++;
                 }
                 // hack to generate automatic property
                 var text = new CodeMemberField(typeof(string[]), propName + PropertyModel.GetAccessors()) { Attributes = MemberAttributes.Public };

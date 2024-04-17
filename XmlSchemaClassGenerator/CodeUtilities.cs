@@ -312,9 +312,13 @@ namespace XmlSchemaClassGenerator
         public static string GetUniqueTypeName(this NamespaceModel model, string name)
         {
             var n = name;
+            var i = 2;
 
-            for (var i = 2; model.Types.ContainsKey(n) && model.Types[n] is not SimpleModel; i++)
+            while (model.Types.ContainsKey(n) && model.Types[n] is not SimpleModel)
+            {
                 n = name + i;
+                i++;
+            }
 
             return n;
         }
