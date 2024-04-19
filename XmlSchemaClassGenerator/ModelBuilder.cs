@@ -16,11 +16,11 @@ namespace XmlSchemaClassGenerator
         private const string ElementName = "Element";
         private readonly GeneratorConfiguration _configuration;
         private readonly XmlSchemaSet _set;
-        private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaAttributeGroup>> AttributeGroups = new();
-        private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaGroup>> Groups = new();
-        private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = new();
-        private readonly Dictionary<string, TypeModel> Types = new();
-        private readonly Dictionary<XmlQualifiedName, HashSet<Substitute>> SubstitutionGroups = new();
+        private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaAttributeGroup>> AttributeGroups = [];
+        private readonly Dictionary<XmlQualifiedName, HashSet<XmlSchemaGroup>> Groups = [];
+        private readonly Dictionary<NamespaceKey, NamespaceModel> Namespaces = [];
+        private readonly Dictionary<string, TypeModel> Types = [];
+        private readonly Dictionary<XmlQualifiedName, HashSet<Substitute>> SubstitutionGroups = [];
 
         private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
@@ -62,7 +62,7 @@ namespace XmlSchemaClassGenerator
                 {
                     if (!AttributeGroups.ContainsKey(currentAttributeGroup.QualifiedName))
                     {
-                        AttributeGroups.Add(currentAttributeGroup.QualifiedName, new HashSet<XmlSchemaAttributeGroup>());
+                        AttributeGroups.Add(currentAttributeGroup.QualifiedName, []);
                     }
 
                     AttributeGroups[currentAttributeGroup.QualifiedName].Add(currentAttributeGroup);
@@ -75,7 +75,7 @@ namespace XmlSchemaClassGenerator
                 {
                     if (!Groups.ContainsKey(currentSchemaGroup.QualifiedName))
                     {
-                        Groups.Add(currentSchemaGroup.QualifiedName, new HashSet<XmlSchemaGroup>());
+                        Groups.Add(currentSchemaGroup.QualifiedName, []);
                     }
 
                     Groups[currentSchemaGroup.QualifiedName].Add(currentSchemaGroup);
@@ -314,7 +314,7 @@ namespace XmlSchemaClassGenerator
             {
                 if (!SubstitutionGroups.TryGetValue(rootElement.SubstitutionGroup, out var substitutes))
                 {
-                    substitutes = new HashSet<Substitute>();
+                    substitutes = [];
                     SubstitutionGroups.Add(rootElement.SubstitutionGroup, substitutes);
                 }
 
@@ -422,24 +422,14 @@ namespace XmlSchemaClassGenerator
             return typeModelBuilder.Create(type);
         }
 
-        private sealed class TypeModelBuilder
+        private sealed class TypeModelBuilder(ModelBuilder builder, GeneratorConfiguration configuration, XmlQualifiedName qualifiedName, NamespaceModel namespaceModel, List<DocumentationModel> docs, Uri source)
         {
-            private readonly ModelBuilder builder;
-            private readonly GeneratorConfiguration _configuration;
-            private readonly XmlQualifiedName qualifiedName;
-            private readonly NamespaceModel namespaceModel;
-            private readonly List<DocumentationModel> docs;
-            private readonly Uri source;
-
-            public TypeModelBuilder(ModelBuilder builder, GeneratorConfiguration configuration, XmlQualifiedName qualifiedName, NamespaceModel namespaceModel, List<DocumentationModel> docs, Uri source)
-            {
-                this.builder = builder;
-                _configuration = configuration;
-                this.qualifiedName = qualifiedName;
-                this.namespaceModel = namespaceModel;
-                this.docs = docs;
-                this.source = source;
-            }
+            private readonly ModelBuilder builder = builder;
+            private readonly GeneratorConfiguration _configuration = configuration;
+            private readonly XmlQualifiedName qualifiedName = qualifiedName;
+            private readonly NamespaceModel namespaceModel = namespaceModel;
+            private readonly List<DocumentationModel> docs = docs;
+            private readonly Uri source = source;
 
             internal TypeModel Create(XmlSchemaAnnotated type) => type switch
             {
@@ -661,7 +651,7 @@ namespace XmlSchemaClassGenerator
                     restrictions = CodeUtilities.GetRestrictions(facets, simpleType, _configuration).Where(r => r != null).Sanitize().ToList();
                 }
 
-                return CreateSimpleModel(simpleType, restrictions ?? new());
+                return CreateSimpleModel(simpleType, restrictions ?? []);
 
                 static bool AllMembersHaveFacets(XmlSchemaSimpleTypeUnion typeUnion, out List<IEnumerable<XmlSchemaFacet>> baseFacets)
                 {
@@ -673,7 +663,7 @@ namespace XmlSchemaClassGenerator
 
                 static List<XmlSchemaFacet> MergeRestrictions(XmlSchemaSimpleType type)
                 {
-                    if (type == null) return new();
+                    if (type == null) return [];
                     var baseFacets = MergeRestrictions(type.BaseXmlSchemaType as XmlSchemaSimpleType);
                     if (type.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
                     {
@@ -908,7 +898,7 @@ namespace XmlSchemaClassGenerator
                 {
                     // ElementSchemaType must be non-null. This is not the case when maxOccurs="0".
                     case XmlSchemaElement element when element.ElementSchemaType != null:
-                        property = PropertyFromElement(owningTypeModel, element, particle, item, substitute, passProperties ? properties : new List<PropertyModel>());
+                        property = PropertyFromElement(owningTypeModel, element, particle, item, substitute, passProperties ? properties : []);
                         break;
                     case XmlSchemaAny:
                         SimpleModel typeModel = new(_configuration)
@@ -1093,7 +1083,7 @@ namespace XmlSchemaClassGenerator
 
         public static List<DocumentationModel> GetDocumentation(XmlSchemaAnnotated annotated)
         {
-	        return annotated.Annotation == null ? new List<DocumentationModel>()
+            return annotated.Annotation == null ? []
 		        : annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
 		        .Where(d => d.Markup?.Length > 0)
 		        .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = m.OuterXml }))

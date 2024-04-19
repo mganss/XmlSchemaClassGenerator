@@ -103,6 +103,34 @@ namespace XmlSchemaClassGenerator.Tests
             Assert.Contains(expectedXmlSerializationAttribute, generatedProperty);
         }
 
+        [Fact]
+        public void WhenDateTimeOffsetIsNotUsed_DataTypePropertyIsPresent2()
+        {
+            var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+			<xs:element name=""someDate"" type=""xs:date"" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+            var generatedType = ConvertXml(
+                xsd, new()
+                {
+                    NamespaceProvider = new()
+                    {
+                        GenerateNamespace = _ => "Test"
+                    },
+                    DateTimeWithTimeZone = true
+                });
+
+            var expectedXmlSerializationAttribute = "[System.Xml.Serialization.XmlElementAttribute(\"someDate\", DataType=\"date\")]";
+            var generatedProperty = generatedType.First();
+
+            Assert.Contains(expectedXmlSerializationAttribute, generatedProperty);
+        }
+
         [Theory]
         [InlineData(false, "System.DateTime")]
         [InlineData(true, "System.DateTimeOffset")]

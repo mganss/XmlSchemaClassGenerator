@@ -67,10 +67,11 @@ namespace XmlSchemaClassGenerator
         public static string ToBackingField(this string propertyName, string privateFieldPrefix)
             => string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
 
-        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type) => type.TypeCode switch
+        public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration) => type.TypeCode switch
         {
             XmlTypeCode.AnyAtomicType => false,// union
-            XmlTypeCode.DateTime or XmlTypeCode.Time or XmlTypeCode.Date or XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
+            XmlTypeCode.DateTime or XmlTypeCode.Time => !configuration.DateTimeWithTimeZone,
+            XmlTypeCode.Date or XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
             _ => false,
         };
 

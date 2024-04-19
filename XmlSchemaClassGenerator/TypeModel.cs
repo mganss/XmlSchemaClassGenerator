@@ -326,7 +326,7 @@ namespace XmlSchemaClassGenerator
                         docs.AddRange(simpleModel.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
                         text.CustomAttributes.AddRange(simpleModel.GetRestrictionAttributes().ToArray());
 
-                        if (BaseClass.GetQualifiedName() is { Namespace: XmlSchema.Namespace, Name: var name } && (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? simpleModel.UseDataTypeAttribute))
+                        if (BaseClass.GetQualifiedName() is { Namespace: XmlSchema.Namespace, Name: var name } && (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed(Configuration) ?? simpleModel.UseDataTypeAttribute))
                             attribute.Arguments.Add(new CodeAttributeArgument(nameof(XmlTextAttribute.DataType), new CodePrimitiveExpression(name)));
                     }
 
@@ -1104,8 +1104,7 @@ namespace XmlSchemaClassGenerator
                     {
                         var qualifiedName = xmlSchemaType.GetQualifiedName();
 
-                        if (qualifiedName.Namespace == XmlSchema.Namespace && qualifiedName.Name != "anySimpleType" &&
-                            !(xmlSchemaType.Datatype.ValueType == typeof(DateTime) && Configuration.DateTimeWithTimeZone))
+                        if (qualifiedName.Namespace == XmlSchema.Namespace && qualifiedName.Name != "anySimpleType")
                         {
                             args.Add(new("DataType", new CodePrimitiveExpression(qualifiedName.Name)));
                             break;
@@ -1250,7 +1249,7 @@ namespace XmlSchemaClassGenerator
                 // XmlSerializer is inconsistent: maps xs:decimal to decimal but xs:integer to string,
                 // even though xs:integer is a restriction of xs:decimal
                 type = XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, XmlSchemaType, attribute);
-                UseDataTypeAttribute = XmlSchemaType.Datatype.IsDataTypeAttributeAllowed() ?? UseDataTypeAttribute;
+                UseDataTypeAttribute = XmlSchemaType.Datatype.IsDataTypeAttributeAllowed(Configuration) ?? UseDataTypeAttribute;
             }
 
             if (collection)
