@@ -622,7 +622,7 @@ namespace XmlSchemaClassGenerator
 
             AddDescription(member.CustomAttributes, docs);
 
-            if (PropertyType is SimpleModel simpleType)
+            if (PropertyType is SimpleModel simpleType && !IsEnumerable)
             {
                 docs.AddRange(simpleType.Documentation);
                 docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
