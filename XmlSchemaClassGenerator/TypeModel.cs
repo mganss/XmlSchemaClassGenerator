@@ -762,6 +762,8 @@ namespace XmlSchemaClassGenerator
             if (IsRequired && Configuration.DataAnnotationMode != DataAnnotationMode.None)
             {
                 var requiredAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.Required, Configuration));
+                var allowEmptyStringsArgument = new CodeAttributeArgument("AllowEmptyStrings", new CodePrimitiveExpression(true));
+                requiredAttribute.Arguments.Add(allowEmptyStringsArgument);
                 member.CustomAttributes.Add(requiredAttribute);
             }
 
