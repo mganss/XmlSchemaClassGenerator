@@ -30,8 +30,8 @@ namespace XmlSchemaClassGenerator
 
             foreach (var (Namespace, Condition) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)).OrderBy(n => n.Namespace))
                 codeNamespace.Imports.Add(new CodeNamespaceImport(Namespace));
-
-            foreach (var typeModel in parts.SelectMany(x => x.Types.Values).ToList())
+            //This is to ensure that the simpleModels are emitted if we use them
+            foreach (var typeModel in parts.SelectMany(x => x.Types.Values).OrderBy(x => x is SimpleModel).ToList())
             {
                 var type = typeModel.Generate();
                 if (type != null)
@@ -514,6 +514,8 @@ namespace XmlSchemaClassGenerator
         public bool IsRequired { get; set; }
         public bool IsNillable { get; set; }
         public bool IsCollection { get; set; }
+        public decimal MaxOccurs { get; set; }
+        public decimal MinOccurs { get; set; }
         public bool IsDeprecated { get; set; }
         public bool IsAny { get; set; }
         public int? Order { get; set; }
@@ -539,7 +541,9 @@ namespace XmlSchemaClassGenerator
             XmlParent = item.XmlParent;
 
             IsRequired = isRequired;
-            IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m; // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
+            IsCollection = item.MaxOccurs > 1.0m || particle.MinOccurs > 1.0m; // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
+            MinOccurs = item.MinOccurs;
+            MaxOccurs = item.MaxOccurs;
         }
 
         public void SetSchemaNameAndNamespace(TypeModel owningTypeModel, IXmlSchemaNode xs)
@@ -622,11 +626,24 @@ namespace XmlSchemaClassGenerator
 
             AddDescription(member.CustomAttributes, docs);
 
-            if (PropertyType is SimpleModel simpleType && !IsEnumerable)
+            if (PropertyType is SimpleModel simpleType)
             {
                 docs.AddRange(simpleType.Documentation);
                 docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
-                member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
+                //use the current model to detemine min and max length
+                if (IsEnumerable)
+                {
+                    if (MaxOccurs > 0 && MaxOccurs < decimal.MaxValue)
+                        member.CustomAttributes.Add(AttributeDecl(Attributes.MaxLength, new(new CodePrimitiveExpression(Convert.ToInt32(MaxOccurs)))));
+                    if (MinOccurs > 0)
+                        member.CustomAttributes.Add(AttributeDecl(Attributes.MinLength, new(new CodePrimitiveExpression(Convert.ToInt32(MinOccurs)))));
+                    //flag the simple model to be emitted
+                    simpleType.IsUtilized = true;
+                }
+                else 
+                {
+                    member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
+                }
             }
 
             member.Comments.AddRange(GetComments(docs).ToArray());
@@ -1118,7 +1135,11 @@ namespace XmlSchemaClassGenerator
                     }
                 }
             }
-
+            if (OwningType is SimpleModel)
+            {
+                var attribute = AttributeDecl<XmlTextAttribute>();
+                attributes.Add(attribute);
+            }
             return attributes;
         }
     }
@@ -1197,6 +1218,7 @@ namespace XmlSchemaClassGenerator
         public Type ValueType { get; set; }
         public List<RestrictionModel> Restrictions { get; } = [];
         public bool UseDataTypeAttribute { get; set; } = true;
+        public bool IsUtilized { get; set; }
 
         public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
         {
@@ -1236,6 +1258,34 @@ namespace XmlSchemaClassGenerator
 
         public override CodeTypeDeclaration Generate()
         {
+            if (IsUtilized)
+            {
+                var classDeclaration = base.Generate();
+
+                GenerateSerializableAttribute(classDeclaration);
+                GenerateTypeAttribute(classDeclaration);
+
+                classDeclaration.IsClass = true;
+                classDeclaration.IsPartial = true;
+                if (Configuration.AssemblyVisible)
+                    classDeclaration.TypeAttributes = (classDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+                if (RootElementName != null)
+                {
+                    var rootAttribute = AttributeDecl<XmlRootAttribute>(
+                        new(new CodePrimitiveExpression(XmlSchemaName.Name)),
+                        new(nameof(XmlRootAttribute.Namespace), new CodePrimitiveExpression(XmlSchemaName.Namespace)));
+                    classDeclaration.CustomAttributes.Add(rootAttribute);
+                }
+                var property = new PropertyModel(Configuration, "Value", this, this);
+                XmlSchemaElementEx schema = new XmlSchemaElement() { SchemaType = new XmlSchemaSimpleType { Name = Name } };
+                property.SetSchemaNameAndNamespace(this, schema);
+
+                property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+                return classDeclaration;
+
+                //TODO add implicit conversions to aid in development
+            }
+
             return null;
         }
 
