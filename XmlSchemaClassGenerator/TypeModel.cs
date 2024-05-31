@@ -1351,7 +1351,7 @@ namespace XmlSchemaClassGenerator
             {
                 var rangeAttribute = new CodeAttributeDeclaration(
                     CodeUtilities.CreateTypeReference(Attributes.Range, Configuration),
-                    new(new CodeTypeOfExpression(minInclusive.Type)),
+                    new(new CodeTypeOfExpression(GetReferenceFor(Namespace))),
                     new(new CodePrimitiveExpression(minInclusive.Value)),
                     new(new CodePrimitiveExpression(maxInclusive.Value)));
 
