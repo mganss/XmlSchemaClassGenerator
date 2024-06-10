@@ -541,7 +541,7 @@ namespace XmlSchemaClassGenerator
             XmlParent = item.XmlParent;
 
             IsRequired = isRequired;
-            IsCollection = item.MaxOccurs > 1.0m || particle.MinOccurs > 1.0m; // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
+            IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m; // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
             MinOccurs = item.MinOccurs;
             MaxOccurs = item.MaxOccurs;
         }
@@ -1279,6 +1279,37 @@ namespace XmlSchemaClassGenerator
                 var property = new PropertyModel(Configuration, "Value", this, this);
                 XmlSchemaElementEx schema = new XmlSchemaElement() { SchemaType = new XmlSchemaSimpleType { Name = Name } };
                 property.SetSchemaNameAndNamespace(this, schema);
+
+                if (Configuration.EnableDataBinding)
+                {
+                    var propertyChangedEvent = new CodeMemberEvent()
+                    {
+                        Name = nameof(INotifyPropertyChanged.PropertyChanged),
+                        Type = TypeRef<PropertyChangedEventHandler>(),
+                        Attributes = MemberAttributes.Public,
+                    };
+                    classDeclaration.Members.Add(propertyChangedEvent);
+
+                    SimpleModel type = new(Configuration) { ValueType = typeof(PropertyChangedEventHandler) };
+                    var propertyChangedModel = new PropertyModel(Configuration, propertyChangedEvent.Name, type, this);
+
+                    Configuration.MemberVisitor(propertyChangedEvent, propertyChangedModel);
+
+                    var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName = null");
+                    param.CustomAttributes.Add(new(TypeRef<System.Runtime.CompilerServices.CallerMemberNameAttribute>()));
+                    var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs({param.Name}))");
+                    var onPropChangedMethod = new CodeMemberMethod
+                    {
+                        Name = OnPropertyChanged,
+                        Attributes = MemberAttributes.Family,
+                        Parameters = { param },
+                        Statements = { threadSafeDelegateInvokeExpression }
+                    };
+
+                    classDeclaration.Members.Add(onPropChangedMethod);
+
+                    classDeclaration.BaseTypes.Add(TypeRef<INotifyPropertyChanged>());
+                }
 
                 property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
                 return classDeclaration;
