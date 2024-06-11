@@ -640,7 +640,7 @@ namespace XmlSchemaClassGenerator
                     //flag the simple model to be emitted
                     simpleType.IsUtilized = true;
                 }
-                else 
+                else
                 {
                     member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
                 }
@@ -1142,6 +1142,17 @@ namespace XmlSchemaClassGenerator
             }
             return attributes;
         }
+
+        internal void AddImplicitConversions(CodeTypeDeclaration classDeclaration)
+        {
+            var wrappedType = TypeReference.BaseType;
+            if(TypeReference.TypeArguments.Count > 0)
+            {
+                wrappedType = wrappedType.Substring(0,wrappedType.Length - 2) + $"<{string.Join(",", TypeReference.TypeArguments.Cast<CodeTypeReference>().Select(x => x.BaseType))}>";
+            }
+            classDeclaration.Members.Add(new CodeSnippetTypeMember($"public static implicit operator {classDeclaration.Name}({wrappedType} obj)" + " { return new() { Value = obj } ; }"));
+            classDeclaration.Members.Add(new CodeSnippetTypeMember($"public static implicit operator {wrappedType}({classDeclaration.Name} obj) => obj.Value;"));
+        }
     }
 
     public class EnumValueModel
@@ -1312,9 +1323,8 @@ namespace XmlSchemaClassGenerator
                 }
 
                 property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+                property.AddImplicitConversions(classDeclaration);
                 return classDeclaration;
-
-                //TODO add implicit conversions to aid in development
             }
 
             return null;
@@ -1337,6 +1347,10 @@ namespace XmlSchemaClassGenerator
 
             if (collection)
             {
+                if (Restrictions.Any())
+                {
+                    return base.GetReferenceFor(referencingNamespace, collection, forInit, attribute);
+                }
                 var collectionType = forInit ? (Configuration.CollectionImplementationType ?? Configuration.CollectionType) : Configuration.CollectionType;
 
                 if (collectionType.IsGenericType)
