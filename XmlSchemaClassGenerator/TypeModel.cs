@@ -627,7 +627,6 @@ namespace XmlSchemaClassGenerator
 
             if (PropertyType is SimpleModel simpleType)
             {
-                //use the current model to detemine min and max length
                 if (IsEnumerable)
                 {
                     if (MaxOccurs > 0 && MaxOccurs < decimal.MaxValue)
