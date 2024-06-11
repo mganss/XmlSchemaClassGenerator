@@ -629,16 +629,19 @@ namespace XmlSchemaClassGenerator
             if (PropertyType is SimpleModel simpleType)
             {
                 docs.AddRange(simpleType.Documentation);
-                docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
                 //use the current model to detemine min and max length
                 if (IsEnumerable)
                 {
                     if (MaxOccurs > 0 && MaxOccurs < decimal.MaxValue)
+                    {
                         member.CustomAttributes.Add(AttributeDecl(Attributes.MaxLength, new(new CodePrimitiveExpression(Convert.ToInt32(MaxOccurs)))));
+                        docs.Add(new DocumentationModel() { Language = English, Text = new MaxLengthRestrictionModel(Configuration) { Value = Convert.ToInt32(MaxOccurs) }.Description });
+                    }
                     if (MinOccurs > 0)
+                    {
                         member.CustomAttributes.Add(AttributeDecl(Attributes.MinLength, new(new CodePrimitiveExpression(Convert.ToInt32(MinOccurs)))));
-                    //flag the simple model to be emitted
-                    simpleType.IsUtilized = true;
+                        docs.Add(new DocumentationModel() { Language = English, Text = new MinLengthRestrictionModel(Configuration) { Value = Convert.ToInt32(MinOccurs) }.Description });
+                    }
                 }
                 else
                 {
@@ -1077,10 +1080,13 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    var attribute = AttributeDecl<XmlElementAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
-                    if (Order != null)
-                        attribute.Arguments.Add(new(nameof(Order), new CodePrimitiveExpression(Order.Value)));
-                    attributes.Add(attribute);
+                    if (!string.IsNullOrEmpty(XmlSchemaName?.Name))
+                    {
+                        var attribute = AttributeDecl<XmlElementAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                        if (Order != null)
+                            attribute.Arguments.Add(new(nameof(Order), new CodePrimitiveExpression(Order.Value)));
+                        attributes.Add(attribute);
+                    }
                 }
             }
             else
@@ -1143,16 +1149,6 @@ namespace XmlSchemaClassGenerator
             return attributes;
         }
 
-        internal void AddImplicitConversions(CodeTypeDeclaration classDeclaration)
-        {
-            var wrappedType = TypeReference.BaseType;
-            if(TypeReference.TypeArguments.Count > 0)
-            {
-                wrappedType = wrappedType.Substring(0,wrappedType.Length - 2) + $"<{string.Join(",", TypeReference.TypeArguments.Cast<CodeTypeReference>().Select(x => x.BaseType))}>";
-            }
-            classDeclaration.Members.Add(new CodeSnippetTypeMember($"public static implicit operator {classDeclaration.Name}({wrappedType} obj)" + " { return new() { Value = obj } ; }"));
-            classDeclaration.Members.Add(new CodeSnippetTypeMember($"public static implicit operator {wrappedType}({classDeclaration.Name} obj) => obj.Value;"));
-        }
     }
 
     public class EnumValueModel
@@ -1229,7 +1225,6 @@ namespace XmlSchemaClassGenerator
         public Type ValueType { get; set; }
         public List<RestrictionModel> Restrictions { get; } = [];
         public bool UseDataTypeAttribute { get; set; } = true;
-        public bool IsUtilized { get; set; }
 
         public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
         {
@@ -1269,9 +1264,10 @@ namespace XmlSchemaClassGenerator
 
         public override CodeTypeDeclaration Generate()
         {
-            if (IsUtilized)
+            if (Restrictions.Any())
             {
                 var classDeclaration = base.Generate();
+                classDeclaration.Name = "Simple_" + classDeclaration.Name;
 
                 GenerateSerializableAttribute(classDeclaration);
                 GenerateTypeAttribute(classDeclaration);
@@ -1287,10 +1283,16 @@ namespace XmlSchemaClassGenerator
                         new(nameof(XmlRootAttribute.Namespace), new CodePrimitiveExpression(XmlSchemaName.Namespace)));
                     classDeclaration.CustomAttributes.Add(rootAttribute);
                 }
-                var property = new PropertyModel(Configuration, "Value", this, this);
+                var valueModel = new SimpleModel(Configuration) { ValueType = ValueType };
+                valueModel.Documentation.AddRange(Documentation);
+                valueModel.Restrictions.AddRange(Restrictions);
+                valueModel.UseDataTypeAttribute = UseDataTypeAttribute;
+
+                var property = new PropertyModel(Configuration, "Value", valueModel, this);
+
                 XmlSchemaElementEx schema = new XmlSchemaElement() { SchemaType = new XmlSchemaSimpleType { Name = Name } };
                 property.SetSchemaNameAndNamespace(this, schema);
-
+                
                 if (Configuration.EnableDataBinding)
                 {
                     var propertyChangedEvent = new CodeMemberEvent()
@@ -1323,7 +1325,7 @@ namespace XmlSchemaClassGenerator
                 }
 
                 property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
-                property.AddImplicitConversions(classDeclaration);
+                
                 return classDeclaration;
             }
 
@@ -1349,7 +1351,8 @@ namespace XmlSchemaClassGenerator
             {
                 if (Restrictions.Any())
                 {
-                    return base.GetReferenceFor(referencingNamespace, collection, forInit, attribute);
+                    var reference = base.GetReferenceFor(referencingNamespace, collection, forInit, attribute);
+                    reference.BaseType = "Simple_" + reference.BaseType;
                 }
                 var collectionType = forInit ? (Configuration.CollectionImplementationType ?? Configuration.CollectionType) : Configuration.CollectionType;
 
