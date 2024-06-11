@@ -627,7 +627,6 @@ namespace XmlSchemaClassGenerator
 
             if (PropertyType is SimpleModel simpleType)
             {
-                docs.AddRange(simpleType.Documentation);
                 //use the current model to detemine min and max length
                 if (IsEnumerable)
                 {
@@ -644,6 +643,8 @@ namespace XmlSchemaClassGenerator
                 }
                 else
                 {
+                    docs.AddRange(simpleType.Documentation);
+                    docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
                     member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
                 }
             }
