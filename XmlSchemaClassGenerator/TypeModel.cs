@@ -30,8 +30,7 @@ namespace XmlSchemaClassGenerator
 
             foreach (var (Namespace, Condition) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)).OrderBy(n => n.Namespace))
                 codeNamespace.Imports.Add(new CodeNamespaceImport(Namespace));
-            //This is to ensure that the simpleModels are emitted if we use them
-            foreach (var typeModel in parts.SelectMany(x => x.Types.Values).OrderBy(x => x is SimpleModel).ToList())
+            foreach (var typeModel in parts.SelectMany(x => x.Types.Values).ToList())
             {
                 var type = typeModel.Generate();
                 if (type != null)
