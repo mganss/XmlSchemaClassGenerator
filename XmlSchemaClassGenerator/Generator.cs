@@ -342,6 +342,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.SerializeEmptyCollections = value; }
         }
 
+        public bool AllowDtdParse
+        {
+            get { return _configuration.AllowDtdParse; }
+            set { _configuration.AllowDtdParse = value; }
+        }
+
         public bool ValidationError { get; private set; }
 
         static Generator()
@@ -352,7 +358,7 @@ namespace XmlSchemaClassGenerator
         public void Generate(IEnumerable<string> files)
         {
             var set = new XmlSchemaSet();
-            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
+            var settings = new XmlReaderSettings { DtdProcessing = AllowDtdParse ? DtdProcessing.Parse : DtdProcessing.Ignore };
             var readers = files.Select(f => XmlReader.Create(f, settings));
 
             ValidationError = false;

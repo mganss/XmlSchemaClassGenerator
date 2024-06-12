@@ -193,6 +193,8 @@ Options:
       --uc, --unionCommonType
                              generate a common type for unions if possible (
                                default is false)
+      --dtd, --allowDtdParse
+                             allow DTD parsing (default is false)
 ```
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):

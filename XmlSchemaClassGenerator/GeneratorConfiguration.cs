@@ -348,5 +348,10 @@ namespace XmlSchemaClassGenerator
         /// Determines whether empty collections should be serialized as empty elements. Default is false.
         /// </summary>
         public bool SerializeEmptyCollections { get; set; } = false;
+
+        /// <summary>
+        /// Allow DTD parsing. Default is false.
+        /// </summary>
+        public bool AllowDtdParse { get; set; } = false;
     }
 }

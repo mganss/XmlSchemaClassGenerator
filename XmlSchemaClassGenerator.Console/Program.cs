@@ -66,6 +66,7 @@ namespace XmlSchemaClassGenerator.Console
             var unionCommonType = false;
             var separateNamespaceHierarchy = false;
             var serializeEmptyCollections = false;
+            var allowDtdParse = false;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -160,6 +161,7 @@ with or without backing field initialization for collections
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
                 { "uc|unionCommonType", "generate a common type for unions if possible (default is false)", v => unionCommonType = v != null },
                 { "ec|serializeEmptyCollections", "serialize empty collections (default is false)", v => serializeEmptyCollections = v != null },
+                { "dtd|allowDtdParse", "allows dtd parse (default is false)", v => allowDtdParse = v != null },
             };
 
             var globsAndUris = options.Parse(args);
@@ -248,6 +250,7 @@ with or without backing field initialization for collections
                 MapUnionToWidestCommonType = unionCommonType,
                 SeparateNamespaceHierarchy = separateNamespaceHierarchy,
                 SerializeEmptyCollections = serializeEmptyCollections,
+                AllowDtdParse = allowDtdParse
             };
 
             if (nameSubstituteMap.Any())
