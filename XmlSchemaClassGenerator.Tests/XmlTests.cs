@@ -61,25 +61,13 @@ namespace XmlSchemaClassGenerator.Tests
                 CollectionSettersMode = generatorPrototype.CollectionSettersMode,
                 UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
                 EnumAsString = generatorPrototype.EnumAsString,
+                AllowDtdParse = generatorPrototype.AllowDtdParse
             };
 
             gen.CommentLanguages.Clear();
             gen.CommentLanguages.UnionWith(generatorPrototype.CommentLanguages);
 
-            var set = new XmlSchemaSet();
-
-            foreach (var xsd in xsds)
-            {
-                using var stringReader = new StringReader(xsd);
-                var schema = XmlSchema.Read(stringReader, (s, e) =>
-                {
-                    throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception);
-                });
-
-                set.Add(schema);
-            }
-
-            gen.Generate(set);
+            gen.Generate(xsds.Select(i => new StringReader(i)));
 
             return writer.Content;
         }
@@ -3011,6 +2999,87 @@ namespace Test
             {
                 Assert.Null(interfaceCommon);
             }
+        }
+
+
+        [Fact]
+        public void TestAllowDtdParse()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<!DOCTYPE schema [
+	<!ENTITY lowalpha ""a-z"">
+	<!ENTITY hialpha ""A-Z"">
+	<!ENTITY digit ""0-9"">
+]>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:simpleType name=""CodecsType"">
+		<xs:annotation>
+			<xs:documentation xml:lang=""en"">
+				List of Profiles
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base=""xs:string"">
+			<xs:pattern value=""[&lowalpha;&hialpha;&digit;]+""/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:complexType name=""ComplexType"">
+      <xs:attribute name=""codecs"" type=""CodecsType""/>
+    </xs:complexType>
+</xs:schema>
+
+";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                AllowDtdParse = true
+            };
+
+            var generatedType = ConvertXml(nameof(TestAllowDtdParse), xsd, generator).First();
+
+            Assert.Contains(@"public partial class ComplexType", generatedType);
+            Assert.Contains(@"[a-zA-Z0-9]+", generatedType);
+        }
+
+        [Fact]
+        public void TestNotAllowDtdParse()
+        {
+            const string xsd = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<!DOCTYPE schema [
+	<!ENTITY lowalpha ""a-z"">
+	<!ENTITY hialpha ""A-Z"">
+	<!ENTITY digit ""0-9"">
+]>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:simpleType name=""CodecsType"">
+		<xs:annotation>
+			<xs:documentation xml:lang=""en"">
+				List of Profiles
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base=""xs:string"">
+			<xs:pattern value=""[&lowalpha;&hialpha;&digit;]+""/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:complexType name=""ComplexType"">
+      <xs:attribute name=""codecs"" type=""CodecsType""/>
+    </xs:complexType>
+</xs:schema>
+
+";
+            var generator = new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test"
+                },
+                AllowDtdParse = false
+            };
+
+            var exception = Assert.Throws<XmlException>(() => ConvertXml(nameof(TestNotAllowDtdParse), xsd, generator));
+            Assert.Contains("Reference to undeclared entity 'lowalpha'", exception.Message);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -342,6 +342,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.SerializeEmptyCollections = value; }
         }
 
+        public bool AllowDtdParse
+        {
+            get { return _configuration.AllowDtdParse; }
+            set { _configuration.AllowDtdParse = value; }
+        }
+
         public bool ValidationError { get; private set; }
 
         static Generator()
@@ -351,9 +357,19 @@ namespace XmlSchemaClassGenerator
 
         public void Generate(IEnumerable<string> files)
         {
+            var settings = CreateSettings();
+            Generate(files.Select(f => XmlReader.Create(f, settings)));
+        }
+
+        public void Generate(IEnumerable<TextReader> streams)
+        {
+            var settings = CreateSettings();
+            Generate(streams.Select(f => XmlReader.Create(f, settings)));
+        }
+
+        public void Generate(IEnumerable<XmlReader> readers)
+        {
             var set = new XmlSchemaSet();
-            var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
-            var readers = files.Select(f => XmlReader.Create(f, settings));
 
             ValidationError = false;
 
@@ -406,6 +422,11 @@ namespace XmlSchemaClassGenerator
 
                 writer.Write(ns);
             }
+        }
+
+        private XmlReaderSettings CreateSettings()
+        {
+            return new XmlReaderSettings { DtdProcessing = AllowDtdParse ? DtdProcessing.Parse : DtdProcessing.Ignore };
         }
     }
 }
