@@ -48,7 +48,7 @@ For command line use, choose your preferred installation:
 - .NET Core CLI tool available in the [dotnet-xscgen NuGet package](https://www.nuget.org/packages/dotnet-xscgen/)
 - CI Builds are available at the NuGet feed https://ci.appveyor.com/nuget/xmlschemaclassgenerator-0f1t3r6ti475
 
-```
+<pre>
 Usage: xscgen [OPTIONS]+ xsdFile...
 Generate C# classes from XML Schema files.
 Version ...
@@ -80,7 +80,7 @@ Options:
                                Separate type/member name and substitute name by
                                '='.
                                Prefix type/member name with an appropriate kind
-                               ID as documented at: https://t.ly/HHEI.
+                               ID as documented at: <a href="https://t.ly/HHEI">https://t.ly/HHEI</a>.
                                Prefix with 'A:' to substitute any type/member.
       --tnsf, --typeNameSubstituteFile=VALUE
                              file containing generated type/member name
@@ -195,7 +195,7 @@ Options:
                                default is false)
       --dtd, --allowDtdParse
                              allow DTD parsing (default is false)
-```
+</pre>
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
 
