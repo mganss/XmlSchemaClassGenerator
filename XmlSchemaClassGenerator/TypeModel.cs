@@ -275,7 +275,7 @@ namespace XmlSchemaClassGenerator
 
                 var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName = null");
                 param.CustomAttributes.Add(new(TypeRef<System.Runtime.CompilerServices.CallerMemberNameAttribute>()));
-                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs({param.Name}))");
+                var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName))");
                 var onPropChangedMethod = new CodeMemberMethod
                 {
                     Name = OnPropertyChanged,
