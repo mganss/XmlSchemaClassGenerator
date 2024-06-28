@@ -30,7 +30,6 @@ namespace XmlSchemaClassGenerator
 
             foreach (var (Namespace, Condition) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)).OrderBy(n => n.Namespace))
                 codeNamespace.Imports.Add(new CodeNamespaceImport(Namespace));
-
             foreach (var typeModel in parts.SelectMany(x => x.Types.Values).ToList())
             {
                 var type = typeModel.Generate();
@@ -514,6 +513,8 @@ namespace XmlSchemaClassGenerator
         public bool IsRequired { get; set; }
         public bool IsNillable { get; set; }
         public bool IsCollection { get; set; }
+        public decimal MaxOccurs { get; set; }
+        public decimal MinOccurs { get; set; }
         public bool IsDeprecated { get; set; }
         public bool IsAny { get; set; }
         public int? Order { get; set; }
@@ -540,6 +541,8 @@ namespace XmlSchemaClassGenerator
 
             IsRequired = isRequired;
             IsCollection = item.MaxOccurs > 1.0m || particle.MaxOccurs > 1.0m; // http://msdn.microsoft.com/en-us/library/vstudio/d3hx2s7e(v=vs.100).aspx
+            MinOccurs = item.MinOccurs;
+            MaxOccurs = item.MaxOccurs;
         }
 
         public void SetSchemaNameAndNamespace(TypeModel owningTypeModel, IXmlSchemaNode xs)
@@ -622,11 +625,27 @@ namespace XmlSchemaClassGenerator
 
             AddDescription(member.CustomAttributes, docs);
 
-            if (PropertyType is SimpleModel simpleType && !IsEnumerable)
+            if (PropertyType is SimpleModel simpleType)
             {
-                docs.AddRange(simpleType.Documentation);
-                docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
-                member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
+                if (IsEnumerable)
+                {
+                    if (MaxOccurs > 0 && MaxOccurs < decimal.MaxValue)
+                    {
+                        member.CustomAttributes.Add(AttributeDecl(Attributes.MaxLength, new(new CodePrimitiveExpression(Convert.ToInt32(MaxOccurs)))));
+                        docs.Add(new DocumentationModel() { Language = English, Text = new MaxLengthRestrictionModel(Configuration) { Value = Convert.ToInt32(MaxOccurs) }.Description });
+                    }
+                    if (MinOccurs > 0)
+                    {
+                        member.CustomAttributes.Add(AttributeDecl(Attributes.MinLength, new(new CodePrimitiveExpression(Convert.ToInt32(MinOccurs)))));
+                        docs.Add(new DocumentationModel() { Language = English, Text = new MinLengthRestrictionModel(Configuration) { Value = Convert.ToInt32(MinOccurs) }.Description });
+                    }
+                }
+                else
+                {
+                    docs.AddRange(simpleType.Documentation);
+                    docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
+                    member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
+                }
             }
 
             member.Comments.AddRange(GetComments(docs).ToArray());
@@ -1060,10 +1079,13 @@ namespace XmlSchemaClassGenerator
                         }
                     }
 
-                    var attribute = AttributeDecl<XmlElementAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
-                    if (Order != null)
-                        attribute.Arguments.Add(new(nameof(Order), new CodePrimitiveExpression(Order.Value)));
-                    attributes.Add(attribute);
+                    if (!string.IsNullOrEmpty(XmlSchemaName?.Name))
+                    {
+                        var attribute = AttributeDecl<XmlElementAttribute>(new CodeAttributeArgument(new CodePrimitiveExpression(XmlSchemaName.Name)));
+                        if (Order != null)
+                            attribute.Arguments.Add(new(nameof(Order), new CodePrimitiveExpression(Order.Value)));
+                        attributes.Add(attribute);
+                    }
                 }
             }
             else
@@ -1118,9 +1140,14 @@ namespace XmlSchemaClassGenerator
                     }
                 }
             }
-
+            if (OwningType is SimpleModel)
+            {
+                var attribute = AttributeDecl<XmlTextAttribute>();
+                attributes.Add(attribute);
+            }
             return attributes;
         }
+
     }
 
     public class EnumValueModel
@@ -1236,6 +1263,71 @@ namespace XmlSchemaClassGenerator
 
         public override CodeTypeDeclaration Generate()
         {
+            if (Restrictions.Any())
+            {
+                var classDeclaration = base.Generate();
+                classDeclaration.Name = "Simple_" + classDeclaration.Name;
+
+                GenerateSerializableAttribute(classDeclaration);
+                GenerateTypeAttribute(classDeclaration);
+
+                classDeclaration.IsClass = true;
+                classDeclaration.IsPartial = true;
+                if (Configuration.AssemblyVisible)
+                    classDeclaration.TypeAttributes = (classDeclaration.TypeAttributes & ~System.Reflection.TypeAttributes.VisibilityMask) | System.Reflection.TypeAttributes.NestedAssembly;
+                if (RootElementName != null)
+                {
+                    var rootAttribute = AttributeDecl<XmlRootAttribute>(
+                        new(new CodePrimitiveExpression(XmlSchemaName.Name)),
+                        new(nameof(XmlRootAttribute.Namespace), new CodePrimitiveExpression(XmlSchemaName.Namespace)));
+                    classDeclaration.CustomAttributes.Add(rootAttribute);
+                }
+                var valueModel = new SimpleModel(Configuration) { ValueType = ValueType };
+                valueModel.Documentation.AddRange(Documentation);
+                valueModel.Restrictions.AddRange(Restrictions);
+                valueModel.UseDataTypeAttribute = UseDataTypeAttribute;
+
+                var property = new PropertyModel(Configuration, "Value", valueModel, this);
+
+                XmlSchemaElementEx schema = new XmlSchemaElement() { SchemaType = new XmlSchemaSimpleType { Name = Name } };
+                property.SetSchemaNameAndNamespace(this, schema);
+                
+                if (Configuration.EnableDataBinding)
+                {
+                    var propertyChangedEvent = new CodeMemberEvent()
+                    {
+                        Name = nameof(INotifyPropertyChanged.PropertyChanged),
+                        Type = TypeRef<PropertyChangedEventHandler>(),
+                        Attributes = MemberAttributes.Public,
+                    };
+                    classDeclaration.Members.Add(propertyChangedEvent);
+
+                    SimpleModel type = new(Configuration) { ValueType = typeof(PropertyChangedEventHandler) };
+                    var propertyChangedModel = new PropertyModel(Configuration, propertyChangedEvent.Name, type, this);
+
+                    Configuration.MemberVisitor(propertyChangedEvent, propertyChangedModel);
+
+                    var param = new CodeParameterDeclarationExpression(typeof(string), "propertyName = null");
+                    param.CustomAttributes.Add(new(TypeRef<System.Runtime.CompilerServices.CallerMemberNameAttribute>()));
+                    var threadSafeDelegateInvokeExpression = new CodeSnippetExpression($"{propertyChangedEvent.Name}?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs({param.Name}))");
+                    var onPropChangedMethod = new CodeMemberMethod
+                    {
+                        Name = OnPropertyChanged,
+                        Attributes = MemberAttributes.Family,
+                        Parameters = { param },
+                        Statements = { threadSafeDelegateInvokeExpression }
+                    };
+
+                    classDeclaration.Members.Add(onPropChangedMethod);
+
+                    classDeclaration.BaseTypes.Add(TypeRef<INotifyPropertyChanged>());
+                }
+
+                property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
+                
+                return classDeclaration;
+            }
+
             return null;
         }
 
@@ -1256,6 +1348,11 @@ namespace XmlSchemaClassGenerator
 
             if (collection)
             {
+                if (Restrictions.Any())
+                {
+                    var reference = base.GetReferenceFor(referencingNamespace, collection, forInit, attribute);
+                    reference.BaseType = "Simple_" + reference.BaseType;
+                }
                 var collectionType = forInit ? (Configuration.CollectionImplementationType ?? Configuration.CollectionType) : Configuration.CollectionType;
 
                 if (collectionType.IsGenericType)
