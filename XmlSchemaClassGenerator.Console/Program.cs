@@ -235,7 +235,6 @@ with or without backing field initialization for collections
                 DateTimeWithTimeZone = dateTimeWithTimeZone,
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
-                NamingScheme = namingScheme != null ? namingScheme.Value : (pascal ? NamingScheme.PascalCase : NamingScheme.Direct),
                 AssemblyVisible = assembly,
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
@@ -265,6 +264,15 @@ with or without backing field initialization for collections
                 SerializeEmptyCollections = serializeEmptyCollections,
                 AllowDtdParse = allowDtdParse,
             };
+
+            if (namingScheme != null)
+            {
+                generator.NamingScheme = namingScheme.Value;
+            }
+            else
+            {
+                generator.NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct;
+            }
 
             if (nameSubstituteMap.Any())
             {
