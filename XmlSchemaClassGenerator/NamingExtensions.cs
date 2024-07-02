@@ -106,6 +106,9 @@ namespace XmlSchemaClassGenerator
                 case NamingScheme.PascalCase:
                     s = s.ToPascalCase();
                     break;
+                case NamingScheme.LegacyPascalCase:
+                    s = s.ToLegacyPascalCase();
+                    break;
             }
             return s.MakeValidIdentifier();
         }

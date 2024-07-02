@@ -67,6 +67,7 @@ namespace XmlSchemaClassGenerator.Console
             var separateNamespaceHierarchy = false;
             var serializeEmptyCollections = false;
             var allowDtdParse = false;
+            NamingScheme? namingScheme = null;
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -123,20 +124,20 @@ Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Ad
                 { "csm|collectionSettersMode=", @"generate a private, public, or init-only setter
 with or without backing field initialization for collections
 (default is Private; can be: {Private, Public, PublicWithoutConstructorInitialization, Init, InitWithoutConstructorInitialization})",
-                                        v =>
-                                        {
-                                            collectionSettersMode = v switch
-                                            {
-                                                "pr" or "Private" => CollectionSettersMode.Private,
-                                                "pu" or "Public" => CollectionSettersMode.Public,
-                                                "puwci" or "PublicWithoutConstructorInitialization" =>
-                                                    CollectionSettersMode.PublicWithoutConstructorInitialization,
-                                                "in" or "Init" => CollectionSettersMode.Init,
-                                                "inwci" or "InitWithoutConstructorInitialization" =>
-                                                    CollectionSettersMode.InitWithoutConstructorInitialization,
-                                                _ => CollectionSettersMode.Private
-                                            };
-                                        }},
+                    v =>
+                    {
+                        collectionSettersMode = v switch
+                        {
+                            "pr" or "Private" => CollectionSettersMode.Private,
+                            "pu" or "Public" => CollectionSettersMode.Public,
+                            "puwci" or "PublicWithoutConstructorInitialization" =>
+                                CollectionSettersMode.PublicWithoutConstructorInitialization,
+                            "in" or "Init" => CollectionSettersMode.Init,
+                            "inwci" or "InitWithoutConstructorInitialization" =>
+                                CollectionSettersMode.InitWithoutConstructorInitialization,
+                            _ => CollectionSettersMode.Private
+                        };
+                    }},
                 { "ctro|codeTypeReferenceOptions=", "the default CodeTypeReferenceOptions Flags to use (default is unset; can be: {GlobalReference, GenericTypeParameter})", v => codeTypeReferenceOptions = v == null ? default : (CodeTypeReferenceOptions)Enum.Parse(typeof(CodeTypeReferenceOptions), v, false) },
                 { "tvpn|textValuePropertyName=", "the name of the property that holds the text value of an element (default is Value)", v => textValuePropertyName = v },
                 { "dst|debuggerStepThrough", "generate DebuggerStepThroughAttribute (default is enabled)", v => generateDebuggerStepThroughAttribute = v != null },
@@ -162,6 +163,18 @@ with or without backing field initialization for collections
                 { "uc|unionCommonType", "generate a common type for unions if possible (default is false)", v => unionCommonType = v != null },
                 { "ec|serializeEmptyCollections", "serialize empty collections (default is false)", v => serializeEmptyCollections = v != null },
                 { "dtd|allowDtdParse", "allows dtd parse (default is false)", v => allowDtdParse = v != null },
+                { "ns|namingScheme", @"use the specified naming scheme for class and property names (default is Pascal; can be: Direct, Pascal, Legacy)",
+                    v =>
+                    {
+                        namingScheme = v?.ToLowerInvariant() switch
+                        {
+                            "direct" => NamingScheme.Direct,
+                            "pascal" => NamingScheme.PascalCase,
+                            "legacy" => NamingScheme.LegacyPascalCase,
+                            _ => NamingScheme.PascalCase,
+                        };
+                    }
+                }
             };
 
             var globsAndUris = options.Parse(args);
@@ -222,7 +235,7 @@ with or without backing field initialization for collections
                 DateTimeWithTimeZone = dateTimeWithTimeZone,
                 EntityFramework = entityFramework,
                 GenerateInterfaces = interfaces,
-                NamingScheme = pascal ? NamingScheme.PascalCase : NamingScheme.Direct,
+                NamingScheme = namingScheme != null ? namingScheme.Value : (pascal ? NamingScheme.PascalCase : NamingScheme.Direct),
                 AssemblyVisible = assembly,
                 CollectionType = collectionType,
                 CollectionImplementationType = collectionImplementationType,
@@ -250,7 +263,7 @@ with or without backing field initialization for collections
                 MapUnionToWidestCommonType = unionCommonType,
                 SeparateNamespaceHierarchy = separateNamespaceHierarchy,
                 SerializeEmptyCollections = serializeEmptyCollections,
-                AllowDtdParse = allowDtdParse
+                AllowDtdParse = allowDtdParse,
             };
 
             if (nameSubstituteMap.Any())

@@ -14,6 +14,14 @@ namespace XmlSchemaClassGenerator
 {
     public static class CodeUtilities
     {
+        // Match non-letter followed by letter
+        private static readonly Regex PascalCaseRegex = new(@"[^\p{L}]\p{L}", RegexOptions.Compiled);
+
+        // Uppercases first letter and all letters following non-letters.
+        // Examples: testcase -> Testcase, html5element -> Html5Element, test_case -> Test_Case
+        public static string ToLegacyPascalCase(this string s) => string.IsNullOrEmpty(s) ? s
+            : char.ToUpperInvariant(s[0]) + PascalCaseRegex.Replace(s.Substring(1), m => m.Value[0] + char.ToUpperInvariant(m.Value[1]).ToString());
+
         private static readonly Regex invalidCharsRgx = new(@"[^_\p{L}\p{N}]");
         private static readonly Regex whiteSpace = new(@"(?<=\s)");
         private static readonly Regex startsWithLowerCaseChar = new(@"^\p{Ll}");

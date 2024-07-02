@@ -7,14 +7,26 @@ namespace XmlSchemaClassGenerator.NamingProviders
     /// <summary>
     /// Provides options to customize member names, and automatically substitute names for defined types/members.
     /// </summary>
-    public class SubstituteNamingProvider
-        : NamingProvider, INamingProvider
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="SubstituteNamingProvider"/> class.
+    /// </remarks>
+    /// <param name="namingScheme">The naming scheme.</param>
+    /// <param name="nameSubstitutes">
+    /// A dictionary containing name substitute pairs.
+    /// <para>
+    /// Keys need to be prefixed with an appropriate kind ID as documented at:
+    /// <see href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d42-id-string-format">https://t.ly/HHEI</see>.
+    /// </para>
+    /// <para>Prefix with <c>A:</c> to substitute any type/member.</para>
+    /// </param>
+    public class SubstituteNamingProvider(NamingScheme namingScheme, Dictionary<string, string> nameSubstitutes)
+                : NamingProvider(namingScheme), INamingProvider
     {
-        private readonly Dictionary<string, string> _nameSubstitutes;
+        private readonly Dictionary<string, string> _nameSubstitutes = nameSubstitutes;
 
         /// <inheritdoc cref="SubstituteNamingProvider(NamingScheme, Dictionary{string, string})"/>
         public SubstituteNamingProvider(NamingScheme namingScheme)
-            : this(namingScheme, new())
+            : this(namingScheme, [])
         {
         }
 
@@ -22,24 +34,6 @@ namespace XmlSchemaClassGenerator.NamingProviders
         public SubstituteNamingProvider(Dictionary<string, string> nameSubstitutes)
             : this(NamingScheme.PascalCase, nameSubstitutes)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SubstituteNamingProvider"/> class.
-        /// </summary>
-        /// <param name="namingScheme">The naming scheme.</param>
-        /// <param name="nameSubstitutes">
-        /// A dictionary containing name substitute pairs.
-        /// <para>
-        /// Keys need to be prefixed with an appropriate kind ID as documented at:
-        /// <see href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/documentation-comments#d42-id-string-format">https://t.ly/HHEI</see>.
-        /// </para>
-        /// <para>Prefix with <c>A:</c> to substitute any type/member.</para>
-        /// </param>
-        public SubstituteNamingProvider(NamingScheme namingScheme, Dictionary<string, string> nameSubstitutes)
-            : base(namingScheme)
-        {
-            _nameSubstitutes = nameSubstitutes;
         }
 
         /// <inheritdoc/>
@@ -101,8 +95,7 @@ namespace XmlSchemaClassGenerator.NamingProviders
                 return name;
             }
 
-            string substituteName;
-            if (_nameSubstitutes.TryGetValue($"{typeIdPrefix}:{name}", out substituteName) || _nameSubstitutes.TryGetValue($"A:{name}", out substituteName))
+            if (_nameSubstitutes.TryGetValue($"{typeIdPrefix}:{name}", out string substituteName) || _nameSubstitutes.TryGetValue($"A:{name}", out substituteName))
             {
                 return substituteName;
             }

@@ -195,6 +195,9 @@ Options:
                                default is false)
       --dtd, --allowDtdParse
                              allow DTD parsing (default is false)
+      --ns, --namingScheme   use the specified naming scheme for class and
+                               property names (default is Pascal; can be:
+                               Direct, Pascal, Legacy)
 </pre>
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):

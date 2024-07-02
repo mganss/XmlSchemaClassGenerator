@@ -9,6 +9,7 @@ namespace XmlSchemaClassGenerator
     public enum NamingScheme
     {
         Direct,
-        PascalCase
+        PascalCase,
+        LegacyPascalCase,
     }
 }
