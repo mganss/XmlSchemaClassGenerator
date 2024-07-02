@@ -242,8 +242,15 @@ namespace XmlSchemaClassGenerator
 
         public static IEnumerable<RestrictionModel> GetRestrictions(IEnumerable<XmlSchemaFacet> facets, XmlSchemaSimpleType type, GeneratorConfiguration _configuration)
         {
-            var min = facets.OfType<XmlSchemaMinLengthFacet>().Select(f => int.Parse(f.Value)).DefaultIfEmpty().Max();
-            var max = facets.OfType<XmlSchemaMaxLengthFacet>().Select(f => int.Parse(f.Value)).DefaultIfEmpty().Min();
+            var len = facets.OfType<XmlSchemaLengthFacet>().Select(f => int.Parse(f.Value)).ToList();
+            var min = facets.OfType<XmlSchemaMinLengthFacet>().Select(f => int.Parse(f.Value))
+                .Union(len)
+                .DefaultIfEmpty()
+                .Max();
+            var max = facets.OfType<XmlSchemaMaxLengthFacet>().Select(f => int.Parse(f.Value))
+                .Union(len)
+                .DefaultIfEmpty()
+                .Min();
 
             if (_configuration.DataAnnotationMode == DataAnnotationMode.All)
             {
@@ -260,18 +267,6 @@ namespace XmlSchemaClassGenerator
                 var valueType = type.Datatype.ValueType;
                 switch (facet)
                 {
-                    case XmlSchemaLengthFacet:
-                        var value = int.Parse(facet.Value);
-                        if (_configuration.DataAnnotationMode == DataAnnotationMode.All)
-                        {
-                            yield return new MinLengthRestrictionModel(_configuration) { Value = value };
-                            yield return new MaxLengthRestrictionModel(_configuration) { Value = value };
-                        }
-                        else
-                        {
-                            yield return new MinMaxLengthRestrictionModel(_configuration) { Min = value, Max = value };
-                        }
-                        break;
                     case XmlSchemaTotalDigitsFacet:
                         yield return new TotalDigitsRestrictionModel(_configuration) { Value = int.Parse(facet.Value) }; break;
                     case XmlSchemaFractionDigitsFacet:
