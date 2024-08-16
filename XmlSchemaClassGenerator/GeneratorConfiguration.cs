@@ -39,9 +39,12 @@ namespace XmlSchemaClassGenerator
             Version = VersionProvider.CreateFromAssembly();
             EnableUpaCheck = true;
             CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
+            MergeRestrictionsWithBase = true;
         }
 
         public bool EnumAsString { get; set; }
+
+        public bool MergeRestrictionsWithBase { get; set; }
 
         /// <summary>
         /// The writer to be used to generate the code files

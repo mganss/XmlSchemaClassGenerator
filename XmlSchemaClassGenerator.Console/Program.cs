@@ -61,6 +61,7 @@ namespace XmlSchemaClassGenerator.Console
             var generateCommandLineArgs = true;
             var useArrayItemAttribute = true;
             var enumAsString = false;
+            var disableMergeRestrictionsWithBase = false;
             var namespaceFiles = new List<string>();
             var nameSubstituteFiles = new List<string>();
             var unionCommonType = false;
@@ -159,6 +160,7 @@ with or without backing field initialization for collections
                 { "nr|nullableReferenceAttributes", "generate attributes for nullable reference types (default is false)", v => nullableReferenceAttributes = v != null },
                 { "ar|useArrayItemAttribute", "use ArrayItemAttribute for sequences with single elements (default is true)", v => useArrayItemAttribute = v != null },
                 { "es|enumAsString", "Use string instead of enum for enumeration", v => enumAsString = v != null },
+                { "dmb|disableMergeRestrictionsWithBase", "Disable merging of simple type restrictions with base type restrictions", v => disableMergeRestrictionsWithBase = v != null },
                 { "ca|commandArgs", "generate a comment with the exact command line arguments that were used to generate the source code (default is true)", v => generateCommandLineArgs = v != null },
                 { "uc|unionCommonType", "generate a common type for unions if possible (default is false)", v => unionCommonType = v != null },
                 { "ec|serializeEmptyCollections", "serialize empty collections (default is false)", v => serializeEmptyCollections = v != null },
@@ -259,6 +261,7 @@ with or without backing field initialization for collections
                 GenerateCommandLineArgumentsComment = generateCommandLineArgs,
                 UseArrayItemAttribute = useArrayItemAttribute,
                 EnumAsString = enumAsString,
+                MergeRestrictionsWithBase = !disableMergeRestrictionsWithBase,
                 MapUnionToWidestCommonType = unionCommonType,
                 SeparateNamespaceHierarchy = separateNamespaceHierarchy,
                 SerializeEmptyCollections = serializeEmptyCollections,

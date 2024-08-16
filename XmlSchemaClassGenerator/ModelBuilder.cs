@@ -635,6 +635,7 @@ namespace XmlSchemaClassGenerator
 
                 var facets = simpleType.Content switch
                 {
+                    XmlSchemaSimpleTypeRestriction typeRestriction when !_configuration.MergeRestrictionsWithBase => typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList(),
                     XmlSchemaSimpleTypeUnion typeUnion when AllMembersHaveFacets(typeUnion, out baseFacets) => baseFacets.SelectMany(f => f).ToList(),
                     _ => MergeRestrictions(simpleType)
                 };
