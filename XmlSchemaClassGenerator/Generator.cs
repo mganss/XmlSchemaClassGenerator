@@ -39,6 +39,12 @@ namespace XmlSchemaClassGenerator
             set { _configuration.EnumAsString = value; }
         }
 
+        public bool MergeRestrictionsWithBase
+        {
+            get { return _configuration.MergeRestrictionsWithBase; }
+            set { _configuration.MergeRestrictionsWithBase = value; }
+        }
+
         public bool GenerateComplexTypesForCollections
         {
             get { return _configuration.GenerateComplexTypesForCollections; }
