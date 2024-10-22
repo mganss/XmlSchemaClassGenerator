@@ -1331,7 +1331,7 @@ namespace XmlSchemaClassGenerator
             else if (type == typeof(double) && !string.IsNullOrWhiteSpace(defaultString))
             {
                 if (defaultString.Equals("inf", StringComparison.OrdinalIgnoreCase))
-                    return new CodePrimitiveExpression(double.NegativeInfinity);
+                    return new CodePrimitiveExpression(double.PositiveInfinity);
                 else if (defaultString.Equals("-inf", StringComparison.OrdinalIgnoreCase))
                     return new CodePrimitiveExpression(double.NegativeInfinity);
             }
