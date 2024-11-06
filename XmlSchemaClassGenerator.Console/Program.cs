@@ -279,7 +279,7 @@ with or without backing field initialization for collections
 
             if (nameSubstituteMap.Any())
             {
-                generator.NamingProvider = new SubstituteNamingProvider(nameSubstituteMap);
+                generator.NamingProvider = new SubstituteNamingProvider(generator.NamingScheme, nameSubstituteMap);
             }
 
             generator.CommentLanguages.UnionWith(commentLanguages);
