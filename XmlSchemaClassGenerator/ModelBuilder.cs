@@ -597,7 +597,7 @@ namespace XmlSchemaClassGenerator
                         if (baseType is not XmlSchemaComplexType baseComplexType)
                             continue;
 
-                        if (baseComplexType.AttributeWildcard != null)
+                        if (baseComplexType.QualifiedName != AnyType && baseComplexType.AttributeWildcard != null)
                         {
                             hasAnyAttribute = false;
                             break;
