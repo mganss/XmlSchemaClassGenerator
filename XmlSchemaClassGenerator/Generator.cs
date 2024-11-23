@@ -9,12 +9,52 @@ using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
 {
+    class NormalizingXmlResolver : XmlUrlResolver
+    {
+        // the Uri scheme to force on the resolved Uris
+        // "none" - do not change Uri scheme
+        // "same" - force the same Uri scheme as base Uri
+        // any other string becomes the new Uri scheme of the baseUri
+        private string forceUriScheme; 
+        public NormalizingXmlResolver(string forceUriScheme) : base()
+        {
+            this.forceUriScheme=forceUriScheme;
+        }
+        public override Uri ResolveUri(Uri baseUri, string relativeUri)
+        {
+            Uri resolvedUri = base.ResolveUri(baseUri, relativeUri);
+            var r=NormalizeUri(baseUri, resolvedUri);
+            Console.WriteLine($"-- ResolveUri:from {baseUri} to {relativeUri}: {r}");
+            return r; 
+        }
+        private Uri NormalizeUri(Uri baseUri, Uri resolvedUri )
+        {
+            var newScheme=forceUriScheme;
+            switch (forceUriScheme)
+            {
+                case "none": return resolvedUri;
+                case "same":
+                {
+                    newScheme=baseUri.Scheme;
+                    break; 
+                }
+            }
+            UriBuilder builder = new UriBuilder(resolvedUri) { Scheme = newScheme, Port=-1};
+            return builder.Uri;
+        }
+    }
+    
     public class Generator
     {
         private readonly GeneratorConfiguration _configuration = new();
 
         public GeneratorConfiguration Configuration => _configuration;
 
+        public string ForceUriScheme
+        {
+            get { return _configuration.ForceUriScheme; }
+            set { _configuration.ForceUriScheme=value;  }
+        }
         public NamespaceProvider NamespaceProvider
         {
             get { return _configuration.NamespaceProvider; }
@@ -375,11 +415,10 @@ namespace XmlSchemaClassGenerator
 
         public void Generate(IEnumerable<XmlReader> readers)
         {
-            var set = new XmlSchemaSet();
-
+            var set = new XmlSchemaSet(); 
             ValidationError = false;
 
-            set.XmlResolver = new XmlUrlResolver();
+            set.XmlResolver = new NormalizingXmlResolver(ForceUriScheme); // XmlUrlResolver();
             set.ValidationEventHandler += (s, e) =>
             {
                 var ex = e.Exception as Exception;

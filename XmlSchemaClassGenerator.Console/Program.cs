@@ -69,6 +69,8 @@ namespace XmlSchemaClassGenerator.Console
             var serializeEmptyCollections = false;
             var allowDtdParse = false;
             NamingScheme? namingScheme = null;
+            var forceUriScheme = "none";
+
 
             var options = new OptionSet {
                 { "h|help", "show this message and exit", v => showHelp = v != null },
@@ -176,7 +178,8 @@ with or without backing field initialization for collections
                             _ => NamingScheme.PascalCase,
                         };
                     }
-                }
+                },
+                { "fu|forceUriScheme=", "force URI scheme when resolving Urls (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v }
             };
 
             var globsAndUris = options.Parse(args);
@@ -266,6 +269,7 @@ with or without backing field initialization for collections
                 SeparateNamespaceHierarchy = separateNamespaceHierarchy,
                 SerializeEmptyCollections = serializeEmptyCollections,
                 AllowDtdParse = allowDtdParse,
+                ForceUriScheme = forceUriScheme
             };
 
             if (namingScheme != null)
