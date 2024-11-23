@@ -24,7 +24,6 @@ namespace XmlSchemaClassGenerator
         {
             Uri resolvedUri = base.ResolveUri(baseUri, relativeUri);
             var r=NormalizeUri(baseUri, resolvedUri);
-            Console.WriteLine($"-- ResolveUri:from {baseUri} to {relativeUri}: {r}");
             return r; 
         }
         private Uri NormalizeUri(Uri baseUri, Uri resolvedUri )
