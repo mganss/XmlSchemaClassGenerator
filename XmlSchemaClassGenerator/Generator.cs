@@ -9,7 +9,7 @@ using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
 {
-    class NormalizingXmlResolver : XmlUrlResolver
+    public class NormalizingXmlResolver : XmlUrlResolver
     {
         // the Uri scheme to force on the resolved Uris
         // "none" - do not change Uri scheme
