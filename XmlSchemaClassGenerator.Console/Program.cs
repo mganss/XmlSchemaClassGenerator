@@ -179,7 +179,7 @@ with or without backing field initialization for collections
                         };
                     }
                 },
-                { "fu|forceUriScheme=", "force URI scheme when resolving Urls (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v }
+                { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v }
             };
 
             var globsAndUris = options.Parse(args);

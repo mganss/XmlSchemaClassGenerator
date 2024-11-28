@@ -9,40 +9,41 @@ using System.Xml.Schema;
 
 namespace XmlSchemaClassGenerator
 {
-    public class NormalizingXmlResolver : XmlUrlResolver
+    public class NormalizingXmlResolver(string forceUriScheme) : XmlUrlResolver()
     {
         // the Uri scheme to force on the resolved Uris
         // "none" - do not change Uri scheme
         // "same" - force the same Uri scheme as base Uri
         // any other string becomes the new Uri scheme of the baseUri
-        private string forceUriScheme; 
-        public NormalizingXmlResolver(string forceUriScheme) : base()
-        {
-            this.forceUriScheme=forceUriScheme;
-        }
+        private readonly string forceUriScheme = forceUriScheme;
+
         public override Uri ResolveUri(Uri baseUri, string relativeUri)
         {
-            Uri resolvedUri = base.ResolveUri(baseUri, relativeUri);
-            var r=NormalizeUri(baseUri, resolvedUri);
-            return r; 
+            var resolvedUri = base.ResolveUri(baseUri, relativeUri);
+            var r = NormalizeUri(baseUri, resolvedUri);
+            return r;
         }
-        private Uri NormalizeUri(Uri baseUri, Uri resolvedUri )
+
+        private Uri NormalizeUri(Uri baseUri, Uri resolvedUri)
         {
-            var newScheme=forceUriScheme;
+            var newScheme = forceUriScheme;
+
             switch (forceUriScheme)
             {
                 case "none": return resolvedUri;
                 case "same":
                 {
-                    newScheme=baseUri.Scheme;
-                    break; 
+                    newScheme = baseUri.Scheme;
+                    break;
                 }
             }
-            UriBuilder builder = new UriBuilder(resolvedUri) { Scheme = newScheme, Port=-1};
+
+            var builder = new UriBuilder(resolvedUri) { Scheme = newScheme, Port = -1 };
+
             return builder.Uri;
         }
     }
-    
+
     public class Generator
     {
         private readonly GeneratorConfiguration _configuration = new();
@@ -52,8 +53,9 @@ namespace XmlSchemaClassGenerator
         public string ForceUriScheme
         {
             get { return _configuration.ForceUriScheme; }
-            set { _configuration.ForceUriScheme=value;  }
+            set { _configuration.ForceUriScheme = value;  }
         }
+
         public NamespaceProvider NamespaceProvider
         {
             get { return _configuration.NamespaceProvider; }
@@ -414,10 +416,11 @@ namespace XmlSchemaClassGenerator
 
         public void Generate(IEnumerable<XmlReader> readers)
         {
-            var set = new XmlSchemaSet(); 
+            var set = new XmlSchemaSet();
+
             ValidationError = false;
 
-            set.XmlResolver = new NormalizingXmlResolver(ForceUriScheme); // XmlUrlResolver();
+            set.XmlResolver = new NormalizingXmlResolver(ForceUriScheme);
             set.ValidationEventHandler += (s, e) =>
             {
                 var ex = e.Exception as Exception;

@@ -199,7 +199,7 @@ Options:
                                property names (default is Pascal; can be:
                                Direct, Pascal, Legacy)
       --fu, --forceUriScheme=VALUE
-                             force URI scheme when resolving Urls (default is none; can be: none, same, or any defined value for scheme, like https or http) 
+                             force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http) 
 </pre>
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
