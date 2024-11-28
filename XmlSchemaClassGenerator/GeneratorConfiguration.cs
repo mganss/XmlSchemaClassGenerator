@@ -40,6 +40,7 @@ namespace XmlSchemaClassGenerator
             EnableUpaCheck = true;
             CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
             MergeRestrictionsWithBase = true;
+            ForceUriScheme = "none";
         }
 
         public bool EnumAsString { get; set; }
@@ -85,6 +86,10 @@ namespace XmlSchemaClassGenerator
         /// Generate attributes for nullable references to avoid compiler-warnings in .NET Core and Standard with nullable-checks.
         /// </summary>
         public bool EnableNullableReferenceAttributes { get; set; }
+        /// <summary>
+        /// Force Uri Scheme for resolved Urls in XmlSchemaSet
+        /// </summary>
+        public string ForceUriScheme { get; set; }
 
         private NamingScheme namingScheme;
 
