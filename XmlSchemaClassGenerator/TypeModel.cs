@@ -600,13 +600,13 @@ namespace XmlSchemaClassGenerator
 
         private TypeModel PropertyType => !IsArray ? Type : TypeClassModel.Properties[0].Type;
 
-        private bool IsNullable => DefaultValue == null && !IsRequired && !IsEnumerable;
+        private bool IsNullable => DefaultValue == null && !IsRequired;
 
         private bool IsValueType => PropertyType is EnumModel || (PropertyType is SimpleModel model && model.ValueType.IsValueType);
 
-        private bool IsNullableValueType => IsNullable && IsValueType;
+        private bool IsNullableValueType => IsNullable && !IsEnumerable && IsValueType;
 
-        private bool IsNullableReferenceType => IsNullable && (PropertyType is ClassModel || (PropertyType is SimpleModel model && !model.ValueType.IsValueType));
+        private bool IsNullableReferenceType => IsNullable && (!IsEnumerable || !IsPrivateSetter) && (PropertyType is ClassModel || (PropertyType is SimpleModel model && !model.ValueType.IsValueType));
 
         private bool IsNillableValueType => IsNillable && !IsEnumerable && IsValueType;
 
@@ -1451,11 +1451,6 @@ namespace XmlSchemaClassGenerator
 			                 || Configuration.CommentLanguages.Contains(d.Language)
 			                 || Configuration.CommentLanguages
 				                 .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
-		        )
-		        .Where
-		        (
-			        d => string.IsNullOrEmpty(d.Language)
-			             || d.Language.StartsWith(English, StringComparison.OrdinalIgnoreCase)
 		        )
 		        .Select(x => x.Text)
         );

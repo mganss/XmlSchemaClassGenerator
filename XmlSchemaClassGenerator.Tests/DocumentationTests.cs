@@ -23,8 +23,17 @@ public sealed class DocumentationTests
 			Version = new("Tests", "1.0.0.1"),
 			NamespaceProvider = generatorPrototype.NamespaceProvider,
 			//DataAnnotationMode = generatorPrototype.DataAnnotationMode,
-			GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute
+			GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute,
 		};
+
+		if (generatorPrototype.CommentLanguages.Count > 0)
+		{
+			gen.CommentLanguages.Clear();
+            foreach (var lang in generatorPrototype.CommentLanguages)
+            {
+				gen.CommentLanguages.Add(lang);
+            }
+        }
 
 		var set = new XmlSchemaSet();
 
@@ -154,7 +163,8 @@ public sealed class DocumentationTests
 		                         			</xs:element>
 		                         			<xs:element name="MessageKind" type="xs:string" minOccurs="0">
 		                            				<xs:annotation>
-		                               					<xs:documentation>Тип сообщения</xs:documentation>
+		                               					<xs:documentation xml:lang="ru">Тип сообщения</xs:documentation>
+		                               					<xs:documentation xml:lang="en">Message Kind</xs:documentation>
 		                            				</xs:annotation>
 		                         			</xs:element>
 		                      		</xs:sequence>
@@ -162,7 +172,7 @@ public sealed class DocumentationTests
 		                   </xs:schema>
 		                   """;
 
-		var code = ConvertXml(xsd, new() {NamespacePrefix = "Test", GenerateDescriptionAttribute = true})
+		var code = ConvertXml(xsd, new() {NamespacePrefix = "Test", GenerateDescriptionAttribute = true, CommentLanguages = { "ru" } })
 			.Single();
 
 		Assert.Contains
@@ -186,11 +196,18 @@ public sealed class DocumentationTests
 			StringComparison.Ordinal
 		);
 
-		Assert.Contains
+        Assert.Contains
+        (
+            """[System.ComponentModel.DescriptionAttribute("Тип сообщения")]""",
+            code,
+            StringComparison.Ordinal
+        );
+
+		Assert.DoesNotContain
 		(
-			"""[System.ComponentModel.DescriptionAttribute("Тип сообщения")]""",
+			"""[System.ComponentModel.DescriptionAttribute("Message Kind")]""",
 			code,
 			StringComparison.Ordinal
 		);
-	}
+    }
 }
