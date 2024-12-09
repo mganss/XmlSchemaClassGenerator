@@ -73,7 +73,14 @@ namespace XmlSchemaClassGenerator
                 : char.ToLowerInvariant(s[0]) + s.Substring(1);
 
         public static string ToBackingField(this string propertyName, string privateFieldPrefix)
-            => string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
+        {
+            var ret = string.Concat(privateFieldPrefix, propertyName.ToCamelCase());
+            if(ret is "value")
+            {
+                ret = "_" + ret;
+            }
+            return ret;
+        }
 
         public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration) => type.TypeCode switch
         {
