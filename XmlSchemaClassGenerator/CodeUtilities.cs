@@ -56,7 +56,7 @@ namespace XmlSchemaClassGenerator
             // replace white spaces with undescore, then replace all invalid chars with undescore
             var pascalCase = invalidCharsRgx.Replace(whiteSpace.Replace(original, "_"), "_")
                 // split by underscores
-                .Split(new char[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(['_'], StringSplitOptions.RemoveEmptyEntries)
                 // set first letter to uppercase
                 .Select(w => startsWithLowerCaseChar.Replace(w, m => m.Value.ToUpper()))
                 // replace second and all following upper case letters to lower if there is no next lower (ABC -> Abc)
@@ -398,7 +398,8 @@ namespace XmlSchemaClassGenerator
             return new KeyValuePair<NamespaceKey, string>(new NamespaceKey(source, xmlNs), netNs);
         }
 
-        public static readonly ImmutableList<(string Namespace, Func<GeneratorConfiguration, bool> Condition)> UsingNamespaces = ImmutableList.Create<(string, Func<GeneratorConfiguration, bool>)>(
+        public static readonly ImmutableList<(string Namespace, Func<GeneratorConfiguration, bool> Condition)> UsingNamespaces =
+        [
             ("System", c => c.CompactTypeNames),
             ("System.CodeDom.Compiler", c => c.CompactTypeNames),
             ("System.Collections.Generic", c => c.CompactTypeNames),
@@ -411,7 +412,8 @@ namespace XmlSchemaClassGenerator
             ("System.Xml", c => c.CompactTypeNames),
             ("System.Xml.Schema", c => c.CompactTypeNames),
             ("System.Xml.Serialization", c => c.CompactTypeNames)
-        );
+,
+        ];
 
         public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf)
             => UsingNamespaces.Exists(n => n.Namespace == namespaceName && n.Condition(conf));

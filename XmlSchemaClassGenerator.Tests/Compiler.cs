@@ -11,158 +11,157 @@ using Xunit;
 using Ganss.IO;
 using System.Collections.Concurrent;
 
-namespace XmlSchemaClassGenerator.Tests
+namespace XmlSchemaClassGenerator.Tests;
+
+class CompilationResult
 {
-    class CompilationResult
+    public Assembly Assembly { get; set; }
+    public EmitResult Result { get; set; }
+}
+
+class Compiler
+{
+    public static CompilationResult GenerateAssembly(Compilation compilation)
     {
-        public Assembly Assembly { get; set; }
-        public EmitResult Result { get; set; }
+        using var stream = new MemoryStream();
+        var emitResult = compilation.Emit(stream);
+
+        return new CompilationResult
+        {
+            Assembly = emitResult.Success ? Assembly.Load(stream.ToArray()) : null,
+            Result = emitResult
+        };
     }
 
-    class Compiler
+    private static readonly ConcurrentDictionary<string, Assembly> Assemblies = new();
+
+    private static readonly string[] DependencyAssemblies =
+    [
+        "netstandard",
+        "System.ComponentModel.Annotations",
+        "System.ComponentModel.Primitives",
+        "System.Diagnostics.Tools",
+        "System.Linq",
+        "System.ObjectModel",
+        "System.Private.CoreLib",
+        "System.Private.Xml",
+        "System.Private.Xml.Linq",
+        "System.Runtime",
+        "System.Runtime.Extensions",
+        "System.Xml.XDocument",
+        "System.Xml.XmlSerializer",
+    ];
+
+    public static Assembly GetAssembly(string name)
     {
-        public static CompilationResult GenerateAssembly(Compilation compilation)
+        Assemblies.TryGetValue(name, out var assembly);
+        return assembly;
+    }
+
+    public static Assembly Generate(string name, string pattern, Generator generatorPrototype = null)
+    {
+        if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+
+        var files = Glob.ExpandNames(pattern).OrderByDescending(f => f);
+
+        return GenerateFiles(name, files, generatorPrototype);
+    }
+
+    public static Assembly GenerateFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null)
+    {
+        if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+
+        generatorPrototype ??= new Generator
         {
-            using var stream = new MemoryStream();
-            var emitResult = compilation.Emit(stream);
-
-            return new CompilationResult
-            {
-                Assembly = emitResult.Success ? Assembly.Load(stream.ToArray()) : null,
-                Result = emitResult
-            };
-        }
-
-        private static readonly ConcurrentDictionary<string, Assembly> Assemblies = new();
-
-        private static readonly string[] DependencyAssemblies = new[]
-        {
-            "netstandard",
-            "System.ComponentModel.Annotations",
-            "System.ComponentModel.Primitives",
-            "System.Diagnostics.Tools",
-            "System.Linq",
-            "System.ObjectModel",
-            "System.Private.CoreLib",
-            "System.Private.Xml",
-            "System.Private.Xml.Linq",
-            "System.Runtime",
-            "System.Runtime.Extensions",
-            "System.Xml.XDocument",
-            "System.Xml.XmlSerializer",
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = name,
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value"
         };
 
-        public static Assembly GetAssembly(string name)
+        var output = generatorPrototype.OutputWriter as FileWatcherOutputWriter ?? new FileWatcherOutputWriter(Path.Combine("output", name));
+
+        var gen = new Generator
         {
-            Assemblies.TryGetValue(name, out var assembly);
-            return assembly;
-        }
+            OutputWriter = output,
+            NamespaceProvider = generatorPrototype.NamespaceProvider,
+            GenerateNullables = generatorPrototype.GenerateNullables,
+            UseShouldSerializePattern = generatorPrototype.UseShouldSerializePattern,
+            IntegerDataType = generatorPrototype.IntegerDataType,
+            DataAnnotationMode = generatorPrototype.DataAnnotationMode,
+            GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
+            GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
+            EntityFramework = generatorPrototype.EntityFramework,
+            GenerateInterfaces = generatorPrototype.GenerateInterfaces,
+            MemberVisitor = generatorPrototype.MemberVisitor,
+            GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute,
+            CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
+            CollectionSettersMode = generatorPrototype.CollectionSettersMode,
+            TextValuePropertyName = generatorPrototype.TextValuePropertyName,
+            EmitOrder = generatorPrototype.EmitOrder,
+            SeparateClasses = generatorPrototype.SeparateClasses,
+            CollectionType = generatorPrototype.CollectionType,
+            CollectionImplementationType = generatorPrototype.CollectionImplementationType,
+            SeparateSubstitutes = generatorPrototype.SeparateSubstitutes,
+            CompactTypeNames = generatorPrototype.CompactTypeNames,
+            UniqueTypeNamesAcrossNamespaces = generatorPrototype.UniqueTypeNamesAcrossNamespaces,
+            CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
+            NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
+            EnableNullableReferenceAttributes = generatorPrototype.EnableNullableReferenceAttributes,
+            NamingScheme = generatorPrototype.NamingScheme,
+            UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
+            EnumAsString = generatorPrototype.EnumAsString,
+            MapUnionToWidestCommonType = generatorPrototype.MapUnionToWidestCommonType,
+            SeparateNamespaceHierarchy = generatorPrototype.SeparateNamespaceHierarchy
+        };
 
-        public static Assembly Generate(string name, string pattern, Generator generatorPrototype = null)
-        {
-            if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+        gen.CommentLanguages.Clear();
+        gen.CommentLanguages.UnionWith(generatorPrototype.CommentLanguages);
 
-            var files = Glob.ExpandNames(pattern).OrderByDescending(f => f);
+        output.Configuration = gen.Configuration;
 
-            return GenerateFiles(name, files, generatorPrototype);
-        }
+        gen.Generate(files);
 
-        public static Assembly GenerateFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null)
-        {
-            if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+        return CompileFiles(name, output.Files);
+    }
 
-            generatorPrototype ??= new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = name,
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value"
-            };
+    public static Assembly CompileFiles(string name, IEnumerable<string> files)
+    {
+        return Compile(name, files.Select(f => File.ReadAllText(f)).ToArray());
+    }
 
-            var output = generatorPrototype.OutputWriter as FileWatcherOutputWriter ?? new FileWatcherOutputWriter(Path.Combine("output", name));
+    private static readonly LanguageVersion MaxLanguageVersion = Enum
+        .GetValues(typeof(LanguageVersion))
+        .Cast<LanguageVersion>()
+        .Max();
 
-            var gen = new Generator
-            {
-                OutputWriter = output,
-                NamespaceProvider = generatorPrototype.NamespaceProvider,
-                GenerateNullables = generatorPrototype.GenerateNullables,
-                UseShouldSerializePattern = generatorPrototype.UseShouldSerializePattern,
-                IntegerDataType = generatorPrototype.IntegerDataType,
-                DataAnnotationMode = generatorPrototype.DataAnnotationMode,
-                GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
-                GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
-                EntityFramework = generatorPrototype.EntityFramework,
-                GenerateInterfaces = generatorPrototype.GenerateInterfaces,
-                MemberVisitor = generatorPrototype.MemberVisitor,
-                GenerateDescriptionAttribute = generatorPrototype.GenerateDescriptionAttribute,
-                CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
-                CollectionSettersMode = generatorPrototype.CollectionSettersMode,
-                TextValuePropertyName = generatorPrototype.TextValuePropertyName,
-                EmitOrder = generatorPrototype.EmitOrder,
-                SeparateClasses = generatorPrototype.SeparateClasses,
-                CollectionType = generatorPrototype.CollectionType,
-                CollectionImplementationType = generatorPrototype.CollectionImplementationType,
-                SeparateSubstitutes = generatorPrototype.SeparateSubstitutes,
-                CompactTypeNames = generatorPrototype.CompactTypeNames,
-                UniqueTypeNamesAcrossNamespaces = generatorPrototype.UniqueTypeNamesAcrossNamespaces,
-                CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
-                NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
-                EnableNullableReferenceAttributes = generatorPrototype.EnableNullableReferenceAttributes,
-                NamingScheme = generatorPrototype.NamingScheme,
-                UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
-                EnumAsString = generatorPrototype.EnumAsString,
-                MapUnionToWidestCommonType = generatorPrototype.MapUnionToWidestCommonType,
-                SeparateNamespaceHierarchy = generatorPrototype.SeparateNamespaceHierarchy
-            };
+    public static Assembly Compile(string name, params string[] contents)
+    {
+        var trustedAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
+        var references = trustedAssembliesPaths
+            .Where(p => DependencyAssemblies.Contains(Path.GetFileNameWithoutExtension(p)))
+            .Select(p => MetadataReference.CreateFromFile(p))
+            .ToList();
+        var options = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: MaxLanguageVersion);
+        var syntaxTrees = contents.Select(c => CSharpSyntaxTree.ParseText(c, options));
+        var compilation = CSharpCompilation.Create(name, syntaxTrees)
+            .AddReferences(references)
+            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+        var result = Compiler.GenerateAssembly(compilation);
 
-            gen.CommentLanguages.Clear();
-            gen.CommentLanguages.UnionWith(generatorPrototype.CommentLanguages);
+        Assert.Empty(result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Assert.Empty(result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning));
+        Assert.True(result.Result.Success);
+        Assert.NotNull(result.Assembly);
 
-            output.Configuration = gen.Configuration;
+        Assemblies[name] = result.Assembly;
 
-            gen.Generate(files);
-
-            return CompileFiles(name, output.Files);
-        }
-
-        public static Assembly CompileFiles(string name, IEnumerable<string> files)
-        {
-            return Compile(name, files.Select(f => File.ReadAllText(f)).ToArray());
-        }
-
-        private static readonly LanguageVersion MaxLanguageVersion = Enum
-            .GetValues(typeof(LanguageVersion))
-            .Cast<LanguageVersion>()
-            .Max();
-
-        public static Assembly Compile(string name, params string[] contents)
-        {
-            var trustedAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
-            var references = trustedAssembliesPaths
-                .Where(p => DependencyAssemblies.Contains(Path.GetFileNameWithoutExtension(p)))
-                .Select(p => MetadataReference.CreateFromFile(p))
-                .ToList();
-            var options = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: MaxLanguageVersion);
-            var syntaxTrees = contents.Select(c => CSharpSyntaxTree.ParseText(c, options));
-            var compilation = CSharpCompilation.Create(name, syntaxTrees)
-                .AddReferences(references)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            var result = Compiler.GenerateAssembly(compilation);
-
-            Assert.Empty(result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-            Assert.Empty(result.Result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning));
-            Assert.True(result.Result.Success);
-            Assert.NotNull(result.Assembly);
-
-            Assemblies[name] = result.Assembly;
-
-            return result.Assembly;
-        }
+        return result.Assembly;
     }
 }

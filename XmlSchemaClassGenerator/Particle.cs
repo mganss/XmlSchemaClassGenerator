@@ -5,21 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 
-namespace XmlSchemaClassGenerator
-{
-    public class Particle
-    {
-        public Particle(XmlSchemaParticle particle, XmlSchemaObject parent)
-        {
-            XmlParticle = particle;
-            XmlParent = parent;
-            MinOccurs = particle?.MinOccurs ?? 1;
-            MaxOccurs = particle?.MaxOccurs ?? 1;
-        }
+namespace XmlSchemaClassGenerator;
 
-        public XmlSchemaParticle XmlParticle { get; set; }
-        public XmlSchemaObject XmlParent { get; }
-        public decimal MaxOccurs { get; set; }
-        public decimal MinOccurs { get; set; }
-    }
+public class Particle(XmlSchemaParticle particle, XmlSchemaObject parent)
+{
+    public XmlSchemaParticle XmlParticle { get; set; } = particle;
+    public XmlSchemaObject XmlParent { get; } = parent;
+    public decimal MaxOccurs { get; set; } = particle?.MaxOccurs ?? 1;
+    public decimal MinOccurs { get; set; } = particle?.MinOccurs ?? 1;
 }

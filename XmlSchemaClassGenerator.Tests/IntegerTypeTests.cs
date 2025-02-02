@@ -6,55 +6,55 @@ using System.Text;
 using System.Xml.Schema;
 using Xunit;
 
-namespace XmlSchemaClassGenerator.Tests {
-    public sealed class IntegerTypeTests
+namespace XmlSchemaClassGenerator.Tests; 
+public sealed class IntegerTypeTests
+{
+    private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
     {
-        private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
+        var writer = new MemoryOutputWriter();
+
+        var gen = new Generator
         {
-            var writer = new MemoryOutputWriter();
+            OutputWriter = writer,
+            Version = new("Tests", "1.0.0.1"),
+            NamespaceProvider = generatorPrototype.NamespaceProvider,
+            GenerateNullables = generatorPrototype.GenerateNullables,
+            IntegerDataType = generatorPrototype.IntegerDataType,
+            UseIntegerDataTypeAsFallback = generatorPrototype.UseIntegerDataTypeAsFallback,
+            DataAnnotationMode = generatorPrototype.DataAnnotationMode,
+            GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
+            GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
+            EntityFramework = generatorPrototype.EntityFramework,
+            AssemblyVisible = generatorPrototype.AssemblyVisible,
+            GenerateInterfaces = generatorPrototype.GenerateInterfaces,
+            MemberVisitor = generatorPrototype.MemberVisitor,
+            CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions
+        };
 
-            var gen = new Generator
-            {
-                OutputWriter = writer,
-                Version = new("Tests", "1.0.0.1"),
-                NamespaceProvider = generatorPrototype.NamespaceProvider,
-                GenerateNullables = generatorPrototype.GenerateNullables,
-                IntegerDataType = generatorPrototype.IntegerDataType,
-                UseIntegerDataTypeAsFallback = generatorPrototype.UseIntegerDataTypeAsFallback,
-                DataAnnotationMode = generatorPrototype.DataAnnotationMode,
-                GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
-                GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
-                EntityFramework = generatorPrototype.EntityFramework,
-                AssemblyVisible = generatorPrototype.AssemblyVisible,
-                GenerateInterfaces = generatorPrototype.GenerateInterfaces,
-                MemberVisitor = generatorPrototype.MemberVisitor,
-                CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions
-            };
+        var set = new XmlSchemaSet();
 
-            var set = new XmlSchemaSet();
-
-            using (var stringReader = new StringReader(xsd))
-            {
-                var schema = XmlSchema.Read(stringReader, (_, e) => throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception));
+        using (var stringReader = new StringReader(xsd))
+        {
+            var schema = XmlSchema.Read(stringReader, (_, e) => throw new InvalidOperationException($"{e.Severity}: {e.Message}",e.Exception));
 				ArgumentNullException.ThrowIfNull(schema);
-                set.Add(schema);
-            }
-
-            gen.Generate(set);
-
-            return writer.Content;
+            set.Add(schema);
         }
 
-        [Theory]
-        [InlineData(2, "sbyte")]
-        [InlineData(4, "short")]
-        [InlineData(9, "int")]
-        [InlineData(18, "long")]
-        [InlineData(28, "decimal")]
-        [InlineData(29, "string")]
-        public void TestTotalDigits(int totalDigits, string expectedType)
-        {
-            var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+        gen.Generate(set);
+
+        return writer.Content;
+    }
+
+    [Theory]
+    [InlineData(2, "sbyte")]
+    [InlineData(4, "short")]
+    [InlineData(9, "int")]
+    [InlineData(18, "long")]
+    [InlineData(28, "decimal")]
+    [InlineData(29, "string")]
+    public void TestTotalDigits(int totalDigits, string expectedType)
+    {
+        var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 	<xs:complexType name=""document"">
 		<xs:sequence>
@@ -69,29 +69,29 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-            var generatedType = ConvertXml(
+        var generatedType = ConvertXml(
 	            xsd, new()
+        {
+            NamespaceProvider = new()
             {
-                NamespaceProvider = new()
-                {
-                    GenerateNamespace = _ => "Test"
-                }
-            });
+                GenerateNamespace = _ => "Test"
+            }
+        });
 
-            var expectedProperty = $"public {expectedType} SomeValue";
-            var generatedProperty = generatedType.First();
+        var expectedProperty = $"public {expectedType} SomeValue";
+        var generatedProperty = generatedType.First();
 
 			Assert.Contains(expectedProperty, generatedProperty);
-        }
+    }
 
-        [Theory]
-        [InlineData(4, false, "long")]
-        [InlineData(30, false, "long")]
-        [InlineData(4, true, "short")]
-        [InlineData(30, true, "long")]
-        public void TestFallbackType(int totalDigits, bool useTypeAsFallback, string expectedType)
-        {
-            var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+    [Theory]
+    [InlineData(4, false, "long")]
+    [InlineData(30, false, "long")]
+    [InlineData(4, true, "short")]
+    [InlineData(30, true, "long")]
+    public void TestFallbackType(int totalDigits, bool useTypeAsFallback, string expectedType)
+    {
+        var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 	<xs:complexType name=""document"">
 		<xs:sequence>
@@ -106,22 +106,22 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-          var generatedType = ConvertXml(
+      var generatedType = ConvertXml(
 	          xsd, new()
+      {
+          NamespaceProvider = new()
           {
-              NamespaceProvider = new()
-              {
-                  GenerateNamespace = _ => "Test"
-              },
-              IntegerDataType = typeof(long),
-              UseIntegerDataTypeAsFallback = useTypeAsFallback
-          });
+              GenerateNamespace = _ => "Test"
+          },
+          IntegerDataType = typeof(long),
+          UseIntegerDataTypeAsFallback = useTypeAsFallback
+      });
 
-          var expectedProperty = $"public {expectedType} SomeValue";
-          var generatedProperty = generatedType.First();
+      var expectedProperty = $"public {expectedType} SomeValue";
+      var generatedProperty = generatedType.First();
 
-          Assert.Contains(expectedProperty, generatedProperty);
-        }
+      Assert.Contains(expectedProperty, generatedProperty);
+    }
 
 		[Theory]
 		[InlineData(1, 100, "byte")]
@@ -141,8 +141,8 @@ namespace XmlSchemaClassGenerator.Tests {
 		[InlineData(-10000000000, 10000000000, "long")]
 		[InlineData(long.MinValue, long.MaxValue, "long")]
 		public void TestInclusiveRange(long minInclusive, ulong maxInclusive, string expectedType)
-        {
-            var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+    {
+        var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 	<xs:complexType name=""document"">
 		<xs:sequence>
@@ -158,20 +158,20 @@ namespace XmlSchemaClassGenerator.Tests {
 	</xs:complexType>
 </xs:schema>";
 
-          var generatedType = ConvertXml(
+      var generatedType = ConvertXml(
 	          xsd, new()
+      {
+          NamespaceProvider = new()
           {
-              NamespaceProvider = new()
-              {
-                  GenerateNamespace = _ => "Test"
-              }
-          });
+              GenerateNamespace = _ => "Test"
+          }
+      });
 
-          var expectedProperty = $"public {expectedType} SomeValue";
-          var generatedProperty = generatedType.First();
+      var expectedProperty = $"public {expectedType} SomeValue";
+      var generatedProperty = generatedType.First();
 
-          Assert.Contains(expectedProperty, generatedProperty);
-        }
+      Assert.Contains(expectedProperty, generatedProperty);
+    }
 
 		[Theory]
 		[InlineData(2, "sbyte")]
@@ -304,5 +304,3 @@ namespace XmlSchemaClassGenerator.Tests {
 			Assert.Contains(expectedProperty, generatedProperty);
 		}
 	}
-
-}

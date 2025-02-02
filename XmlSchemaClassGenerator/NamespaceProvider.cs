@@ -5,192 +5,191 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XmlSchemaClassGenerator
+namespace XmlSchemaClassGenerator;
+
+public class NamespaceProvider : IDictionary<NamespaceKey, string>
 {
-    public class NamespaceProvider : IDictionary<NamespaceKey, string>
+    private readonly Dictionary<NamespaceKey, string> InternalDictionary = [];
+
+    public GenerateNamespaceDelegate GenerateNamespace { get; set; }
+
+    protected virtual string OnGenerateNamespace(NamespaceKey key)
     {
-        private readonly Dictionary<NamespaceKey, string> InternalDictionary = new();
-
-        public GenerateNamespaceDelegate GenerateNamespace { get; set; }
-
-        protected virtual string OnGenerateNamespace(NamespaceKey key)
+        if (GenerateNamespace != null)
         {
-            if (GenerateNamespace != null)
-            {
-                return GenerateNamespace(key);
-            }
-            return null;
+            return GenerateNamespace(key);
         }
+        return null;
+    }
 
-        protected virtual bool TryGenerateNamespace(NamespaceKey key, out string ns)
-        {
-            ns = OnGenerateNamespace(key);
-            return !string.IsNullOrEmpty(ns);
-        }
+    protected virtual bool TryGenerateNamespace(NamespaceKey key, out string ns)
+    {
+        ns = OnGenerateNamespace(key);
+        return !string.IsNullOrEmpty(ns);
+    }
 
-        public void Add(NamespaceKey key, string value)
-        {
-            InternalDictionary.Add(key, value);
-        }
+    public void Add(NamespaceKey key, string value)
+    {
+        InternalDictionary.Add(key, value);
+    }
 
-        public bool ContainsKey(NamespaceKey key)
+    public bool ContainsKey(NamespaceKey key)
+    {
+        if (InternalDictionary.ContainsKey(key))
         {
-            if (InternalDictionary.ContainsKey(key))
-            {
-                return true;
-            }
-            if (!TryGenerateNamespace(key, out string ns))
-            {
-                return false;
-            }
-            InternalDictionary.Add(key, ns);
             return true;
         }
-
-        public ICollection<NamespaceKey> Keys
+        if (!TryGenerateNamespace(key, out string ns))
         {
-            get { return InternalDictionary.Keys; }
+            return false;
         }
+        InternalDictionary.Add(key, ns);
+        return true;
+    }
 
-        public bool Remove(NamespaceKey key)
-        {
-            return InternalDictionary.Remove(key);
-        }
+    public ICollection<NamespaceKey> Keys
+    {
+        get { return InternalDictionary.Keys; }
+    }
 
-        public bool TryGetValue(NamespaceKey key, out string value)
+    public bool Remove(NamespaceKey key)
+    {
+        return InternalDictionary.Remove(key);
+    }
+
+    public bool TryGetValue(NamespaceKey key, out string value)
+    {
+        if (InternalDictionary.TryGetValue(key, out value))
         {
-            if (InternalDictionary.TryGetValue(key, out value))
-            {
-                return true;
-            }
-            if (!TryGenerateNamespace(key, out value))
-            {
-                return false;
-            }
-            InternalDictionary.Add(key, value);
             return true;
         }
-
-        public ICollection<string> Values
+        if (!TryGenerateNamespace(key, out value))
         {
-            get { return InternalDictionary.Values; }
+            return false;
         }
+        InternalDictionary.Add(key, value);
+        return true;
+    }
 
-        public string this[NamespaceKey key]
+    public ICollection<string> Values
+    {
+        get { return InternalDictionary.Values; }
+    }
+
+    public string this[NamespaceKey key]
+    {
+        get
         {
-            get
+            if (TryGetValue(key, out string result))
             {
-                if (TryGetValue(key, out string result))
-                {
-                    return result;
-                }
-                throw new KeyNotFoundException();
+                return result;
             }
-            set { InternalDictionary[key] = value; }
+            throw new KeyNotFoundException();
         }
+        set { InternalDictionary[key] = value; }
+    }
 
-        void ICollection<KeyValuePair<NamespaceKey, string>>.Add(KeyValuePair<NamespaceKey, string> item)
-        {
-            InternalDictionary.Add(item.Key, item.Value);
-        }
+    void ICollection<KeyValuePair<NamespaceKey, string>>.Add(KeyValuePair<NamespaceKey, string> item)
+    {
+        InternalDictionary.Add(item.Key, item.Value);
+    }
 
-        public void Clear()
-        {
-            InternalDictionary.Clear();
-        }
+    public void Clear()
+    {
+        InternalDictionary.Clear();
+    }
 
-        bool ICollection<KeyValuePair<NamespaceKey, string>>.Contains(KeyValuePair<NamespaceKey, string> item)
-        {
-            return InternalDictionary.Contains(item);
-        }
+    bool ICollection<KeyValuePair<NamespaceKey, string>>.Contains(KeyValuePair<NamespaceKey, string> item)
+    {
+        return InternalDictionary.Contains(item);
+    }
 
-        void ICollection<KeyValuePair<NamespaceKey, string>>.CopyTo(KeyValuePair<NamespaceKey, string>[] array, int arrayIndex)
-        {
-            ((IDictionary<NamespaceKey, string>)InternalDictionary).CopyTo(array, arrayIndex);
-        }
+    void ICollection<KeyValuePair<NamespaceKey, string>>.CopyTo(KeyValuePair<NamespaceKey, string>[] array, int arrayIndex)
+    {
+        ((IDictionary<NamespaceKey, string>)InternalDictionary).CopyTo(array, arrayIndex);
+    }
 
-        public int Count
-        {
-            get { return InternalDictionary.Count; }
-        }
+    public int Count
+    {
+        get { return InternalDictionary.Count; }
+    }
 
-        bool ICollection<KeyValuePair<NamespaceKey, string>>.IsReadOnly
-        {
-            get { return ((IDictionary<NamespaceKey, string>)InternalDictionary).IsReadOnly; }
-        }
+    bool ICollection<KeyValuePair<NamespaceKey, string>>.IsReadOnly
+    {
+        get { return ((IDictionary<NamespaceKey, string>)InternalDictionary).IsReadOnly; }
+    }
 
-        bool ICollection<KeyValuePair<NamespaceKey, string>>.Remove(KeyValuePair<NamespaceKey, string> item)
-        {
-            return ((IDictionary<NamespaceKey, string>)InternalDictionary).Remove(item);
-        }
+    bool ICollection<KeyValuePair<NamespaceKey, string>>.Remove(KeyValuePair<NamespaceKey, string> item)
+    {
+        return ((IDictionary<NamespaceKey, string>)InternalDictionary).Remove(item);
+    }
 
-        public IEnumerator<KeyValuePair<NamespaceKey, string>> GetEnumerator()
-        {
-            return ((IDictionary<NamespaceKey, string>)InternalDictionary).GetEnumerator();
-        }
+    public IEnumerator<KeyValuePair<NamespaceKey, string>> GetEnumerator()
+    {
+        return ((IDictionary<NamespaceKey, string>)InternalDictionary).GetEnumerator();
+    }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return ((System.Collections.IEnumerable)InternalDictionary).GetEnumerator();
-        }
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return ((System.Collections.IEnumerable)InternalDictionary).GetEnumerator();
+    }
 
-        public string FindNamespace(NamespaceKey key, string defaultNamespace = null)
-        {
-            var keyValues = new List<NamespaceKey>
+    public string FindNamespace(NamespaceKey key, string defaultNamespace = null)
+    {
+        var keyValues = new List<NamespaceKey>
 	        {
-                // First, search for key as-is
+            // First, search for key as-is
 	            key,
 	        };
-            if (key.Source == null)
+        if (key.Source == null)
+        {
+            if (key.XmlSchemaNamespace != null)
             {
-                if (key.XmlSchemaNamespace != null)
-                {
-                    // Search for empty key
-                    keyValues.Add(new NamespaceKey());
-                }
-            }
-            else if (key.XmlSchemaNamespace != null)
-            {
-                // Search for URI only
-                keyValues.Add(new NamespaceKey(key.Source));
-
-                // Search for file name only
-                var path = key.Source.IsAbsoluteUri ? key.Source.LocalPath : key.Source.OriginalString;
-                keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative)));
-
-                // Search for both file name and XmlSchemaNamespace pair
-                keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative), key.XmlSchemaNamespace));
-
-                // Search for XmlSchemaNamespace only
-                keyValues.Add(new NamespaceKey(key.XmlSchemaNamespace));
-
                 // Search for empty key
                 keyValues.Add(new NamespaceKey());
             }
-            else
-            {
-                // Search for file name only
-                var path = key.Source.IsAbsoluteUri ? key.Source.LocalPath : key.Source.OriginalString;
-                keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative)));
-
-                // Search for empty key
-                keyValues.Add(new NamespaceKey());
-            }
-
-            foreach (var keyValue in keyValues)
-            {
-                if (InternalDictionary.TryGetValue(keyValue, out string result))
-                {
-                    return result;
-                }
-            }
-
-            if (TryGetValue(key, out string ns))
-            {
-                return ns;
-            }
-
-            return defaultNamespace;
         }
+        else if (key.XmlSchemaNamespace != null)
+        {
+            // Search for URI only
+            keyValues.Add(new NamespaceKey(key.Source));
+
+            // Search for file name only
+            var path = key.Source.IsAbsoluteUri ? key.Source.LocalPath : key.Source.OriginalString;
+            keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative)));
+
+            // Search for both file name and XmlSchemaNamespace pair
+            keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative), key.XmlSchemaNamespace));
+
+            // Search for XmlSchemaNamespace only
+            keyValues.Add(new NamespaceKey(key.XmlSchemaNamespace));
+
+            // Search for empty key
+            keyValues.Add(new NamespaceKey());
+        }
+        else
+        {
+            // Search for file name only
+            var path = key.Source.IsAbsoluteUri ? key.Source.LocalPath : key.Source.OriginalString;
+            keyValues.Add(new NamespaceKey(new Uri(Path.GetFileName(path), UriKind.Relative)));
+
+            // Search for empty key
+            keyValues.Add(new NamespaceKey());
+        }
+
+        foreach (var keyValue in keyValues)
+        {
+            if (InternalDictionary.TryGetValue(keyValue, out string result))
+            {
+                return result;
+            }
+        }
+
+        if (TryGetValue(key, out string ns))
+        {
+            return ns;
+        }
+
+        return defaultNamespace;
     }
 }

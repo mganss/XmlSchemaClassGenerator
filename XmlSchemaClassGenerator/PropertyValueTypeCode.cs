@@ -1,9 +1,8 @@
-﻿namespace XmlSchemaClassGenerator
+﻿namespace XmlSchemaClassGenerator;
+
+public enum PropertyValueTypeCode
 {
-    public enum PropertyValueTypeCode
-    {
-        ValueType,
-        Array,
-        Other,
-    }
+    ValueType,
+    Array,
+    Other,
 }

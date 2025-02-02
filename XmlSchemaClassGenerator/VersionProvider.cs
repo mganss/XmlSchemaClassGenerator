@@ -1,28 +1,21 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace XmlSchemaClassGenerator
+namespace XmlSchemaClassGenerator;
+
+[DebuggerDisplay("{Title} - {Version}")]
+public class VersionProvider(string title, string version)
 {
-    [DebuggerDisplay("{Title} - {Version}")]
-    public class VersionProvider
+    public string Title { get; } = title;
+
+    public string Version { get; } = version;
+
+    public static VersionProvider CreateFromAssembly()
     {
-        public VersionProvider(string title, string version)
-        {
-            Title = title;
-            Version = version;
-        }
+        var executingAssembly = Assembly.GetExecutingAssembly();
+        var title = executingAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
+        var version = executingAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
 
-        public string Title { get; }
-
-        public string Version { get; }
-
-        public static VersionProvider CreateFromAssembly()
-        {
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            var title = executingAssembly.GetCustomAttribute<AssemblyTitleAttribute>().Title;
-            var version = executingAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>().Version;
-
-            return new VersionProvider(title, version);
-        }
+        return new VersionProvider(title, version);
     }
 }

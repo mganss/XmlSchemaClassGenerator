@@ -20,901 +20,723 @@ using Microsoft.Xml.XMLGen;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace XmlSchemaClassGenerator.Tests
+namespace XmlSchemaClassGenerator.Tests;
+
+[TestCaseOrderer("XmlSchemaClassGenerator.Tests.PriorityOrderer", "XmlSchemaClassGenerator.Tests")]
+public class XmlTests(ITestOutputHelper output)
 {
-    [TestCaseOrderer("XmlSchemaClassGenerator.Tests.PriorityOrderer", "XmlSchemaClassGenerator.Tests")]
-    public class XmlTests(ITestOutputHelper output)
+    private readonly ITestOutputHelper Output = output;
+
+    private static IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
     {
-        private readonly ITestOutputHelper Output = output;
-
-        private static IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
+        if (name is null)
         {
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            var writer = new MemoryOutputWriter();
-
-            var gen = new Generator
-            {
-                OutputWriter = writer,
-                Version = new VersionProvider("Tests", "1.0.0.1"),
-                NamespaceProvider = generatorPrototype.NamespaceProvider,
-                GenerateNullables = generatorPrototype.GenerateNullables,
-                IntegerDataType = generatorPrototype.IntegerDataType,
-                DataAnnotationMode = generatorPrototype.DataAnnotationMode,
-                GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
-                GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
-                EntityFramework = generatorPrototype.EntityFramework,
-                AssemblyVisible = generatorPrototype.AssemblyVisible,
-                GenerateInterfaces = generatorPrototype.GenerateInterfaces,
-                MemberVisitor = generatorPrototype.MemberVisitor,
-                CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
-                DoNotForceIsNullable = generatorPrototype.DoNotForceIsNullable,
-                CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
-                NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
-                GenerateCommandLineArgumentsComment = generatorPrototype.GenerateCommandLineArgumentsComment,
-                CommandLineArgumentsProvider = generatorPrototype.CommandLineArgumentsProvider,
-                CollectionType = generatorPrototype.CollectionType,
-                CollectionImplementationType = generatorPrototype.CollectionImplementationType,
-                CollectionSettersMode = generatorPrototype.CollectionSettersMode,
-                UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
-                EnumAsString = generatorPrototype.EnumAsString,
-                AllowDtdParse = generatorPrototype.AllowDtdParse
-            };
-
-            gen.CommentLanguages.Clear();
-            gen.CommentLanguages.UnionWith(generatorPrototype.CommentLanguages);
-
-            gen.Generate(xsds.Select(i => new StringReader(i)));
-
-            return writer.Content;
+            throw new ArgumentNullException(nameof(name));
         }
 
-        private static IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+        var writer = new MemoryOutputWriter();
+
+        var gen = new Generator
         {
-            return ConvertXml(name, new[] {xsd}, generatorPrototype);
-        }
-
-        const string IS24Pattern = "xsd/is24/*/*.xsd";
-        const string IS24ImmoTransferPattern = "xsd/is24immotransfer/is24immotransfer.xsd";
-        const string WadlPattern = "xsd/wadl/wadl.xsd";
-        const string ListPattern = "xsd/list/list.xsd";
-        const string SimplePattern = "xsd/simple/*.xsd";
-        const string ArrayOrderPattern = "xsd/array-order/array-order.xsd";
-        const string ClientPattern = "xsd/client/client.xsd";
-        const string IataPattern = "xsd/iata/*.xsd";
-        const string TimePattern = "xsd/time/time.xsd";
-        const string TableauPattern = "xsd/ts-api/*.xsd";
-        const string VSTstPattern = "xsd/vstst/vstst.xsd";
-        const string BpmnPattern = "xsd/bpmn/*.xsd";
-        const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
-        const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
-        const string EppPattern = "xsd/epp/*.xsd";
-        const string GraphMLPattern = "xsd/graphml/ygraphml.xsd";
-        const string UnionPattern = "xsd/union/union.xsd";
-        const string GuidPattern = "xsd/guid/*.xsd";
-        const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
-
-        // IATA test takes too long to perform every time
-
-        //[Fact, TestPriority(1)]
-        //[UseCulture("en-US")]
-        //public void TestIata()
-        //{
-        //    Compiler.Generate("Iata", IataPattern, new Generator
-        //    {
-        //        EntityFramework = true,
-        //        DataAnnotationMode = DataAnnotationMode.All,
-        //        NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
-        //            .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Iata" }.NamespaceProvider.GenerateNamespace),
-        //        MemberVisitor = (member, model) => { },
-        //        GenerateInterfaces = true
-        //    });
-        //    SharedTestFunctions.TestSamples(Output, "Iata", IataPattern);
-        //}
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestGraphML()
-        {
-            Compiler.Generate("GraphML", GraphMLPattern, new Generator
-            {
-                NamespaceProvider = new Dictionary<NamespaceKey, string> {
-                    { new NamespaceKey(new Uri("graphml.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Main" },
-                    { new NamespaceKey(new Uri("graphml-structure.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Structure" },
-                    { new NamespaceKey(new Uri("ygraphxml.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Y" },
-                    { new NamespaceKey("http://www.w3.org/1999/xlink"), "XLink" },
-                    { new NamespaceKey("http://www.yworks.com/xml/graphml"), "YEd" },
-                }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GraphML" }.NamespaceProvider.GenerateNamespace),
-            });
-            SharedTestFunctions.TestSamples(Output, "GraphML", GraphMLPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestClient()
-        {
-            Compiler.Generate("Client", ClientPattern);
-            SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestGuid()
-        {
-            var assembly = Compiler.Generate("Guid", GuidPattern);
-            var testType = assembly.GetType("Guid.Test");
-            var idProperty = testType.GetProperty("Id");
-            var elementIdProperty = testType.GetProperty("ElementId");
-            var headerType = assembly.GetType("Guid.V1.Header");
-            var referenceProperty = headerType.GetProperty("Reference");
-
-            Assert.Equal(typeof(Nullable<>).MakeGenericType(typeof(Guid)), idProperty.PropertyType);
-            Assert.Equal(typeof(Guid), elementIdProperty.PropertyType);
-            Assert.Equal(typeof(Guid), referenceProperty.PropertyType);
-
-            var serializer = new XmlSerializer(testType);
-
-            var test = Activator.CreateInstance(testType);
-            var idGuid = Guid.NewGuid();
-            var elementGuid = Guid.NewGuid();
-
-            idProperty.SetValue(test, idGuid);
-            elementIdProperty.SetValue(test, elementGuid);
-
-            var sw = new StringWriter();
-
-            serializer.Serialize(sw, test);
-
-            var xml = sw.ToString();
-            var sr = new StringReader(xml);
-
-            var o = serializer.Deserialize(sr);
-
-            Assert.Equal(idGuid, idProperty.GetValue(o));
-            Assert.Equal(elementGuid, elementIdProperty.GetValue(o));
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestUnion()
-        {
-            var assembly = Compiler.Generate("Union", UnionPattern, new Generator
-            {
-                NamespacePrefix = "Union",
-                IntegerDataType = typeof(int),
-                MapUnionToWidestCommonType = true
-            });
-
-            Assert.NotNull(assembly);
-
-            SharedTestFunctions.TestSamples(Output, "Union", UnionPattern);
-
-            var snapshotType = assembly.GetType("Union.Snapshot");
-            Assert.NotNull(snapshotType);
-
-            var date = snapshotType.GetProperty("Date");
-            Assert.NotNull(date);
-            Assert.Equal(typeof(DateTime), date.PropertyType);
-
-            var count = snapshotType.GetProperty("Count");
-            Assert.NotNull(count);
-            Assert.Equal(typeof(int), count.PropertyType);
-
-            var num = snapshotType.GetProperty("Num");
-            Assert.NotNull(num);
-            Assert.Equal(typeof(decimal), num.PropertyType);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestList()
-        {
-            Compiler.Generate("List", ListPattern);
-            SharedTestFunctions.TestSamples(Output, "List", ListPattern);
-        }
-
-        [Fact]
-        public void TestListWithPrivatePropertySetters()
-        {
-            var assembly = Compiler.Generate("List", ListPattern, new Generator() {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "List",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.Private
-            });
-            Assert.NotNull(assembly);
-            var myClassType = assembly.GetType("List.MyClass");
-            Assert.NotNull(myClassType);
-            var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPrivate).OrderBy(p=>p.Name).ToList();
-            Assert.NotEmpty(collectionPropertyInfos);
-            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
-
-            var myClassInstance = Activator.CreateInstance(myClassType);
-            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
-            {
-                Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
-            }
-        }
-
-        [Fact]
-        public void TestListWithPublicPropertySetters()
-        {
-            var assembly = Compiler.Generate("ListPublic", ListPattern, new Generator {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "List",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.Public
-            });
-            Assert.NotNull(assembly);
-            var myClassType = assembly.GetType("List.MyClass");
-            Assert.NotNull(myClassType);
-            var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p=>p.Name).ToList();
-            Assert.NotEmpty(collectionPropertyInfos);
-            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
-
-            var myClassInstance = Activator.CreateInstance(myClassType);
-            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
-            {
-                Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
-            }
-        }
-
-        [Fact]
-        public void TestListWithPublicPropertySettersWithoutConstructors()
-        {
-            var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "List",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization
-            });
-            Assert.NotNull(assembly);
-            var myClassType = assembly.GetType("List.MyClass");
-            Assert.NotNull(myClassType);
-            var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
-            Assert.NotEmpty(collectionPropertyInfos);
-            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
-            var myClassInstance = Activator.CreateInstance(myClassType);
-            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
-            {
-                Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
-            }
-        }
-
-        [Fact]
-        public void TestListWithInitPropertySetters()
-        {
-            var assembly = Compiler.Generate("ListPublic", ListPattern, new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "List",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.Init
-            });
-            Assert.NotNull(assembly);
-            var myClassType = assembly.GetType("List.MyClass");
-            Assert.NotNull(myClassType);
-            var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
-            Assert.NotEmpty(collectionPropertyInfos);
-            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
-            var requiredCustomModifiers = collectionPropertyInfos.Select(p => p.SetMethod.ReturnParameter.GetRequiredCustomModifiers()).ToList();
-            Assert.Equal(collectionPropertyInfos.Count, requiredCustomModifiers.Count);
-            Assert.All(requiredCustomModifiers, m => Assert.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit), m));
-
-            var myClassInstance = Activator.CreateInstance(myClassType);
-            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
-            {
-                Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
-            }
-        }
-
-        [Fact]
-        public void TestListWithInitPropertySettersWithoutConstructors()
-        {
-            var assembly = Compiler.Generate("ListInitWithoutConstructorInitialization", ListPattern, new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "List",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.InitWithoutConstructorInitialization
-            });
-            Assert.NotNull(assembly);
-            var myClassType = assembly.GetType("List.MyClass");
-            Assert.NotNull(myClassType);
-            var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
-            Assert.NotEmpty(collectionPropertyInfos);
-            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
-            var requiredCustomModifiers = collectionPropertyInfos.Select(p => p.SetMethod.ReturnParameter.GetRequiredCustomModifiers()).ToList();
-            Assert.Equal(collectionPropertyInfos.Count, requiredCustomModifiers.Count);
-            Assert.All(requiredCustomModifiers, m => Assert.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit), m));
-            var myClassInstance = Activator.CreateInstance(myClassType);
-            foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
-            {
-                Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
-            }
-        }
-
-        [Fact]
-        public void TestListWithPublicPropertySettersWithoutConstructorsSpecified()
-        {
-            var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "List",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CollectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization
-            });
-            Assert.NotNull(assembly);
-            var myClassType = assembly.GetType("List.MyClass");
-            Assert.NotNull(myClassType);
-            var iListType = typeof(Collection<>);
-            var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
-            var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
-            Assert.NotEmpty(collectionPropertyInfos);
-            Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
-            var myClassInstance = Activator.CreateInstance(myClassType);
-
-            var propertyNamesWithSpecifiedPostfix = publicCollectionPropertyInfos.Select(p => p.Name + "Specified").ToHashSet();
-            var propertiesWithSpecifiedPostfix =
-                myClassType.GetProperties().Where(p => propertyNamesWithSpecifiedPostfix.Contains(p.Name)).ToList();
-
-            //Null collection
-            foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
-            {
-                Assert.False((bool)propertyInfo.GetValue(myClassInstance));
-            }
-
-            foreach (var propertyInfo in publicCollectionPropertyInfos)
-            {
-                var collection = Activator.CreateInstance(propertyInfo.PropertyType);
-                propertyInfo.SetValue(myClassInstance, collection);
-            }
-
-            //Not Null but empty collection
-            foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
-            {
-                Assert.False((bool)propertyInfo.GetValue(myClassInstance));
-            }
-
-            foreach (var propertyInfo in publicCollectionPropertyInfos)
-            {
-
-                var collection = Activator.CreateInstance(propertyInfo.PropertyType);
-                propertyInfo.PropertyType.InvokeMember("Add", BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.Instance, null, collection,
-                    new object[] {null});
-                propertyInfo.SetValue(myClassInstance, collection);
-            }
-
-            //Not Null and not empty collection
-            foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
-            {
-                Assert.True((bool)propertyInfo.GetValue(myClassInstance));
-            }
-        }
-
-        public static TheoryData<CodeTypeReferenceOptions, NamingScheme, Type> TestSimpleData() {
-            var theoryData = new TheoryData<CodeTypeReferenceOptions, NamingScheme, Type>();
-            foreach (var referenceMode in new[]
-                { CodeTypeReferenceOptions.GlobalReference, /*CodeTypeReferenceOptions.GenericTypeParameter*/ })
-            foreach (var namingScheme in new[] { NamingScheme.Direct, NamingScheme.PascalCase })
-            foreach (var collectionType in new[] { typeof(Collection<>), /*typeof(Array)*/ })
-            {
-                theoryData.Add(referenceMode, namingScheme, collectionType);
-            }
-            return theoryData;
-        }
-
-
-        [Theory, TestPriority(1)]
-        [MemberData(nameof(TestSimpleData))]
-        [UseCulture("en-US")]
-        public void TestSimple(CodeTypeReferenceOptions referenceMode, NamingScheme namingScheme, Type collectionType)
-        {
-            var name = $"Simple_{referenceMode}_{namingScheme}_{collectionType}";
-            Compiler.Generate(name, SimplePattern, new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "Simple",
-                GenerateDescriptionAttribute = true,
-                CodeTypeReferenceOptions = referenceMode,
-                NetCoreSpecificCode = true,
-                NamingScheme = namingScheme,
-                CollectionType = collectionType,
-                CollectionSettersMode = CollectionSettersMode.Public
-            });
-            SharedTestFunctions.TestSamples(Output, name, SimplePattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestArrayOrder()
-        {
-            Compiler.Generate("ArrayOrder", ArrayOrderPattern, new Generator
-            {
-                NamespacePrefix = "ArrayOrder",
-                EmitOrder = true
-            });
-            SharedTestFunctions.TestSamples(Output, "ArrayOrder", ArrayOrderPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestIS24RestApi()
-        {
-            Compiler.Generate("IS24RestApi", IS24Pattern, new Generator
-            {
-                GenerateNullables = true,
-                IntegerDataType = typeof(int),
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateDesignerCategoryAttribute = false,
-                GenerateComplexTypesForCollections = true,
-                EntityFramework = false,
-                GenerateInterfaces = true,
-                NamespacePrefix = "IS24RestApi",
-                GenerateDescriptionAttribute = true,
-                TextValuePropertyName = "Value",
-                CompactTypeNames = true
-            });
-            SharedTestFunctions.TestSamples(Output, "IS24RestApi", IS24Pattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestIS24RestApiShouldSerialize()
-        {
-            Compiler.Generate("IS24RestApiShouldSerialize", IS24Pattern, new Generator
-            {
-                GenerateNullables = true,
-                GenerateInterfaces = true,
-                NamespacePrefix = "IS24RestApi",
-                GenerateDescriptionAttribute = true,
-                UseShouldSerializePattern = true
-            });
-            SharedTestFunctions.TestSamples(Output, "IS24RestApiShouldSerialize", IS24Pattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestWadl()
-        {
-            Compiler.Generate("Wadl", WadlPattern, new Generator
-            {
-                EntityFramework = true,
-                DataAnnotationMode = DataAnnotationMode.All,
-                NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace),
-                MemberVisitor = (member, model) => { }
-            });
-            SharedTestFunctions.TestSamples(Output, "Wadl", WadlPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestIS24ImmoTransfer()
-        {
-            Compiler.Generate("IS24ImmoTransfer", IS24ImmoTransferPattern);
-            SharedTestFunctions.TestSamples(Output, "IS24ImmoTransfer", IS24ImmoTransferPattern);
-
-            Compiler.Generate("IS24ImmoTransferSeparate", IS24ImmoTransferPattern, new Generator
-            {
-                SeparateSubstitutes = true
-            });
-            SharedTestFunctions.TestSamples(Output, "IS24ImmoTransferSeparate", IS24ImmoTransferPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestTableau()
-        {
-            Compiler.Generate("Tableau", TableauPattern, new Generator { CompactTypeNames = true });
-            SharedTestFunctions.TestSamples(Output, "Tableau", TableauPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestSeparateClasses()
-        {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Separate"));
-            Compiler.Generate("Tableau.Separate", TableauPattern,
-                new Generator
-                {
-                    OutputWriter = output,
-                    SeparateClasses = true,
-                    EnableDataBinding = true
-                });
-            SharedTestFunctions.TestSamples(Output, "Tableau.Separate", TableauPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestArray()
-        {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Array"));
-            Compiler.Generate("Tableau.Array", TableauPattern,
-                new Generator
-                {
-                    OutputWriter = output,
-                    EnableDataBinding = true,
-                    CollectionType = typeof(System.Array),
-                    CollectionSettersMode = CollectionSettersMode.Public
-                });
-            SharedTestFunctions.TestSamples(Output, "Tableau.Array", TableauPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestSerializeEmptyCollection()
-        {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.EmptyCollection"));
-            Compiler.Generate("Tableau.EmptyCollection", TableauPattern,
-                new Generator
-                {
-                    OutputWriter = output,
-                    EnableDataBinding = true,
-                    CollectionSettersMode = CollectionSettersMode.Private,
-                    SerializeEmptyCollections = true
-                });
-            SharedTestFunctions.TestSamples(Output, "Tableau.EmptyCollection", TableauPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestSerializeEmptyPublicCollection()
-        {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.EmptyPublicCollection"));
-            Compiler.Generate("Tableau.EmptyPublicCollection", TableauPattern,
-                new Generator
-                {
-                    OutputWriter = output,
-                    EnableDataBinding = true,
-                    CollectionSettersMode = CollectionSettersMode.Public,
-                    SerializeEmptyCollections = true
-                });
-            SharedTestFunctions.TestSamples(Output, "Tableau.EmptyPublicCollection", TableauPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestDtsx()
-        {
-            Compiler.Generate("Dtsx", DtsxPattern, new Generator());
-            SharedTestFunctions.TestSamples(Output, "Dtsx", DtsxPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestVSTst()
-        {
-            Compiler.Generate("VSTst", VSTstPattern, new Generator
-            {
-                TextValuePropertyName = "TextValue",
-                GenerateComplexTypesForCollections = true
-            });
-            SharedTestFunctions.TestSamples(Output, "VSTst", VSTstPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestWfs()
-        {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "wfs"));
-            Compiler.Generate("wfs", WfsPattern,
-                new Generator
-                {
-                    OutputWriter = output,
-                    EmitOrder = true,
-                    GenerateInterfaces = true
-                });
-            SharedTestFunctions.TestSamples(Output, "wfs", WfsPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestEpp()
-        {
-            var output = new FileWatcherOutputWriter(Path.Combine("output", "epp"));
-            Compiler.Generate("epp", EppPattern,
-                new Generator
-                {
-                    OutputWriter = output,
-                    GenerateInterfaces = false,
-                    UniqueTypeNamesAcrossNamespaces = true,
-                    NamespaceProvider = new Dictionary<NamespaceKey, string>
-                    {
-                        { new NamespaceKey("urn:ietf:params:xml:ns:eppcom-1.0"), "FoxHillSolutions.Escrow.eppcom" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeDomain-1.0"), "FoxHillSolutions.Escrow.rdeDomain" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeHeader-1.0"), "FoxHillSolutions.Escrow.rdeHeader" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeHost-1.0"), "FoxHillSolutions.Escrow.rdeHost" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeIDN-1.0"), "FoxHillSolutions.Escrow.rdeIDN" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeRegistrar-1.0"), "FoxHillSolutions.Escrow.Registrar" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeDnrdCommon-1.0"), "FoxHillSolutions.Escrow.DnrdCommon" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:secDNS-1.1"), "FoxHillSolutions.Escrow.secDNS" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:domain-1.0"), "FoxHillSolutions.Escrow.domain" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:contact-1.0"), "FoxHillSolutions.Escrow.contact" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:host-1.0"), "FoxHillSolutions.Escrow.host" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rgp-1.0"), "FoxHillSolutions.Escrow.rgp" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:epp-1.0"), "FoxHillSolutions.Escrow.epp" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rde-1.0"), "FoxHillSolutions.Escrow.rde" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeContact-1.0"), "FoxHillSolutions.Escrow.rdeContact" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeEppParams-1.0"), "FoxHillSolutions.Escrow.rdeEppParams" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdeNNDN-1.0"), "FoxHillSolutions.Escrow.rdeNNDN" },
-                        { new NamespaceKey("urn:ietf:params:xml:ns:rdePolicy-1.0"), "FoxHillSolutions.Escrow.rdePolicy" },
-                    }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Epp" }.NamespaceProvider.GenerateNamespace),
-                });
-            SharedTestFunctions.TestSamples(Output, "epp", EppPattern);
-        }
-
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestXbrl()
-        {
-            var outputPath = Path.Combine("output", "xbrl");
-
-            var gen = new Generator
-            {
-                OutputFolder = outputPath,
-                GenerateInterfaces = false,
-                UniqueTypeNamesAcrossNamespaces = true,
-            };
-
-            gen.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
-
-            var xsdFiles = new[]
-            {
-                "xhtml-inlinexbrl-1_1.xsd",
-            }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "xbrl", x)).ToList();
-
-            var assembly = Compiler.GenerateFiles("Xbrl", xsdFiles, gen);
-            Assert.NotNull(assembly);
-
-            var testFiles = new Dictionary<string, string>
-            {
-                { "Schaltbau.xhtml", "XhtmlHtmlType" },
-                { "GLEIF Annual Accounts.html", "XhtmlHtmlType" },
-            };
-
-            foreach (var testFile in testFiles)
-            {
-                var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
-                Assert.NotNull(type);
-
-                var serializer = new XmlSerializer(type);
-                serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
-                serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
-                var unknownNodeError = false;
-                var unknownAttrError = false;
-
-                void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
-                {
-                    unknownNodeError = true;
-                }
-
-                void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
-                {
-                    unknownAttrError = true;
-                }
-
-                var xmlString = File.ReadAllText($"xml/xbrl_tests/{testFile.Key}");
-                xmlString = Regex.Replace(xmlString, "xsi:schemaLocation=\"[^\"]*\"", string.Empty);
-                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
-
-                var isDeserializable = serializer.CanDeserialize(reader);
-                Assert.True(isDeserializable);
-
-                var deserializedObject = serializer.Deserialize(reader);
-                Assert.False(unknownNodeError);
-                Assert.False(unknownAttrError);
-
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
-
-                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
-                AssertEx.Equal(deserializedObject, deserializedXml);
-            }
-        }
-
-        private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
-
-        public static TheoryData<string> Classes => new()
-        {
-            "ApartmentBuy",
-            "ApartmentRent",
-            "AssistedLiving",
-            "CompulsoryAuction",
-            "GarageBuy",
-            "GarageRent",
-            "Gastronomy",
-            "HouseBuy",
-            "HouseRent",
-            "HouseType",
-            "Industry",
-            "Investment",
-            "LivingBuySite",
-            "LivingRentSite",
-            "Office",
-            "SeniorCare",
-            "ShortTermAccommodation",
-            "SpecialPurpose",
-            "Store",
-            "TradeSite",
+            OutputWriter = writer,
+            Version = new VersionProvider("Tests", "1.0.0.1"),
+            NamespaceProvider = generatorPrototype.NamespaceProvider,
+            GenerateNullables = generatorPrototype.GenerateNullables,
+            IntegerDataType = generatorPrototype.IntegerDataType,
+            DataAnnotationMode = generatorPrototype.DataAnnotationMode,
+            GenerateDesignerCategoryAttribute = generatorPrototype.GenerateDesignerCategoryAttribute,
+            GenerateComplexTypesForCollections = generatorPrototype.GenerateComplexTypesForCollections,
+            EntityFramework = generatorPrototype.EntityFramework,
+            AssemblyVisible = generatorPrototype.AssemblyVisible,
+            GenerateInterfaces = generatorPrototype.GenerateInterfaces,
+            MemberVisitor = generatorPrototype.MemberVisitor,
+            CodeTypeReferenceOptions = generatorPrototype.CodeTypeReferenceOptions,
+            DoNotForceIsNullable = generatorPrototype.DoNotForceIsNullable,
+            CreateGeneratedCodeAttributeVersion = generatorPrototype.CreateGeneratedCodeAttributeVersion,
+            NetCoreSpecificCode = generatorPrototype.NetCoreSpecificCode,
+            GenerateCommandLineArgumentsComment = generatorPrototype.GenerateCommandLineArgumentsComment,
+            CommandLineArgumentsProvider = generatorPrototype.CommandLineArgumentsProvider,
+            CollectionType = generatorPrototype.CollectionType,
+            CollectionImplementationType = generatorPrototype.CollectionImplementationType,
+            CollectionSettersMode = generatorPrototype.CollectionSettersMode,
+            UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
+            EnumAsString = generatorPrototype.EnumAsString,
+            AllowDtdParse = generatorPrototype.AllowDtdParse
         };
 
-        [Theory, TestPriority(2)]
-        [MemberData(nameof(Classes))]
-        public void ProducesSameXmlAsXsd(string c)
-        {
-            var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
+        gen.CommentLanguages.Clear();
+        gen.CommentLanguages.UnionWith(generatorPrototype.CommentLanguages);
 
-            var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
-            Assert.NotNull(t1);
-            var t2 = Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace == "IS24RestApi.Xsd");
-            Assert.NotNull(t2);
-            var f = char.ToLower(c[0]) + c[1..];
-            TestCompareToXsd(t1, t2, f);
+        gen.Generate(xsds.Select(i => new StringReader(i)));
+
+        return writer.Content;
+    }
+
+    private static IEnumerable<string> ConvertXml(string name, string xsd, Generator generatorPrototype = null)
+    {
+        return ConvertXml(name, [xsd], generatorPrototype);
+    }
+
+    const string IS24Pattern = "xsd/is24/*/*.xsd";
+    const string IS24ImmoTransferPattern = "xsd/is24immotransfer/is24immotransfer.xsd";
+    const string WadlPattern = "xsd/wadl/wadl.xsd";
+    const string ListPattern = "xsd/list/list.xsd";
+    const string SimplePattern = "xsd/simple/*.xsd";
+    const string ArrayOrderPattern = "xsd/array-order/array-order.xsd";
+    const string ClientPattern = "xsd/client/client.xsd";
+    const string IataPattern = "xsd/iata/*.xsd";
+    const string TimePattern = "xsd/time/time.xsd";
+    const string TableauPattern = "xsd/ts-api/*.xsd";
+    const string VSTstPattern = "xsd/vstst/vstst.xsd";
+    const string BpmnPattern = "xsd/bpmn/*.xsd";
+    const string DtsxPattern = "xsd/dtsx/dtsx2.xsd";
+    const string WfsPattern = "xsd/wfs/schemas.opengis.net/wfs/2.0/wfs.xsd";
+    const string EppPattern = "xsd/epp/*.xsd";
+    const string GraphMLPattern = "xsd/graphml/ygraphml.xsd";
+    const string UnionPattern = "xsd/union/union.xsd";
+    const string GuidPattern = "xsd/guid/*.xsd";
+    const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
+
+    // IATA test takes too long to perform every time
+
+    //[Fact, TestPriority(1)]
+    //[UseCulture("en-US")]
+    //public void TestIata()
+    //{
+    //    Compiler.Generate("Iata", IataPattern, new Generator
+    //    {
+    //        EntityFramework = true,
+    //        DataAnnotationMode = DataAnnotationMode.All,
+    //        NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
+    //            .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Iata" }.NamespaceProvider.GenerateNamespace),
+    //        MemberVisitor = (member, model) => { },
+    //        GenerateInterfaces = true
+    //    });
+    //    SharedTestFunctions.TestSamples(Output, "Iata", IataPattern);
+    //}
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestGraphML()
+    {
+        Compiler.Generate("GraphML", GraphMLPattern, new Generator
+        {
+            NamespaceProvider = new Dictionary<NamespaceKey, string> {
+                { new NamespaceKey(new Uri("graphml.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Main" },
+                { new NamespaceKey(new Uri("graphml-structure.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Structure" },
+                { new NamespaceKey(new Uri("ygraphxml.xsd", UriKind.RelativeOrAbsolute), "http://graphml.graphdrawing.org/xmlns"), "GraphML.Y" },
+                { new NamespaceKey("http://www.w3.org/1999/xlink"), "XLink" },
+                { new NamespaceKey("http://www.yworks.com/xml/graphml"), "YEd" },
+            }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GraphML" }.NamespaceProvider.GenerateNamespace),
+        });
+        SharedTestFunctions.TestSamples(Output, "GraphML", GraphMLPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestClient()
+    {
+        Compiler.Generate("Client", ClientPattern);
+        SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestGuid()
+    {
+        var assembly = Compiler.Generate("Guid", GuidPattern);
+        var testType = assembly.GetType("Guid.Test");
+        var idProperty = testType.GetProperty("Id");
+        var elementIdProperty = testType.GetProperty("ElementId");
+        var headerType = assembly.GetType("Guid.V1.Header");
+        var referenceProperty = headerType.GetProperty("Reference");
+
+        Assert.Equal(typeof(Nullable<>).MakeGenericType(typeof(Guid)), idProperty.PropertyType);
+        Assert.Equal(typeof(Guid), elementIdProperty.PropertyType);
+        Assert.Equal(typeof(Guid), referenceProperty.PropertyType);
+
+        var serializer = new XmlSerializer(testType);
+
+        var test = Activator.CreateInstance(testType);
+        var idGuid = Guid.NewGuid();
+        var elementGuid = Guid.NewGuid();
+
+        idProperty.SetValue(test, idGuid);
+        elementIdProperty.SetValue(test, elementGuid);
+
+        var sw = new StringWriter();
+
+        serializer.Serialize(sw, test);
+
+        var xml = sw.ToString();
+        var sr = new StringReader(xml);
+
+        var o = serializer.Deserialize(sr);
+
+        Assert.Equal(idGuid, idProperty.GetValue(o));
+        Assert.Equal(elementGuid, elementIdProperty.GetValue(o));
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestUnion()
+    {
+        var assembly = Compiler.Generate("Union", UnionPattern, new Generator
+        {
+            NamespacePrefix = "Union",
+            IntegerDataType = typeof(int),
+            MapUnionToWidestCommonType = true
+        });
+
+        Assert.NotNull(assembly);
+
+        SharedTestFunctions.TestSamples(Output, "Union", UnionPattern);
+
+        var snapshotType = assembly.GetType("Union.Snapshot");
+        Assert.NotNull(snapshotType);
+
+        var date = snapshotType.GetProperty("Date");
+        Assert.NotNull(date);
+        Assert.Equal(typeof(DateTime), date.PropertyType);
+
+        var count = snapshotType.GetProperty("Count");
+        Assert.NotNull(count);
+        Assert.Equal(typeof(int), count.PropertyType);
+
+        var num = snapshotType.GetProperty("Num");
+        Assert.NotNull(num);
+        Assert.Equal(typeof(decimal), num.PropertyType);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestList()
+    {
+        Compiler.Generate("List", ListPattern);
+        SharedTestFunctions.TestSamples(Output, "List", ListPattern);
+    }
+
+    [Fact]
+    public void TestListWithPrivatePropertySetters()
+    {
+        var assembly = Compiler.Generate("List", ListPattern, new Generator() {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CollectionSettersMode = CollectionSettersMode.Private
+        });
+        Assert.NotNull(assembly);
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+        var iListType = typeof(Collection<>);
+        var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
+        var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPrivate).OrderBy(p=>p.Name).ToList();
+        Assert.NotEmpty(collectionPropertyInfos);
+        Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+
+        var myClassInstance = Activator.CreateInstance(myClassType);
+        foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+        {
+            Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    [Fact]
+    public void TestListWithPublicPropertySetters()
+    {
+        var assembly = Compiler.Generate("ListPublic", ListPattern, new Generator {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CollectionSettersMode = CollectionSettersMode.Public
+        });
+        Assert.NotNull(assembly);
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+        var iListType = typeof(Collection<>);
+        var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p=>p.Name).ToList();
+        var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p=>p.Name).ToList();
+        Assert.NotEmpty(collectionPropertyInfos);
+        Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+
+        var myClassInstance = Activator.CreateInstance(myClassType);
+        foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+        {
+            Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    [Fact]
+    public void TestListWithPublicPropertySettersWithoutConstructors()
+    {
+        var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CollectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization
+        });
+        Assert.NotNull(assembly);
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+        var iListType = typeof(Collection<>);
+        var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+        var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+        Assert.NotEmpty(collectionPropertyInfos);
+        Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+        var myClassInstance = Activator.CreateInstance(myClassType);
+        foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+        {
+            Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    [Fact]
+    public void TestListWithInitPropertySetters()
+    {
+        var assembly = Compiler.Generate("ListPublic", ListPattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CollectionSettersMode = CollectionSettersMode.Init
+        });
+        Assert.NotNull(assembly);
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+        var iListType = typeof(Collection<>);
+        var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+        var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+        Assert.NotEmpty(collectionPropertyInfos);
+        Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+        var requiredCustomModifiers = collectionPropertyInfos.Select(p => p.SetMethod.ReturnParameter.GetRequiredCustomModifiers()).ToList();
+        Assert.Equal(collectionPropertyInfos.Count, requiredCustomModifiers.Count);
+        Assert.All(requiredCustomModifiers, m => Assert.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit), m));
+
+        var myClassInstance = Activator.CreateInstance(myClassType);
+        foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+        {
+            Assert.NotNull(collectionPropertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    [Fact]
+    public void TestListWithInitPropertySettersWithoutConstructors()
+    {
+        var assembly = Compiler.Generate("ListInitWithoutConstructorInitialization", ListPattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CollectionSettersMode = CollectionSettersMode.InitWithoutConstructorInitialization
+        });
+        Assert.NotNull(assembly);
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+        var iListType = typeof(Collection<>);
+        var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+        var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+        Assert.NotEmpty(collectionPropertyInfos);
+        Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+        var requiredCustomModifiers = collectionPropertyInfos.Select(p => p.SetMethod.ReturnParameter.GetRequiredCustomModifiers()).ToList();
+        Assert.Equal(collectionPropertyInfos.Count, requiredCustomModifiers.Count);
+        Assert.All(requiredCustomModifiers, m => Assert.Contains(typeof(System.Runtime.CompilerServices.IsExternalInit), m));
+        var myClassInstance = Activator.CreateInstance(myClassType);
+        foreach (var collectionPropertyInfo in publicCollectionPropertyInfos)
+        {
+            Assert.Null(collectionPropertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    [Fact]
+    public void TestListWithPublicPropertySettersWithoutConstructorsSpecified()
+    {
+        var assembly = Compiler.Generate("ListPublicWithoutConstructorInitialization", ListPattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CollectionSettersMode = CollectionSettersMode.PublicWithoutConstructorInitialization
+        });
+        Assert.NotNull(assembly);
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+        var iListType = typeof(Collection<>);
+        var collectionPropertyInfos = myClassType.GetProperties().Where(p => p.PropertyType.IsGenericType && iListType.IsAssignableFrom(p.PropertyType.GetGenericTypeDefinition())).OrderBy(p => p.Name).ToList();
+        var publicCollectionPropertyInfos = collectionPropertyInfos.Where(p => p.SetMethod.IsPublic).OrderBy(p => p.Name).ToList();
+        Assert.NotEmpty(collectionPropertyInfos);
+        Assert.Equal(collectionPropertyInfos, publicCollectionPropertyInfos);
+        var myClassInstance = Activator.CreateInstance(myClassType);
+
+        var propertyNamesWithSpecifiedPostfix = publicCollectionPropertyInfos.Select(p => p.Name + "Specified").ToHashSet();
+        var propertiesWithSpecifiedPostfix =
+            myClassType.GetProperties().Where(p => propertyNamesWithSpecifiedPostfix.Contains(p.Name)).ToList();
+
+        //Null collection
+        foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
+        {
+            Assert.False((bool)propertyInfo.GetValue(myClassInstance));
         }
 
-        static void TestCompareToXsd(Type t1, Type t2, string file)
+        foreach (var propertyInfo in publicCollectionPropertyInfos)
         {
-            foreach (var suffix in new[] { "max", "min" })
-            {
-                var serializer1 = new XmlSerializer(t1);
-                var serializer2 = new XmlSerializer(t2);
-                var xml = ReadXml(string.Format("{0}_{1}", file, suffix));
-                var o1 = serializer1.Deserialize(new StringReader(xml));
-                var o2 = serializer2.Deserialize(new StringReader(xml));
-                var x1 = SharedTestFunctions.Serialize(serializer1, o1);
-                var x2 = SharedTestFunctions.Serialize(serializer2, o2);
-
-                File.WriteAllText("x1.xml", x1);
-                File.WriteAllText("x2.xml", x2);
-
-                Assert.Equal(x2, x1);
-            }
+            var collection = Activator.CreateInstance(propertyInfo.PropertyType);
+            propertyInfo.SetValue(myClassInstance, collection);
         }
 
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestCustomNamespaces()
+        //Not Null but empty collection
+        foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
         {
-            string customNsPattern = "|{0}={1}";
-            string bpmnXsd = "BPMN20.xsd";
-            string semantXsd = "Semantic.xsd";
-            string bpmndiXsd = "BPMNDI.xsd";
-            string dcXsd = "DC.xsd";
-            string diXsd = "DI.xsd";
+            Assert.False((bool)propertyInfo.GetValue(myClassInstance));
+        }
 
-            Dictionary<string, string> xsdToCsharpNsMap = new()
+        foreach (var propertyInfo in publicCollectionPropertyInfos)
+        {
+
+            var collection = Activator.CreateInstance(propertyInfo.PropertyType);
+            propertyInfo.PropertyType.InvokeMember("Add", BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.Instance, null, collection,
+                [null]);
+            propertyInfo.SetValue(myClassInstance, collection);
+        }
+
+        //Not Null and not empty collection
+        foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
+        {
+            Assert.True((bool)propertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    public static TheoryData<CodeTypeReferenceOptions, NamingScheme, Type> TestSimpleData() {
+        var theoryData = new TheoryData<CodeTypeReferenceOptions, NamingScheme, Type>();
+        foreach (var referenceMode in new[]
+            { CodeTypeReferenceOptions.GlobalReference, /*CodeTypeReferenceOptions.GenericTypeParameter*/ })
+        foreach (var namingScheme in new[] { NamingScheme.Direct, NamingScheme.PascalCase })
+        foreach (var collectionType in new[] { typeof(Collection<>), /*typeof(Array)*/ })
+        {
+            theoryData.Add(referenceMode, namingScheme, collectionType);
+        }
+        return theoryData;
+    }
+
+
+    [Theory, TestPriority(1)]
+    [MemberData(nameof(TestSimpleData))]
+    [UseCulture("en-US")]
+    public void TestSimple(CodeTypeReferenceOptions referenceMode, NamingScheme namingScheme, Type collectionType)
+    {
+        var name = $"Simple_{referenceMode}_{namingScheme}_{collectionType}";
+        Compiler.Generate(name, SimplePattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "Simple",
+            GenerateDescriptionAttribute = true,
+            CodeTypeReferenceOptions = referenceMode,
+            NetCoreSpecificCode = true,
+            NamingScheme = namingScheme,
+            CollectionType = collectionType,
+            CollectionSettersMode = CollectionSettersMode.Public
+        });
+        SharedTestFunctions.TestSamples(Output, name, SimplePattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestArrayOrder()
+    {
+        Compiler.Generate("ArrayOrder", ArrayOrderPattern, new Generator
+        {
+            NamespacePrefix = "ArrayOrder",
+            EmitOrder = true
+        });
+        SharedTestFunctions.TestSamples(Output, "ArrayOrder", ArrayOrderPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestIS24RestApi()
+    {
+        Compiler.Generate("IS24RestApi", IS24Pattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "IS24RestApi",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            CompactTypeNames = true
+        });
+        SharedTestFunctions.TestSamples(Output, "IS24RestApi", IS24Pattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestIS24RestApiShouldSerialize()
+    {
+        Compiler.Generate("IS24RestApiShouldSerialize", IS24Pattern, new Generator
+        {
+            GenerateNullables = true,
+            GenerateInterfaces = true,
+            NamespacePrefix = "IS24RestApi",
+            GenerateDescriptionAttribute = true,
+            UseShouldSerializePattern = true
+        });
+        SharedTestFunctions.TestSamples(Output, "IS24RestApiShouldSerialize", IS24Pattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestWadl()
+    {
+        Compiler.Generate("Wadl", WadlPattern, new Generator
+        {
+            EntityFramework = true,
+            DataAnnotationMode = DataAnnotationMode.All,
+            NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey("http://wadl.dev.java.net/2009/02"), "Wadl" } }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Wadl" }.NamespaceProvider.GenerateNamespace),
+            MemberVisitor = (member, model) => { }
+        });
+        SharedTestFunctions.TestSamples(Output, "Wadl", WadlPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestIS24ImmoTransfer()
+    {
+        Compiler.Generate("IS24ImmoTransfer", IS24ImmoTransferPattern);
+        SharedTestFunctions.TestSamples(Output, "IS24ImmoTransfer", IS24ImmoTransferPattern);
+
+        Compiler.Generate("IS24ImmoTransferSeparate", IS24ImmoTransferPattern, new Generator
+        {
+            SeparateSubstitutes = true
+        });
+        SharedTestFunctions.TestSamples(Output, "IS24ImmoTransferSeparate", IS24ImmoTransferPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestTableau()
+    {
+        Compiler.Generate("Tableau", TableauPattern, new Generator { CompactTypeNames = true });
+        SharedTestFunctions.TestSamples(Output, "Tableau", TableauPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestSeparateClasses()
+    {
+        var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Separate"));
+        Compiler.Generate("Tableau.Separate", TableauPattern,
+            new Generator
             {
-                { bpmnXsd, "Namespace1" },
-                { semantXsd, "Namespace1" },
-                { bpmndiXsd, "Namespace2" },
-                { dcXsd, "Namespace3" },
-                { diXsd, "Namespace4" }
-            };
-
-            Dictionary<string, string> xsdToCsharpTypeMap = new()
-            {
-                { bpmnXsd, "TDefinitions" },
-                { semantXsd, "TActivity" },
-                { bpmndiXsd, "BpmnDiagram" },
-                { dcXsd, "Font" },
-                { diXsd, "DiagramElement" }
-            };
-
-            List<string> customNamespaceConfig = [];
-
-            foreach (var ns in xsdToCsharpNsMap)
-                customNamespaceConfig.Add(string.Format(customNsPattern, ns.Key, ns.Value));
-
-            var assembly = Compiler.Generate("Bpmn", BpmnPattern, new Generator
-            {
-                DataAnnotationMode = DataAnnotationMode.All,
-                GenerateNullables = true,
-                MemberVisitor = (member, model) => { },
-                NamespaceProvider = customNamespaceConfig.Select(n => CodeUtilities.ParseNamespace(n, null)).ToNamespaceProvider()
+                OutputWriter = output,
+                SeparateClasses = true,
+                EnableDataBinding = true
             });
-            Assert.NotNull(assembly);
+        SharedTestFunctions.TestSamples(Output, "Tableau.Separate", TableauPattern);
+    }
 
-            Type type = null;
-
-            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[bpmnXsd]);
-            Assert.NotNull(type);
-            Assert.Equal(xsdToCsharpNsMap[bpmnXsd], type.Namespace);
-
-            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[semantXsd]);
-            Assert.NotNull(type);
-            Assert.Equal(xsdToCsharpNsMap[semantXsd], type.Namespace);
-
-            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[bpmndiXsd]);
-            Assert.NotNull(type);
-            Assert.Equal(xsdToCsharpNsMap[bpmndiXsd], type.Namespace);
-
-            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[dcXsd]);
-            Assert.NotNull(type);
-            Assert.Equal(xsdToCsharpNsMap[dcXsd], type.Namespace);
-
-            type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[diXsd]);
-            Assert.NotNull(type);
-            Assert.Equal(xsdToCsharpNsMap[diXsd], type.Namespace);
-        }
-
-        [Fact, TestPriority(2)]
-        [UseCulture("en-US")]
-        public void TestBpmn()
-        {
-            PerformBpmnTest("Bpmn");
-            PerformBpmnTest("BpmnSeparate", new Generator
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestArray()
+    {
+        var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.Array"));
+        Compiler.Generate("Tableau.Array", TableauPattern,
+            new Generator
             {
-                SeparateSubstitutes = true
+                OutputWriter = output,
+                EnableDataBinding = true,
+                CollectionType = typeof(System.Array),
+                CollectionSettersMode = CollectionSettersMode.Public
             });
-        }
+        SharedTestFunctions.TestSamples(Output, "Tableau.Array", TableauPattern);
+    }
 
-        private void PerformBpmnTest(string name, Generator generator = null)
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestSerializeEmptyCollection()
+    {
+        var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.EmptyCollection"));
+        Compiler.Generate("Tableau.EmptyCollection", TableauPattern,
+            new Generator
+            {
+                OutputWriter = output,
+                EnableDataBinding = true,
+                CollectionSettersMode = CollectionSettersMode.Private,
+                SerializeEmptyCollections = true
+            });
+        SharedTestFunctions.TestSamples(Output, "Tableau.EmptyCollection", TableauPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestSerializeEmptyPublicCollection()
+    {
+        var output = new FileWatcherOutputWriter(Path.Combine("output", "Tableau.EmptyPublicCollection"));
+        Compiler.Generate("Tableau.EmptyPublicCollection", TableauPattern,
+            new Generator
+            {
+                OutputWriter = output,
+                EnableDataBinding = true,
+                CollectionSettersMode = CollectionSettersMode.Public,
+                SerializeEmptyCollections = true
+            });
+        SharedTestFunctions.TestSamples(Output, "Tableau.EmptyPublicCollection", TableauPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestDtsx()
+    {
+        Compiler.Generate("Dtsx", DtsxPattern, new Generator());
+        SharedTestFunctions.TestSamples(Output, "Dtsx", DtsxPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestVSTst()
+    {
+        Compiler.Generate("VSTst", VSTstPattern, new Generator
         {
-            var assembly = Compiler.Generate(name, BpmnPattern, generator);
-            Assert.NotNull(assembly);
+            TextValuePropertyName = "TextValue",
+            GenerateComplexTypesForCollections = true
+        });
+        SharedTestFunctions.TestSamples(Output, "VSTst", VSTstPattern);
+    }
 
-            var type = assembly.GetTypes().SingleOrDefault(t => t.Name == "TDefinitions");
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestWfs()
+    {
+        var output = new FileWatcherOutputWriter(Path.Combine("output", "wfs"));
+        Compiler.Generate("wfs", WfsPattern,
+            new Generator
+            {
+                OutputWriter = output,
+                EmitOrder = true,
+                GenerateInterfaces = true
+            });
+        SharedTestFunctions.TestSamples(Output, "wfs", WfsPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestEpp()
+    {
+        var output = new FileWatcherOutputWriter(Path.Combine("output", "epp"));
+        Compiler.Generate("epp", EppPattern,
+            new Generator
+            {
+                OutputWriter = output,
+                GenerateInterfaces = false,
+                UniqueTypeNamesAcrossNamespaces = true,
+                NamespaceProvider = new Dictionary<NamespaceKey, string>
+                {
+                    { new NamespaceKey("urn:ietf:params:xml:ns:eppcom-1.0"), "FoxHillSolutions.Escrow.eppcom" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeDomain-1.0"), "FoxHillSolutions.Escrow.rdeDomain" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeHeader-1.0"), "FoxHillSolutions.Escrow.rdeHeader" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeHost-1.0"), "FoxHillSolutions.Escrow.rdeHost" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeIDN-1.0"), "FoxHillSolutions.Escrow.rdeIDN" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeRegistrar-1.0"), "FoxHillSolutions.Escrow.Registrar" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeDnrdCommon-1.0"), "FoxHillSolutions.Escrow.DnrdCommon" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:secDNS-1.1"), "FoxHillSolutions.Escrow.secDNS" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:domain-1.0"), "FoxHillSolutions.Escrow.domain" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:contact-1.0"), "FoxHillSolutions.Escrow.contact" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:host-1.0"), "FoxHillSolutions.Escrow.host" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rgp-1.0"), "FoxHillSolutions.Escrow.rgp" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:epp-1.0"), "FoxHillSolutions.Escrow.epp" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rde-1.0"), "FoxHillSolutions.Escrow.rde" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeContact-1.0"), "FoxHillSolutions.Escrow.rdeContact" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeEppParams-1.0"), "FoxHillSolutions.Escrow.rdeEppParams" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdeNNDN-1.0"), "FoxHillSolutions.Escrow.rdeNNDN" },
+                    { new NamespaceKey("urn:ietf:params:xml:ns:rdePolicy-1.0"), "FoxHillSolutions.Escrow.rdePolicy" },
+                }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Epp" }.NamespaceProvider.GenerateNamespace),
+            });
+        SharedTestFunctions.TestSamples(Output, "epp", EppPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestXbrl()
+    {
+        var outputPath = Path.Combine("output", "xbrl");
+
+        var gen = new Generator
+        {
+            OutputFolder = outputPath,
+            GenerateInterfaces = false,
+            UniqueTypeNamesAcrossNamespaces = true,
+        };
+
+        gen.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
+
+        var xsdFiles = new[]
+        {
+            "xhtml-inlinexbrl-1_1.xsd",
+        }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "xbrl", x)).ToList();
+
+        var assembly = Compiler.GenerateFiles("Xbrl", xsdFiles, gen);
+        Assert.NotNull(assembly);
+
+        var testFiles = new Dictionary<string, string>
+        {
+            { "Schaltbau.xhtml", "XhtmlHtmlType" },
+            { "GLEIF Annual Accounts.html", "XhtmlHtmlType" },
+        };
+
+        foreach (var testFile in testFiles)
+        {
+            var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
             Assert.NotNull(type);
 
             var serializer = new XmlSerializer(type);
@@ -933,84 +755,262 @@ namespace XmlSchemaClassGenerator.Tests
                 unknownAttrError = true;
             }
 
-            var testFiles = Glob.ExpandNames(Path.Combine("xml", "bpmn_tests", "*.bpmn"));
+            var xmlString = File.ReadAllText($"xml/xbrl_tests/{testFile.Key}");
+            xmlString = Regex.Replace(xmlString, "xsi:schemaLocation=\"[^\"]*\"", string.Empty);
+            var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
 
-            foreach (var testFile in testFiles)
-            {
-                var xmlString = File.ReadAllText(testFile);
-                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
+            var isDeserializable = serializer.CanDeserialize(reader);
+            Assert.True(isDeserializable);
 
-                var isDeserializable = serializer.CanDeserialize(reader);
-                Assert.True(isDeserializable);
+            var deserializedObject = serializer.Deserialize(reader);
+            Assert.False(unknownNodeError);
+            Assert.False(unknownAttrError);
 
-                var deserializedObject = serializer.Deserialize(reader);
-                Assert.False(unknownNodeError);
-                Assert.False(unknownAttrError);
+            var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
 
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
+            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+            AssertEx.Equal(deserializedObject, deserializedXml);
+        }
+    }
 
-                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
-                AssertEx.Equal(deserializedObject, deserializedXml);
-            }
+    private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
+
+    public static TheoryData<string> Classes => new()
+    {
+        "ApartmentBuy",
+        "ApartmentRent",
+        "AssistedLiving",
+        "CompulsoryAuction",
+        "GarageBuy",
+        "GarageRent",
+        "Gastronomy",
+        "HouseBuy",
+        "HouseRent",
+        "HouseType",
+        "Industry",
+        "Investment",
+        "LivingBuySite",
+        "LivingRentSite",
+        "Office",
+        "SeniorCare",
+        "ShortTermAccommodation",
+        "SpecialPurpose",
+        "Store",
+        "TradeSite",
+    };
+
+    [Theory, TestPriority(2)]
+    [MemberData(nameof(Classes))]
+    public void ProducesSameXmlAsXsd(string c)
+    {
+        var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
+
+        var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
+        Assert.NotNull(t1);
+        var t2 = Assembly.GetExecutingAssembly().GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace == "IS24RestApi.Xsd");
+        Assert.NotNull(t2);
+        var f = char.ToLower(c[0]) + c[1..];
+        TestCompareToXsd(t1, t2, f);
+    }
+
+    static void TestCompareToXsd(Type t1, Type t2, string file)
+    {
+        foreach (var suffix in new[] { "max", "min" })
+        {
+            var serializer1 = new XmlSerializer(t1);
+            var serializer2 = new XmlSerializer(t2);
+            var xml = ReadXml(string.Format("{0}_{1}", file, suffix));
+            var o1 = serializer1.Deserialize(new StringReader(xml));
+            var o2 = serializer2.Deserialize(new StringReader(xml));
+            var x1 = SharedTestFunctions.Serialize(serializer1, o1);
+            var x2 = SharedTestFunctions.Serialize(serializer2, o2);
+
+            File.WriteAllText("x1.xml", x1);
+            File.WriteAllText("x2.xml", x2);
+
+            Assert.Equal(x2, x1);
+        }
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestCustomNamespaces()
+    {
+        string customNsPattern = "|{0}={1}";
+        string bpmnXsd = "BPMN20.xsd";
+        string semantXsd = "Semantic.xsd";
+        string bpmndiXsd = "BPMNDI.xsd";
+        string dcXsd = "DC.xsd";
+        string diXsd = "DI.xsd";
+
+        Dictionary<string, string> xsdToCsharpNsMap = new()
+        {
+            { bpmnXsd, "Namespace1" },
+            { semantXsd, "Namespace1" },
+            { bpmndiXsd, "Namespace2" },
+            { dcXsd, "Namespace3" },
+            { diXsd, "Namespace4" }
+        };
+
+        Dictionary<string, string> xsdToCsharpTypeMap = new()
+        {
+            { bpmnXsd, "TDefinitions" },
+            { semantXsd, "TActivity" },
+            { bpmndiXsd, "BpmnDiagram" },
+            { dcXsd, "Font" },
+            { diXsd, "DiagramElement" }
+        };
+
+        List<string> customNamespaceConfig = [];
+
+        foreach (var ns in xsdToCsharpNsMap)
+            customNamespaceConfig.Add(string.Format(customNsPattern, ns.Key, ns.Value));
+
+        var assembly = Compiler.Generate("Bpmn", BpmnPattern, new Generator
+        {
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateNullables = true,
+            MemberVisitor = (member, model) => { },
+            NamespaceProvider = customNamespaceConfig.Select(n => CodeUtilities.ParseNamespace(n, null)).ToNamespaceProvider()
+        });
+        Assert.NotNull(assembly);
+
+        Type type = null;
+
+        type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[bpmnXsd]);
+        Assert.NotNull(type);
+        Assert.Equal(xsdToCsharpNsMap[bpmnXsd], type.Namespace);
+
+        type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[semantXsd]);
+        Assert.NotNull(type);
+        Assert.Equal(xsdToCsharpNsMap[semantXsd], type.Namespace);
+
+        type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[bpmndiXsd]);
+        Assert.NotNull(type);
+        Assert.Equal(xsdToCsharpNsMap[bpmndiXsd], type.Namespace);
+
+        type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[dcXsd]);
+        Assert.NotNull(type);
+        Assert.Equal(xsdToCsharpNsMap[dcXsd], type.Namespace);
+
+        type = assembly.GetTypes().SingleOrDefault(t => t.Name == xsdToCsharpTypeMap[diXsd]);
+        Assert.NotNull(type);
+        Assert.Equal(xsdToCsharpNsMap[diXsd], type.Namespace);
+    }
+
+    [Fact, TestPriority(2)]
+    [UseCulture("en-US")]
+    public void TestBpmn()
+    {
+        PerformBpmnTest("Bpmn");
+        PerformBpmnTest("BpmnSeparate", new Generator
+        {
+            SeparateSubstitutes = true
+        });
+    }
+
+    private void PerformBpmnTest(string name, Generator generator = null)
+    {
+        var assembly = Compiler.Generate(name, BpmnPattern, generator);
+        Assert.NotNull(assembly);
+
+        var type = assembly.GetTypes().SingleOrDefault(t => t.Name == "TDefinitions");
+        Assert.NotNull(type);
+
+        var serializer = new XmlSerializer(type);
+        serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
+        serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
+        var unknownNodeError = false;
+        var unknownAttrError = false;
+
+        void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
+        {
+            unknownNodeError = true;
         }
 
-        [Theory, TestPriority(3)]
-        [MemberData(nameof(Classes))]
-        public void CanSerializeAndDeserializeAllExampleXmlFiles(string c)
+        void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
         {
-            var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
-
-            var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
-            Assert.NotNull(t1);
-            var f = char.ToLower(c[0]) + c[1..];
-            TestRoundtrip(t1, f);
+            unknownAttrError = true;
         }
 
-        static void TestRoundtrip(Type t, string file)
+        var testFiles = Glob.ExpandNames(Path.Combine("xml", "bpmn_tests", "*.bpmn"));
+
+        foreach (var testFile in testFiles)
         {
-            var serializer = new XmlSerializer(t);
+            var xmlString = File.ReadAllText(testFile);
+            var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
 
-            foreach (var suffix in new[] { "min", "max" })
-            {
-                var xml = ReadXml(string.Format("{0}_{1}", file, suffix));
+            var isDeserializable = serializer.CanDeserialize(reader);
+            Assert.True(isDeserializable);
 
-                var deserializedObject = serializer.Deserialize(new StringReader(xml));
+            var deserializedObject = serializer.Deserialize(reader);
+            Assert.False(unknownNodeError);
+            Assert.False(unknownAttrError);
 
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject);
+            var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
 
-                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
-                AssertEx.Equal(deserializedObject, deserializedXml);
-            }
+            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+            AssertEx.Equal(deserializedObject, deserializedXml);
         }
+    }
 
-        static string ReadXml(string name)
+    [Theory, TestPriority(3)]
+    [MemberData(nameof(Classes))]
+    public void CanSerializeAndDeserializeAllExampleXmlFiles(string c)
+    {
+        var assembly = Compiler.Generate("IS24RestApi", IS24Pattern);
+
+        var t1 = assembly.GetTypes().SingleOrDefault(t => t.Name == c && t.Namespace.StartsWith("IS24RestApi.Offer.Realestates"));
+        Assert.NotNull(t1);
+        var f = char.ToLower(c[0]) + c[1..];
+        TestRoundtrip(t1, f);
+    }
+
+    static void TestRoundtrip(Type t, string file)
+    {
+        var serializer = new XmlSerializer(t);
+
+        foreach (var suffix in new[] { "min", "max" })
         {
-            var xml = File.ReadAllText(Path.Combine("xml", name + ".xml"));
-            return xml;
+            var xml = ReadXml(string.Format("{0}_{1}", file, suffix));
+
+            var deserializedObject = serializer.Deserialize(new StringReader(xml));
+
+            var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject);
+
+            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+            AssertEx.Equal(deserializedObject, deserializedXml);
         }
+    }
 
-        [Fact]
-        public void DontGenerateElementForEmptyCollectionInChoice()
-        {
-            var assembly = Compiler.Generate("Tableau", TableauPattern, new Generator());
-            Assert.NotNull(assembly);
-            var requestType = assembly.GetType("Api.TsRequest");
-            Assert.NotNull(requestType);
-            var r = Activator.CreateInstance(requestType);
-            var s = new XmlSerializer(requestType);
-            var sw = new StringWriter();
-            s.Serialize(sw, r);
-            var xml = sw.ToString();
-            Assert.DoesNotContain("tags", xml, StringComparison.OrdinalIgnoreCase);
-        }
+    static string ReadXml(string name)
+    {
+        var xml = File.ReadAllText(Path.Combine("xml", name + ".xml"));
+        return xml;
+    }
+
+    [Fact]
+    public void DontGenerateElementForEmptyCollectionInChoice()
+    {
+        var assembly = Compiler.Generate("Tableau", TableauPattern, new Generator());
+        Assert.NotNull(assembly);
+        var requestType = assembly.GetType("Api.TsRequest");
+        Assert.NotNull(requestType);
+        var r = Activator.CreateInstance(requestType);
+        var s = new XmlSerializer(requestType);
+        var sw = new StringWriter();
+        s.Serialize(sw, r);
+        var xml = sw.ToString();
+        Assert.DoesNotContain("tags", xml, StringComparison.OrdinalIgnoreCase);
+    }
 
 
-        [Theory]
-        [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
-        [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
-        public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
-        {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+    [Theory]
+    [InlineData(CodeTypeReferenceOptions.GlobalReference, "[global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]")]
+    [InlineData((CodeTypeReferenceOptions)0, "[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]")]
+    public void EditorBrowsableAttributeRespectsCodeTypeReferenceOptions(CodeTypeReferenceOptions codeTypeReferenceOptions, string expectedLine)
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
 		<xs:complexType name=""document"">
 			<xs:attribute name=""some-value"">
@@ -1025,26 +1025,26 @@ namespace XmlSchemaClassGenerator.Tests
 		</xs:complexType>
 </xs:schema>";
 
-            var generatedType = ConvertXml(nameof(EditorBrowsableAttributeRespectsCodeTypeReferenceOptions), xsd, new Generator
-            {
-                CodeTypeReferenceOptions = codeTypeReferenceOptions,
-                GenerateNullables = true,
-                GenerateInterfaces = true,
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            });
-
-            Assert.Contains(
-                expectedLine,
-                generatedType.First());
-        }
-
-        [Fact]
-        public void MixedTypeMustNotCollideWithExistingMembers()
+        var generatedType = ConvertXml(nameof(EditorBrowsableAttributeRespectsCodeTypeReferenceOptions), xsd, new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            CodeTypeReferenceOptions = codeTypeReferenceOptions,
+            GenerateNullables = true,
+            GenerateInterfaces = true,
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        });
+
+        Assert.Contains(
+            expectedLine,
+            generatedType.First());
+    }
+
+    [Fact]
+    public void MixedTypeMustNotCollideWithExistingMembers()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
 	<xs:element name=""document"" type=""l:elem"">
 	</xs:element>
@@ -1053,23 +1053,23 @@ namespace XmlSchemaClassGenerator.Tests
 	</xs:complexType>
 </xs:schema>";
 
-            var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            });
-
-            Assert.Contains(
-                @"public string[] Text_1 { get; set; }",
-                generatedType.First());
-        }
-
-        [Fact]
-        public void MixedTypeMustNotCollideWithContainingTypeName()
+        var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        });
+
+        Assert.Contains(
+            @"public string[] Text_1 { get; set; }",
+            generatedType.First());
+    }
+
+    [Fact]
+    public void MixedTypeMustNotCollideWithContainingTypeName()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
 	<xs:element name=""document"" type=""l:Text"">
 	</xs:element>
@@ -1077,33 +1077,33 @@ namespace XmlSchemaClassGenerator.Tests
 	</xs:complexType>
 </xs:schema>";
 
-            var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+        var generatedType = ConvertXml(nameof(MixedTypeMustNotCollideWithExistingMembers), xsd, new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
             {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            });
+                GenerateNamespace = key => "Test"
+            }
+        });
 
-            Assert.Contains(
-                @"public string[] Text_1 { get; set; }",
-                generatedType.First());
-        }
+        Assert.Contains(
+            @"public string[] Text_1 { get; set; }",
+            generatedType.First());
+    }
 
-        [Theory]
-        [InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
-        public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
-        {
-            // Compilation would previously throw due to duplicate type name within type
-            var assembly = Compiler.GenerateFiles("AttributesWithSameName", files);
+    [Theory]
+    [InlineData(@"xml/sameattributenames.xsd", @"xml/sameattributenames_import.xsd")]
+    public void CollidingAttributeAndPropertyNamesCanBeResolved(params string[] files)
+    {
+        // Compilation would previously throw due to duplicate type name within type
+        var assembly = Compiler.GenerateFiles("AttributesWithSameName", files);
 
-            Assert.NotNull(assembly);
-        }
+        Assert.NotNull(assembly);
+    }
 
-        [Fact]
-        public void CollidingElementAndComplexTypeNamesCanBeResolved()
-        {
-            const string xsd = @"<?xml version=""1.0"" encoding = ""UTF-8""?>
+    [Fact]
+    public void CollidingElementAndComplexTypeNamesCanBeResolved()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding = ""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"">
   <xs:complexType name=""MyType"">
     <xs:sequence>
@@ -1121,24 +1121,24 @@ namespace XmlSchemaClassGenerator.Tests
   </xs:element>
 </xs:schema>
 ";
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-
-            var generatedType = ConvertXml(nameof(CollidingElementAndComplexTypeNamesCanBeResolved), xsd, generator).First();
-
-            Assert.Contains(@"public partial class MyType", generatedType);
-            Assert.Contains(@"public enum MyType2", generatedType);
-        }
-
-        [Fact]
-        public void EnumAsStringOption()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding = ""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        };
+
+        var generatedType = ConvertXml(nameof(CollidingElementAndComplexTypeNamesCanBeResolved), xsd, generator).First();
+
+        Assert.Contains(@"public partial class MyType", generatedType);
+        Assert.Contains(@"public enum MyType2", generatedType);
+    }
+
+    [Fact]
+    public void EnumAsStringOption()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding = ""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"">
 	<xs:element name=""Authorisation"">
 		<xs:complexType>
@@ -1158,24 +1158,24 @@ namespace XmlSchemaClassGenerator.Tests
 	</xs:element>
 </xs:schema>
 ";
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                EnumAsString = true
-            };
-
-            var generatedType = ConvertXml(nameof(EnumAsStringOption), xsd, generator).First();
-
-            Assert.Contains(@"public string Type", generatedType);
-        }
-
-        [Fact]
-        public void ComplexTypeWithAttributeGroupExtension()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            EnumAsString = true
+        };
+
+        var generatedType = ConvertXml(nameof(EnumAsStringOption), xsd, generator).First();
+
+        Assert.Contains(@"public string Type", generatedType);
+    }
+
+    [Fact]
+    public void ComplexTypeWithAttributeGroupExtension()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
   <xs:attributeGroup name=""justify"">
     <xs:attribute name=""justify"" type=""simpleType""/>
@@ -1194,23 +1194,23 @@ namespace XmlSchemaClassGenerator.Tests
   </xs:simpleType>
 </xs:schema>";
 
-            var generator = new Generator
+        var generator = new Generator
+        {
+            GenerateInterfaces = false,
+            NamespaceProvider = new NamespaceProvider
             {
-                GenerateInterfaces = false,
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                CommentLanguages = { "de", "en" },
-                CreateGeneratedCodeAttributeVersion = false
-            };
+                GenerateNamespace = key => "Test"
+            },
+            CommentLanguages = { "de", "en" },
+            CreateGeneratedCodeAttributeVersion = false
+        };
 
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
 
-            var csharp = Assert.Single(contents);
+        var csharp = Assert.Single(contents);
 
-            CompareOutput(
-                @"//------------------------------------------------------------------------------
+        CompareOutput(
+            @"//------------------------------------------------------------------------------
 // <auto-generated>
 //     This code was generated by a tool.
 //
@@ -1260,16 +1260,16 @@ namespace Test
     }
 }
 ", csharp);
-        }
+    }
 
-        [Fact]
-        public void ChoiceMembersAreNullable()
-        {
-            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
-            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
-            // as a proxy.
+    [Fact]
+    public void ChoiceMembersAreNullable()
+    {
+        // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+        // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+        // as a proxy.
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
     <xs:complexType name=""Root"">
       <xs:sequence>
@@ -1291,28 +1291,28 @@ namespace Test
     </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
-
-            Assert.Contains("Opt1Specified", content);
-            Assert.Contains("Opt2Specified", content);
-            Assert.Contains("Opt3Specified", content);
-            Assert.Contains("Opt4Specified", content);
-        }
-
-        [Fact]
-        public void NestedElementInChoiceIsNullable()
+        var generator = new Generator
         {
-            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
-            // as a proxy.
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
+
+        Assert.Contains("Opt1Specified", content);
+        Assert.Contains("Opt2Specified", content);
+        Assert.Contains("Opt3Specified", content);
+        Assert.Contains("Opt4Specified", content);
+    }
+
+    [Fact]
+    public void NestedElementInChoiceIsNullable()
+    {
+        // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+        // as a proxy.
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
   <xs:element name=""Root"">
     <xs:complexType>
@@ -1332,26 +1332,26 @@ namespace Test
   </xs:group>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-            var contents = ConvertXml(nameof(NestedElementInChoiceIsNullable), xsd, generator);
-            var content = Assert.Single(contents);
-
-            Assert.Contains("ElementASpecified", content);
-            Assert.Contains("ElementBSpecified", content);
-        }
-
-        [Fact]
-        public void OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice()
+        var generator = new Generator
         {
-            // Because nullability isn't directly exposed in the generated C#, we use the "RequiredAttribute"
-            // as a proxy.
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        };
+        var contents = ConvertXml(nameof(NestedElementInChoiceIsNullable), xsd, generator);
+        var content = Assert.Single(contents);
+
+        Assert.Contains("ElementASpecified", content);
+        Assert.Contains("ElementBSpecified", content);
+    }
+
+    [Fact]
+    public void OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice()
+    {
+        // Because nullability isn't directly exposed in the generated C#, we use the "RequiredAttribute"
+        // as a proxy.
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
   <xs:element name=""Root"">
     <xs:complexType>
@@ -1368,36 +1368,36 @@ namespace Test
   </xs:element>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-            var contents = ConvertXml(nameof(OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice), xsd, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice), contents);
-
-            var elementWithChildProperty = assembly.GetType("Test.Root")?.GetProperty("ElementWithChild");
-            var nestedChildProperty = assembly.GetType("Test.RootElementWithChild")?.GetProperty("NestedChild");
-            Assert.NotNull(elementWithChildProperty);
-            Assert.NotNull(nestedChildProperty);
-
-            Type requiredType = typeof(System.ComponentModel.DataAnnotations.RequiredAttribute);
-            bool elementWithChildIsRequired = Attribute.GetCustomAttribute(elementWithChildProperty, requiredType) != null;
-            bool nestedChildIsRequired = Attribute.GetCustomAttribute(nestedChildProperty, requiredType) != null;
-            Assert.False(elementWithChildIsRequired);
-            Assert.True(nestedChildIsRequired);
-        }
-
-        [Fact]
-        public void AssemblyVisibleIsInternalClass()
+        var generator = new Generator
         {
-            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
-            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
-            // as a proxy.
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        };
+        var contents = ConvertXml(nameof(OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice), xsd, generator).ToArray();
+        var assembly = Compiler.Compile(nameof(OnlyFirstElementOfNestedElementsIsForcedToNullableInChoice), contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        var elementWithChildProperty = assembly.GetType("Test.Root")?.GetProperty("ElementWithChild");
+        var nestedChildProperty = assembly.GetType("Test.RootElementWithChild")?.GetProperty("NestedChild");
+        Assert.NotNull(elementWithChildProperty);
+        Assert.NotNull(nestedChildProperty);
+
+        Type requiredType = typeof(System.ComponentModel.DataAnnotations.RequiredAttribute);
+        bool elementWithChildIsRequired = Attribute.GetCustomAttribute(elementWithChildProperty, requiredType) != null;
+        bool nestedChildIsRequired = Attribute.GetCustomAttribute(nestedChildProperty, requiredType) != null;
+        Assert.False(elementWithChildIsRequired);
+        Assert.True(nestedChildIsRequired);
+    }
+
+    [Fact]
+    public void AssemblyVisibleIsInternalClass()
+    {
+        // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+        // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+        // as a proxy.
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
     <xs:complexType name=""Root"">
       <xs:sequence>
@@ -1419,29 +1419,29 @@ namespace Test
     </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
-
-            Assert.Contains("internal partial class RootSub", content);
-            Assert.Contains("internal partial class Root", content);
-        }
-
-        [Fact]
-        public void AssemblyVisibleIsInternalEnum()
+        var generator = new Generator
         {
-            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
-            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
-            // as a proxy.
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        Assert.Contains("internal partial class RootSub", content);
+        Assert.Contains("internal partial class Root", content);
+    }
+
+    [Fact]
+    public void AssemblyVisibleIsInternalEnum()
+    {
+        // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+        // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+        // as a proxy.
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
   <xs:simpleType name=""Answer"">
     <xs:restriction base=""xs:string"">
@@ -1452,28 +1452,28 @@ namespace Test
   </xs:simpleType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
-
-            Assert.Contains("internal enum Answer", content);
-        }
-
-        [Fact]
-        public void AssemblyVisibleIsInternalInterface()
+        var generator = new Generator
         {
-            // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
-            // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
-            // as a proxy.
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        Assert.Contains("internal enum Answer", content);
+    }
+
+    [Fact]
+    public void AssemblyVisibleIsInternalInterface()
+    {
+        // We test to see whether choices which are part of a larger ComplexType are marked as nullable.
+        // Because nullability isn't directly exposed in the generated C#, we use "XXXSpecified" on a value type
+        // as a proxy.
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:tns=""http://test.test/schema/AssemblyVisibleIsInternalInterface"" targetNamespace=""http://test.test/schema/AssemblyVisibleIsInternalInterface"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
   <xs:complexType name=""NamedType"">
     <xs:attributeGroup ref=""tns:NamedElement""/>
@@ -1483,54 +1483,54 @@ namespace Test
   </xs:attributeGroup>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
-
-            Assert.Contains("internal partial interface INamedElement", content);
-        }
-
-        [Fact]
-        public void DecimalSeparatorTest()
+        var generator = new Generator
         {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/101
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        Assert.Contains("internal partial interface INamedElement", content);
+    }
+
+    [Fact]
+    public void DecimalSeparatorTest()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/101
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
   <xs:complexType name=""NamedType"">
     <xs:attribute name=""SomeAttr"" type=""xs:decimal"" default=""1.5"" />
   </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
-
-            Assert.Contains("private decimal _someAttr = 1.5m;", content);
-        }
-
-        [Fact]
-        public void DoNotGenerateIntermediaryClassForArrayElements()
+        var generator = new Generator
         {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/32
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        Assert.Contains("private decimal _someAttr = 1.5m;", content);
+    }
+
+    [Fact]
+    public void DoNotGenerateIntermediaryClassForArrayElements()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/32
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema version=""1.0"" targetNamespace=""test""
   elementFormDefault=""qualified""
   xmlns:test=""test""
@@ -1550,32 +1550,32 @@ namespace Test
 </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateComplexTypesForCollections = false,
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(DoNotGenerateIntermediaryClassForArrayElements), content);
-
-            var fooType = assembly.DefinedTypes.Single(t => t.FullName == "Test.Foo");
-            Assert.NotNull(fooType);
-            Assert.Equal("Test.Foo", fooType.FullName);
-        }
-
-        [Fact]
-        public void GenerateIntermediaryClassForArrayElements()
+        var generator = new Generator
         {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/32
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateComplexTypesForCollections = false,
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        var assembly = Compiler.Compile(nameof(DoNotGenerateIntermediaryClassForArrayElements), content);
+
+        var fooType = assembly.DefinedTypes.Single(t => t.FullName == "Test.Foo");
+        Assert.NotNull(fooType);
+        Assert.Equal("Test.Foo", fooType.FullName);
+    }
+
+    [Fact]
+    public void GenerateIntermediaryClassForArrayElements()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/32
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema version=""1.0"" targetNamespace=""test""
   elementFormDefault=""qualified""
   xmlns:test=""test""
@@ -1595,31 +1595,31 @@ namespace Test
 </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateComplexTypesForCollections = true,
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(GenerateIntermediaryClassForArrayElements), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(GenerateIntermediaryClassForArrayElements), content);
-
-            Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.Foo");
-            Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.FooBar");
-        }
-
-        [Fact]
-        public void BoolTest()
+        var generator = new Generator
         {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/103
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateComplexTypesForCollections = true,
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(GenerateIntermediaryClassForArrayElements), xsd, generator);
+        var content = Assert.Single(contents);
 
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        var assembly = Compiler.Compile(nameof(GenerateIntermediaryClassForArrayElements), content);
+
+        Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.Foo");
+        Assert.Single(assembly.DefinedTypes, x => x.FullName == "Test.FooBar");
+    }
+
+    [Fact]
+    public void BoolTest()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/103
+
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
   <xs:complexType name=""NamedType"">
     <xs:attribute name=""b0"" type=""xs:boolean"" default=""0"" />
@@ -1629,37 +1629,37 @@ namespace Test
   </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
+        var generator = new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
             {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
-            var content = Assert.Single(contents);
+                GenerateNamespace = key => "Test",
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(ComplexTypeWithAttributeGroupExtension), xsd, generator);
+        var content = Assert.Single(contents);
 
-            Assert.Contains("private bool _b0 = false;", content);
-            Assert.Contains("private bool _b1 = true;", content);
-            Assert.Contains("private bool _bf = false;", content);
-            Assert.Contains("private bool _bt = true;", content);
-        }
+        Assert.Contains("private bool _b0 = false;", content);
+        Assert.Contains("private bool _b1 = true;", content);
+        Assert.Contains("private bool _bf = false;", content);
+        Assert.Contains("private bool _bt = true;", content);
+    }
 
-        private static void CompareOutput(string expected, string actual)
-        {
-            static string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r?\n", "\n");
-            Assert.Equal(Normalize(expected), Normalize(actual));
-        }
+    private static void CompareOutput(string expected, string actual)
+    {
+        static string Normalize(string input) => Regex.Replace(input, @"[ \t]*\r?\n", "\n");
+        Assert.Equal(Normalize(expected), Normalize(actual));
+    }
 
-        [Theory]
-        [InlineData(typeof(decimal), "decimal")]
-        [InlineData(typeof(long), "long")]
-        [InlineData(null, "string")]
-        public void UnmappedIntegerDerivedTypesAreMappedToExpectedCSharpType(Type integerDataType, string expectedTypeName)
-        {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+    [Theory]
+    [InlineData(typeof(decimal), "decimal")]
+    [InlineData(typeof(long), "long")]
+    [InlineData(null, "string")]
+    public void UnmappedIntegerDerivedTypesAreMappedToExpectedCSharpType(Type integerDataType, string expectedTypeName)
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
     <xs:complexType name=""root"">
         <xs:sequence>
@@ -1704,58 +1704,58 @@ namespace Test
     </xs:simpleType>
 </xs:schema>";
 
-            var generatedType = ConvertXml(nameof(UnmappedIntegerDerivedTypesAreMappedToExpectedCSharpType), xsd, new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateNullables = true,
-                NamingScheme = NamingScheme.PascalCase,
-                IntegerDataType = integerDataType,
-            }).First();
-
-            Assert.Contains($"public {expectedTypeName} UnboundedInteger01", generatedType);
-            Assert.Contains($"public {expectedTypeName} UnboundedInteger02", generatedType);
-            Assert.Contains($"public {expectedTypeName} UnboundedInteger03", generatedType);
-            Assert.Contains($"public {expectedTypeName} UnboundedInteger04", generatedType);
-            Assert.Contains($"public {expectedTypeName} UnboundedInteger05", generatedType);
-            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger01", generatedType);
-            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger02", generatedType);
-            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger03", generatedType);
-            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger04", generatedType);
-            Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger05", generatedType);
-        }
-
-        [Theory]
-        [InlineData("xs:positiveInteger", 1, 2, "byte")]
-        [InlineData("xs:nonNegativeInteger", 1, 2, "byte")]
-        [InlineData("xs:integer", 1, 2, "sbyte")]
-        [InlineData("xs:negativeInteger", 1, 2, "sbyte")]
-        [InlineData("xs:nonPositiveInteger", 1, 2, "sbyte")]
-        [InlineData("xs:positiveInteger", 3, 4, "ushort")]
-        [InlineData("xs:nonNegativeInteger", 3, 4, "ushort")]
-        [InlineData("xs:integer", 3, 4, "short")]
-        [InlineData("xs:negativeInteger", 3, 4, "short")]
-        [InlineData("xs:nonPositiveInteger", 3, 4, "short")]
-        [InlineData("xs:positiveInteger", 5, 9, "uint")]
-        [InlineData("xs:nonNegativeInteger", 5, 9, "uint")]
-        [InlineData("xs:integer", 5, 9, "int")]
-        [InlineData("xs:negativeInteger", 5, 9, "int")]
-        [InlineData("xs:nonPositiveInteger", 5, 9, "int")]
-        [InlineData("xs:positiveInteger", 10, 19, "ulong")]
-        [InlineData("xs:nonNegativeInteger", 10, 19, "ulong")]
-        [InlineData("xs:integer", 10, 18, "long")]
-        [InlineData("xs:negativeInteger", 10, 18, "long")]
-        [InlineData("xs:nonPositiveInteger", 10, 18, "long")]
-        [InlineData("xs:positiveInteger", 20, 29, "decimal")]
-        [InlineData("xs:nonNegativeInteger", 20, 29, "decimal")]
-        [InlineData("xs:integer", 20, 28, "decimal")]
-        [InlineData("xs:negativeInteger", 20, 28, "decimal")]
-        [InlineData("xs:nonPositiveInteger", 20, 28, "decimal")]
-        public void RestrictedIntegerDerivedTypesAreMappedToExpectedCSharpTypes(string restrictionBase, int totalDigitsRangeFrom, int totalDigitsRangeTo, string expectedTypeName)
+        var generatedType = ConvertXml(nameof(UnmappedIntegerDerivedTypesAreMappedToExpectedCSharpType), xsd, new Generator
         {
-            const string xsdTemplate = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateNullables = true,
+            NamingScheme = NamingScheme.PascalCase,
+            IntegerDataType = integerDataType,
+        }).First();
+
+        Assert.Contains($"public {expectedTypeName} UnboundedInteger01", generatedType);
+        Assert.Contains($"public {expectedTypeName} UnboundedInteger02", generatedType);
+        Assert.Contains($"public {expectedTypeName} UnboundedInteger03", generatedType);
+        Assert.Contains($"public {expectedTypeName} UnboundedInteger04", generatedType);
+        Assert.Contains($"public {expectedTypeName} UnboundedInteger05", generatedType);
+        Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger01", generatedType);
+        Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger02", generatedType);
+        Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger03", generatedType);
+        Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger04", generatedType);
+        Assert.Contains($"public {expectedTypeName} OutOfBoundsInteger05", generatedType);
+    }
+
+    [Theory]
+    [InlineData("xs:positiveInteger", 1, 2, "byte")]
+    [InlineData("xs:nonNegativeInteger", 1, 2, "byte")]
+    [InlineData("xs:integer", 1, 2, "sbyte")]
+    [InlineData("xs:negativeInteger", 1, 2, "sbyte")]
+    [InlineData("xs:nonPositiveInteger", 1, 2, "sbyte")]
+    [InlineData("xs:positiveInteger", 3, 4, "ushort")]
+    [InlineData("xs:nonNegativeInteger", 3, 4, "ushort")]
+    [InlineData("xs:integer", 3, 4, "short")]
+    [InlineData("xs:negativeInteger", 3, 4, "short")]
+    [InlineData("xs:nonPositiveInteger", 3, 4, "short")]
+    [InlineData("xs:positiveInteger", 5, 9, "uint")]
+    [InlineData("xs:nonNegativeInteger", 5, 9, "uint")]
+    [InlineData("xs:integer", 5, 9, "int")]
+    [InlineData("xs:negativeInteger", 5, 9, "int")]
+    [InlineData("xs:nonPositiveInteger", 5, 9, "int")]
+    [InlineData("xs:positiveInteger", 10, 19, "ulong")]
+    [InlineData("xs:nonNegativeInteger", 10, 19, "ulong")]
+    [InlineData("xs:integer", 10, 18, "long")]
+    [InlineData("xs:negativeInteger", 10, 18, "long")]
+    [InlineData("xs:nonPositiveInteger", 10, 18, "long")]
+    [InlineData("xs:positiveInteger", 20, 29, "decimal")]
+    [InlineData("xs:nonNegativeInteger", 20, 29, "decimal")]
+    [InlineData("xs:integer", 20, 28, "decimal")]
+    [InlineData("xs:negativeInteger", 20, 28, "decimal")]
+    [InlineData("xs:nonPositiveInteger", 20, 28, "decimal")]
+    public void RestrictedIntegerDerivedTypesAreMappedToExpectedCSharpTypes(string restrictionBase, int totalDigitsRangeFrom, int totalDigitsRangeTo, string expectedTypeName)
+    {
+        const string xsdTemplate = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
     <xs:complexType name=""root"">
         <xs:sequence>
@@ -1766,9 +1766,9 @@ namespace Test
     {1}
 </xs:schema>";
 
-            const string elementTemplate = @"<xs:element name=""restrictedInteger{0}"" type=""RestrictedInteger{0}""/>";
+        const string elementTemplate = @"<xs:element name=""restrictedInteger{0}"" type=""RestrictedInteger{0}""/>";
 
-            const string simpleTypeTemplate = @"
+        const string simpleTypeTemplate = @"
 <xs:simpleType name=""RestrictedInteger{1}"">
 	<xs:restriction base=""{0}"">
 		<xs:totalDigits value=""{1}""/>
@@ -1776,35 +1776,35 @@ namespace Test
 </xs:simpleType>
 ";
 
-            string elementDefinitions = "", simpleTypeDefinitions = "";
-            for (var i = totalDigitsRangeFrom; i <= totalDigitsRangeTo; i++)
-            {
-                elementDefinitions += string.Format(elementTemplate, i);
-                simpleTypeDefinitions += string.Format(simpleTypeTemplate, restrictionBase, i);
-            }
-
-            var xsd = string.Format(xsdTemplate, elementDefinitions, simpleTypeDefinitions);
-            var generatedType = ConvertXml(nameof(RestrictedIntegerDerivedTypesAreMappedToExpectedCSharpTypes), xsd,
-                new Generator
-                {
-                    NamespaceProvider = new NamespaceProvider
-                    {
-                        GenerateNamespace = key => "Test",
-                    },
-                    GenerateNullables = true,
-                    NamingScheme = NamingScheme.PascalCase,
-                }).First();
-
-            for (var i = totalDigitsRangeFrom; i <= totalDigitsRangeTo; i++)
-            {
-                Assert.Contains($"public {expectedTypeName} RestrictedInteger{i}", generatedType);
-            }
+        string elementDefinitions = "", simpleTypeDefinitions = "";
+        for (var i = totalDigitsRangeFrom; i <= totalDigitsRangeTo; i++)
+        {
+            elementDefinitions += string.Format(elementTemplate, i);
+            simpleTypeDefinitions += string.Format(simpleTypeTemplate, restrictionBase, i);
         }
 
-        [Fact]
-        public void EnumWithNonUniqueEntriesTest()
+        var xsd = string.Format(xsdTemplate, elementDefinitions, simpleTypeDefinitions);
+        var generatedType = ConvertXml(nameof(RestrictedIntegerDerivedTypesAreMappedToExpectedCSharpTypes), xsd,
+            new Generator
+            {
+                NamespaceProvider = new NamespaceProvider
+                {
+                    GenerateNamespace = key => "Test",
+                },
+                GenerateNullables = true,
+                NamingScheme = NamingScheme.PascalCase,
+            }).First();
+
+        for (var i = totalDigitsRangeFrom; i <= totalDigitsRangeTo; i++)
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            Assert.Contains($"public {expectedTypeName} RestrictedInteger{i}", generatedType);
+        }
+    }
+
+    [Fact]
+    public void EnumWithNonUniqueEntriesTest()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 				<xs:simpleType name=""TestEnum"">
 					<xs:restriction base=""xs:string"">
@@ -1816,36 +1816,36 @@ namespace Test
 				</xs:simpleType>
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(EnumWithNonUniqueEntriesTest), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(EnumWithNonUniqueEntriesTest), content);
-            var durationEnumType = assembly.GetType("Test.TestEnum");
-            Assert.NotNull(durationEnumType);
-
-            var expectedEnumValues = new[] {"TestCase", "TestCase1", "TestCase2", "TestCase3"};
-            var enumValues = durationEnumType.GetEnumNames().OrderBy(n => n).ToList();
-            Assert.Equal(expectedEnumValues, enumValues);
-
-            var mEnumValue = durationEnumType.GetMembers().First(mi => mi.Name == "TestCase1");
-            var xmlEnumAttribute = mEnumValue.GetCustomAttributes<XmlEnumAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlEnumAttribute);
-            Assert.Equal("test_Case", xmlEnumAttribute.Name);
-        }
-
-        [Fact]
-        public void RenameInterfacePropertyInDerivedClassTest()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(EnumWithNonUniqueEntriesTest), xsd, generator);
+        var content = Assert.Single(contents);
+
+        var assembly = Compiler.Compile(nameof(EnumWithNonUniqueEntriesTest), content);
+        var durationEnumType = assembly.GetType("Test.TestEnum");
+        Assert.NotNull(durationEnumType);
+
+        var expectedEnumValues = new[] {"TestCase", "TestCase1", "TestCase2", "TestCase3"};
+        var enumValues = durationEnumType.GetEnumNames().OrderBy(n => n).ToList();
+        Assert.Equal(expectedEnumValues, enumValues);
+
+        var mEnumValue = durationEnumType.GetMembers().First(mi => mi.Name == "TestCase1");
+        var xmlEnumAttribute = mEnumValue.GetCustomAttributes<XmlEnumAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlEnumAttribute);
+        Assert.Equal("test_Case", xmlEnumAttribute.Name);
+    }
+
+    [Fact]
+    public void RenameInterfacePropertyInDerivedClassTest()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -1889,42 +1889,42 @@ namespace Test
 
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(RenameInterfacePropertyInDerivedClassTest), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(RenameInterfacePropertyInDerivedClassTest), content);
-            var classType = assembly.GetType("Test.ClassItem");
-            Assert.NotNull(classType);
-            Assert.Single(classType.GetProperties());
-            Assert.Equal("ClassItemBaseProperty", classType.GetProperties().First().Name);
-
-            var level1Interface = assembly.GetType("Test.ILevel1");
-            Assert.NotNull(level1Interface);
-            Assert.Empty(level1Interface.GetProperties());
-
-            var level2Interface = assembly.GetType("Test.ILevel1");
-            Assert.NotNull(level2Interface);
-            Assert.Empty(level2Interface.GetProperties());
-
-            var level3Interface = assembly.GetType("Test.ILevel3");
-            Assert.NotNull(level3Interface);
-            Assert.Single(level3Interface.GetProperties());
-            Assert.Equal("ClassItemBaseProperty", level3Interface.GetProperties().First().Name);
-        }
-
-        [Fact]
-        public void RefTypesGetNoXmlElementAttributeTest()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""utf-16""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(RenameInterfacePropertyInDerivedClassTest), xsd, generator);
+        var content = Assert.Single(contents);
+
+        var assembly = Compiler.Compile(nameof(RenameInterfacePropertyInDerivedClassTest), content);
+        var classType = assembly.GetType("Test.ClassItem");
+        Assert.NotNull(classType);
+        Assert.Single(classType.GetProperties());
+        Assert.Equal("ClassItemBaseProperty", classType.GetProperties().First().Name);
+
+        var level1Interface = assembly.GetType("Test.ILevel1");
+        Assert.NotNull(level1Interface);
+        Assert.Empty(level1Interface.GetProperties());
+
+        var level2Interface = assembly.GetType("Test.ILevel1");
+        Assert.NotNull(level2Interface);
+        Assert.Empty(level2Interface.GetProperties());
+
+        var level3Interface = assembly.GetType("Test.ILevel3");
+        Assert.NotNull(level3Interface);
+        Assert.Single(level3Interface.GetProperties());
+        Assert.Equal("ClassItemBaseProperty", level3Interface.GetProperties().First().Name);
+    }
+
+    [Fact]
+    public void RefTypesGetNoXmlElementAttributeTest()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <xs:schema xmlns=""SampleNamespace"" targetNamespace=""SampleNamespace"" version=""1.0"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
   <xs:element name=""SampleRoot"">
     <xs:complexType>
@@ -1949,33 +1949,33 @@ namespace Test
   </xs:element>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(RefTypesGetNoXmlElementAttributeTest), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(RefTypesGetNoXmlElementAttributeTest), content);
-            var classType = assembly.GetType("Test.SampleRoot");
-            Assert.NotNull(classType);
-
-            var directProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "Direct"));
-            Assert.Equal(XmlSchemaForm.Unqualified, directProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
-
-            var viaRefProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "ViaRef"));
-            Assert.Equal(XmlSchemaForm.None, viaRefProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
-        }
-
-        [Fact]
-        public void DoNotGenerateSamePropertiesInDerivedInterfacesClassTest()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(RefTypesGetNoXmlElementAttributeTest), xsd, generator);
+        var content = Assert.Single(contents);
+
+        var assembly = Compiler.Compile(nameof(RefTypesGetNoXmlElementAttributeTest), content);
+        var classType = assembly.GetType("Test.SampleRoot");
+        Assert.NotNull(classType);
+
+        var directProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "Direct"));
+        Assert.Equal(XmlSchemaForm.Unqualified, directProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
+
+        var viaRefProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "ViaRef"));
+        Assert.Equal(XmlSchemaForm.None, viaRefProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
+    }
+
+    [Fact]
+    public void DoNotGenerateSamePropertiesInDerivedInterfacesClassTest()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2017,45 +2017,45 @@ namespace Test
 
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                GenerateInterfaces = true,
-                AssemblyVisible = true
-            };
-            var contents = ConvertXml(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), content);
-
-            var listType = assembly.GetType("Test.ParentClass");
-            Assert.NotNull(listType);
-
-            var listTypePropertyInfo = listType.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
-            Assert.NotNull(listTypePropertyInfo);
-
-            var level1Interface = assembly.GetType("Test.ILevel1");
-            Assert.NotNull(level1Interface);
-            Assert.Empty(level1Interface.GetProperties());
-
-            var level2Interface = assembly.GetType("Test.ILevel2");
-            Assert.NotNull(level2Interface);
-            Assert.Empty(level2Interface.GetProperties());
-
-            var level3Interface = assembly.GetType("Test.ILevel3");
-            Assert.NotNull(level3Interface);
-            var level3InterfacePropertyInfo = level3Interface.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
-            Assert.NotNull(level3InterfacePropertyInfo);
-
-        }
-
-        [Fact]
-        public void NillableWithDefaultValueTest()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            GenerateInterfaces = true,
+            AssemblyVisible = true
+        };
+        var contents = ConvertXml(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), xsd, generator);
+        var content = Assert.Single(contents);
+
+        var assembly = Compiler.Compile(nameof(DoNotGenerateSamePropertiesInDerivedInterfacesClassTest), content);
+
+        var listType = assembly.GetType("Test.ParentClass");
+        Assert.NotNull(listType);
+
+        var listTypePropertyInfo = listType.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
+        Assert.NotNull(listTypePropertyInfo);
+
+        var level1Interface = assembly.GetType("Test.ILevel1");
+        Assert.NotNull(level1Interface);
+        Assert.Empty(level1Interface.GetProperties());
+
+        var level2Interface = assembly.GetType("Test.ILevel2");
+        Assert.NotNull(level2Interface);
+        Assert.Empty(level2Interface.GetProperties());
+
+        var level3Interface = assembly.GetType("Test.ILevel3");
+        Assert.NotNull(level3Interface);
+        var level3InterfacePropertyInfo = level3Interface.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
+        Assert.NotNull(level3InterfacePropertyInfo);
+
+    }
+
+    [Fact]
+    public void NillableWithDefaultValueTest()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2067,41 +2067,41 @@ namespace Test
 
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-            var contents = ConvertXml(nameof(NillableWithDefaultValueTest), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(NillableWithDefaultValueTest), content);
-
-            var testType = assembly.GetType("Test.TestType");
-            Assert.NotNull(testType);
-
-            var propertyInfo = testType.GetProperties().FirstOrDefault(p => p.Name == "IntProperty");
-            Assert.NotNull(propertyInfo);
-            var testTypeInstance = Activator.CreateInstance(testType);
-            var propertyDefaultValue = propertyInfo.GetValue(testTypeInstance);
-            Assert.IsType<int>(propertyDefaultValue);
-            Assert.Equal(9000, propertyDefaultValue);
-
-            propertyInfo.SetValue(testTypeInstance, null);
-            var serializer = new XmlSerializer(testType);
-
-            var serializedXml = SharedTestFunctions.Serialize(serializer, testTypeInstance);
-            Assert.Contains(
-                @":nil=""true""",
-                serializedXml);
-        }
-
-        [Fact]
-        public void GenerateXmlRootAttributeForEnumTest()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        };
+        var contents = ConvertXml(nameof(NillableWithDefaultValueTest), xsd, generator);
+        var content = Assert.Single(contents);
+
+        var assembly = Compiler.Compile(nameof(NillableWithDefaultValueTest), content);
+
+        var testType = assembly.GetType("Test.TestType");
+        Assert.NotNull(testType);
+
+        var propertyInfo = testType.GetProperties().FirstOrDefault(p => p.Name == "IntProperty");
+        Assert.NotNull(propertyInfo);
+        var testTypeInstance = Activator.CreateInstance(testType);
+        var propertyDefaultValue = propertyInfo.GetValue(testTypeInstance);
+        Assert.IsType<int>(propertyDefaultValue);
+        Assert.Equal(9000, propertyDefaultValue);
+
+        propertyInfo.SetValue(testTypeInstance, null);
+        var serializer = new XmlSerializer(testType);
+
+        var serializedXml = SharedTestFunctions.Serialize(serializer, testTypeInstance);
+        Assert.Contains(
+            @":nil=""true""",
+            serializedXml);
+    }
+
+    [Fact]
+    public void GenerateXmlRootAttributeForEnumTest()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://test.namespace""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2115,30 +2115,30 @@ namespace Test
 
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-            var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd, generator);
-            var content = Assert.Single(contents);
-
-            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content);
-
-            var testType = assembly.GetType("Test.EnumTestType");
-            Assert.NotNull(testType);
-            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
-            Assert.Equal("http://test.namespace", xmlRootAttribute.Namespace);
-        }
-
-        [Fact]
-        public void AmbiguousTypesTest()
+        var generator = new Generator
         {
-            const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            }
+        };
+        var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd, generator);
+        var content = Assert.Single(contents);
+
+        var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content);
+
+        var testType = assembly.GetType("Test.EnumTestType");
+        Assert.NotNull(testType);
+        var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+        Assert.Equal("http://test.namespace", xmlRootAttribute.Namespace);
+    }
+
+    [Fact]
+    public void AmbiguousTypesTest()
+    {
+        const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2151,7 +2151,7 @@ namespace Test
 	            </xs:element>
 
             </xs:schema>";
-            const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS2""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2164,39 +2164,39 @@ namespace Test
 	            </xs:element>
 
             </xs:schema>";
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key =>key.XmlSchemaNamespace
-                }
-            };
-            var contents1 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd1, generator);
-            var contents2 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd2, generator);
-            var content1 = Assert.Single(contents1);
-            var content2 = Assert.Single(contents2);
-
-            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content1, content2);
-
-            var testType = assembly.GetType("Test_NS1.EnumTestType");
-            Assert.NotNull(testType);
-            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
-
-            testType = assembly.GetType("Test_NS2.EnumTestType");
-            Assert.NotNull(testType);
-            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
-        }
-
-        [Fact]
-        public void AmbiguousAnonymousTypesTest()
+        var generator = new Generator
         {
-            const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key =>key.XmlSchemaNamespace
+            }
+        };
+        var contents1 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd1, generator);
+        var contents2 = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), xsd2, generator);
+        var content1 = Assert.Single(contents1);
+        var content2 = Assert.Single(contents2);
+
+        var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), content1, content2);
+
+        var testType = assembly.GetType("Test_NS1.EnumTestType");
+        Assert.NotNull(testType);
+        var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+
+        testType = assembly.GetType("Test_NS2.EnumTestType");
+        Assert.NotNull(testType);
+        xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("EnumTestType", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+    }
+
+    [Fact]
+    public void AmbiguousAnonymousTypesTest()
+    {
+        const string xsd1 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2225,7 +2225,7 @@ namespace Test
 	            </xs:complexType>
 
             </xs:schema>";
-            const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+        const string xsd2 = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS2""
                 elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
 
@@ -2254,62 +2254,62 @@ namespace Test
 	            </xs:complexType>
 
             </xs:schema>";
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key =>key.XmlSchemaNamespace
-                }
-            };
-            var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), new[]{xsd1, xsd2}, generator).ToArray();
-            Assert.Equal(2, contents.Length);
-
-            var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), contents);
-
-            var testType = assembly.GetType("Test_NS1.TestType");
-            Assert.NotNull(testType);
-            var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("TestType", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
-            testType = assembly.GetType("Test_NS1.TestTypeProperty");
-            Assert.NotNull(testType);
-            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("TestTypeProperty", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
-            testType = assembly.GetType("Test_NS1.TestType2Property");
-            Assert.NotNull(testType);
-            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
-
-
-            testType = assembly.GetType("Test_NS2.TestType");
-            Assert.NotNull(testType);
-            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("TestType", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
-            testType = assembly.GetType("Test_NS2.TestTypeProperty");
-            Assert.NotNull(testType);
-            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("TestTypeProperty", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
-            testType = assembly.GetType("Test_NS2.TestType2Property");
-            Assert.NotNull(testType);
-            xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
-            Assert.NotNull(xmlRootAttribute);
-            Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
-            Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
-        }
-
-        [Fact]
-        public void TestShouldPatternForCollections()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key =>key.XmlSchemaNamespace
+            }
+        };
+        var contents = ConvertXml(nameof(GenerateXmlRootAttributeForEnumTest), [xsd1, xsd2], generator).ToArray();
+        Assert.Equal(2, contents.Length);
+
+        var assembly = Compiler.Compile(nameof(GenerateXmlRootAttributeForEnumTest), contents);
+
+        var testType = assembly.GetType("Test_NS1.TestType");
+        Assert.NotNull(testType);
+        var xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("TestType", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+        testType = assembly.GetType("Test_NS1.TestTypeProperty");
+        Assert.NotNull(testType);
+        xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("TestTypeProperty", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+        testType = assembly.GetType("Test_NS1.TestType2Property");
+        Assert.NotNull(testType);
+        xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS1", xmlRootAttribute.Namespace);
+
+
+        testType = assembly.GetType("Test_NS2.TestType");
+        Assert.NotNull(testType);
+        xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("TestType", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+        testType = assembly.GetType("Test_NS2.TestTypeProperty");
+        Assert.NotNull(testType);
+        xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("TestTypeProperty", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+        testType = assembly.GetType("Test_NS2.TestType2Property");
+        Assert.NotNull(testType);
+        xmlRootAttribute = testType.GetCustomAttributes<XmlRootAttribute>().FirstOrDefault();
+        Assert.NotNull(xmlRootAttribute);
+        Assert.Equal("TestType2Property", xmlRootAttribute.ElementName);
+        Assert.Equal("Test_NS2", xmlRootAttribute.Namespace);
+    }
+
+    [Fact]
+    public void TestShouldPatternForCollections()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
             elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
             <xs:element name=""TestType"">
@@ -2328,27 +2328,27 @@ namespace Test
             </xs:element>
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => key.XmlSchemaNamespace
-                }
-            };
-
-            var contents = ConvertXml(nameof(TestShouldPatternForCollections), xsd, generator).ToArray();
-            Assert.Single(contents);
-            var assembly = Compiler.Compile(nameof(TestShouldPatternForCollections), contents);
-            var testType = assembly.GetType("Test_NS1.TestType");
-            var serializer = new XmlSerializer(testType);
-            Assert.NotNull(serializer);
-        }
-
-
-        [Fact]
-        public void TestDoNotForceIsNullableGeneration()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => key.XmlSchemaNamespace
+            }
+        };
+
+        var contents = ConvertXml(nameof(TestShouldPatternForCollections), xsd, generator).ToArray();
+        Assert.Single(contents);
+        var assembly = Compiler.Compile(nameof(TestShouldPatternForCollections), contents);
+        var testType = assembly.GetType("Test_NS1.TestType");
+        var serializer = new XmlSerializer(testType);
+        Assert.NotNull(serializer);
+    }
+
+
+    [Fact]
+    public void TestDoNotForceIsNullableGeneration()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
             elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
             <xs:element name=""TestType"">
@@ -2362,42 +2362,42 @@ namespace Test
             </xs:element>
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => key.XmlSchemaNamespace
-                },
-                DoNotForceIsNullable = true
-            };
-
-            var contents = ConvertXml(nameof(TestDoNotForceIsNullableGeneration), xsd, generator).ToArray();
-            Assert.Single(contents);
-            var assembly = Compiler.Compile(nameof(TestDoNotForceIsNullableGeneration), contents);
-            var testType = assembly.GetType("Test_NS1.TestType");
-            var serializer = new XmlSerializer(testType);
-            Assert.NotNull(serializer);
-
-            var prop = testType.GetProperty("StringProperty");
-            Assert.NotNull(prop);
-            var xmlElementAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
-            Assert.False(xmlElementAttribute.IsNullable);
-
-            prop = testType.GetProperty("StringNullableProperty");
-            Assert.NotNull(prop);
-            var xmlElementNullableAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
-            Assert.True(xmlElementNullableAttribute.IsNullable);
-
-            prop = testType.GetProperty("StringNullableProperty2");
-            Assert.NotNull(prop);
-            var xmlElementNullableAttribute2 = prop.GetCustomAttribute<XmlElementAttribute>();
-            Assert.True(xmlElementNullableAttribute2.IsNullable);
-        }
-
-        [Fact]
-        public void TestForceIsNullableGeneration()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => key.XmlSchemaNamespace
+            },
+            DoNotForceIsNullable = true
+        };
+
+        var contents = ConvertXml(nameof(TestDoNotForceIsNullableGeneration), xsd, generator).ToArray();
+        Assert.Single(contents);
+        var assembly = Compiler.Compile(nameof(TestDoNotForceIsNullableGeneration), contents);
+        var testType = assembly.GetType("Test_NS1.TestType");
+        var serializer = new XmlSerializer(testType);
+        Assert.NotNull(serializer);
+
+        var prop = testType.GetProperty("StringProperty");
+        Assert.NotNull(prop);
+        var xmlElementAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
+        Assert.False(xmlElementAttribute.IsNullable);
+
+        prop = testType.GetProperty("StringNullableProperty");
+        Assert.NotNull(prop);
+        var xmlElementNullableAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
+        Assert.True(xmlElementNullableAttribute.IsNullable);
+
+        prop = testType.GetProperty("StringNullableProperty2");
+        Assert.NotNull(prop);
+        var xmlElementNullableAttribute2 = prop.GetCustomAttribute<XmlElementAttribute>();
+        Assert.True(xmlElementNullableAttribute2.IsNullable);
+    }
+
+    [Fact]
+    public void TestForceIsNullableGeneration()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
             <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""Test_NS1""
             elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
             <xs:element name=""TestType"">
@@ -2411,45 +2411,45 @@ namespace Test
             </xs:element>
             </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => key.XmlSchemaNamespace
-                },
-                DoNotForceIsNullable = false
-            };
-
-            var contents = ConvertXml(nameof(TestForceIsNullableGeneration), xsd, generator).ToArray();
-            Assert.Single(contents);
-            var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
-            var testType = assembly.GetType("Test_NS1.TestType");
-            var serializer = new XmlSerializer(testType);
-            Assert.NotNull(serializer);
-
-            var prop = testType.GetProperty("StringProperty");
-            Assert.NotNull(prop);
-            var xmlElementAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
-            Assert.True(xmlElementAttribute.IsNullable);
-
-            prop = testType.GetProperty("StringNullableProperty");
-            Assert.NotNull(prop);
-            var xmlElementNullableAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
-            Assert.True(xmlElementNullableAttribute.IsNullable);
-
-            prop = testType.GetProperty("StringNullableProperty2");
-            Assert.NotNull(prop);
-            var xmlElementNullableAttribute2 = prop.GetCustomAttribute<XmlElementAttribute>();
-            Assert.True(xmlElementNullableAttribute2.IsNullable);
-        }
-
-        [Fact]
-        public void TestArrayOfMsTypeGeneration()
+        var generator = new Generator
         {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/214
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => key.XmlSchemaNamespace
+            },
+            DoNotForceIsNullable = false
+        };
 
-            var xsd0 =
-                @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" targetNamespace=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" elementFormDefault=""qualified"">
+        var contents = ConvertXml(nameof(TestForceIsNullableGeneration), xsd, generator).ToArray();
+        Assert.Single(contents);
+        var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
+        var testType = assembly.GetType("Test_NS1.TestType");
+        var serializer = new XmlSerializer(testType);
+        Assert.NotNull(serializer);
+
+        var prop = testType.GetProperty("StringProperty");
+        Assert.NotNull(prop);
+        var xmlElementAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
+        Assert.True(xmlElementAttribute.IsNullable);
+
+        prop = testType.GetProperty("StringNullableProperty");
+        Assert.NotNull(prop);
+        var xmlElementNullableAttribute = prop.GetCustomAttribute<XmlElementAttribute>();
+        Assert.True(xmlElementNullableAttribute.IsNullable);
+
+        prop = testType.GetProperty("StringNullableProperty2");
+        Assert.NotNull(prop);
+        var xmlElementNullableAttribute2 = prop.GetCustomAttribute<XmlElementAttribute>();
+        Assert.True(xmlElementNullableAttribute2.IsNullable);
+    }
+
+    [Fact]
+    public void TestArrayOfMsTypeGeneration()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/214
+
+        var xsd0 =
+            @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" targetNamespace=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" elementFormDefault=""qualified"">
             <xs:complexType name=""ArrayOfstring"">
                 <xs:sequence>
 	                <xs:element name=""string"" type=""xs:string"" nillable=""true"" minOccurs=""0"" maxOccurs=""unbounded""/>
@@ -2458,8 +2458,8 @@ namespace Test
             <xs:element name=""ArrayOfstring"" type=""tns:ArrayOfstring"" nillable=""true""/>
         </xs:schema>
         ";
-            var xsd1 =
-                @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:q1=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" elementFormDefault=""qualified"">
+        var xsd1 =
+            @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:q1=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"" elementFormDefault=""qualified"">
             <xs:import namespace=""http://schemas.microsoft.com/2003/10/Serialization/Arrays""/>
             <xs:complexType name=""c_ai"">
                 <xs:sequence>
@@ -2475,8 +2475,8 @@ namespace Test
             <xs:element name=""c_ai"" type=""c_ai"" nillable=""true""/>
         </xs:schema>
         ";
-            var validXml =
-                @"<c_ai xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+        var validXml =
+            @"<c_ai xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
             <d>
                 <tns:string>String</tns:string>
                 <tns:string>String</tns:string>
@@ -2484,30 +2484,30 @@ namespace Test
             </d>
         </c_ai>
         ";
-            var generator = new Generator
-            {
-                IntegerDataType = typeof(int),
-                NamespacePrefix = "TestNS1",
-                GenerateNullables = true,
-                CollectionType = typeof(System.Collections.Generic.List<>)
-            };
-            var contents = ConvertXml(nameof(TestArrayOfMsTypeGeneration), new[] { xsd0, xsd1 }, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
-            var testType = assembly.GetType("TestNS1.CAi");
-            var serializer = new XmlSerializer(testType);
-            Assert.NotNull(serializer);
-            dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
-            //Assert.NotEmpty((System.Collections.IEnumerable)deserialized.D);  //<== oops
-        }
-
-        [Fact]
-        public void TestArrayOfStringsWhenPublicAndNull()
+        var generator = new Generator
         {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/282
+            IntegerDataType = typeof(int),
+            NamespacePrefix = "TestNS1",
+            GenerateNullables = true,
+            CollectionType = typeof(System.Collections.Generic.List<>)
+        };
+        var contents = ConvertXml(nameof(TestArrayOfMsTypeGeneration), [xsd0, xsd1], generator).ToArray();
+        var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
+        var testType = assembly.GetType("TestNS1.CAi");
+        var serializer = new XmlSerializer(testType);
+        Assert.NotNull(serializer);
+        dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
+        //Assert.NotEmpty((System.Collections.IEnumerable)deserialized.D);  //<== oops
+    }
 
-            // arrange
-            var xsd =
-                @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+    [Fact]
+    public void TestArrayOfStringsWhenPublicAndNull()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/282
+
+        // arrange
+        var xsd =
+            @"<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
                     <xs:complexType name=""ArrayOfstring"">
                         <xs:sequence>
                              <xs:element name=""testString"" type=""xs:string"" minOccurs=""0"" maxOccurs=""unbounded""/>
@@ -2515,258 +2515,258 @@ namespace Test
                     </xs:complexType>
                 </xs:schema>
                 ";
-            var validXml =
-                @"<ArrayOfstring xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
+        var validXml =
+            @"<ArrayOfstring xmlns:tns=""http://schemas.microsoft.com/2003/10/Serialization/Arrays"">
                 </ArrayOfstring>
                 ";
-            var generator = new Generator
-            {
-                IntegerDataType = typeof(int),
-                NamespacePrefix = "Test_NS1",
-                GenerateNullables = true,
-                CollectionType = typeof(System.Array),
-                CollectionSettersMode = CollectionSettersMode.Public
-            };
-            var contents = ConvertXml(nameof(TestArrayOfStringsWhenPublicAndNull), new[] { xsd }, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
-            var testType = assembly.GetType("Test_NS1.ArrayOfstring");
-            Assert.NotNull(testType);
-            var serializer = new XmlSerializer(testType);
-
-            // act
-            dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
-            var xml = SharedTestFunctions.Serialize(serializer, deserialized);
-
-            // assert
-            Assert.NotNull(xml);
-        }
-
-        [Fact, TestPriority(1)]
-        public void AirspaceServicesTest1()
+        var generator = new Generator
         {
-            var outputPath = Path.Combine("output", "aixm");
+            IntegerDataType = typeof(int),
+            NamespacePrefix = "Test_NS1",
+            GenerateNullables = true,
+            CollectionType = typeof(System.Array),
+            CollectionSettersMode = CollectionSettersMode.Public
+        };
+        var contents = ConvertXml(nameof(TestArrayOfStringsWhenPublicAndNull), [xsd], generator).ToArray();
+        var assembly = Compiler.Compile(nameof(TestForceIsNullableGeneration), contents);
+        var testType = assembly.GetType("Test_NS1.ArrayOfstring");
+        Assert.NotNull(testType);
+        var serializer = new XmlSerializer(testType);
 
-            string xlink = "http://www.w3.org/1999/xlink";
-            string gml3 = "http://www.opengis.net/gml/3.2";
-            string gts = "http://www.isotc211.org/2005/gts";
-            string gss = "http://www.isotc211.org/2005/gss";
-            string gsr = "http://www.isotc211.org/2005/gsr";
-            string gmd = "http://www.isotc211.org/2005/gmd";
-            string gco = "http://www.isotc211.org/2005/gco";
+        // act
+        dynamic deserialized = serializer.Deserialize(new StringReader(validXml));
+        var xml = SharedTestFunctions.Serialize(serializer, deserialized);
 
-            string fixmBase = "http://www.fixm.aero/base/4.1";
-            string fixmFlight = "http://www.fixm.aero/flight/4.1";
-            string fixmNm = "http://www.fixm.aero/nm/1.2";
-            string fixmMessaging = "http://www.fixm.aero/messaging/4.1";
+        // assert
+        Assert.NotNull(xml);
+    }
 
-            string adr = "http://www.aixm.aero/schema/5.1.1/extensions/EUR/ADR";
-            string aixmV511 = "http://www.aixm.aero/schema/5.1.1";
+    [Fact, TestPriority(1)]
+    public void AirspaceServicesTest1()
+    {
+        var outputPath = Path.Combine("output", "aixm");
 
-            string adrmessage = "http://www.eurocontrol.int/cfmu/b2b/ADRMessage";
+        string xlink = "http://www.w3.org/1999/xlink";
+        string gml3 = "http://www.opengis.net/gml/3.2";
+        string gts = "http://www.isotc211.org/2005/gts";
+        string gss = "http://www.isotc211.org/2005/gss";
+        string gsr = "http://www.isotc211.org/2005/gsr";
+        string gmd = "http://www.isotc211.org/2005/gmd";
+        string gco = "http://www.isotc211.org/2005/gco";
 
-            var _xsdToCsharpNsMap = new Dictionary<NamespaceKey, string>
+        string fixmBase = "http://www.fixm.aero/base/4.1";
+        string fixmFlight = "http://www.fixm.aero/flight/4.1";
+        string fixmNm = "http://www.fixm.aero/nm/1.2";
+        string fixmMessaging = "http://www.fixm.aero/messaging/4.1";
+
+        string adr = "http://www.aixm.aero/schema/5.1.1/extensions/EUR/ADR";
+        string aixmV511 = "http://www.aixm.aero/schema/5.1.1";
+
+        string adrmessage = "http://www.eurocontrol.int/cfmu/b2b/ADRMessage";
+
+        var _xsdToCsharpNsMap = new Dictionary<NamespaceKey, string>
+        {
+            { new NamespaceKey(), "other" },
+            { new NamespaceKey(xlink), "org.w3._1999.xlink" },
+            { new NamespaceKey(gts), "org.isotc211._2005.gts" },
+            { new NamespaceKey(gss), "org.isotc211._2005.gss" },
+            { new NamespaceKey(gsr), "org.isotc211._2005.gsr" },
+            { new NamespaceKey(gmd), "org.isotc211._2005.gmd" },
+            { new NamespaceKey(gco), "org.isotc211._2005.gco" },
+            { new NamespaceKey(gml3), "net.opengis.gml._3" },
+            { new NamespaceKey(aixmV511), "aero.aixm.v5_1_1" },
+            { new NamespaceKey(fixmNm), "aero.fixm.v4_1_0.nm.v1_2" },
+            { new NamespaceKey(fixmMessaging), "aero.fixm.v4_1_0.messaging" },
+            { new NamespaceKey(fixmFlight), "aero.fixm.v4_1_0.flight" },
+            { new NamespaceKey(fixmBase), "aero.fixm.v4_1_0.base" },
+            { new NamespaceKey(adr), "aero.aixm.schema._5_1_1.extensions.eur.adr" },
+            { new NamespaceKey(adrmessage), "_int.eurocontrol.cfmu.b2b.adrmessage" }
+        };
+
+        var gen = new Generator
+        {
+            OutputFolder = outputPath,
+            NamespaceProvider = _xsdToCsharpNsMap.ToNamespaceProvider(),
+            CollectionSettersMode = CollectionSettersMode.Public,
+            SeparateSubstitutes = true,
+            GenerateInterfaces = false,
+            EmitOrder = true
+        };
+        var xsdFiles = new[]
+        {
+            "AIXM_AbstractGML_ObjectTypes.xsd",
+            "AIXM_DataTypes.xsd",
+            "AIXM_Features.xsd",
+            Path.Combine("extensions", "ADR-23.5.0", "ADR_DataTypes.xsd"),
+            Path.Combine("extensions", "ADR-23.5.0", "ADR_Features.xsd"),
+            Path.Combine("message", "ADR_Message.xsd"),
+            Path.Combine("message", "AIXM_BasicMessage.xsd"),
+        }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "aixm", "aixm-5.1.1", x)).ToList();
+
+        var assembly = Compiler.GenerateFiles("Aixm", xsdFiles, gen);
+        Assert.NotNull(assembly);
+
+        /*
+        var testFiles = new Dictionary<string, string>
+        {
+            { "airport1.xml", "AirportHeliportType" },
+            { "airportHeliportTimeSlice.xml", "AirportHeliportTimeSliceType" },
+            { "airspace1.xml", "AirspaceType" },
+            { "navaid1.xml", "NavaidType" },
+            { "navaidTimeSlice.xml", "NavaidTimeSliceType" },
+            { "navaidWithAbstractTime.xml", "NavaidWithAbstractTime" },
+            { "navaid.xml", "Navaid" },
+            { "routesegment1.xml", "RouteSegment" },
+            { "timePeriod.xml", "TimePeriod" },
+        };
+
+        foreach (var testFile in testFiles)
+        {
+            var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
+            Assert.NotNull(type);
+
+            var serializer = new XmlSerializer(type);
+            serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
+            var unknownNodeError = false;
+            var unknownAttrError = false;
+
+            void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
             {
-                { new NamespaceKey(), "other" },
-                { new NamespaceKey(xlink), "org.w3._1999.xlink" },
-                { new NamespaceKey(gts), "org.isotc211._2005.gts" },
-                { new NamespaceKey(gss), "org.isotc211._2005.gss" },
-                { new NamespaceKey(gsr), "org.isotc211._2005.gsr" },
-                { new NamespaceKey(gmd), "org.isotc211._2005.gmd" },
-                { new NamespaceKey(gco), "org.isotc211._2005.gco" },
-                { new NamespaceKey(gml3), "net.opengis.gml._3" },
-                { new NamespaceKey(aixmV511), "aero.aixm.v5_1_1" },
-                { new NamespaceKey(fixmNm), "aero.fixm.v4_1_0.nm.v1_2" },
-                { new NamespaceKey(fixmMessaging), "aero.fixm.v4_1_0.messaging" },
-                { new NamespaceKey(fixmFlight), "aero.fixm.v4_1_0.flight" },
-                { new NamespaceKey(fixmBase), "aero.fixm.v4_1_0.base" },
-                { new NamespaceKey(adr), "aero.aixm.schema._5_1_1.extensions.eur.adr" },
-                { new NamespaceKey(adrmessage), "_int.eurocontrol.cfmu.b2b.adrmessage" }
-            };
-
-            var gen = new Generator
-            {
-                OutputFolder = outputPath,
-                NamespaceProvider = _xsdToCsharpNsMap.ToNamespaceProvider(),
-                CollectionSettersMode = CollectionSettersMode.Public,
-                SeparateSubstitutes = true,
-                GenerateInterfaces = false,
-                EmitOrder = true
-            };
-            var xsdFiles = new[]
-            {
-                "AIXM_AbstractGML_ObjectTypes.xsd",
-                "AIXM_DataTypes.xsd",
-                "AIXM_Features.xsd",
-                Path.Combine("extensions", "ADR-23.5.0", "ADR_DataTypes.xsd"),
-                Path.Combine("extensions", "ADR-23.5.0", "ADR_Features.xsd"),
-                Path.Combine("message", "ADR_Message.xsd"),
-                Path.Combine("message", "AIXM_BasicMessage.xsd"),
-            }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "aixm", "aixm-5.1.1", x)).ToList();
-
-            var assembly = Compiler.GenerateFiles("Aixm", xsdFiles, gen);
-            Assert.NotNull(assembly);
-
-            /*
-            var testFiles = new Dictionary<string, string>
-            {
-                { "airport1.xml", "AirportHeliportType" },
-                { "airportHeliportTimeSlice.xml", "AirportHeliportTimeSliceType" },
-                { "airspace1.xml", "AirspaceType" },
-                { "navaid1.xml", "NavaidType" },
-                { "navaidTimeSlice.xml", "NavaidTimeSliceType" },
-                { "navaidWithAbstractTime.xml", "NavaidWithAbstractTime" },
-                { "navaid.xml", "Navaid" },
-                { "routesegment1.xml", "RouteSegment" },
-                { "timePeriod.xml", "TimePeriod" },
-            };
-
-            foreach (var testFile in testFiles)
-            {
-                var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
-                Assert.NotNull(type);
-
-                var serializer = new XmlSerializer(type);
-                serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
-                serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
-                var unknownNodeError = false;
-                var unknownAttrError = false;
-
-                void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
-                {
-                    unknownNodeError = true;
-                }
-
-                void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
-                {
-                    unknownAttrError = true;
-                }
-
-                var xmlString = File.ReadAllText($"xml/aixm_tests/{testFile.Key}");
-                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
-
-                var isDeserializable = serializer.CanDeserialize(reader);
-                Assert.True(isDeserializable);
-
-                var deserializedObject = serializer.Deserialize(reader);
-                Assert.False(unknownNodeError);
-                Assert.False(unknownAttrError);
-
-                var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
-
-                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
-                AssertEx.Equal(deserializedObject, deserializedXml);
+                unknownNodeError = true;
             }
-            */
-        }
 
-        [Fact, TestPriority(1)]
-        [UseCulture("en-US")]
-        public void TestNullableReferenceAttributes()
-        {
-            var files = Glob.ExpandNames(NullableReferenceAttributesPattern).OrderByDescending(f => f);
-            var generator = new Generator
+            void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
             {
-                EnableNullableReferenceAttributes = true,
-                UseShouldSerializePattern = true,
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                }
-            };
-            var assembly = Compiler.Generate(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
-            void assertNullable(string typename, bool nullable)
-            {
-                Type c = assembly.GetType(typename);
-                var property = c.GetProperty("Text");
-                var setParameter = property.SetMethod.GetParameters();
-                var getReturnParameter = property.GetMethod.ReturnParameter;
-                var allowNullableAttribute = setParameter.Single().CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(AllowNullAttribute));
-                var maybeNullAttribute = getReturnParameter.CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(MaybeNullAttribute));
-                var hasAllowNullAttribute = allowNullableAttribute != null;
-                var hasMaybeNullAttribute = maybeNullAttribute != null;
-                Assert.Equal(nullable, hasAllowNullAttribute);
-                Assert.Equal(nullable, hasMaybeNullAttribute);
+                unknownAttrError = true;
             }
-            assertNullable("Test.ElementReferenceNullable", true);
-            assertNullable("Test.ElementReferenceList", false);
-            assertNullable("Test.ElementReferenceNonNullable", false);
-            assertNullable("Test.AttributeReferenceNullable", true);
-            assertNullable("Test.AttributeReferenceNonNullable", false);
-            assertNullable("Test.AttributeValueNullableInt", false);
+
+            var xmlString = File.ReadAllText($"xml/aixm_tests/{testFile.Key}");
+            var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
+
+            var isDeserializable = serializer.CanDeserialize(reader);
+            Assert.True(isDeserializable);
+
+            var deserializedObject = serializer.Deserialize(reader);
+            Assert.False(unknownNodeError);
+            Assert.False(unknownAttrError);
+
+            var serializedXml = Serialize(serializer, deserializedObject, GetNamespacesFromSource(xmlString));
+
+            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+            AssertEx.Equal(deserializedObject, deserializedXml);
         }
+        */
+    }
 
-        [Fact, TestPriority(1)]
-        public void TestNetex()
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestNullableReferenceAttributes()
+    {
+        var files = Glob.ExpandNames(NullableReferenceAttributesPattern).OrderByDescending(f => f);
+        var generator = new Generator
         {
-            var outputPath = Path.Combine("output", "netex");
-
-            var gen = new Generator
+            EnableNullableReferenceAttributes = true,
+            UseShouldSerializePattern = true,
+            NamespaceProvider = new NamespaceProvider
             {
-                OutputFolder = outputPath,
-                CollectionSettersMode = CollectionSettersMode.Public,
-                EmitOrder = true,
-                SeparateSubstitutes = true,
-                GenerateInterfaces = false,
-                UniqueTypeNamesAcrossNamespaces = true,
-            };
-            var xsdFiles = new[]
-            {
-                "NeTEx_publication.xsd",
-            }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "netex", x)).ToList();
-
-            var assembly = Compiler.GenerateFiles("Netex", xsdFiles, gen);
-            Assert.NotNull(assembly);
-
-            var testFiles = new Dictionary<string, string>
-            {
-                { "functions/calendar/Netex_calendarCodeing_02.xml", "PublicationDeliveryStructure" },
-            };
-
-            foreach (var testFile in testFiles)
-            {
-                var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
-                Assert.NotNull(type);
-
-                var serializer = new XmlSerializer(type);
-                serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
-                serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
-                var unknownNodeError = false;
-                var unknownAttrError = false;
-
-                void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
-                {
-                    unknownNodeError = true;
-                }
-
-                void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
-                {
-                    unknownAttrError = true;
-                }
-
-                var xmlString = File.ReadAllText($"xml/netex_tests/{testFile.Key}");
-                xmlString = Regex.Replace(xmlString, "xsi:schemaLocation=\"[^\"]*\"", string.Empty);
-                var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
-
-                var isDeserializable = serializer.CanDeserialize(reader);
-                Assert.True(isDeserializable);
-
-                var deserializedObject = serializer.Deserialize(reader);
-                Assert.False(unknownNodeError);
-                Assert.False(unknownAttrError);
-
-                var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
-
-                var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
-                AssertEx.Equal(deserializedObject, deserializedXml);
+                GenerateNamespace = key => "Test"
             }
-        }
-
-        [Theory]
-        [InlineData("fake command line arguments", "fake command line arguments")]
-        [InlineData(null, "N/A")]
-        public void IncludeCommandLineArguments(string commandLineArguments, string expectedCommandLineArguments)
+        };
+        var assembly = Compiler.Generate(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
+        void assertNullable(string typename, bool nullable)
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            Type c = assembly.GetType(typename);
+            var property = c.GetProperty("Text");
+            var setParameter = property.SetMethod.GetParameters();
+            var getReturnParameter = property.GetMethod.ReturnParameter;
+            var allowNullableAttribute = setParameter.Single().CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(AllowNullAttribute));
+            var maybeNullAttribute = getReturnParameter.CustomAttributes.SingleOrDefault(a => a.AttributeType == typeof(MaybeNullAttribute));
+            var hasAllowNullAttribute = allowNullableAttribute != null;
+            var hasMaybeNullAttribute = maybeNullAttribute != null;
+            Assert.Equal(nullable, hasAllowNullAttribute);
+            Assert.Equal(nullable, hasMaybeNullAttribute);
+        }
+        assertNullable("Test.ElementReferenceNullable", true);
+        assertNullable("Test.ElementReferenceList", false);
+        assertNullable("Test.ElementReferenceNonNullable", false);
+        assertNullable("Test.AttributeReferenceNullable", true);
+        assertNullable("Test.AttributeReferenceNonNullable", false);
+        assertNullable("Test.AttributeValueNullableInt", false);
+    }
+
+    [Fact, TestPriority(1)]
+    public void TestNetex()
+    {
+        var outputPath = Path.Combine("output", "netex");
+
+        var gen = new Generator
+        {
+            OutputFolder = outputPath,
+            CollectionSettersMode = CollectionSettersMode.Public,
+            EmitOrder = true,
+            SeparateSubstitutes = true,
+            GenerateInterfaces = false,
+            UniqueTypeNamesAcrossNamespaces = true,
+        };
+        var xsdFiles = new[]
+        {
+            "NeTEx_publication.xsd",
+        }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "netex", x)).ToList();
+
+        var assembly = Compiler.GenerateFiles("Netex", xsdFiles, gen);
+        Assert.NotNull(assembly);
+
+        var testFiles = new Dictionary<string, string>
+        {
+            { "functions/calendar/Netex_calendarCodeing_02.xml", "PublicationDeliveryStructure" },
+        };
+
+        foreach (var testFile in testFiles)
+        {
+            var type = assembly.GetTypes().SingleOrDefault(t => t.Name == testFile.Value);
+            Assert.NotNull(type);
+
+            var serializer = new XmlSerializer(type);
+            serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeHandler);
+            serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeHandler);
+            var unknownNodeError = false;
+            var unknownAttrError = false;
+
+            void UnknownNodeHandler(object sender, XmlNodeEventArgs e)
+            {
+                unknownNodeError = true;
+            }
+
+            void UnknownAttributeHandler(object sender, XmlAttributeEventArgs e)
+            {
+                unknownAttrError = true;
+            }
+
+            var xmlString = File.ReadAllText($"xml/netex_tests/{testFile.Key}");
+            xmlString = Regex.Replace(xmlString, "xsi:schemaLocation=\"[^\"]*\"", string.Empty);
+            var reader = XmlReader.Create(new StringReader(xmlString), new XmlReaderSettings { IgnoreWhitespace = true });
+
+            var isDeserializable = serializer.CanDeserialize(reader);
+            Assert.True(isDeserializable);
+
+            var deserializedObject = serializer.Deserialize(reader);
+            Assert.False(unknownNodeError);
+            Assert.False(unknownAttrError);
+
+            var serializedXml = SharedTestFunctions.Serialize(serializer, deserializedObject, SharedTestFunctions.GetNamespacesFromSource(xmlString));
+
+            var deserializedXml = serializer.Deserialize(new StringReader(serializedXml));
+            AssertEx.Equal(deserializedObject, deserializedXml);
+        }
+    }
+
+    [Theory]
+    [InlineData("fake command line arguments", "fake command line arguments")]
+    [InlineData(null, "N/A")]
+    public void IncludeCommandLineArguments(string commandLineArguments, string expectedCommandLineArguments)
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://local.none"" xmlns:l=""http://local.none"">
 	<xs:element name=""document"" type=""l:elem"" />
 	<xs:complexType name=""elem"">
@@ -2774,23 +2774,23 @@ namespace Test
 	</xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
+        var generator = new Generator
+        {
+            GenerateInterfaces = false,
+            NamespaceProvider = new NamespaceProvider
             {
-                GenerateInterfaces = false,
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                GenerateCommandLineArgumentsComment = true,
-                CommandLineArgumentsProvider = new CommandLineArgumentsProvider(commandLineArguments)
-            };
+                GenerateNamespace = key => "Test"
+            },
+            GenerateCommandLineArgumentsComment = true,
+            CommandLineArgumentsProvider = new CommandLineArgumentsProvider(commandLineArguments)
+        };
 
-            var contents = ConvertXml(nameof(IncludeCommandLineArguments), xsd, generator);
+        var contents = ConvertXml(nameof(IncludeCommandLineArguments), xsd, generator);
 
-            var csharp = Assert.Single(contents);
+        var csharp = Assert.Single(contents);
 
-            CompareOutput(
-                $@"//------------------------------------------------------------------------------
+        CompareOutput(
+            $@"//------------------------------------------------------------------------------
 // <auto-generated>
 //     This code was generated by a tool.
 //
@@ -2818,14 +2818,14 @@ namespace Test
     }}
 }}
 ", csharp);
-        }
+    }
 
-        [Fact]
-        public void TestArrayItemAttribute()
-        {
-            // see https://github.com/mganss/XmlSchemaClassGenerator/issues/313
+    [Fact]
+    public void TestArrayItemAttribute()
+    {
+        // see https://github.com/mganss/XmlSchemaClassGenerator/issues/313
 
-            var xsd =
+        var xsd =
 @"<?xml version=""1.0"" encoding=""UTF-8""?>
 
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema""
@@ -2853,26 +2853,26 @@ namespace Test
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>";
-            var generator = new Generator
-            {
-                IntegerDataType = typeof(int),
-                GenerateNullables = true,
-                CollectionType = typeof(System.Array),
-                CollectionSettersMode = CollectionSettersMode.Public,
-                UseArrayItemAttribute = false
-            };
-            var contents = ConvertXml(nameof(TestArrayItemAttribute), new[] { xsd }, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(TestArrayItemAttribute), contents);
-            var applicationType = assembly.GetType("TestGenerationNamespace.TApplication");
-            Assert.NotNull(applicationType);
-            var optionList = applicationType.GetProperty("OptionList");
-            Assert.Equal("TestGenerationNamespace.TOptionList", optionList.PropertyType.FullName);
-        }
-
-        [Fact]
-        public void CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            IntegerDataType = typeof(int),
+            GenerateNullables = true,
+            CollectionType = typeof(System.Array),
+            CollectionSettersMode = CollectionSettersMode.Public,
+            UseArrayItemAttribute = false
+        };
+        var contents = ConvertXml(nameof(TestArrayItemAttribute), [xsd], generator).ToArray();
+        var assembly = Compiler.Compile(nameof(TestArrayItemAttribute), contents);
+        var applicationType = assembly.GetType("TestGenerationNamespace.TApplication");
+        Assert.NotNull(applicationType);
+        var optionList = applicationType.GetProperty("OptionList");
+        Assert.Equal("TestGenerationNamespace.TOptionList", optionList.PropertyType.FullName);
+    }
+
+    [Fact]
+    public void CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
   <xs:element name=""Element"">
     <xs:complexType>
@@ -2889,33 +2889,33 @@ namespace Test
   </xs:attributeGroup>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateInterfaces = true,
-                CollectionSettersMode = CollectionSettersMode.Private
-            };
-            var contents = ConvertXml(nameof(CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate), xsd, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate), contents);
-
-            var interfaceProperty = assembly.GetType("Test.IAttrGroup")?.GetProperty("Attr");
-            var implementerProperty = assembly.GetType("Test.Element")?.GetProperty("Attr");
-            Assert.NotNull(interfaceProperty);
-            Assert.NotNull(implementerProperty);
-
-            var interfaceHasPublicSetter = interfaceProperty.GetSetMethod() != null;
-            var implementerHasPublicSetter = implementerProperty.GetSetMethod() != null;
-            Assert.False(interfaceHasPublicSetter);
-            Assert.False(implementerHasPublicSetter);
-        }
-
-        [Fact]
-        public void CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateInterfaces = true,
+            CollectionSettersMode = CollectionSettersMode.Private
+        };
+        var contents = ConvertXml(nameof(CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate), xsd, generator).ToArray();
+        var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPrivateIfCollectionSetterModeIsPrivate), contents);
+
+        var interfaceProperty = assembly.GetType("Test.IAttrGroup")?.GetProperty("Attr");
+        var implementerProperty = assembly.GetType("Test.Element")?.GetProperty("Attr");
+        Assert.NotNull(interfaceProperty);
+        Assert.NotNull(implementerProperty);
+
+        var interfaceHasPublicSetter = interfaceProperty.GetSetMethod() != null;
+        var implementerHasPublicSetter = implementerProperty.GetSetMethod() != null;
+        Assert.False(interfaceHasPublicSetter);
+        Assert.False(implementerHasPublicSetter);
+    }
+
+    [Fact]
+    public void CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
   <xs:element name=""Element"">
     <xs:complexType>
@@ -2932,35 +2932,35 @@ namespace Test
   </xs:attributeGroup>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateInterfaces = true,
-                CollectionSettersMode = CollectionSettersMode.Public
-            };
-            var contents = ConvertXml(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), xsd, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), contents);
-
-            var interfaceProperty = assembly.GetType("Test.IAttrGroup")?.GetProperty("Attr");
-            var implementerProperty = assembly.GetType("Test.Element")?.GetProperty("Attr");
-            Assert.NotNull(interfaceProperty);
-            Assert.NotNull(implementerProperty);
-
-            var interfaceHasPublicSetter = interfaceProperty.GetSetMethod() != null;
-            var implementerHasPublicSetter = implementerProperty.GetSetMethod() != null;
-            Assert.True(interfaceHasPublicSetter);
-            Assert.True(implementerHasPublicSetter);
-        }
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void SimpleInterface(bool generateInterface)
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateInterfaces = true,
+            CollectionSettersMode = CollectionSettersMode.Public
+        };
+        var contents = ConvertXml(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), xsd, generator).ToArray();
+        var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), contents);
+
+        var interfaceProperty = assembly.GetType("Test.IAttrGroup")?.GetProperty("Attr");
+        var implementerProperty = assembly.GetType("Test.Element")?.GetProperty("Attr");
+        Assert.NotNull(interfaceProperty);
+        Assert.NotNull(implementerProperty);
+
+        var interfaceHasPublicSetter = interfaceProperty.GetSetMethod() != null;
+        var implementerHasPublicSetter = implementerProperty.GetSetMethod() != null;
+        Assert.True(interfaceHasPublicSetter);
+        Assert.True(implementerHasPublicSetter);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void SimpleInterface(bool generateInterface)
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
   <xs:attributeGroup name=""Common"">
     <xs:attribute name=""name"" type=""xs:string""></xs:attribute>
@@ -2975,37 +2975,37 @@ namespace Test
   </xs:complexType>
 </xs:schema>";
 
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test",
-                },
-                GenerateInterfaces = generateInterface,
-            };
-            var contents = ConvertXml(nameof(SimpleInterface) + $"({generateInterface})", xsd, generator).ToArray();
-            var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), contents);
-
-            var interfaceCommon = assembly.GetType("Test.ICommon");
-            var typeA = assembly.GetType("Test.A");
-            var typeB = assembly.GetType("Test.B");
-            if(generateInterface)
-            {
-                Assert.True(interfaceCommon.IsInterface);
-                Assert.True(interfaceCommon.IsAssignableFrom(typeA));
-                Assert.True(interfaceCommon.IsAssignableFrom(typeB));
-            }
-            else
-            {
-                Assert.Null(interfaceCommon);
-            }
-        }
-
-
-        [Fact]
-        public void TestAllowDtdParse()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test",
+            },
+            GenerateInterfaces = generateInterface,
+        };
+        var contents = ConvertXml(nameof(SimpleInterface) + $"({generateInterface})", xsd, generator).ToArray();
+        var assembly = Compiler.Compile(nameof(CollectionSetterInAttributeGroupInterfaceIsPublicIfCollectionSetterModeIsPublic), contents);
+
+        var interfaceCommon = assembly.GetType("Test.ICommon");
+        var typeA = assembly.GetType("Test.A");
+        var typeB = assembly.GetType("Test.B");
+        if(generateInterface)
+        {
+            Assert.True(interfaceCommon.IsInterface);
+            Assert.True(interfaceCommon.IsAssignableFrom(typeA));
+            Assert.True(interfaceCommon.IsAssignableFrom(typeB));
+        }
+        else
+        {
+            Assert.Null(interfaceCommon);
+        }
+    }
+
+
+    [Fact]
+    public void TestAllowDtdParse()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE schema [
 	<!ENTITY lowalpha ""a-z"">
 	<!ENTITY hialpha ""A-Z"">
@@ -3028,25 +3028,25 @@ namespace Test
 </xs:schema>
 
 ";
-            var generator = new Generator
-            {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                AllowDtdParse = true
-            };
-
-            var generatedType = ConvertXml(nameof(TestAllowDtdParse), xsd, generator).First();
-
-            Assert.Contains(@"public partial class ComplexType", generatedType);
-            Assert.Contains(@"[a-zA-Z0-9]+", generatedType);
-        }
-
-        [Fact]
-        public void TestNotAllowDtdParse()
+        var generator = new Generator
         {
-            const string xsd = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            AllowDtdParse = true
+        };
+
+        var generatedType = ConvertXml(nameof(TestAllowDtdParse), xsd, generator).First();
+
+        Assert.Contains(@"public partial class ComplexType", generatedType);
+        Assert.Contains(@"[a-zA-Z0-9]+", generatedType);
+    }
+
+    [Fact]
+    public void TestNotAllowDtdParse()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE schema [
 	<!ENTITY lowalpha ""a-z"">
 	<!ENTITY hialpha ""A-Z"">
@@ -3069,17 +3069,16 @@ namespace Test
 </xs:schema>
 
 ";
-            var generator = new Generator
+        var generator = new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
             {
-                NamespaceProvider = new NamespaceProvider
-                {
-                    GenerateNamespace = key => "Test"
-                },
-                AllowDtdParse = false
-            };
+                GenerateNamespace = key => "Test"
+            },
+            AllowDtdParse = false
+        };
 
-            var exception = Assert.Throws<XmlException>(() => ConvertXml(nameof(TestNotAllowDtdParse), xsd, generator));
-            Assert.Contains("Reference to undeclared entity 'lowalpha'", exception.Message);
-        }
+        var exception = Assert.Throws<XmlException>(() => ConvertXml(nameof(TestNotAllowDtdParse), xsd, generator));
+        Assert.Contains("Reference to undeclared entity 'lowalpha'", exception.Message);
     }
 }

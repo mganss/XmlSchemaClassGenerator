@@ -1,24 +1,17 @@
 ﻿using System.CodeDom;
 using System.Collections.Generic;
 
-namespace XmlSchemaClassGenerator.Tests
+namespace XmlSchemaClassGenerator.Tests;
+
+internal class FileWatcherOutputWriter(string directory) : FileOutputWriter(directory)
 {
-    internal class FileWatcherOutputWriter : FileOutputWriter
+    private readonly List<string> _files = [];
+
+    public IEnumerable<string> Files => _files;
+
+    protected override void WriteFile(string path, CodeCompileUnit cu)
     {
-        private readonly List<string> _files;
-
-        public FileWatcherOutputWriter(string directory)
-            : base(directory)
-        {
-            _files = new List<string>();
-        }
-
-        public IEnumerable<string> Files => _files;
-
-        protected override void WriteFile(string path, CodeCompileUnit cu)
-        {
-            base.WriteFile(path, cu);
-            _files.Add(path);
-        }
+        base.WriteFile(path, cu);
+        _files.Add(path);
     }
 }

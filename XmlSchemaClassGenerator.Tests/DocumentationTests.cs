@@ -99,7 +99,7 @@ public sealed class DocumentationTests
 			"\r\n",
 			ConvertXml(xsd, new() {NamespacePrefix = "Test"})
 				.Single()
-				.Split(new[] {"\r\n", "\r", "\n"}, StringSplitOptions.TrimEntries)
+				.Split(["\r\n", "\r", "\n"], StringSplitOptions.TrimEntries)
 		);
 
 		Assert.Contains

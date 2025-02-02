@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XmlSchemaClassGenerator
+namespace XmlSchemaClassGenerator;
+
+public enum NamingScheme
 {
-    public enum NamingScheme
-    {
-        Direct,
-        PascalCase,
-        LegacyPascalCase,
-    }
+    Direct,
+    PascalCase,
+    LegacyPascalCase,
 }

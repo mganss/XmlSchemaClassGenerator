@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace XmlSchemaClassGenerator.Tests
-{
+namespace XmlSchemaClassGenerator.Tests;
+
 	public class DefaultInSequenceTests
 	{
 		/// <summary>
@@ -45,4 +45,3 @@ namespace XmlSchemaClassGenerator.Tests
 			}, collectionProperties);
 		}
 	}
-}
