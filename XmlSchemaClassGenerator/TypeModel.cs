@@ -28,7 +28,7 @@ public class NamespaceModel(NamespaceKey key, GeneratorConfiguration configurati
     {
         var codeNamespace = new CodeNamespace(namespaceName);
 
-        foreach (var (Namespace, Condition) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)).OrderBy(n => n.Namespace))
+        foreach (var (Namespace, _) in CodeUtilities.UsingNamespaces.Where(n => n.Condition(conf)).OrderBy(n => n.Namespace))
             codeNamespace.Imports.Add(new CodeNamespaceImport(Namespace));
 
         foreach (var typeModel in parts.SelectMany(x => x.Types.Values).ToList())

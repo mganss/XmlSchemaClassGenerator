@@ -24,7 +24,7 @@ internal class ModelBuilder
 
     private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
-    private string BuildKey(XmlSchemaAnnotated annotated, XmlQualifiedName name)
+    private static string BuildKey(XmlSchemaAnnotated annotated, XmlQualifiedName name)
         => $"{annotated.GetType()}:{annotated.SourceUri}:{annotated.LineNumber}:{annotated.LinePosition}:{name}";
 
     private void SetType(XmlSchemaAnnotated annotated, XmlQualifiedName name, TypeModel type)

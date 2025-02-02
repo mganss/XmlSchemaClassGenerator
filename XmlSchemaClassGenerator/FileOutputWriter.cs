@@ -98,5 +98,5 @@ public class FileOutputWriter : OutputWriter
 
     static readonly Regex InvalidCharacters = new($"[{string.Join("", Path.GetInvalidFileNameChars())}]", RegexOptions.Compiled);
 
-    private string ValidateName(string name) => InvalidCharacters.Replace(name, "_");
+    private static string ValidateName(string name) => InvalidCharacters.Replace(name, "_");
 }
