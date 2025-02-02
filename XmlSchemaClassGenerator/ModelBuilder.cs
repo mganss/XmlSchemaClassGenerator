@@ -210,7 +210,7 @@ namespace XmlSchemaClassGenerator
                                 && implementationClassProperty.XmlSchemaName == interfaceProperty.XmlSchemaName
                                 && implementationClassProperty.IsAttribute == interfaceProperty.IsAttribute)
                             {
-                                RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, interfaceProperty, implementationClassProperty.Name);
+                                RenameInterfacePropertyInBaseClasses(interfaceModel, implementationClass, implementationClassProperty);
                                 interfaceProperty.Name = implementationClassProperty.Name;
                             }
                         }
@@ -256,12 +256,15 @@ namespace XmlSchemaClassGenerator
         }
 
         private static void RenameInterfacePropertyInBaseClasses(InterfaceModel interfaceModel, ReferenceTypeModel implementationClass,
-            PropertyModel interfaceProperty, string newName)
+            PropertyModel implementationClassProperty)
         {
             foreach (var derivedClass in interfaceModel.AllDerivedReferenceTypes().Where(c => c != implementationClass))
             {
-                foreach (var propertyModel in derivedClass.Properties.Where(p => p.Name == interfaceProperty.Name))
-                    propertyModel.Name = newName;
+                foreach (var propertyModel in derivedClass.Properties.Where(p => 
+                    implementationClassProperty.OriginalPropertyName == p.OriginalPropertyName
+                    && implementationClassProperty.XmlSchemaName == p.XmlSchemaName
+                    && implementationClassProperty.IsAttribute == p.IsAttribute))
+                    propertyModel.Name = implementationClassProperty.Name;
             }
         }
 
