@@ -260,7 +260,7 @@ internal class ModelBuilder
     {
         foreach (var derivedClass in interfaceModel.AllDerivedReferenceTypes().Where(c => c != implementationClass))
         {
-            foreach (var propertyModel in derivedClass.Properties.Where(p => 
+            foreach (var propertyModel in derivedClass.Properties.Where(p =>
                 implementationClassProperty.OriginalPropertyName == p.OriginalPropertyName
                 && implementationClassProperty.XmlSchemaName == p.XmlSchemaName
                 && implementationClassProperty.IsAttribute == p.IsAttribute))
@@ -526,7 +526,11 @@ internal class ModelBuilder
                 var baseModel = builder.CreateTypeModel(complexType.BaseXmlSchemaType.QualifiedName, complexType.BaseXmlSchemaType);
                 classModel.BaseClass = baseModel;
                 if (baseModel is ClassModel baseClassModel)
+                {
                     baseClassModel.DerivedTypes.Add(classModel);
+                    if (classModel.AllBaseTypes.Any(b => b.XmlSchemaType.QualifiedName == qualifiedName))
+                        classModel.Name += "Redefinition";
+                }
             }
 
             XmlSchemaParticle xmlParticle = null;
