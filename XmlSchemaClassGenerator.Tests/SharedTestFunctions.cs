@@ -20,11 +20,20 @@ internal static class SharedTestFunctions
 {
     private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
-    internal static void TestSamples(ITestOutputHelper output, string name, string pattern)
+    internal static void TestSamples(ITestOutputHelper output, string name, string pattern,
+        List<XmlQualifiedName> typesToTest = null)
     {
         var assembly = Compiler.GetAssembly(name);
         Assert.NotNull(assembly);
-        DeserializeSampleXml(output, pattern, assembly);
+        DeserializeSampleXml(output, pattern, assembly, typesToTest);
+    }
+
+    internal static void TestSimple(ITestOutputHelper output, string name, string pattern,
+        List<XmlQualifiedName> typesToTest = null)
+    {
+        var assembly = Compiler.GetAssembly(name);
+        Assert.NotNull(assembly);
+        DeserializeSimpleXml(output, pattern, assembly, typesToTest);
     }
 
     internal static string Serialize(XmlSerializer serializer, object o, IDictionary<string, string> prefixToNsMap = null)
@@ -49,7 +58,43 @@ internal static class SharedTestFunctions
         return serializedXml;
     }
 
-    private static void DeserializeSampleXml(ITestOutputHelper output, string pattern, Assembly assembly)
+    private static void DeserializeSimpleXml(ITestOutputHelper output, string pattern, Assembly assembly,
+        List<XmlQualifiedName> typesToTest = null)
+    {
+        var files = Glob.ExpandNames(pattern);
+
+        var set = new XmlSchemaSet();
+        var xmlSchemaReaderSettings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Ignore };
+
+        set.XmlResolver = new XmlUrlResolver();
+
+        var readers = files.Select(f => XmlReader.Create(f, xmlSchemaReaderSettings));
+
+        foreach (var reader in readers)
+            set.Add(null, reader);
+
+        set.Compile();
+
+        foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e =>
+            !e.IsAbstract
+            && e.ElementSchemaType is not XmlSchemaSimpleType
+            && e.ElementSchemaType.QualifiedName != AnyType
+            && (typesToTest == null || typesToTest.Contains(e.QualifiedName))))
+        {
+            var type = FindType(assembly, rootElement.QualifiedName);
+            var serializer = new XmlSerializer(type);
+            Assert.NotNull(serializer);
+            var o = Activator.CreateInstance(type);
+            var xml = Serialize(serializer, o);
+            Assert.NotNull(xml);
+            Assert.NotEmpty(xml);
+            var o2 = serializer.Deserialize(new StringReader(xml));
+            AssertEx.Equal(o, o2);
+        }
+    }
+
+    private static void DeserializeSampleXml(ITestOutputHelper output, string pattern, Assembly assembly,
+        List<XmlQualifiedName> typesToTest = null)
     {
         var files = Glob.ExpandNames(pattern);
 
@@ -71,7 +116,8 @@ internal static class SharedTestFunctions
         foreach (var rootElement in set.GlobalElements.Values.Cast<XmlSchemaElement>().Where(e =>
             !e.IsAbstract
             && e.ElementSchemaType is not XmlSchemaSimpleType
-            && e.ElementSchemaType.QualifiedName != AnyType))
+            && e.ElementSchemaType.QualifiedName != AnyType
+            && (typesToTest == null || typesToTest.Contains(e.QualifiedName))))
         {
             var type = FindType(assembly, rootElement.QualifiedName);
             var serializer = new XmlSerializer(type);

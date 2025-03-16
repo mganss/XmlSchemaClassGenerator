@@ -100,6 +100,7 @@ internal class ModelBuilder
             RemoveDuplicateInterfaceProperties();
         }
 
+        RemoveDuplicatePropertiesInDerivedClasses();
         AddXmlRootAttributeToAmbiguousTypes();
 
         if (_configuration.UniqueTypeNameAcrossNamespaces)
@@ -175,6 +176,20 @@ internal class ModelBuilder
             }
             foreach (var typeModel in types)
                 typeModel.RootElementName = typeModel.GetQualifiedName();
+        }
+    }
+
+    private void RemoveDuplicatePropertiesInDerivedClasses()
+    {
+        foreach (var classModel in Types.Values.OfType<ClassModel>())
+        {
+            var baseProperties = classModel.AllBaseClasses.SelectMany(b => b.Properties).ToList();
+            var properties = classModel.Properties.ToList();
+            foreach (var propertyToRemove in properties.Where(p =>
+                baseProperties.Any(b => p.XmlSchemaName != null && p.XmlSchemaName == b.XmlSchemaName)))
+            {
+                classModel.Properties.Remove(propertyToRemove);
+            }
         }
     }
 

@@ -96,24 +96,24 @@ public class XmlTests(ITestOutputHelper output)
     const string UnionPattern = "xsd/union/union.xsd";
     const string GuidPattern = "xsd/guid/*.xsd";
     const string NullableReferenceAttributesPattern = "xsd/nullablereferenceattributes/nullablereference.xsd";
+    const string X3DPattern = "xsd/x3d/*.xsd";
 
-    // IATA test takes too long to perform every time
-
-    //[Fact, TestPriority(1)]
-    //[UseCulture("en-US")]
-    //public void TestIata()
-    //{
-    //    Compiler.Generate("Iata", IataPattern, new Generator
-    //    {
-    //        EntityFramework = true,
-    //        DataAnnotationMode = DataAnnotationMode.All,
-    //        NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
-    //            .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Iata" }.NamespaceProvider.GenerateNamespace),
-    //        MemberVisitor = (member, model) => { },
-    //        GenerateInterfaces = true
-    //    });
-    //    SharedTestFunctions.TestSamples(Output, "Iata", IataPattern);
-    //}
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestIata()
+    {
+        Compiler.Generate("Iata", IataPattern, new Generator
+        {
+            EntityFramework = true,
+            DataAnnotationMode = DataAnnotationMode.All,
+            NamespaceProvider = new Dictionary<NamespaceKey, string> { { new NamespaceKey(""), "XmlSchema" }, { new NamespaceKey("http://www.iata.org/IATA/EDIST/2017.2"), "Iata" } }
+                .ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "Iata" }.NamespaceProvider.GenerateNamespace),
+            MemberVisitor = (member, model) => { },
+            GenerateInterfaces = true
+        });
+        var typesToTest = new List<XmlQualifiedName> { new("AirShoppingRS", "http://www.iata.org/IATA/EDIST/2017.2") };
+        SharedTestFunctions.TestSimple(Output, "Iata", IataPattern, typesToTest);
+    }
 
     [Fact, TestPriority(1)]
     [UseCulture("en-US")]
@@ -138,6 +138,15 @@ public class XmlTests(ITestOutputHelper output)
     {
         Compiler.Generate("Client", ClientPattern);
         SharedTestFunctions.TestSamples(Output, "Client", ClientPattern);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestX3D()
+    {
+        Compiler.Generate("X3D", X3DPattern);
+        var typesToTest = new List<XmlQualifiedName> { new("GeoLocation") };
+        SharedTestFunctions.TestSimple(Output, "X3D", X3DPattern, typesToTest);
     }
 
     [Fact, TestPriority(1)]
