@@ -760,7 +760,9 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         if (IsRequired && Configuration.DataAnnotationMode != DataAnnotationMode.None)
         {
             var requiredAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.Required, Configuration));
-            var allowEmptyStringsArgument = new CodeAttributeArgument("AllowEmptyStrings", new CodePrimitiveExpression(true));
+            var noEmptyStrings = propertyType is SimpleModel simpleModel 
+                && simpleModel.Restrictions.Any(r => r is MinLengthRestrictionModel m && m.Value > 0);
+            var allowEmptyStringsArgument = new CodeAttributeArgument("AllowEmptyStrings", new CodePrimitiveExpression(!noEmptyStrings));
             requiredAttribute.Arguments.Add(allowEmptyStringsArgument);
             member.CustomAttributes.Add(requiredAttribute);
         }
