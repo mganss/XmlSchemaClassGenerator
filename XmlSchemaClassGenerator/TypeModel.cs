@@ -441,7 +441,7 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
     {
         var rootClass = AllBaseTypes.LastOrDefault();
 
-        if (rootClass is SimpleModel)
+        if (rootClass is SimpleModel || rootClass is EnumModel)
         {
             string reference, val;
 

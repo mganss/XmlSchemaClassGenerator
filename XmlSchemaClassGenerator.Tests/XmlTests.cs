@@ -29,10 +29,7 @@ public class XmlTests(ITestOutputHelper output)
 
     private static IEnumerable<string> ConvertXml(string name, IEnumerable<string> xsds, Generator generatorPrototype = null)
     {
-        if (name is null)
-        {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentNullException.ThrowIfNull(name);
 
         var writer = new MemoryOutputWriter();
 
@@ -729,10 +726,7 @@ public class XmlTests(ITestOutputHelper output)
 
         gen.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
 
-        var xsdFiles = new[]
-        {
-            "xhtml-inlinexbrl-1_1.xsd",
-        }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "xbrl", x)).ToList();
+        var xsdFiles = new[] { Path.Combine(Directory.GetCurrentDirectory(), "xsd", "xbrl", "xhtml-inlinexbrl-1_1.xsd") };
 
         var assembly = Compiler.GenerateFiles("Xbrl", xsdFiles, gen);
         Assert.NotNull(assembly);
@@ -784,8 +778,8 @@ public class XmlTests(ITestOutputHelper output)
 
     private static readonly XmlQualifiedName AnyType = new("anyType", XmlSchema.Namespace);
 
-    public static TheoryData<string> Classes => new()
-    {
+    public static TheoryData<string> Classes =>
+    [
         "ApartmentBuy",
         "ApartmentRent",
         "AssistedLiving",
@@ -806,7 +800,7 @@ public class XmlTests(ITestOutputHelper output)
         "SpecialPurpose",
         "Store",
         "TradeSite",
-    };
+    ];
 
     [Theory, TestPriority(2)]
     [MemberData(nameof(Classes))]
@@ -1974,10 +1968,10 @@ namespace Test
         var classType = assembly.GetType("Test.SampleRoot");
         Assert.NotNull(classType);
 
-        var directProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "Direct"));
+        var directProperty = Assert.Single(classType.GetProperties(), p => p.Name == "Direct");
         Assert.Equal(XmlSchemaForm.Unqualified, directProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
 
-        var viaRefProperty = Assert.Single(classType.GetProperties().Where(p => p.Name == "ViaRef"));
+        var viaRefProperty = Assert.Single(classType.GetProperties(), p => p.Name == "ViaRef");
         Assert.Equal(XmlSchemaForm.None, viaRefProperty.GetCustomAttributes<XmlElementAttribute>().FirstOrDefault()?.Form);
     }
 
@@ -2718,10 +2712,8 @@ namespace Test
             GenerateInterfaces = false,
             UniqueTypeNamesAcrossNamespaces = true,
         };
-        var xsdFiles = new[]
-        {
-            "NeTEx_publication.xsd",
-        }.Select(x => Path.Combine(Directory.GetCurrentDirectory(), "xsd", "netex", x)).ToList();
+
+        var xsdFiles = new[] { Path.Combine(Directory.GetCurrentDirectory(), "xsd", "netex", "NeTEx_publication.xsd") };
 
         var assembly = Compiler.GenerateFiles("Netex", xsdFiles, gen);
         Assert.NotNull(assembly);
