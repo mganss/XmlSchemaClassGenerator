@@ -302,6 +302,7 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
+                if (simpleTypeModel.XmlSchemaType == null) return simpleTypeModel.XmlSchemaName;
                 qualifiedName = simpleTypeModel.XmlSchemaType.GetQualifiedName();
                 var xmlSchemaType = simpleTypeModel.XmlSchemaType;
                 while (qualifiedName.Namespace != XmlSchema.Namespace && xmlSchemaType.BaseXmlSchemaType != null)
