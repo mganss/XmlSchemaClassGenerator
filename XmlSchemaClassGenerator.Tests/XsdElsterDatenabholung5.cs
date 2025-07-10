@@ -54,14 +54,7 @@ public class XsdElsterDatenabholung5
                 }
             }
         };
-        var xsdFiles = new[]
-        {
-                "headerbasis000002.xsd",
-                "ndh000010_extern.xsd",
-                "th000008_extern.xsd",
-                "datenabholung_5.xsd",
-                "elster0810_datenabholung_5.xsd",
-            }.Select(x => Path.Combine(InputPath, x)).ToList();
+        var xsdFiles = sourceArray.Select(x => Path.Combine(InputPath, x)).ToList();
         var encodings = System.Text.Encoding.GetEncodings();
         System.Text.Encoding.GetEncoding("ISO-8859-15");
         gen.Generate(xsdFiles);
@@ -82,6 +75,15 @@ public class XsdElsterDatenabholung5
     {
         get { return Path.Combine(Directory.GetCurrentDirectory(), "xsd", "elster-xml-datenabholung5"); }
     }
+
+    private static readonly string[] sourceArray =
+    [
+        "headerbasis000002.xsd",
+        "ndh000010_extern.xsd",
+        "th000008_extern.xsd",
+        "datenabholung_5.xsd",
+        "elster0810_datenabholung_5.xsd",
+    ];
 
     private static string GetOutputPath(string testCaseId)
     {

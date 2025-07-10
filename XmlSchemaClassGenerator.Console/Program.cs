@@ -213,10 +213,8 @@ with or without backing field initialization for collections
 
         var namespaceMap = namespaces.Select(n => CodeUtilities.ParseNamespace(n, namespacePrefix)).ToNamespaceProvider(key =>
         {
-            var xn = key.XmlSchemaNamespace;
-            var name = string.Join(".", xn.Split('/').Where(p => p != "schema" && GeneratorConfiguration.IdentifierRegex.IsMatch(p))
-                .Select(n => n.ToTitleCase(NamingScheme.PascalCase)));
-            if (!string.IsNullOrEmpty(namespacePrefix)) { name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name)); }
+            var xmlns = key.XmlSchemaNamespace;
+            var name = CodeUtilities.GenerateNamespace(xmlns, namespacePrefix);
             return name;
         });
 

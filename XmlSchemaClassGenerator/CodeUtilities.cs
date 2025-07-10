@@ -466,6 +466,44 @@ namespace XmlSchemaClassGenerator
             XmlSchemaAttributeGroup attrGroup => attrGroup.QualifiedName,
             _ => null
         };
+
+        public static string GenerateNamespace(string xmlns, string namespacePrefix = null)
+        {
+            if (string.IsNullOrEmpty(xmlns)) return !string.IsNullOrEmpty(namespacePrefix) ? namespacePrefix : string.Empty;
+
+            var schemeIndex = xmlns.IndexOf("://");
+            List<string> segments;
+
+            if (xmlns.StartsWith("urn:"))
+            {
+                segments = [.. xmlns.Substring(4).Split(':', '-', '.', '_')];
+            }
+            else
+            {
+                if (schemeIndex > 0) xmlns = xmlns.Substring(schemeIndex + 3);
+
+                segments = [.. xmlns.Split('/')];
+
+                if (segments.Count > 0)
+                {
+                    var splitSegments = segments[0].Split('.').Reverse().Where(s => s != "www").ToList();
+                    if (segments.Count > 1)
+                        splitSegments.AddRange(segments.Skip(1));
+                    segments = splitSegments.SelectMany(s => s.Split('-', '.', '_')).ToList();
+                }
+            }
+
+            var cleanedSegments = segments
+                .Where(s => !string.IsNullOrEmpty(s))
+                .Select(s => s.ToTitleCase(NamingScheme.PascalCase))
+                .Select(s => s.Length > 0 && !char.IsLetter(s[0]) && s[0] != '_' ? "_" + s : s)
+                .ToList();
+            var name = string.Join(".", cleanedSegments);
+
+            if (!string.IsNullOrEmpty(namespacePrefix)) { name = namespacePrefix + (string.IsNullOrEmpty(name) ? "" : ("." + name)); }
+
+            return name;
+        }
     }
 
     public readonly record struct TypeInfo(string Namespace, string Name);
