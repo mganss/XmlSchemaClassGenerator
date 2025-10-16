@@ -195,7 +195,10 @@ Options:
                                default is false)
       --dtd, --allowDtdParse
                              allow DTD parsing (default is false)
-      --ns, --namingScheme   use the specified naming scheme for class and
+      --oxi, --omitXmlIncludeAttribute
+                             omit generation of XmlIncludeAttribute for derived
+                               types (default is false)
+	  --ns, --namingScheme   use the specified naming scheme for class and
                                property names (default is Pascal; can be:
                                Direct, Pascal, Legacy)
       --fu, --forceUriScheme=VALUE
