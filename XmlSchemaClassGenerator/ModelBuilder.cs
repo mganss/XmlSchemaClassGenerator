@@ -379,10 +379,13 @@ internal class ModelBuilder
     {
         // Also create an empty derived class for the original root element
 
+        var originalRootElement = type.RootElement;
+        var originalRootElementSource = CodeUtilities.CreateUri(originalRootElement.SourceUri);
+
         var originalClassModel = new ClassModel(_configuration)
         {
             Name = _configuration.NamingProvider.RootClassNameFromQualifiedName(type.RootElementName, rootElement),
-            Namespace = classModel.Namespace
+            Namespace = CreateNamespaceModel(originalRootElementSource, originalRootElement.QualifiedName)
         };
 
         originalClassModel.Documentation.AddRange(classModel.Documentation);
