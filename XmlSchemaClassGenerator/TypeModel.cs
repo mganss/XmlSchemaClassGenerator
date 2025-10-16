@@ -417,9 +417,12 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
             customAttributes.Add(rootAttribute);
         }
 
-        var derivedTypes = GetAllDerivedTypes();
-        foreach (var derivedType in derivedTypes.OrderBy(t => t.Name))
-            customAttributes.Add(AttributeDecl<XmlIncludeAttribute>(new CodeAttributeArgument(new CodeTypeOfExpression(derivedType.GetReferenceFor(Namespace)))));
+        if (!Configuration.OmitXmlIncludeAttribute)
+        {
+            var derivedTypes = GetAllDerivedTypes();
+            foreach (var derivedType in derivedTypes.OrderBy(t => t.Name))
+                customAttributes.Add(AttributeDecl<XmlIncludeAttribute>(new CodeAttributeArgument(new CodeTypeOfExpression(derivedType.GetReferenceFor(Namespace)))));
+        }
 
         classDeclaration.BaseTypes.AddRange(Interfaces.Select(i => i.GetReferenceFor(Namespace)).ToArray());
 
@@ -760,7 +763,7 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         if (IsRequired && Configuration.DataAnnotationMode != DataAnnotationMode.None)
         {
             var requiredAttribute = new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.Required, Configuration));
-            var noEmptyStrings = propertyType is SimpleModel simpleModel 
+            var noEmptyStrings = propertyType is SimpleModel simpleModel
                 && simpleModel.Restrictions.Any(r => r is MinLengthRestrictionModel m && m.Value > 0);
             var allowEmptyStringsArgument = new CodeAttributeArgument("AllowEmptyStrings", new CodePrimitiveExpression(!noEmptyStrings));
             requiredAttribute.Arguments.Add(allowEmptyStringsArgument);

@@ -361,4 +361,9 @@ public class GeneratorConfiguration
     /// Allow DTD parsing. Default is false.
     /// </summary>
     public bool AllowDtdParse { get; set; } = false;
+
+    /// <summary>
+    /// Omit generation of XmlIncludeAttribute for derived types. Default is false.
+    /// </summary>
+    public bool OmitXmlIncludeAttribute { get; set; } = false;
 }

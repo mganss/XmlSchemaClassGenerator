@@ -395,6 +395,12 @@ public class Generator
         set { _configuration.AllowDtdParse = value; }
     }
 
+    public bool OmitXmlIncludeAttribute
+    {
+        get { return _configuration.OmitXmlIncludeAttribute; }
+        set { _configuration.OmitXmlIncludeAttribute = value; }
+    }
+
     public bool ValidationError { get; private set; }
 
     static Generator()

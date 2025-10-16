@@ -58,7 +58,8 @@ public class XmlTests(ITestOutputHelper output)
             CollectionSettersMode = generatorPrototype.CollectionSettersMode,
             UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
             EnumAsString = generatorPrototype.EnumAsString,
-            AllowDtdParse = generatorPrototype.AllowDtdParse
+            AllowDtdParse = generatorPrototype.AllowDtdParse,
+            OmitXmlIncludeAttribute = generatorPrototype.OmitXmlIncludeAttribute
         };
 
         gen.CommentLanguages.Clear();
@@ -3081,5 +3082,211 @@ namespace Test
 
         var exception = Assert.Throws<XmlException>(() => ConvertXml(nameof(TestNotAllowDtdParse), xsd, generator));
         Assert.Contains("Reference to undeclared entity 'lowalpha'", exception.Message);
+    }
+
+    [Fact]
+    public void TestOmitXmlIncludeAttribute()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:xlink=""http://www.w3.org/1999/xlink"" elementFormDefault=""qualified"" attributeFormDefault=""unqualified"">
+    <xs:complexType name=""BaseType"">
+        <xs:sequence>
+            <xs:element name=""BaseProperty"" type=""xs:string""/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name=""DerivedType1"">
+        <xs:complexContent>
+            <xs:extension base=""BaseType"">
+                <xs:sequence>
+                    <xs:element name=""DerivedProperty1"" type=""xs:string""/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name=""DerivedType2"">
+        <xs:complexContent>
+            <xs:extension base=""BaseType"">
+                <xs:sequence>
+                    <xs:element name=""DerivedProperty2"" type=""xs:string""/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>";
+
+        // Test with OmitXmlIncludeAttribute = false (default behavior)
+        var generatorWithInclude = new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            OmitXmlIncludeAttribute = false
+        };
+
+        var contentsWithInclude = ConvertXml(nameof(TestOmitXmlIncludeAttribute) + "WithInclude", xsd, generatorWithInclude);
+        var contentWithInclude = Assert.Single(contentsWithInclude);
+
+        // Verify XmlIncludeAttribute is present for both derived types
+        Assert.Contains("[System.Xml.Serialization.XmlIncludeAttribute(typeof(DerivedType1))]", contentWithInclude);
+        Assert.Contains("[System.Xml.Serialization.XmlIncludeAttribute(typeof(DerivedType2))]", contentWithInclude);
+
+        // Test with OmitXmlIncludeAttribute = true
+        var generatorWithoutInclude = new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            OmitXmlIncludeAttribute = true
+        };
+
+        var contentsWithoutInclude = ConvertXml(nameof(TestOmitXmlIncludeAttribute) + "WithoutInclude", xsd, generatorWithoutInclude);
+        var contentWithoutInclude = Assert.Single(contentsWithoutInclude);
+
+        // Verify XmlIncludeAttribute is NOT present
+        Assert.DoesNotContain("XmlIncludeAttribute", contentWithoutInclude);
+
+        // Verify that the base and derived types are still generated correctly
+        Assert.Contains("public partial class BaseType", contentWithoutInclude);
+        Assert.Contains("public partial class DerivedType1 : BaseType", contentWithoutInclude);
+        Assert.Contains("public partial class DerivedType2 : BaseType", contentWithoutInclude);
+    }
+
+    [Fact]
+    public void TestOmitXmlIncludeAttributeSerializationWithExtraTypes()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" targetNamespace=""http://test.example/omit"" xmlns:t=""http://test.example/omit"" elementFormDefault=""qualified"">
+    <xs:element name=""Container"" type=""t:ContainerType""/>
+    <xs:complexType name=""ContainerType"">
+        <xs:sequence>
+            <xs:element name=""Item"" type=""t:BaseType""/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name=""BaseType"">
+        <xs:sequence>
+            <xs:element name=""BaseProperty"" type=""xs:string""/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name=""DerivedType1"">
+        <xs:complexContent>
+            <xs:extension base=""t:BaseType"">
+                <xs:sequence>
+                    <xs:element name=""DerivedProperty1"" type=""xs:string""/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name=""DerivedType2"">
+        <xs:complexContent>
+            <xs:extension base=""t:BaseType"">
+                <xs:sequence>
+                    <xs:element name=""DerivedProperty2"" type=""xs:int""/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>";
+
+        var generator = new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test.Omit"
+            },
+            OmitXmlIncludeAttribute = true
+        };
+
+        var contents = ConvertXml(nameof(TestOmitXmlIncludeAttributeSerializationWithExtraTypes), xsd, generator).ToArray();
+        var assembly = Compiler.Compile(nameof(TestOmitXmlIncludeAttributeSerializationWithExtraTypes), contents);
+
+        Assert.NotNull(assembly);
+
+        // Get the generated types
+        var containerType = assembly.GetType("Test.Omit.ContainerType");
+        var baseType = assembly.GetType("Test.Omit.BaseType");
+        var derivedType1 = assembly.GetType("Test.Omit.DerivedType1");
+        var derivedType2 = assembly.GetType("Test.Omit.DerivedType2");
+
+        Assert.NotNull(containerType);
+        Assert.NotNull(baseType);
+        Assert.NotNull(derivedType1);
+        Assert.NotNull(derivedType2);
+
+        // Verify that BaseType does NOT have XmlIncludeAttribute
+        var xmlIncludeAttributes = baseType.GetCustomAttributes(typeof(XmlIncludeAttribute), false);
+        Assert.Empty(xmlIncludeAttributes);
+
+        // Test serialization with extraTypes parameter for DerivedType1
+        var serializer1 = new XmlSerializer(containerType, new[] { derivedType1, derivedType2 });
+
+        // Create an instance with DerivedType1
+        var container1 = Activator.CreateInstance(containerType);
+        var derived1 = Activator.CreateInstance(derivedType1);
+
+        var basePropertyProp = baseType.GetProperty("BaseProperty");
+        var derivedProperty1Prop = derivedType1.GetProperty("DerivedProperty1");
+
+        basePropertyProp.SetValue(derived1, "Base Value 1");
+        derivedProperty1Prop.SetValue(derived1, "Derived Value 1");
+
+        var itemProp = containerType.GetProperty("Item");
+        itemProp.SetValue(container1, derived1);
+
+        // Serialize
+        var sw1 = new StringWriter();
+        serializer1.Serialize(sw1, container1);
+        var xml1 = sw1.ToString();
+
+        // Verify the XML contains xsi:type information
+        Assert.Contains("DerivedType1", xml1);
+        Assert.Contains("Base Value 1", xml1);
+        Assert.Contains("Derived Value 1", xml1);
+
+        // Deserialize back
+        var sr1 = new StringReader(xml1);
+        var deserialized1 = serializer1.Deserialize(sr1);
+
+        Assert.NotNull(deserialized1);
+        var deserializedItem1 = itemProp.GetValue(deserialized1);
+        Assert.NotNull(deserializedItem1);
+        Assert.Equal(derivedType1, deserializedItem1.GetType());
+        Assert.Equal("Base Value 1", basePropertyProp.GetValue(deserializedItem1));
+        Assert.Equal("Derived Value 1", derivedProperty1Prop.GetValue(deserializedItem1));
+
+        // Test serialization with DerivedType2
+        var serializer2 = new XmlSerializer(containerType, new[] { derivedType1, derivedType2 });
+
+        var container2 = Activator.CreateInstance(containerType);
+        var derived2 = Activator.CreateInstance(derivedType2);
+
+        var derivedProperty2Prop = derivedType2.GetProperty("DerivedProperty2");
+
+        basePropertyProp.SetValue(derived2, "Base Value 2");
+        derivedProperty2Prop.SetValue(derived2, 42);
+
+        itemProp.SetValue(container2, derived2);
+
+        // Serialize
+        var sw2 = new StringWriter();
+        serializer2.Serialize(sw2, container2);
+        var xml2 = sw2.ToString();
+
+        // Verify the XML contains xsi:type information
+        Assert.Contains("DerivedType2", xml2);
+        Assert.Contains("Base Value 2", xml2);
+        Assert.Contains("42", xml2);
+
+        // Deserialize back
+        var sr2 = new StringReader(xml2);
+        var deserialized2 = serializer2.Deserialize(sr2);
+
+        Assert.NotNull(deserialized2);
+        var deserializedItem2 = itemProp.GetValue(deserialized2);
+        Assert.NotNull(deserializedItem2);
+        Assert.Equal(derivedType2, deserializedItem2.GetType());
+        Assert.Equal("Base Value 2", basePropertyProp.GetValue(deserializedItem2));
+        Assert.Equal(42, derivedProperty2Prop.GetValue(deserializedItem2));
     }
 }

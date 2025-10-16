@@ -68,6 +68,7 @@ static class Program
         var separateNamespaceHierarchy = false;
         var serializeEmptyCollections = false;
         var allowDtdParse = false;
+        var omitXmlIncludeAttribute = false;
         NamingScheme? namingScheme = null;
         var forceUriScheme = "none";
 
@@ -167,6 +168,7 @@ with or without backing field initialization for collections
             { "uc|unionCommonType", "generate a common type for unions if possible (default is false)", v => unionCommonType = v != null },
             { "ec|serializeEmptyCollections", "serialize empty collections (default is false)", v => serializeEmptyCollections = v != null },
             { "dtd|allowDtdParse", "allows dtd parse (default is false)", v => allowDtdParse = v != null },
+            { "oxi|omitXmlIncludeAttribute", "omit generation of XmlIncludeAttribute for derived types (default is false)", v => omitXmlIncludeAttribute = v != null },
             { "ns|namingScheme=", @"use the specified naming scheme for class and property names (default is Pascal; can be: Direct, Pascal, Legacy)",
                 v =>
                 {
@@ -267,6 +269,7 @@ with or without backing field initialization for collections
             SeparateNamespaceHierarchy = separateNamespaceHierarchy,
             SerializeEmptyCollections = serializeEmptyCollections,
             AllowDtdParse = allowDtdParse,
+            OmitXmlIncludeAttribute = omitXmlIncludeAttribute,
             ForceUriScheme = forceUriScheme
         };
 

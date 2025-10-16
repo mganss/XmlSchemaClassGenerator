@@ -118,7 +118,8 @@ class Compiler
             UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
             EnumAsString = generatorPrototype.EnumAsString,
             MapUnionToWidestCommonType = generatorPrototype.MapUnionToWidestCommonType,
-            SeparateNamespaceHierarchy = generatorPrototype.SeparateNamespaceHierarchy
+            SeparateNamespaceHierarchy = generatorPrototype.SeparateNamespaceHierarchy,
+            OmitXmlIncludeAttribute = generatorPrototype.OmitXmlIncludeAttribute,
         };
 
         gen.CommentLanguages.Clear();
