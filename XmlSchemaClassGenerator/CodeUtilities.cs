@@ -413,7 +413,6 @@ namespace XmlSchemaClassGenerator
             ("System.Xml", c => c.CompactTypeNames),
             ("System.Xml.Schema", c => c.CompactTypeNames),
             ("System.Xml.Serialization", c => c.CompactTypeNames)
-,
         ];
 
         public static bool IsUsingNamespace(string namespaceName, GeneratorConfiguration conf)
@@ -486,7 +485,7 @@ namespace XmlSchemaClassGenerator
 
                 if (segments.Count > 0)
                 {
-                    var splitSegments = segments[0].Split('.').Reverse().Where(s => s != "www").ToList();
+                    var splitSegments = ((IEnumerable<string>)segments[0].Split('.')).Reverse().Where(s => s != "www").ToList();
                     if (segments.Count > 1)
                         splitSegments.AddRange(segments.Skip(1));
                     segments = splitSegments.SelectMany(s => s.Split('-', '.', '_')).ToList();
