@@ -3219,7 +3219,7 @@ namespace Test
         Assert.Empty(xmlIncludeAttributes);
 
         // Test serialization with extraTypes parameter for DerivedType1
-        var serializer1 = new XmlSerializer(containerType, new[] { derivedType1, derivedType2 });
+        var serializer1 = new XmlSerializer(containerType, [derivedType1, derivedType2]);
 
         // Create an instance with DerivedType1
         var container1 = Activator.CreateInstance(containerType);
@@ -3256,7 +3256,7 @@ namespace Test
         Assert.Equal("Derived Value 1", derivedProperty1Prop.GetValue(deserializedItem1));
 
         // Test serialization with DerivedType2
-        var serializer2 = new XmlSerializer(containerType, new[] { derivedType1, derivedType2 });
+        var serializer2 = new XmlSerializer(containerType, [derivedType1, derivedType2]);
 
         var container2 = Activator.CreateInstance(containerType);
         var derived2 = Activator.CreateInstance(derivedType2);

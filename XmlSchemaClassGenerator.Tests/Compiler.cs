@@ -60,7 +60,7 @@ class Compiler
 
     public static Assembly Generate(string name, string pattern, Generator generatorPrototype = null)
     {
-        if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+        if (Assemblies.TryGetValue(name, out Assembly value)) { return value; }
 
         var files = Glob.ExpandNames(pattern).OrderByDescending(f => f);
 
@@ -69,7 +69,7 @@ class Compiler
 
     public static Assembly GenerateFiles(string name, IEnumerable<string> files, Generator generatorPrototype = null)
     {
-        if (Assemblies.ContainsKey(name)) { return Assemblies[name]; }
+        if (Assemblies.TryGetValue(name, out Assembly value)) { return value; }
 
         generatorPrototype ??= new Generator
         {
