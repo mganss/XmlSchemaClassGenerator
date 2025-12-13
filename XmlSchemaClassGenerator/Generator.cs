@@ -32,10 +32,10 @@ public class NormalizingXmlResolver(string forceUriScheme) : XmlUrlResolver()
         {
             case "none": return resolvedUri;
             case "same":
-            {
-                newScheme = baseUri.Scheme;
-                break;
-            }
+                {
+                    newScheme = baseUri.Scheme;
+                    break;
+                }
         }
 
         var builder = new UriBuilder(resolvedUri) { Scheme = newScheme, Port = -1 };
@@ -53,7 +53,7 @@ public class Generator
     public string ForceUriScheme
     {
         get { return _configuration.ForceUriScheme; }
-        set { _configuration.ForceUriScheme = value;  }
+        set { _configuration.ForceUriScheme = value; }
     }
 
     public NamespaceProvider NamespaceProvider
@@ -228,6 +228,12 @@ public class Generator
         set { _configuration.DateTimeWithTimeZone = value; }
     }
 
+    public bool UseDateOnly
+    {
+        get { return _configuration.UseDateOnly; }
+        set { _configuration.UseDateOnly = value; }
+    }
+
     public bool EntityFramework
     {
         get { return _configuration.EntityFramework; }
@@ -356,7 +362,7 @@ public class Generator
     public bool UseArrayItemAttribute
     {
         get { return _configuration.UseArrayItemAttribute; }
-        set {  _configuration.UseArrayItemAttribute = value;}
+        set { _configuration.UseArrayItemAttribute = value; }
     }
 
     public bool GenerateCommandLineArgumentsComment

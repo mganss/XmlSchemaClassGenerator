@@ -24,6 +24,7 @@ static class Program
         var nameSubstitutes = new List<string>();
         var outputFolder = (string)null;
         bool dateTimeWithTimeZone = false;
+        bool useDateOnly = false;
         Type integerType = null;
         var useIntegerTypeAsFallback = false;
         var namespacePrefix = "";
@@ -93,6 +94,7 @@ The line format is one mapping per line: prefixed type/member name = substitute 
 Lines starting with # and empty lines are ignored.", v => nameSubstituteFiles.Add(v) },
             { "o|output=", "the {FOLDER} to write the resulting .cs files to", v => outputFolder = v },
             { "d|datetime-offset", "map xs:datetime and derived types to System.DateTimeOffset instead of System.DateTime", v => dateTimeWithTimeZone = v != null },
+            { "do|dateOnly", "map xs:date to System.DateOnly and xs:time to System.TimeOnly", v => useDateOnly = v != null },
             { "i|integer=", @"map xs:integer and derived types to {TYPE} instead of automatic approximation
 {TYPE} can be i[nt], l[ong], or d[ecimal]", v => {
                                      switch (v)
@@ -238,6 +240,7 @@ with or without backing field initialization for collections
             IntegerDataType = integerType,
             UseIntegerDataTypeAsFallback = useIntegerTypeAsFallback,
             DateTimeWithTimeZone = dateTimeWithTimeZone,
+            UseDateOnly = useDateOnly,
             EntityFramework = entityFramework,
             GenerateInterfaces = interfaces,
             AssemblyVisible = assembly,
