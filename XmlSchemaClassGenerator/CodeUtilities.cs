@@ -170,7 +170,7 @@ namespace XmlSchemaClassGenerator
                 XmlTypeCode.AnyUri or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
                 XmlTypeCode.Duration => configuration.NetCoreSpecificCode ? type.ValueType : typeof(string),
                 XmlTypeCode.Time => configuration.UseDateOnly ? typeof(TimeOnly) : (configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime)),
-                XmlTypeCode.Date => configuration.UseDateOnly ? typeof(DateOnly) : typeof(DateTime),
+                XmlTypeCode.Date => configuration.UseDateOnly ? typeof(DateOnly) : (configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime)),
                 XmlTypeCode.DateTime => configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime),
                 XmlTypeCode.Idref => typeof(string),
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),

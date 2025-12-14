@@ -134,4 +134,60 @@ public sealed class DateOnlyTimeOnlyTests
         Assert.Contains("System.DateOnly.Parse(\"2023-10-27\")", code);
         Assert.Contains("System.TimeOnly.Parse(\"12:34:56\")", code);
     }
+    [Fact]
+    public void WhenUseDateOnlyIsFalse_AndDateTimeWithTimeZoneIsTrue_DateTimeOffsetIsGeneratedForTime()
+    {
+        var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+            <xs:element name=""someTime"" type=""xs:time"" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+        var generatedType = ConvertXml(
+            xsd, new()
+            {
+                NamespaceProvider = new()
+                {
+                    GenerateNamespace = _ => "Test"
+                },
+                UseDateOnly = false,
+                DateTimeWithTimeZone = true
+            });
+
+        var code = string.Join(Environment.NewLine, generatedType);
+
+        Assert.Contains("public System.DateTimeOffset SomeTime", code);
+        Assert.Contains("DataType=\"time\"", code);
+    }
+    [Fact]
+    public void WhenUseDateOnlyIsFalse_AndDateTimeWithTimeZoneIsTrue_DateTimeOffsetIsGeneratedForDate()
+    {
+        var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+            <xs:element name=""someDate"" type=""xs:date"" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+        var generatedType = ConvertXml(
+            xsd, new()
+            {
+                NamespaceProvider = new()
+                {
+                    GenerateNamespace = _ => "Test"
+                },
+                UseDateOnly = false,
+                DateTimeWithTimeZone = true
+            });
+
+        var code = string.Join(Environment.NewLine, generatedType);
+
+        Assert.Contains("public System.DateTimeOffset SomeDate", code);
+        Assert.Contains("DataType=\"date\"", code);
+    }
 }
