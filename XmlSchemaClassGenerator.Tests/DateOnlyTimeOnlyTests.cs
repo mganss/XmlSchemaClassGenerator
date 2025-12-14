@@ -106,4 +106,32 @@ public sealed class DateOnlyTimeOnlyTests
         Assert.Contains("DataType=\"date\"", code);
         Assert.Contains("DataType=\"time\"", code);
     }
+    [Fact]
+    public void WhenDefaultValueIsPresent_CodeIsGenerated()
+    {
+        var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+			<xs:element name=""someDate"" type=""xs:date"" default=""2023-10-27"" />
+            <xs:element name=""someTime"" type=""xs:time"" default=""12:34:56"" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+        var generatedType = ConvertXml(
+            xsd, new()
+            {
+                NamespaceProvider = new()
+                {
+                    GenerateNamespace = _ => "Test"
+                },
+                UseDateOnly = true
+            });
+
+        var code = string.Join(Environment.NewLine, generatedType);
+
+        Assert.Contains("System.DateOnly.Parse(\"2023-10-27\")", code);
+        Assert.Contains("System.TimeOnly.Parse(\"12:34:56\")", code);
+    }
 }
