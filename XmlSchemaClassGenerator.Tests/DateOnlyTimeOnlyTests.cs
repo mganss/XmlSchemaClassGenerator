@@ -160,7 +160,7 @@ public sealed class DateOnlyTimeOnlyTests
         var code = string.Join(Environment.NewLine, generatedType);
 
         Assert.Contains("public System.DateTimeOffset SomeTime", code);
-        Assert.Contains("DataType=\"time\"", code);
+        Assert.DoesNotContain("DataType=\"time\"", code);
     }
     [Fact]
     public void WhenUseDateOnlyIsFalse_AndDateTimeWithTimeZoneIsTrue_DateTimeOffsetIsGeneratedForDate()
@@ -188,6 +188,6 @@ public sealed class DateOnlyTimeOnlyTests
         var code = string.Join(Environment.NewLine, generatedType);
 
         Assert.Contains("public System.DateTimeOffset SomeDate", code);
-        Assert.Contains("DataType=\"date\"", code);
+        Assert.DoesNotContain("DataType=\"date\"", code);
     }
 }
