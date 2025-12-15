@@ -78,6 +78,7 @@ namespace XmlSchemaClassGenerator
         public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration) => type.TypeCode switch
         {
             XmlTypeCode.AnyAtomicType => false,// union
+            XmlTypeCode.Date or XmlTypeCode.Time when configuration.UseDateOnly => true,
             XmlTypeCode.DateTime or XmlTypeCode.Date or XmlTypeCode.Time => !configuration.DateTimeWithTimeZone,
             XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
             _ => false,
