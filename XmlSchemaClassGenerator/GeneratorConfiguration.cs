@@ -160,7 +160,7 @@ public class GeneratorConfiguration
     /// </summary>
     public bool DateTimeWithTimeZone { get; set; } = false;
     /// <summary>
-    /// Generate .NET 6.0 DateOnly and TimeOnly properties for xs:time and xs:date elements
+    /// Generate DateOnly and TimeOnly properties for xs:time and xs:date elements
     /// </summary>
     public bool UseDateOnly { get; set; } = false;
     /// <summary>
