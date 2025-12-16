@@ -1306,6 +1306,14 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
         {
             return new CodeMethodInvokeExpression(TypeRefExpr<DateTime>(), nameof(DateTime.Parse), new CodePrimitiveExpression(defaultString));
         }
+        else if (type == typeof(DateOnly))
+        {
+            return new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("System.DateOnly"), "Parse", new CodePrimitiveExpression(defaultString));
+        }
+        else if (type == typeof(TimeOnly))
+        {
+            return new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("System.TimeOnly"), "Parse", new CodePrimitiveExpression(defaultString));
+        }
         else if (type == typeof(TimeSpan))
         {
             return new CodeMethodInvokeExpression(TypeRefExpr<XmlConvert>(), nameof(XmlConvert.ToTimeSpan), new CodePrimitiveExpression(defaultString));
@@ -1411,20 +1419,20 @@ public class GeneratorModel
         yield return new CodeCommentStatement("<summary>", true);
 
         foreach (var doc in docs.Where
-	            (
-		            d => !string.IsNullOrWhiteSpace(d.Text)
-		                 && (string.IsNullOrEmpty(d.Language)
-		                     || Configuration.CommentLanguages.Count is 0
-		                     || Configuration.CommentLanguages.Contains(d.Language)
-		                     || Configuration.CommentLanguages
-			                     .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
-	            )
-	            .OrderBy(d => d.Language))
+                (
+                    d => !string.IsNullOrWhiteSpace(d.Text)
+                         && (string.IsNullOrEmpty(d.Language)
+                             || Configuration.CommentLanguages.Count is 0
+                             || Configuration.CommentLanguages.Contains(d.Language)
+                             || Configuration.CommentLanguages
+                                 .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+                )
+                .OrderBy(d => d.Language))
         {
-	            var text = doc.Text;
-	            var comment = $"<para{(string.IsNullOrEmpty(doc.Language) ? "" : $@" xml:lang=""{doc.Language}""")}>{CodeUtilities.NormalizeNewlines(text).Trim()}</para>";
+            var text = doc.Text;
+            var comment = $"<para{(string.IsNullOrEmpty(doc.Language) ? "" : $@" xml:lang=""{doc.Language}""")}>{CodeUtilities.NormalizeNewlines(text).Trim()}</para>";
 
-	            yield return new(comment, true);
+            yield return new(comment, true);
         }
 
         yield return new CodeCommentStatement("</summary>", true);
@@ -1445,16 +1453,16 @@ public class GeneratorModel
 
     private string GetSingleDoc(IReadOnlyList<DocumentationModel> docs) => string.Join
     (
-	        " ",
-	        docs.Where
-		        (
-			        d => !string.IsNullOrWhiteSpace(d.Text)
-			             && (string.IsNullOrEmpty(d.Language)
-			                 || Configuration.CommentLanguages.Count is 0
-			                 || Configuration.CommentLanguages.Contains(d.Language)
-			                 || Configuration.CommentLanguages
-				                 .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
-		        )
-		        .Select(x => x.Text)
+            " ",
+            docs.Where
+                (
+                    d => !string.IsNullOrWhiteSpace(d.Text)
+                         && (string.IsNullOrEmpty(d.Language)
+                             || Configuration.CommentLanguages.Count is 0
+                             || Configuration.CommentLanguages.Contains(d.Language)
+                             || Configuration.CommentLanguages
+                                 .Any(l => d.Language.StartsWith(l, StringComparison.OrdinalIgnoreCase)))
+                )
+                .Select(x => x.Text)
     );
 }

@@ -104,7 +104,7 @@ public sealed class DateTimeTypeTests
     }
 
     [Fact]
-    public void WhenDateTimeOffsetIsNotUsed_DataTypePropertyIsPresent2()
+    public void WhenDateTimeOffsetIsUsed_DataTypePropertyIsNotPresent()
     {
         var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
@@ -125,7 +125,7 @@ public sealed class DateTimeTypeTests
                 DateTimeWithTimeZone = true
             });
 
-        var expectedXmlSerializationAttribute = "[System.Xml.Serialization.XmlElementAttribute(\"someDate\", DataType=\"date\")]";
+        var expectedXmlSerializationAttribute = "[System.Xml.Serialization.XmlElementAttribute(\"someDate\")]";
         var generatedProperty = generatedType.First();
 
         Assert.Contains(expectedXmlSerializationAttribute, generatedProperty);

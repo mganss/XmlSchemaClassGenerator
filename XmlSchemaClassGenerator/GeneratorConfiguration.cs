@@ -160,6 +160,10 @@ public class GeneratorConfiguration
     /// </summary>
     public bool DateTimeWithTimeZone { get; set; } = false;
     /// <summary>
+    /// Generate DateOnly and TimeOnly properties for xs:time and xs:date elements
+    /// </summary>
+    public bool UseDateOnly { get; set; } = false;
+    /// <summary>
     /// Generate Entity Framework Code First compatible classes
     /// </summary>
     public bool EntityFramework { get; set; }

@@ -90,8 +90,10 @@ Options:
                                Lines starting with # and empty lines are
                                ignored.
   -o, --output=FOLDER        the FOLDER to write the resulting .cs files to
-  -d, --datetime-offset      map xs:datetime and derived types to System.
-                               DateTimeOffset instead of System.DateTime
+  -d, --datetime-offset      map xs:datetime, xs:date and xs:time to System.
+                                DateTimeOffset instead of System.DateTime
+      --do, --dateOnly       map xs:date and xs:time to System.DateOnly and
+                                System.TimeOnly instead of System.DateTime
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of automatic approximation
                                TYPE can be i[nt], l[ong], or d[ecimal]
