@@ -78,8 +78,9 @@ namespace XmlSchemaClassGenerator
         public static bool? IsDataTypeAttributeAllowed(this XmlSchemaDatatype type, GeneratorConfiguration configuration) => type.TypeCode switch
         {
             XmlTypeCode.AnyAtomicType => false,// union
-            XmlTypeCode.DateTime or XmlTypeCode.Time => !configuration.DateTimeWithTimeZone,
-            XmlTypeCode.Date or XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
+            XmlTypeCode.Date or XmlTypeCode.Time when configuration.UseDateOnly => true,
+            XmlTypeCode.DateTime or XmlTypeCode.Date or XmlTypeCode.Time => !configuration.DateTimeWithTimeZone,
+            XmlTypeCode.Base64Binary or XmlTypeCode.HexBinary => true,
             _ => false,
         };
 
@@ -169,7 +170,9 @@ namespace XmlSchemaClassGenerator
                 XmlTypeCode.AnyAtomicType => configuration.MapUnionToWidestCommonType ? GetUnionType(configuration, schemaType, attribute) : typeof(string), // union
                 XmlTypeCode.AnyUri or XmlTypeCode.GDay or XmlTypeCode.GMonth or XmlTypeCode.GMonthDay or XmlTypeCode.GYear or XmlTypeCode.GYearMonth => typeof(string),
                 XmlTypeCode.Duration => configuration.NetCoreSpecificCode ? type.ValueType : typeof(string),
-                XmlTypeCode.Time or XmlTypeCode.DateTime => configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime),
+                XmlTypeCode.Time => configuration.UseDateOnly ? typeof(TimeOnly) : (configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime)),
+                XmlTypeCode.Date => configuration.UseDateOnly ? typeof(DateOnly) : (configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime)),
+                XmlTypeCode.DateTime => configuration.DateTimeWithTimeZone ? typeof(DateTimeOffset) : typeof(DateTime),
                 XmlTypeCode.Idref => typeof(string),
                 XmlTypeCode.Integer or XmlTypeCode.NegativeInteger or XmlTypeCode.NonNegativeInteger or XmlTypeCode.NonPositiveInteger or XmlTypeCode.PositiveInteger => GetIntegerDerivedType(type, configuration, restrictions),
                 XmlTypeCode.Decimal when restrictions.OfType<FractionDigitsRestrictionModel>().SingleOrDefault() is { IsSupported: true, Value: 0 } => GetIntegerDerivedType(type, configuration, restrictions),
@@ -436,6 +439,11 @@ namespace XmlSchemaClassGenerator
             }
             else
             {
+                if (type == typeof(DateOnly))
+                    return new CodeTypeReference("System.DateOnly", conf.CodeTypeReferenceOptions);
+                if (type == typeof(TimeOnly))
+                    return new CodeTypeReference("System.TimeOnly", conf.CodeTypeReferenceOptions);
+
                 var typeRef = new CodeTypeReference(type, conf.CodeTypeReferenceOptions);
 
                 foreach (var typeArgRef in typeRef.TypeArguments.OfType<CodeTypeReference>())
@@ -530,6 +538,8 @@ namespace XmlSchemaClassGenerator
         public static TypeInfo AllowNull { get; } = Make(CodeAnalysis);
         public static TypeInfo MaybeNull { get; } = Make(CodeAnalysis);
     }
+    internal struct DateOnly { }
+    internal struct TimeOnly { }
 }
 
 //Fixes a bug with VS2019 (https://developercommunity.visualstudio.com/content/problem/1244809/error-cs0518-predefined-type-systemruntimecompiler.html)
