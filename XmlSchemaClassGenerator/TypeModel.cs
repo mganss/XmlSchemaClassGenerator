@@ -1025,8 +1025,6 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             if (IsAny)
             {
                 var anyAttribute = AttributeDecl<XmlAnyAttributeAttribute>();
-                if (Order != null)
-                    anyAttribute.Arguments.Add(new(nameof(Order), new CodePrimitiveExpression(Order.Value)));
                 attributes.Add(anyAttribute);
             }
             else
