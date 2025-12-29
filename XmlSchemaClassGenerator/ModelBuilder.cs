@@ -551,6 +551,15 @@ internal class ModelBuilder
                 }
             }
 
+            if (complexType.ContentModel?.Content is XmlSchemaSimpleContentRestriction simpleContentRestriction)
+            {
+                var enumFacets = simpleContentRestriction.Facets?.OfType<XmlSchemaEnumerationFacet>().ToList();
+                if (enumFacets?.Count > 0 && !_configuration.EnumAsString)
+                {
+                    classModel.TextValueType = CreateSimpleContentEnumModel(classModel, enumFacets);
+                }
+            }
+
             XmlSchemaParticle xmlParticle = null;
             if (classModel.BaseClass != null)
             {
@@ -721,6 +730,49 @@ internal class ModelBuilder
             }
 
             return enumModelValues;
+        }
+
+        private EnumModel CreateSimpleContentEnumModel(ClassModel classModel, List<XmlSchemaEnumerationFacet> enumFacets)
+        {
+            var enumNamespace = namespaceModel?.Key.XmlSchemaNamespace ?? qualifiedName.Namespace;
+            var enumQualifiedName = qualifiedName.IsEmpty
+                ? new XmlQualifiedName($"{classModel.Name}Enum", enumNamespace)
+                : new XmlQualifiedName($"{qualifiedName.Name}Enum", enumNamespace);
+
+            var enumName = $"{classModel.Name}Enum";
+            if (namespaceModel != null)
+                enumName = namespaceModel.GetUniqueTypeName(enumName);
+
+            var enumModel = new EnumModel(_configuration)
+            {
+                Name = enumName,
+                Namespace = namespaceModel,
+                XmlSchemaName = enumQualifiedName,
+                IsAnonymous = false,
+            };
+
+            foreach (var facet in enumFacets.DistinctBy(f => f.Value))
+            {
+                var value = new EnumValueModel
+                {
+                    Name = _configuration.NamingProvider.EnumMemberNameFromValue(enumModel.Name, facet.Value, facet),
+                    Value = facet.Value
+                };
+
+                var valueDocs = GetDocumentation(facet);
+                value.Documentation.AddRange(valueDocs);
+
+                value.IsDeprecated = facet.Annotation?.Items.OfType<XmlSchemaAppInfo>()
+                    .Any(a => Array.Exists(a.Markup, m => m.Name == "annox:annotate" && m.HasChildNodes && m.FirstChild.Name == "jl:Deprecated")) == true;
+
+                enumModel.Values.Add(value);
+            }
+
+            enumModel.Values = EnsureEnumValuesUnique(enumModel.Values);
+            if (namespaceModel != null)
+                namespaceModel.Types[enumModel.Name] = enumModel;
+
+            return enumModel;
         }
 
         private EnumModel CreateEnumModel(XmlSchemaSimpleType simpleType, List<XmlSchemaEnumerationFacet> enumFacets)
