@@ -217,6 +217,31 @@ public class XmlTests(ITestOutputHelper output)
 
     [Fact, TestPriority(1)]
     [UseCulture("en-US")]
+    public void TestSimpleContentEnum()
+    {
+        var assembly = Compiler.Generate("SimpleContentEnum", "xsd/simple/simplecontent-enum.xsd");
+
+        const string ns = "SimpleContentEnum.Simplecontent";
+
+        var enumType = assembly.GetType($"{ns}.TransConfirmationCodeTypeEnum");
+        if (enumType == null)
+        {
+            var names = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+            Assert.Fail($"Enum type not found. Available types: {names}");
+        }
+
+        var type = assembly.GetType($"{ns}.TransConfirmationCodeType");
+        Assert.NotNull(type);
+
+        var baseType = assembly.GetType($"{ns}.CodeType");
+        Assert.Equal(baseType, type.BaseType);
+
+        var valueProperty = type.GetProperties().Single(p => p.PropertyType == enumType);
+        Assert.Equal("Value", valueProperty.Name);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
     public void TestList()
     {
         Compiler.Generate("List", ListPattern);

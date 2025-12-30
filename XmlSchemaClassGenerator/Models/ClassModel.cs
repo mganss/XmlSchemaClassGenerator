@@ -17,6 +17,7 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
     public bool IsMixed { get; set; }
     public bool IsSubstitution { get; set; }
     public TypeModel BaseClass { get; set; }
+    public TypeModel TextValueType { get; set; }
     public List<ClassModel> DerivedTypes { get; set; } = [];
     public override bool IsSubtype => BaseClass != null;
 
@@ -95,6 +96,46 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
             if (BaseClass is ClassModel)
             {
                 classDeclaration.BaseTypes.Add(BaseClass.GetReferenceFor(Namespace));
+
+                if (TextValueType != null && !string.IsNullOrEmpty(Configuration.TextValuePropertyName))
+                {
+                    var textName = Configuration.TextValuePropertyName;
+                    var enableDataBinding = Configuration.EnableDataBinding;
+                    var typeReference = TextValueType.GetReferenceFor(Namespace);
+
+                    CodeMemberField backingFieldMember = null;
+                    if (enableDataBinding)
+                    {
+                        backingFieldMember = new CodeMemberField(typeReference, textName.ToBackingField(Configuration.PrivateMemberPrefix))
+                        {
+                            Attributes = MemberAttributes.Private
+                        };
+                        classDeclaration.Members.Add(backingFieldMember);
+                    }
+
+                    CodeMemberField text = new(typeReference, textName + PropertyModel.GetAccessors(backingFieldMember, enableDataBinding, TextValueType.GetPropertyValueTypeCode()))
+                    {
+                        Attributes = MemberAttributes.Public | MemberAttributes.New,
+                    };
+
+                    var docs = new List<DocumentationModel> {
+                            new() { Language = English, Text = "Gets or sets the text value." },
+                            new() { Language = German, Text = "Ruft den Text ab oder legt diesen fest." }
+                        };
+
+                    docs.AddRange(TextValueType.Documentation);
+
+                    var attribute = AttributeDecl<XmlTextAttribute>();
+
+                    text.Comments.AddRange(GetComments(docs).ToArray());
+
+                    text.CustomAttributes.Add(attribute);
+                    classDeclaration.Members.Add(text);
+
+                    var valuePropertyModel = new PropertyModel(Configuration, textName, TextValueType, this);
+
+                    Configuration.MemberVisitor(text, valuePropertyModel);
+                }
             }
             else if (!string.IsNullOrEmpty(Configuration.TextValuePropertyName))
             {
