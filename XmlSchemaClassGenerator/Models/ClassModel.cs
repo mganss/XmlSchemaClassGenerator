@@ -97,20 +97,17 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
             {
                 classDeclaration.BaseTypes.Add(BaseClass.GetReferenceFor(Namespace));
 
-                if (TextValueType != null && !string.IsNullOrEmpty(Configuration.TextValuePropertyName))
-                {
-                    // When a derived class has a simpleContent restriction with enum facets,
-                    // we generate the enum type but do NOT add a new Value property in the derived class.
-                    // This is because the C# XmlSerializer has limitations when dealing with simpleContent
-                    // restrictions in inheritance hierarchies - it cannot handle a derived class that adds
-                    // a new XmlText property when the base class already has one.
-                    //
-                    // The enum type is still generated and can be used for validation/conversion manually:
-                    // e.g., var enumValue = (MyEnum)Enum.Parse(typeof(MyEnum), instance.Value);
-                    //
-                    // This is a compromise to work within XmlSerializer's constraints while still providing
-                    // the enum type that users requested in issue #561.
-                }
+                // When a derived class has a simpleContent restriction with enum facets (TextValueType != null),
+                // we generate the enum type but do NOT add a new Value property in the derived class.
+                // This is because the C# XmlSerializer has limitations when dealing with simpleContent
+                // restrictions in inheritance hierarchies - it cannot handle a derived class that adds
+                // a new XmlText property when the base class already has one.
+                //
+                // The enum type is still generated (in ModelBuilder) and can be used for validation/conversion manually:
+                // e.g., var enumValue = (MyEnum)Enum.Parse(typeof(MyEnum), instance.Value);
+                //
+                // This is a compromise to work within XmlSerializer's constraints while still providing
+                // the enum type that users requested in issue #561.
             }
             else if (!string.IsNullOrEmpty(Configuration.TextValuePropertyName))
             {

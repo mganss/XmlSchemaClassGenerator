@@ -734,8 +734,8 @@ internal class ModelBuilder
 
         private EnumModel CreateSimpleContentEnumModel(ClassModel classModel, List<XmlSchemaEnumerationFacet> enumFacets)
         {
-            var enumNamespace = namespaceModel?.Key.XmlSchemaNamespace ?? qualifiedName.Namespace;
-            var enumQualifiedName = qualifiedName.IsEmpty
+            var enumNamespace = namespaceModel?.Key.XmlSchemaNamespace ?? qualifiedName?.Namespace ?? "";
+            var enumQualifiedName = qualifiedName == null || qualifiedName.IsEmpty
                 ? new XmlQualifiedName($"{classModel.Name}Enum", enumNamespace)
                 : new XmlQualifiedName($"{qualifiedName.Name}Enum", enumNamespace);
 
