@@ -223,6 +223,7 @@ public class XmlTests(ITestOutputHelper output)
 
         const string ns = "SimpleContentEnum.Simplecontent";
 
+        // The enum type should be generated
         var enumType = assembly.GetType($"{ns}.TransConfirmationCodeTypeEnum");
         if (enumType == null)
         {
@@ -230,14 +231,26 @@ public class XmlTests(ITestOutputHelper output)
             Assert.Fail($"Enum type not found. Available types: {names}");
         }
 
+        // Verify it's an enum with the expected values
+        Assert.True(enumType.IsEnum);
+        var enumValues = Enum.GetNames(enumType);
+        Assert.Contains("Always", enumValues);
+        Assert.Contains("Never", enumValues);
+        Assert.Contains("OnError", enumValues);
+
+        // The derived class should exist and inherit from the base
         var type = assembly.GetType($"{ns}.TransConfirmationCodeType");
         Assert.NotNull(type);
 
         var baseType = assembly.GetType($"{ns}.CodeType");
         Assert.Equal(baseType, type.BaseType);
 
-        var valueProperty = type.GetProperties().Single(p => p.PropertyType == enumType);
-        Assert.Equal("Value", valueProperty.Name);
+        // The derived class should NOT have its own Value property
+        // It inherits the string Value property from the base class
+        // Users can manually convert between string and enum as needed
+        var valueProperty = type.GetProperty("Value");
+        Assert.NotNull(valueProperty);
+        Assert.Equal(typeof(string), valueProperty.PropertyType);
     }
 
     [Fact, TestPriority(1)]

@@ -99,42 +99,17 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
 
                 if (TextValueType != null && !string.IsNullOrEmpty(Configuration.TextValuePropertyName))
                 {
-                    var textName = Configuration.TextValuePropertyName;
-                    var enableDataBinding = Configuration.EnableDataBinding;
-                    var typeReference = TextValueType.GetReferenceFor(Namespace);
-
-                    CodeMemberField backingFieldMember = null;
-                    if (enableDataBinding)
-                    {
-                        backingFieldMember = new CodeMemberField(typeReference, textName.ToBackingField(Configuration.PrivateMemberPrefix))
-                        {
-                            Attributes = MemberAttributes.Private
-                        };
-                        classDeclaration.Members.Add(backingFieldMember);
-                    }
-
-                    CodeMemberField text = new(typeReference, textName + PropertyModel.GetAccessors(backingFieldMember, enableDataBinding, TextValueType.GetPropertyValueTypeCode()))
-                    {
-                        Attributes = MemberAttributes.Public | MemberAttributes.New,
-                    };
-
-                    var docs = new List<DocumentationModel> {
-                            new() { Language = English, Text = "Gets or sets the text value." },
-                            new() { Language = German, Text = "Ruft den Text ab oder legt diesen fest." }
-                        };
-
-                    docs.AddRange(TextValueType.Documentation);
-
-                    var attribute = AttributeDecl<XmlTextAttribute>();
-
-                    text.Comments.AddRange(GetComments(docs).ToArray());
-
-                    text.CustomAttributes.Add(attribute);
-                    classDeclaration.Members.Add(text);
-
-                    var valuePropertyModel = new PropertyModel(Configuration, textName, TextValueType, this);
-
-                    Configuration.MemberVisitor(text, valuePropertyModel);
+                    // When a derived class has a simpleContent restriction with enum facets,
+                    // we generate the enum type but do NOT add a new Value property in the derived class.
+                    // This is because the C# XmlSerializer has limitations when dealing with simpleContent
+                    // restrictions in inheritance hierarchies - it cannot handle a derived class that adds
+                    // a new XmlText property when the base class already has one.
+                    //
+                    // The enum type is still generated and can be used for validation/conversion manually:
+                    // e.g., var enumValue = (MyEnum)Enum.Parse(typeof(MyEnum), instance.Value);
+                    //
+                    // This is a compromise to work within XmlSerializer's constraints while still providing
+                    // the enum type that users requested in issue #561.
                 }
             }
             else if (!string.IsNullOrEmpty(Configuration.TextValuePropertyName))
