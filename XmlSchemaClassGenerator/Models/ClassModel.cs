@@ -98,16 +98,97 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                 classDeclaration.BaseTypes.Add(BaseClass.GetReferenceFor(Namespace));
 
                 // When a derived class has a simpleContent restriction with enum facets (TextValueType != null),
-                // we generate the enum type but do NOT add a new Value property in the derived class.
-                // This is because the C# XmlSerializer has limitations when dealing with simpleContent
-                // restrictions in inheritance hierarchies - it cannot handle a derived class that adds
-                // a new XmlText property when the base class already has one.
-                //
-                // The enum type is still generated (in ModelBuilder) and can be used for validation/conversion manually:
-                // e.g., var enumValue = (MyEnum)Enum.Parse(typeof(MyEnum), instance.Value);
-                //
-                // This is a compromise to work within XmlSerializer's constraints while still providing
-                // the enum type that users requested in issue #561.
+                // we generate an adapter property that allows strongly-typed access to the enum values.
+                // We cannot add a new XmlText property because the XmlSerializer doesn't allow it when
+                // the base class already has one. Instead, we use an [XmlIgnore] adapter property.
+                if (TextValueType != null && !string.IsNullOrEmpty(Configuration.TextValuePropertyName))
+                {
+                    var textName = Configuration.TextValuePropertyName;
+                    var enumTypeReference = TextValueType.GetReferenceFor(Namespace);
+                    var nullableEnumTypeReference = new CodeTypeReference(typeof(Nullable<>));
+                    nullableEnumTypeReference.TypeArguments.Add(enumTypeReference);
+
+                    // Create the EnumValue adapter property
+                    var enumValueProperty = new CodeMemberProperty
+                    {
+                        Name = "EnumValue",
+                        Type = nullableEnumTypeReference,
+                        Attributes = MemberAttributes.Public,
+                        HasGet = true,
+                        HasSet = true
+                    };
+
+                    // Add [XmlIgnore] attribute
+                    var ignoreAttribute = AttributeDecl<XmlIgnoreAttribute>();
+                    enumValueProperty.CustomAttributes.Add(ignoreAttribute);
+
+                    // Getter: Try to parse the Value property to enum
+                    // if (Enum.TryParse(typeof(EnumType), Value, true, out var result))
+                    //     return (EnumType)result;
+                    // return null;
+                    var resultVariable = new CodeVariableDeclarationStatement(typeof(object), "result");
+                    var tryParseCondition = new CodeMethodInvokeExpression(
+                        new CodeTypeReferenceExpression(typeof(Enum)),
+                        "TryParse",
+                        new CodeTypeOfExpression(enumTypeReference),
+                        new CodePropertyReferenceExpression(
+                            new CodeThisReferenceExpression(),
+                            textName),
+                        new CodePrimitiveExpression(true),
+                        new CodeDirectionExpression(FieldDirection.Out, new CodeVariableReferenceExpression("result")));
+
+                    var returnCastResult = new CodeMethodReturnStatement(
+                        new CodeCastExpression(
+                            nullableEnumTypeReference,
+                            new CodeVariableReferenceExpression("result")));
+
+                    var ifTryParse = new CodeConditionStatement(
+                        tryParseCondition,
+                        returnCastResult);
+
+                    enumValueProperty.GetStatements.Add(resultVariable);
+                    enumValueProperty.GetStatements.Add(ifTryParse);
+                    enumValueProperty.GetStatements.Add(new CodeMethodReturnStatement(new CodePrimitiveExpression(null)));
+
+                    // Setter: Value = value?.ToString();
+                    // Since CodeDOM doesn't support null-conditional operator, we need to check and set
+                    var valueNotNull = new CodeBinaryOperatorExpression(
+                        new CodePropertySetValueReferenceExpression(),
+                        CodeBinaryOperatorType.IdentityInequality,
+                        new CodePrimitiveExpression(null));
+
+                    var setToString = new CodeAssignStatement(
+                        new CodePropertyReferenceExpression(
+                            new CodeThisReferenceExpression(),
+                            textName),
+                        new CodeMethodInvokeExpression(
+                            new CodePropertySetValueReferenceExpression(),
+                            "ToString"));
+
+                    var setToNull = new CodeAssignStatement(
+                        new CodePropertyReferenceExpression(
+                            new CodeThisReferenceExpression(),
+                            textName),
+                        new CodePrimitiveExpression(null));
+
+                    enumValueProperty.SetStatements.Add(
+                        new CodeConditionStatement(
+                            valueNotNull,
+                            new CodeStatement[] { setToString },
+                            new CodeStatement[] { setToNull }));
+
+                    var docs = new List<DocumentationModel> {
+                        new() { Language = English, Text = "Gets or sets the typed value of the text content." },
+                        new() { Language = German, Text = "Ruft den typisierten Wert des Textinhalts ab oder legt diesen fest." }
+                    };
+
+                    enumValueProperty.Comments.AddRange(GetComments(docs).ToArray());
+
+                    classDeclaration.Members.Add(enumValueProperty);
+
+                    var enumValuePropertyModel = new PropertyModel(Configuration, "EnumValue", TextValueType, this);
+                    Configuration.MemberVisitor(enumValueProperty, enumValuePropertyModel);
+                }
             }
             else if (!string.IsNullOrEmpty(Configuration.TextValuePropertyName))
             {

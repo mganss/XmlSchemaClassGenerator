@@ -245,12 +245,36 @@ public class XmlTests(ITestOutputHelper output)
         var baseType = assembly.GetType($"{ns}.CodeType");
         Assert.Equal(baseType, type.BaseType);
 
-        // The derived class should NOT have its own Value property
-        // It inherits the string Value property from the base class
-        // Users can manually convert between string and enum as needed
+        // The derived class inherits the string Value property from the base class
         var valueProperty = type.GetProperty("Value");
         Assert.NotNull(valueProperty);
         Assert.Equal(typeof(string), valueProperty.PropertyType);
+
+        // The derived class should have an EnumValue adapter property
+        var enumValueProperty = type.GetProperty("EnumValue");
+        Assert.NotNull(enumValueProperty);
+        Assert.Equal(typeof(Nullable<>).MakeGenericType(enumType), enumValueProperty.PropertyType);
+
+        // Test that the EnumValue property works correctly
+        var instance = Activator.CreateInstance(type);
+        Assert.NotNull(instance);
+
+        // Set Value to a string and verify EnumValue returns the correct enum
+        valueProperty.SetValue(instance, "Always");
+        var enumValue = enumValueProperty.GetValue(instance);
+        Assert.NotNull(enumValue);
+        Assert.Equal("Always", enumValue.ToString());
+
+        // Set EnumValue and verify Value is updated
+        var alwaysValue = Enum.Parse(enumType, "Never");
+        enumValueProperty.SetValue(instance, alwaysValue);
+        var stringValue = valueProperty.GetValue(instance);
+        Assert.Equal("Never", stringValue);
+
+        // Set EnumValue to null and verify Value is null
+        enumValueProperty.SetValue(instance, null);
+        stringValue = valueProperty.GetValue(instance);
+        Assert.Null(stringValue);
     }
 
     [Fact, TestPriority(1)]
