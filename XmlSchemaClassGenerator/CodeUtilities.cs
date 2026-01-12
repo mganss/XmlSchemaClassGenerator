@@ -496,7 +496,7 @@ namespace XmlSchemaClassGenerator
                     var splitSegments = ((IEnumerable<string>)segments[0].Split('.')).Reverse().Where(s => s != "www").ToList();
                     if (segments.Count > 1)
                         splitSegments.AddRange(segments.Skip(1));
-                    segments = splitSegments.SelectMany(s => s.Split('-', '.', '_')).ToList();
+                    segments = [.. splitSegments.SelectMany(s => s.Split('-', '.', '_'))];
                 }
             }
 

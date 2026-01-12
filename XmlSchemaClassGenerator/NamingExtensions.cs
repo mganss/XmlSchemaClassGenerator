@@ -80,7 +80,7 @@ public static class NamingExtensions
 
     private static Regex CreateInvalidCharsRegex()
     {
-        var r = string.Join("", InvalidChars.Keys.Select(c => string.Format(@"\x{0:x2}", (int)c)).ToArray());
+        var r = string.Join("", [.. InvalidChars.Keys.Select(c => string.Format(@"\x{0:x2}", (int)c))]);
         return new Regex("[" + r + "]", RegexOptions.Compiled);
     }
 

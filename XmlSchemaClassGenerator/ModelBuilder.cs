@@ -475,8 +475,7 @@ internal class ModelBuilder
 
             interfaceModel.Documentation.AddRange(docs);
 
-            if (namespaceModel != null)
-                namespaceModel.Types[name] = interfaceModel;
+            namespaceModel?.Types[name] = interfaceModel;
 
             if (!qualifiedName.IsEmpty)
                 builder.SetType(group, qualifiedName, interfaceModel);
@@ -533,8 +532,7 @@ internal class ModelBuilder
 
             classModel.Documentation.AddRange(docs);
 
-            if (namespaceModel != null)
-                namespaceModel.Types[classModel.Name] = classModel;
+            namespaceModel?.Types[classModel.Name] = classModel;
 
             if (!qualifiedName.IsEmpty)
                 builder.SetType(complexType, qualifiedName, classModel);
@@ -669,8 +667,8 @@ internal class ModelBuilder
 
             var facets = simpleType.Content switch
             {
-                XmlSchemaSimpleTypeRestriction typeRestriction when !_configuration.MergeRestrictionsWithBase => typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList(),
-                XmlSchemaSimpleTypeUnion typeUnion when AllMembersHaveFacets(typeUnion, out baseFacets) => baseFacets.SelectMany(f => f).ToList(),
+                XmlSchemaSimpleTypeRestriction typeRestriction when !_configuration.MergeRestrictionsWithBase => [.. typeRestriction.Facets.Cast<XmlSchemaFacet>()],
+                XmlSchemaSimpleTypeUnion typeUnion when AllMembersHaveFacets(typeUnion, out baseFacets) => [.. baseFacets.SelectMany(f => f)],
                 _ => MergeRestrictions(simpleType)
             };
 
@@ -683,7 +681,7 @@ internal class ModelBuilder
                 if (enumFacets.Count > 0 && (baseFacets is null || baseFacets.TrueForAll(fs => fs.OfType<XmlSchemaEnumerationFacet>().Any())) && !_configuration.EnumAsString)
                     return CreateEnumModel(simpleType, enumFacets);
 
-                restrictions = CodeUtilities.GetRestrictions(facets, simpleType, _configuration).Where(r => r != null).Sanitize().ToList();
+                restrictions = [.. CodeUtilities.GetRestrictions(facets, simpleType, _configuration).Where(r => r != null).Sanitize()];
             }
 
             return CreateSimpleModel(simpleType, restrictions ?? []);
@@ -692,7 +690,7 @@ internal class ModelBuilder
             {
                 var members = typeUnion.BaseMemberTypes.Select(b => b.Content as XmlSchemaSimpleTypeRestriction);
                 var retval = members.All(r => r?.Facets.Count > 0);
-                baseFacets = !retval ? null : members.Select(r => r.Facets.Cast<XmlSchemaFacet>()).ToList();
+                baseFacets = !retval ? null : [.. members.Select(r => r.Facets.Cast<XmlSchemaFacet>())];
                 return retval;
             }
 
@@ -769,8 +767,7 @@ internal class ModelBuilder
             }
 
             enumModel.Values = EnsureEnumValuesUnique(enumModel.Values);
-            if (namespaceModel != null)
-                namespaceModel.Types[enumModel.Name] = enumModel;
+            namespaceModel?.Types[enumModel.Name] = enumModel;
 
             return enumModel;
         }
@@ -811,8 +808,7 @@ internal class ModelBuilder
             }
 
             enumModel.Values = EnsureEnumValuesUnique(enumModel.Values);
-            if (namespaceModel != null)
-                namespaceModel.Types[enumModel.Name] = enumModel;
+            namespaceModel?.Types[enumModel.Name] = enumModel;
 
             if (!qualifiedName.IsEmpty)
                 builder.SetType(simpleType, qualifiedName, enumModel);
@@ -838,8 +834,7 @@ internal class ModelBuilder
             simpleModel.Documentation.AddRange(docs);
             simpleModel.Restrictions.AddRange(restrictions);
 
-            if (namespaceModel != null)
-                namespaceModel.Types[simpleModel.Name] = simpleModel;
+            namespaceModel?.Types[simpleModel.Name] = simpleModel;
 
             if (!qualifiedName.IsEmpty)
                 builder.SetType(simpleType, qualifiedName, simpleModel);
@@ -1162,12 +1157,11 @@ internal class ModelBuilder
     public static List<DocumentationModel> GetDocumentation(XmlSchemaAnnotated annotated)
     {
         return annotated.Annotation == null ? []
-		        : annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
+		        : [.. annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
 		        .Where(d => d.Markup?.Length > 0)
 		        .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = m.OuterXml }))
 		        .SelectMany(d => d)
-		        .Where(d => !string.IsNullOrEmpty(d.Text))
-		        .ToList();
+		        .Where(d => !string.IsNullOrEmpty(d.Text))];
     }
 
     public IEnumerable<CodeNamespace> GenerateCode()

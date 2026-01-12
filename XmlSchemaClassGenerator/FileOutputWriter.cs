@@ -82,7 +82,7 @@ public class FileOutputWriter : OutputWriter
 
         Directory.CreateDirectory(dirPath);
 
-        cns.Imports.AddRange(cn.Imports.Cast<CodeNamespaceImport>().ToArray());
+        cns.Imports.AddRange([.. cn.Imports.Cast<CodeNamespaceImport>()]);
         cns.Comments.AddRange(cn.Comments);
         ccu.Namespaces.Add(cns);
 

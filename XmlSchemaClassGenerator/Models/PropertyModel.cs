@@ -269,8 +269,7 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         {
             var defaultValueExpression = propertyType.GetDefaultValueFor(DefaultValue, IsAttribute);
 
-            if (backingField != null)
-                backingField.InitExpression = defaultValueExpression;
+            backingField?.InitExpression = defaultValueExpression;
 
             member.Type = IsNillableValueType ? NullableTypeRef(typeReference) : typeReference;
 
@@ -518,7 +517,7 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             foreach (var propertyAttribute in arrayItemProperty.GetAttributes(false, OwningType).ToList())
             {
                 var arrayItemAttribute = AttributeDecl<XmlArrayItemAttribute>(
-                    propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, nameof(Order), StringComparison.Ordinal)).ToArray());
+                    [.. propertyAttribute.Arguments.Cast<CodeAttributeArgument>().Where(x => !string.Equals(x.Name, nameof(Order), StringComparison.Ordinal))]);
                 var namespacePresent = arrayItemAttribute.Arguments.OfType<CodeAttributeArgument>().Any(a => a.Name == Namespace);
                 if (!namespacePresent && !arrayItemProperty.XmlSchemaName.IsEmpty && !string.IsNullOrEmpty(arrayItemProperty.XmlSchemaName.Namespace))
                     arrayItemAttribute.Arguments.Add(new(Namespace, new CodePrimitiveExpression(arrayItemProperty.XmlSchemaName.Namespace)));

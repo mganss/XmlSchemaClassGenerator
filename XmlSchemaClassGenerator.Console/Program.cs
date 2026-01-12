@@ -158,7 +158,7 @@ with or without backing field initialization for collections
             { "dnfin|doNotForceIsNullable", "do not force generator to emit IsNullable = true in XmlElement annotation for nillable elements when element is nullable (minOccurs < 1 or parent element is choice) (default is false)", v => doNotForceIsNullable = v != null },
             { "cn|compactTypeNames", "use type names without namespace qualifier for types in the using list (default is false)", v => compactTypeNames = v != null },
             { "cl|commentLanguages=", $"comment languages to use (default is {string.Join(", ", commentLanguages)}; supported are {string.Join(", ", supportedCommentLanguages)})",
-                v => commentLanguages = v.Split(',').Select(l => l.Trim()).ToArray() },
+                v => commentLanguages = [.. v.Split(',').Select(l => l.Trim())] },
             { "un|uniqueTypeNames", "generate type names that are unique across namespaces (default is false)", v => uniqueTypeNamesAcrossNamespaces = v != null },
             { "gc|generatedCodeAttribute", "add version information to GeneratedCodeAttribute (default is true)", v => createGeneratedCodeAttributeVersion = v != null },
             { "nc|netCore", "generate .NET Core specific code that might not work with .NET Framework (default is false)", v => netCoreSpecificCode = v != null },
