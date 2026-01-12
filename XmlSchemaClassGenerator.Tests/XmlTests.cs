@@ -217,6 +217,68 @@ public class XmlTests(ITestOutputHelper output)
 
     [Fact, TestPriority(1)]
     [UseCulture("en-US")]
+    public void TestSimpleContentEnum()
+    {
+        var assembly = Compiler.Generate("SimpleContentEnum", "xsd/simple/simplecontent-enum.xsd");
+
+        const string ns = "SimpleContentEnum.Simplecontent";
+
+        // The enum type should be generated
+        var enumType = assembly.GetType($"{ns}.TransConfirmationCodeTypeEnum");
+        if (enumType == null)
+        {
+            var names = string.Join(", ", assembly.GetTypes().Select(t => t.FullName));
+            Assert.Fail($"Enum type not found. Available types: {names}");
+        }
+
+        // Verify it's an enum with the expected values
+        Assert.True(enumType.IsEnum);
+        var enumValues = Enum.GetNames(enumType);
+        Assert.Contains("Always", enumValues);
+        Assert.Contains("Never", enumValues);
+        Assert.Contains("OnError", enumValues);
+
+        // The derived class should exist and inherit from the base
+        var type = assembly.GetType($"{ns}.TransConfirmationCodeType");
+        Assert.NotNull(type);
+
+        var baseType = assembly.GetType($"{ns}.CodeType");
+        Assert.Equal(baseType, type.BaseType);
+
+        // The derived class inherits the string Value property from the base class
+        var valueProperty = type.GetProperty("Value");
+        Assert.NotNull(valueProperty);
+        Assert.Equal(typeof(string), valueProperty.PropertyType);
+
+        // The derived class should have an EnumValue adapter property
+        var enumValueProperty = type.GetProperty("EnumValue");
+        Assert.NotNull(enumValueProperty);
+        Assert.Equal(typeof(Nullable<>).MakeGenericType(enumType), enumValueProperty.PropertyType);
+
+        // Test that the EnumValue property works correctly
+        var instance = Activator.CreateInstance(type);
+        Assert.NotNull(instance);
+
+        // Set Value to a string and verify EnumValue returns the correct enum
+        valueProperty.SetValue(instance, "Always");
+        var enumValue = enumValueProperty.GetValue(instance);
+        Assert.NotNull(enumValue);
+        Assert.Equal("Always", enumValue.ToString());
+
+        // Set EnumValue and verify Value is updated
+        var alwaysValue = Enum.Parse(enumType, "Never");
+        enumValueProperty.SetValue(instance, alwaysValue);
+        var stringValue = valueProperty.GetValue(instance);
+        Assert.Equal("Never", stringValue);
+
+        // Set EnumValue to null and verify Value is null
+        enumValueProperty.SetValue(instance, null);
+        stringValue = valueProperty.GetValue(instance);
+        Assert.Null(stringValue);
+    }
+
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
     public void TestList()
     {
         Compiler.Generate("List", ListPattern);
