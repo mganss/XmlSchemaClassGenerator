@@ -72,8 +72,8 @@ public sealed class DateOnlyTimeOnlyTests
 
         Assert.Contains("public System.DateOnly SomeDate", code);
         Assert.Contains("public System.TimeOnly SomeTime", code);
-        Assert.Contains("DataType=\"date\"", code);
-        Assert.Contains("DataType=\"time\"", code);
+        Assert.DoesNotContain("DataType=\"date\"", code);
+        Assert.DoesNotContain("DataType=\"time\"", code);
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public sealed class DateOnlyTimeOnlyTests
         Assert.DoesNotContain("DataType=\"date\"", code);
     }
     [Fact]
-    public void WhenUseDateOnlyIsTrue_AndDateTimeWithTimeZoneIsTrue_DateOnlyAndTimeOnlyAreGenerated_WithDataTypeAttribute()
+    public void WhenUseDateOnlyIsTrue_AndDateTimeWithTimeZoneIsTrue_DateOnlyAndTimeOnlyAreGenerated()
     {
         var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
 <xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
@@ -218,7 +218,7 @@ public sealed class DateOnlyTimeOnlyTests
 
         Assert.Contains("public System.DateOnly SomeDate", code);
         Assert.Contains("public System.TimeOnly SomeTime", code);
-        Assert.Contains("DataType=\"date\"", code);
-        Assert.Contains("DataType=\"time\"", code);
+        Assert.DoesNotContain("DataType=\"date\"", code);
+        Assert.DoesNotContain("DataType=\"time\"", code);
     }
 }
