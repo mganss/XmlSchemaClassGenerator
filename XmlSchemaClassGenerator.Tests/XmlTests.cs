@@ -59,7 +59,8 @@ public class XmlTests(ITestOutputHelper output)
             UseArrayItemAttribute = generatorPrototype.UseArrayItemAttribute,
             EnumAsString = generatorPrototype.EnumAsString,
             AllowDtdParse = generatorPrototype.AllowDtdParse,
-            OmitXmlIncludeAttribute = generatorPrototype.OmitXmlIncludeAttribute
+            OmitXmlIncludeAttribute = generatorPrototype.OmitXmlIncludeAttribute,
+            EnumCollection = generatorPrototype.EnumCollection,
         };
 
         gen.CommentLanguages.Clear();
@@ -514,6 +515,112 @@ public class XmlTests(ITestOutputHelper output)
         foreach (var propertyInfo in propertiesWithSpecifiedPostfix)
         {
             Assert.True((bool)propertyInfo.GetValue(myClassInstance));
+        }
+    }
+
+    [Fact]
+    public void TestEnumCollection()
+    {
+        var assembly = Compiler.Generate("ListEnumCollection", ListPattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            EnumCollection = true
+        });
+
+        Assert.NotNull(assembly);
+
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+
+        var enumType = assembly.GetType("List.EnumType");
+        Assert.NotNull(enumType);
+        Assert.True(enumType.IsEnum);
+
+        // Element property: should be Collection<EnumType>, not Collection<string>
+        var enumElemProp = myClassType.GetProperty("EnumElem");
+        Assert.NotNull(enumElemProp);
+        Assert.True(enumElemProp.PropertyType.IsGenericType);
+        Assert.Equal(enumType, enumElemProp.PropertyType.GetGenericArguments()[0]);
+
+        // Attribute property: should use enum type, not string
+        var enumAttrProp = myClassType.GetProperty("EnumAttr");
+        Assert.NotNull(enumAttrProp);
+        if (enumAttrProp.PropertyType.IsArray)
+        {
+            Assert.Equal(enumType, enumAttrProp.PropertyType.GetElementType());
+        }
+        else if (enumAttrProp.PropertyType.IsGenericType)
+        {
+            Assert.Equal(enumType, enumAttrProp.PropertyType.GetGenericArguments()[0]);
+        }
+        else
+        {
+            Assert.Fail($"Expected array or generic collection, got {enumAttrProp.PropertyType}");
+        }
+
+        // Non-enum list properties should remain string-based
+        var timeListElemProp = myClassType.GetProperty("TimeListElem");
+        Assert.NotNull(timeListElemProp);
+        Assert.True(timeListElemProp.PropertyType.IsGenericType);
+        Assert.Equal(typeof(string), timeListElemProp.PropertyType.GetGenericArguments()[0]);
+    }
+
+    [Theory]
+    [InlineData(typeof(Collection<>), null)]
+    [InlineData(typeof(List<>), null)]
+    [InlineData(typeof(HashSet<>), null)]
+    [InlineData(typeof(Array), null)]
+    public void TestEnumCollectionRespectsCollectionType(Type collectionType, Type collectionImplementationType)
+    {
+        var assembly = Compiler.Generate($"ListEnumCollection_{collectionType.Name}_{collectionImplementationType?.Name}", ListPattern, new Generator
+        {
+            GenerateNullables = true,
+            IntegerDataType = typeof(int),
+            DataAnnotationMode = DataAnnotationMode.All,
+            GenerateDesignerCategoryAttribute = false,
+            GenerateComplexTypesForCollections = true,
+            EntityFramework = false,
+            GenerateInterfaces = true,
+            NamespacePrefix = "List",
+            GenerateDescriptionAttribute = true,
+            TextValuePropertyName = "Value",
+            EnumCollection = true,
+            CollectionType = collectionType,
+            CollectionImplementationType = collectionImplementationType
+        });
+
+        Assert.NotNull(assembly);
+
+        var myClassType = assembly.GetType("List.MyClass");
+        Assert.NotNull(myClassType);
+
+        var enumType = assembly.GetType("List.EnumType");
+        Assert.NotNull(enumType);
+
+        var enumElemProp = myClassType.GetProperty("EnumElem");
+        Assert.NotNull(enumElemProp);
+
+        if (collectionType == typeof(System.Array))
+        {
+            Assert.True(enumElemProp.PropertyType.IsArray);
+            Assert.Equal(enumType, enumElemProp.PropertyType.GetElementType());
+        }
+        else
+        {
+            Assert.True(enumElemProp.PropertyType.IsGenericType);
+            Assert.Equal(enumType, enumElemProp.PropertyType.GetGenericArguments()[0]);
+
+            var expectedCollectionType = collectionType.MakeGenericType(enumType);
+            Assert.Equal(expectedCollectionType, enumElemProp.PropertyType);
         }
     }
 
