@@ -1,4 +1,4 @@
-using System.CodeDom;
+﻿using System.CodeDom;
 using System.Collections.Generic;
 using XmlSchemaClassGenerator.Metadata;
 

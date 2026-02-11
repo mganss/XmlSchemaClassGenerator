@@ -1,4 +1,4 @@
-namespace XmlSchemaClassGenerator;
+﻿namespace XmlSchemaClassGenerator;
 
 /// <summary>
 /// Determines whether metadata helper types are emitted.
