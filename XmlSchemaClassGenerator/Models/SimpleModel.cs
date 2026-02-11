@@ -12,6 +12,8 @@ namespace XmlSchemaClassGenerator;
 
 public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(configuration)
 {
+    private static readonly RestrictionAttributeEmitterRegistry RestrictionEmitterRegistry = RestrictionAttributeEmitterRegistry.Default;
+
     public Type ValueType { get; set; }
     public List<RestrictionModel> Restrictions { get; } = [];
     public bool UseDataTypeAttribute { get; set; } = true;
@@ -167,8 +169,23 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
 
     public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()
     {
-        foreach (var attribute in Restrictions.Where(x => x.IsSupported).Select(r => r.GetAttribute()).Where(a => a != null))
-            yield return attribute;
+        foreach (var restriction in Restrictions.Where(x => x.IsSupported))
+        {
+            if (RestrictionEmitterRegistry.TryEmit(restriction, Configuration, out var emittedAttribute, out var requiredMetadataHelper))
+            {
+                if (!string.IsNullOrEmpty(requiredMetadataHelper))
+                    Configuration.RequiredMetadataHelpers.Add(requiredMetadataHelper);
+
+                if (emittedAttribute != null)
+                    yield return emittedAttribute;
+
+                continue;
+            }
+
+            var attribute = restriction.GetAttribute();
+            if (attribute != null)
+                yield return attribute;
+        }
 
         var minInclusive = Restrictions.OfType<MinInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
         var maxInclusive = Restrictions.OfType<MaxInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);

@@ -522,6 +522,7 @@ namespace XmlSchemaClassGenerator
     {
         private const string DataAnnotations = "System.ComponentModel.DataAnnotations";
         private const string CodeAnalysis = "System.Diagnostics.CodeAnalysis";
+        internal const string FractionDigitsAttributeName = "FractionDigitsAttribute";
 
         private static TypeInfo Make(string @namespace, [CallerMemberName] string name = null)
             => new(@namespace, name + "Attribute");
@@ -534,6 +535,7 @@ namespace XmlSchemaClassGenerator
         public static TypeInfo StringLength { get; } = Make(DataAnnotations);
         public static TypeInfo RegularExpression { get; } = Make(DataAnnotations);
         public static TypeInfo NotMapped { get; } = Make($"{DataAnnotations}.Schema");
+        public static TypeInfo FractionDigits(string metadataNamespace) => new(metadataNamespace, FractionDigitsAttributeName);
 
         public static TypeInfo AllowNull { get; } = Make(CodeAnalysis);
         public static TypeInfo MaybeNull { get; } = Make(CodeAnalysis);

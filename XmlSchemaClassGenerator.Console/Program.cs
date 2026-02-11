@@ -72,6 +72,7 @@ static class Program
         var omitXmlIncludeAttribute = false;
         NamingScheme? namingScheme = null;
         var forceUriScheme = "none";
+        var metadataNamespace = GeneratorConfiguration.DefaultMetadataNamespace;
 
 
         var options = new OptionSet {
@@ -183,7 +184,8 @@ with or without backing field initialization for collections
                     };
                 }
             },
-            { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v }
+            { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v },
+            { "mn|metadataNamespace=", $"namespace for generated metadata helper attributes (default is {GeneratorConfiguration.DefaultMetadataNamespace})", v => metadataNamespace = v }
         };
 
         var globsAndUris = options.Parse(args);
@@ -273,7 +275,8 @@ with or without backing field initialization for collections
             SerializeEmptyCollections = serializeEmptyCollections,
             AllowDtdParse = allowDtdParse,
             OmitXmlIncludeAttribute = omitXmlIncludeAttribute,
-            ForceUriScheme = forceUriScheme
+            ForceUriScheme = forceUriScheme,
+            MetadataNamespace = metadataNamespace
         };
 
         if (namingScheme != null)

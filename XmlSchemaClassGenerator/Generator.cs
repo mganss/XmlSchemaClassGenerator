@@ -372,6 +372,15 @@ public class Generator
         set { _configuration.OmitXmlIncludeAttribute = value; }
     }
 
+    /// <summary>
+    /// Namespace where generated metadata helper attributes are emitted.
+    /// </summary>
+    public string MetadataNamespace
+    {
+        get { return _configuration.MetadataNamespace; }
+        set { _configuration.MetadataNamespace = value; }
+    }
+
     public bool ValidationError { get; private set; }
 
     static Generator()
