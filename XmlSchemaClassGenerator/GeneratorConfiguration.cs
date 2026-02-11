@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -370,4 +370,10 @@ public class GeneratorConfiguration
     /// Omit generation of XmlIncludeAttribute for derived types. Default is false.
     /// </summary>
     public bool OmitXmlIncludeAttribute { get; set; } = false;
+
+    /// <summary>
+    /// Generate typed enum collections for xs:list types whose item type is an enumeration,
+    /// instead of falling back to string collections. Default is false.
+    /// </summary>
+    public bool EnumCollection { get; set; }
 }

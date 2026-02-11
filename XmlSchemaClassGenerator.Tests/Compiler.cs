@@ -120,6 +120,7 @@ class Compiler
             MapUnionToWidestCommonType = generatorPrototype.MapUnionToWidestCommonType,
             SeparateNamespaceHierarchy = generatorPrototype.SeparateNamespaceHierarchy,
             OmitXmlIncludeAttribute = generatorPrototype.OmitXmlIncludeAttribute,
+            EnumCollection = generatorPrototype.EnumCollection,
         };
 
         gen.CommentLanguages.Clear();

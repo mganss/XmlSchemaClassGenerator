@@ -16,6 +16,11 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
     public List<RestrictionModel> Restrictions { get; } = [];
     public bool UseDataTypeAttribute { get; set; } = true;
 
+    /// <summary>
+    /// Represents the item type of a list of enums if this simple type is generated as a collection of enums.
+    /// </summary>
+    public TypeModel EnumListItemType { get; set; }
+
     public static string GetCollectionDefinitionName(string typeName, GeneratorConfiguration configuration)
     {
         var type = configuration.CollectionType;
@@ -57,6 +62,12 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
 
     public override CodeTypeReference GetReferenceFor(NamespaceModel referencingNamespace, bool collection = false, bool forInit = false, bool attribute = false)
     {
+        // if this simpleType is a collection of enums, return the list item type
+        if (Configuration.EnumCollection && EnumListItemType != null)
+        {
+            return EnumListItemType.GetReferenceFor(referencingNamespace, collection: collection, forInit: forInit, attribute: attribute);
+        }
+
         var type = ValueType;
 
         if (XmlSchemaType != null)
