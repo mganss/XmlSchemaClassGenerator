@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -345,19 +345,8 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
 
         if (rootClass is SimpleModel || rootClass is EnumModel)
         {
-            string reference, val;
-
-            using (var writer = new System.IO.StringWriter())
-            {
-                CSharpProvider.GenerateCodeFromExpression(rootClass.GetDefaultValueFor(defaultString, attribute), writer, new CodeGeneratorOptions());
-                val = writer.ToString();
-            }
-
-            using (var writer = new System.IO.StringWriter())
-            {
-                CSharpProvider.GenerateCodeFromExpression(new CodeTypeReferenceExpression(GetReferenceFor(referencingNamespace: null)), writer, new CodeGeneratorOptions());
-                reference = writer.ToString();
-            }
+            var val = GenerateCSharpCodeFromExpression(rootClass.GetDefaultValueFor(defaultString, attribute));
+            var reference = GenerateCSharpCodeFromExpression(new CodeTypeReferenceExpression(GetReferenceFor(referencingNamespace: null)));
 
             return new CodeSnippetExpression($"new {reference} {{ {Configuration.TextValuePropertyName} = {val} }};");
         }
