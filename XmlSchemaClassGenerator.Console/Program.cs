@@ -1,4 +1,4 @@
-﻿using XmlSchemaClassGenerator;
+using XmlSchemaClassGenerator;
 using XmlSchemaClassGenerator.NamingProviders;
 using System;
 using System.CodeDom;
@@ -70,6 +70,7 @@ static class Program
         var serializeEmptyCollections = false;
         var allowDtdParse = false;
         var omitXmlIncludeAttribute = false;
+        var enumCollection = false;
         NamingScheme? namingScheme = null;
         var forceUriScheme = "none";
         var metadataNamespace = GeneratorConfiguration.DefaultMetadataNamespace;
@@ -172,6 +173,7 @@ with or without backing field initialization for collections
             { "ec|serializeEmptyCollections", "serialize empty collections (default is false)", v => serializeEmptyCollections = v != null },
             { "dtd|allowDtdParse", "allows dtd parse (default is false)", v => allowDtdParse = v != null },
             { "oxi|omitXmlIncludeAttribute", "omit generation of XmlIncludeAttribute for derived types (default is false)", v => omitXmlIncludeAttribute = v != null },
+            { "ecl|enumCollection", "generate typed enum collections for xs:list types instead of string collections (default is false)", v => enumCollection = v != null },
             { "ns|namingScheme=", @"use the specified naming scheme for class and property names (default is Pascal; can be: Direct, Pascal, Legacy)",
                 v =>
                 {
@@ -275,6 +277,7 @@ with or without backing field initialization for collections
             SerializeEmptyCollections = serializeEmptyCollections,
             AllowDtdParse = allowDtdParse,
             OmitXmlIncludeAttribute = omitXmlIncludeAttribute,
+            EnumCollection = enumCollection,
             ForceUriScheme = forceUriScheme,
             MetadataNamespace = metadataNamespace
         };

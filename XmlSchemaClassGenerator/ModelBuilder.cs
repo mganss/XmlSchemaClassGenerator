@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -685,7 +685,28 @@ internal class ModelBuilder
                 restrictions = [.. CodeUtilities.GetRestrictions(facets, simpleType, _configuration).Where(r => r != null).Sanitize()];
             }
 
-            return CreateSimpleModel(simpleType, restrictions ?? []);
+            if (!_configuration.EnumCollection || simpleType.Datatype?.Variety != XmlSchemaDatatypeVariety.List)
+            {
+                return CreateSimpleModel(simpleType, restrictions ?? [], null);
+            }
+
+            // get the list's item type if the simpleType is a list
+            var listItemType = FindListItemType(simpleType);
+            if (listItemType == null)
+            {
+                return CreateSimpleModel(simpleType, restrictions ?? [], null);
+            }
+
+            // if EnumCollection flag is enabled and the simpleType is a list, check if the item type is an enum and
+            // set the model's ListItemType to that enum, so that the generated collection can be of the enum type instead of string
+            TypeModel enumListItemTypeModel = null;
+            var itemTypeModel = builder.CreateTypeModel(listItemType.QualifiedName, listItemType);
+            if (itemTypeModel is EnumModel)
+            {
+                enumListItemTypeModel = itemTypeModel;
+            }
+
+            return CreateSimpleModel(simpleType, restrictions ?? [], enumListItemTypeModel);
 
             static bool AllMembersHaveFacets(XmlSchemaSimpleTypeUnion typeUnion, out List<IEnumerable<XmlSchemaFacet>> baseFacets)
             {
@@ -817,7 +838,7 @@ internal class ModelBuilder
             return enumModel;
         }
 
-        private SimpleModel CreateSimpleModel(XmlSchemaSimpleType simpleType, List<RestrictionModel> restrictions)
+        private SimpleModel CreateSimpleModel(XmlSchemaSimpleType simpleType, List<RestrictionModel> restrictions, TypeModel enumListTypeModel)
         {
             var simpleModelName = _configuration.NamingProvider.SimpleTypeNameFromQualifiedName(qualifiedName, simpleType);
             if (namespaceModel != null)
@@ -830,6 +851,7 @@ internal class ModelBuilder
                 XmlSchemaName = qualifiedName,
                 XmlSchemaType = simpleType,
                 ValueType = simpleType.Datatype.GetEffectiveType(_configuration, restrictions, simpleType),
+                EnumListItemType = enumListTypeModel
             };
 
             simpleModel.Documentation.AddRange(docs);
@@ -1185,5 +1207,46 @@ internal class ModelBuilder
         var result = _configuration.NamespaceProvider.FindNamespace(key);
         return !string.IsNullOrEmpty(result) ? result
             : throw new ArgumentException(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
+    }
+
+    /// <summary>
+    /// <para>
+    /// Follows the <see cref="XmlSchemaSimpleType.BaseXmlSchemaType"/> chain to find the item type
+    /// of an <c>xs:list</c>. Returns <c>null</c> if no list content is found.
+    /// </para>
+    /// <para>
+    /// Direct — the simpleType's Content is the list itself, matched on the first iteration:
+    /// <code>
+    ///   &lt;xs:simpleType&gt;
+    ///     &lt;xs:list itemType="my:enumType" /&gt;
+    ///   &lt;/xs:simpleType&gt;
+    /// </code>
+    /// </para>
+    /// <para>
+    /// Wrapped — the simpleType's Content is a restriction.
+    /// The restriction's <see cref="XmlSchemaSimpleType.BaseXmlSchemaType"/> points to an
+    /// anonymous inner simpleType whose Content is the list, reached on the second iteration:
+    /// <code>
+    ///   &lt;xs:simpleType&gt;
+    ///     &lt;xs:restriction&gt;
+    ///       &lt;xs:simpleType&gt;&lt;xs:list itemType="my:enumType" /&gt;&lt;/xs:simpleType&gt;
+    ///       &lt;xs:minLength value="1" /&gt;
+    ///     &lt;/xs:restriction&gt;
+    ///   &lt;/xs:simpleType&gt;
+    /// </code>
+    /// </para>
+    /// </summary>
+    /// <param name="type">The simple type to inspect.</param>
+    /// <returns>The resolved item type of the list, or <c>null</c> if no list content was found.</returns>
+    private static XmlSchemaSimpleType FindListItemType(XmlSchemaSimpleType type)
+    {
+        for (var current = type; current != null; current = current.BaseXmlSchemaType as XmlSchemaSimpleType)
+        {
+            if (current.Content is XmlSchemaSimpleTypeList list)
+            {
+                return list.BaseItemType ?? list.ItemType;
+            }
+        }
+        return null;
     }
 }

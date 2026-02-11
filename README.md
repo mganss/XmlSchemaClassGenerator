@@ -200,7 +200,10 @@ Options:
       --oxi, --omitXmlIncludeAttribute
                              omit generation of XmlIncludeAttribute for derived
                                types (default is false)
-	  --ns, --namingScheme   use the specified naming scheme for class and
+      --ecl, --enumCollection
+                             generate typed enum collections for xs:list types
+                             instead of string collections (default is false)
+      --ns, --namingScheme   use the specified naming scheme for class and
                                property names (default is Pascal; can be:
                                Direct, Pascal, Legacy)
       --fu, --forceUriScheme=VALUE

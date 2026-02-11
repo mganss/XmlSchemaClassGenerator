@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
@@ -370,6 +370,12 @@ public class Generator
     {
         get { return _configuration.OmitXmlIncludeAttribute; }
         set { _configuration.OmitXmlIncludeAttribute = value; }
+    }
+
+    public bool EnumCollection
+    {
+        get { return _configuration.EnumCollection; }
+        set { _configuration.EnumCollection = value; }
     }
 
     /// <summary>
