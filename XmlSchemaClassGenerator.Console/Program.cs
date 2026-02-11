@@ -1,4 +1,4 @@
-﻿using XmlSchemaClassGenerator;
+using XmlSchemaClassGenerator;
 using XmlSchemaClassGenerator.NamingProviders;
 using System;
 using System.CodeDom;

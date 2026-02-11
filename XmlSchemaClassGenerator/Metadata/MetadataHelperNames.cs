@@ -1,4 +1,4 @@
-﻿namespace XmlSchemaClassGenerator.Metadata;
+namespace XmlSchemaClassGenerator.Metadata;
 
 internal static class MetadataHelperNames
 {
