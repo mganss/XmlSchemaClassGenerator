@@ -43,6 +43,7 @@ public class GeneratorConfiguration
         CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         MergeRestrictionsWithBase = true;
         ForceUriScheme = "none";
+        MetadataEmissionMode = MetadataEmissionMode.None;
     }
 
     internal HashSet<string> RequiredMetadataHelpers { get; } = new(StringComparer.Ordinal);
@@ -380,6 +381,11 @@ public class GeneratorConfiguration
     /// instead of falling back to string collections. Default is false.
     /// </summary>
     public bool EnumCollection { get; set; }
+
+    /// <summary>
+    /// Determines whether metadata helper types should be emitted.
+    /// </summary>
+    public MetadataEmissionMode MetadataEmissionMode { get; set; }
 
     private string metadataNamespace = DefaultMetadataNamespace;
 

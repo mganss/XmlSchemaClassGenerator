@@ -24,6 +24,9 @@ internal sealed class MetadataHelperEmitter
 
     public void EnsureEmitted(ICollection<CodeNamespace> codeNamespaces)
     {
+        if (_configuration.MetadataEmissionMode == MetadataEmissionMode.None)
+            return;
+
         foreach (var requiredHelper in _configuration.RequiredMetadataHelpers.OrderBy(h => h, StringComparer.Ordinal))
         {
             if (_helperDescriptors.TryGetValue(requiredHelper, out var descriptor))

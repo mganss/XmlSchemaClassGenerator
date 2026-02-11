@@ -73,6 +73,7 @@ static class Program
         var enumCollection = false;
         NamingScheme? namingScheme = null;
         var forceUriScheme = "none";
+        var metadataEmissionMode = MetadataEmissionMode.None;
         var metadataNamespace = GeneratorConfiguration.DefaultMetadataNamespace;
 
 
@@ -187,6 +188,7 @@ with or without backing field initialization for collections
                 }
             },
             { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v },
+            { "mem|metadataEmissionMode=", "metadata helper emission mode (default is None; values: None, Enabled)", v => metadataEmissionMode = ParseMetadataEmissionMode(v) },
             { "mn|metadataNamespace=", $"namespace for generated metadata helper attributes (default is {GeneratorConfiguration.DefaultMetadataNamespace})", v => metadataNamespace = v }
         };
 
@@ -279,6 +281,7 @@ with or without backing field initialization for collections
             OmitXmlIncludeAttribute = omitXmlIncludeAttribute,
             EnumCollection = enumCollection,
             ForceUriScheme = forceUriScheme,
+            MetadataEmissionMode = metadataEmissionMode,
             MetadataNamespace = metadataNamespace
         };
 
@@ -389,5 +392,15 @@ with or without backing field initialization for collections
         System.Console.WriteLine();
         System.Console.WriteLine("Options:");
         p.WriteOptionDescriptions(System.Console.Out);
+    }
+
+    private static MetadataEmissionMode ParseMetadataEmissionMode(string value)
+    {
+        return value?.Trim().ToLowerInvariant() switch
+        {
+            "none" => MetadataEmissionMode.None,
+            "enabled" => MetadataEmissionMode.Enabled,
+            _ => throw new OptionException("Invalid metadata emission mode. Use None or Enabled.", "metadataEmissionMode")
+        };
     }
 }

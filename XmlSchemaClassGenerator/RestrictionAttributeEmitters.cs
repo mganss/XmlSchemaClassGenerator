@@ -44,6 +44,13 @@ internal sealed class RestrictionAttributeEmitterRegistry
 
     public bool TryEmit(RestrictionModel restriction, GeneratorConfiguration configuration, out CodeAttributeDeclaration attribute, out string requiredMetadataHelper)
     {
+        if (configuration.MetadataEmissionMode == MetadataEmissionMode.None)
+        {
+            attribute = null;
+            requiredMetadataHelper = null;
+            return false;
+        }
+
         foreach (var emitter in _emitters)
         {
             if (emitter.TryEmit(restriction, configuration, out attribute, out requiredMetadataHelper))

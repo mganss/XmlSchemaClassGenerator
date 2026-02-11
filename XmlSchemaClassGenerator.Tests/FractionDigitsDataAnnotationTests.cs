@@ -19,6 +19,7 @@ public class FractionDigitsDataAnnotationTests
             NamespaceProvider = generatorPrototype.NamespaceProvider,
             DataAnnotationMode = generatorPrototype.DataAnnotationMode,
             CompactTypeNames = generatorPrototype.CompactTypeNames,
+            MetadataEmissionMode = generatorPrototype.MetadataEmissionMode,
             MetadataNamespace = generatorPrototype.MetadataNamespace,
         };
 
@@ -59,8 +60,9 @@ public class FractionDigitsDataAnnotationTests
             {
                 GenerateNamespace = _ => "My.Schema.Generated.Model",
             },
-            MetadataNamespace = "Shared.Metadata",
             DataAnnotationMode = DataAnnotationMode.All,
+            MetadataEmissionMode = MetadataEmissionMode.Enabled,
+            MetadataNamespace = "Shared.Metadata",
         }).ToArray();
 
         var allContent = string.Join(Environment.NewLine, contents);
@@ -123,8 +125,9 @@ public class FractionDigitsDataAnnotationTests
                     _ => "Ns.Other",
                 },
             },
-            MetadataNamespace = "Common.Metadata",
             DataAnnotationMode = DataAnnotationMode.All,
+            MetadataEmissionMode = MetadataEmissionMode.Enabled,
+            MetadataNamespace = "Common.Metadata",
         }).ToArray();
 
         var allContent = string.Join(Environment.NewLine, contents);
@@ -164,8 +167,9 @@ public class FractionDigitsDataAnnotationTests
             {
                 GenerateNamespace = _ => "My.Schema.Generated.Model",
             },
-            MetadataNamespace = "Shared.Metadata",
             DataAnnotationMode = mode,
+            MetadataEmissionMode = MetadataEmissionMode.Enabled,
+            MetadataNamespace = "Shared.Metadata",
         }).ToArray();
 
         var allContent = string.Join(Environment.NewLine, contents);
@@ -173,6 +177,43 @@ public class FractionDigitsDataAnnotationTests
         Assert.DoesNotContain("FractionDigitsAttribute(", allContent);
         Assert.DoesNotContain("class FractionDigitsAttribute", allContent);
         Compiler.Compile($"{nameof(FractionDigitsAttribute_IsNotEmitted_WhenNotSupportedByMode)}_{mode}", contents);
+    }
+
+    [Fact]
+    public void FractionDigitsAttribute_IsNotEmitted_WhenMetadataEmissionModeIsNone()
+    {
+        const string xsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:t=""urn:test"" targetNamespace=""urn:test"" elementFormDefault=""qualified"">
+  <xs:element name=""document"" type=""t:documentType"" />
+  <xs:complexType name=""documentType"">
+    <xs:sequence>
+      <xs:element name=""price"">
+        <xs:simpleType>
+          <xs:restriction base=""xs:decimal"">
+            <xs:fractionDigits value=""2"" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>";
+
+        var contents = ConvertXml([xsd], new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = _ => "My.Schema.Generated.Model",
+            },
+            DataAnnotationMode = DataAnnotationMode.All,
+            // Default mode: metadata emission disabled.
+            MetadataNamespace = "Shared.Metadata",
+        }).ToArray();
+
+        var allContent = string.Join(Environment.NewLine, contents);
+
+        Assert.DoesNotContain("FractionDigitsAttribute(", allContent);
+        Assert.DoesNotContain("class FractionDigitsAttribute", allContent);
+        Compiler.Compile(nameof(FractionDigitsAttribute_IsNotEmitted_WhenMetadataEmissionModeIsNone), contents);
     }
 
     [Fact]
@@ -201,8 +242,9 @@ public class FractionDigitsDataAnnotationTests
             {
                 GenerateNamespace = _ => "My.Schema.Generated.Model",
             },
-            MetadataNamespace = "Shared.Metadata",
             DataAnnotationMode = DataAnnotationMode.All,
+            MetadataEmissionMode = MetadataEmissionMode.Enabled,
+            MetadataNamespace = "Shared.Metadata",
         }).ToArray();
 
         var allContent = string.Join(Environment.NewLine, contents);
@@ -237,8 +279,9 @@ public class FractionDigitsDataAnnotationTests
             {
                 GenerateNamespace = _ => "My.Schema.Generated.Model",
             },
-            MetadataNamespace = null,
             DataAnnotationMode = DataAnnotationMode.All,
+            MetadataEmissionMode = MetadataEmissionMode.Enabled,
+            MetadataNamespace = null,
         }).ToArray();
 
         var allContent = string.Join(Environment.NewLine, contents);

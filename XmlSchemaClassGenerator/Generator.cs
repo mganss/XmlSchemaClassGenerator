@@ -379,6 +379,15 @@ public class Generator
     }
 
     /// <summary>
+    /// Determines whether metadata helper attributes are emitted.
+    /// </summary>
+    public MetadataEmissionMode MetadataEmissionMode
+    {
+        get { return _configuration.MetadataEmissionMode; }
+        set { _configuration.MetadataEmissionMode = value; }
+    }
+
+    /// <summary>
     /// Namespace where generated metadata helper attributes are emitted.
     /// </summary>
     public string MetadataNamespace
