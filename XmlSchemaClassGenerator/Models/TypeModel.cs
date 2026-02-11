@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -16,7 +16,19 @@ namespace XmlSchemaClassGenerator;
 [DebuggerDisplay("{Name}")]
 public abstract class TypeModel(GeneratorConfiguration configuration) : GeneratorModel(configuration)
 {
-    protected static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
+    private static readonly CodeDomProvider CSharpProvider = CodeDomProvider.CreateProvider("CSharp");
+    private static readonly object CSharpProviderLock = new();
+
+    // prevents simultaneous access to the static CodeDomProvider, which is not thread-safe
+    protected static string GenerateCSharpCodeFromExpression(CodeExpression expression)
+    {
+        lock (CSharpProviderLock)
+        {
+            using var writer = new System.IO.StringWriter();
+            CSharpProvider.GenerateCodeFromExpression(expression, writer, new CodeGeneratorOptions());
+            return writer.ToString();
+        }
+    }
 
     public NamespaceModel Namespace { get; set; }
     public XmlSchemaElement RootElement { get; set; }

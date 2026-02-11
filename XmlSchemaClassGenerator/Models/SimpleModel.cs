@@ -50,9 +50,7 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
         {
             Type = { Options = CodeTypeReferenceOptions.GenericTypeParameter }
         };
-        using var writer = new System.IO.StringWriter();
-        CSharpProvider.GenerateCodeFromExpression(typeOfExpr, writer, new CodeGeneratorOptions());
-        var fullTypeName = writer.ToString();
+        var fullTypeName = GenerateCSharpCodeFromExpression(typeOfExpr);
         Debug.Assert(fullTypeName.StartsWith("typeof(") && fullTypeName.EndsWith(")"), $"Expected typeof expression, got: {fullTypeName}");
         return fullTypeName.Substring(7, fullTypeName.Length - 8);
     }
