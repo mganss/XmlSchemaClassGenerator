@@ -381,10 +381,10 @@ public class Generator
     /// <summary>
     /// Determines whether metadata helper attributes are emitted.
     /// </summary>
-    public MetadataEmissionMode MetadataEmissionMode
+    public bool EmitMetadataAttributes
     {
-        get { return _configuration.MetadataEmissionMode; }
-        set { _configuration.MetadataEmissionMode = value; }
+        get { return _configuration.EmitMetadataAttributes; }
+        set { _configuration.EmitMetadataAttributes = value; }
     }
 
     /// <summary>

@@ -79,7 +79,7 @@ public class FractionDigitsRestrictionModel(GeneratorConfiguration configuration
 
     public override CodeAttributeDeclaration GetAttribute()
     {
-        if (Configuration.MetadataEmissionMode == MetadataEmissionMode.None)
+        if (!Configuration.EmitMetadataAttributes)
             return null;
 
         return AttributeDecl(

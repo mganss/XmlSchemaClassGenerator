@@ -17,7 +17,7 @@ internal sealed class MetadataHelperEmitter
 
     public void EnsureFractionDigitsAttributeEmitted(ICollection<CodeNamespace> codeNamespaces)
     {
-        if (_configuration.MetadataEmissionMode == MetadataEmissionMode.None)
+        if (!_configuration.EmitMetadataAttributes)
             return;
 
         var existingNamespace = codeNamespaces.FirstOrDefault(ns => ns.Name == _configuration.MetadataNamespace);

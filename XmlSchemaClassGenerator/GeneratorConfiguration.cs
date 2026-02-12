@@ -43,7 +43,7 @@ public class GeneratorConfiguration
         CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         MergeRestrictionsWithBase = true;
         ForceUriScheme = "none";
-        MetadataEmissionMode = MetadataEmissionMode.None;
+        EmitMetadataAttributes = false;
     }
 
     public bool EnumAsString { get; set; }
@@ -383,7 +383,7 @@ public class GeneratorConfiguration
     /// <summary>
     /// Determines whether metadata helper types should be emitted.
     /// </summary>
-    public MetadataEmissionMode MetadataEmissionMode { get; set; }
+    public bool EmitMetadataAttributes { get; set; }
 
     private string metadataNamespace = DefaultMetadataNamespace;
 
