@@ -176,12 +176,8 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
 
     public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()
     {
-        foreach (var restriction in Restrictions.Where(x => x.IsSupported))
-        {
-            var attribute = restriction.GetAttribute();
-            if (attribute != null)
-                yield return attribute;
-        }
+        foreach (var attribute in Restrictions.Where(x => x.IsSupported).Select(r => r.GetAttribute()).Where(a => a != null))
+            yield return attribute;
 
         var minInclusive = Restrictions.OfType<MinInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
         var maxInclusive = Restrictions.OfType<MaxInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
