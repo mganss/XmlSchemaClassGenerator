@@ -1195,11 +1195,19 @@ internal class ModelBuilder
             .Select(nhi => NamespaceModel.Generate(nhi.FullName, nhi.Models, _configuration))
             .ToList();
 
-        var metadataHelperEmitter = new MetadataHelperEmitter(_configuration);
-        metadataHelperEmitter.EnsureEmitted(codeNamespaces);
+        if (HasSupportedFractionDigitsRestrictions())
+        {
+            var metadataHelperEmitter = new MetadataHelperEmitter(_configuration);
+            metadataHelperEmitter.EnsureFractionDigitsAttributeEmitted(codeNamespaces);
+        }
 
         return codeNamespaces;
     }
+
+    private bool HasSupportedFractionDigitsRestrictions()
+        => Types.Values
+            .OfType<SimpleModel>()
+            .Any(model => model.Restrictions.OfType<FractionDigitsRestrictionModel>().Any(restriction => restriction.IsSupported));
 
     private string BuildNamespace(Uri source, string xmlNamespace)
     {

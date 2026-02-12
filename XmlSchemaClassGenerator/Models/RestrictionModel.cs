@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.CodeDom;
 
 namespace XmlSchemaClassGenerator;
@@ -76,6 +76,16 @@ public class FractionDigitsRestrictionModel(GeneratorConfiguration configuration
     public override DataAnnotationMode MinimumDataAnnotationMode => DataAnnotationMode.All;
 
     public override string Description => $"Total number of digits in fraction: {Value}.";
+
+    public override CodeAttributeDeclaration GetAttribute()
+    {
+        if (Configuration.MetadataEmissionMode == MetadataEmissionMode.None)
+            return null;
+
+        return AttributeDecl(
+            Attributes.FractionDigits(Configuration.MetadataNamespace),
+            new(new CodePrimitiveExpression(Value)));
+    }
 }
 
 public class PatternRestrictionModel(GeneratorConfiguration configuration) : ValueRestrictionModel<string>(configuration)

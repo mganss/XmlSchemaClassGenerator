@@ -9,45 +9,29 @@ namespace XmlSchemaClassGenerator.Metadata;
 internal sealed class MetadataHelperEmitter
 {
     private readonly GeneratorConfiguration _configuration;
-    private readonly Dictionary<string, MetadataHelperDescriptor> _helperDescriptors;
-
-    private readonly record struct MetadataHelperDescriptor(string TypeName, Func<CodeTypeDeclaration> CreateTypeDeclaration);
 
     public MetadataHelperEmitter(GeneratorConfiguration configuration)
     {
         _configuration = configuration;
-        _helperDescriptors = new(StringComparer.Ordinal)
-        {
-            [MetadataHelperNames.FractionDigits] = new MetadataHelperDescriptor(Attributes.FractionDigitsAttributeName, CreateFractionDigitsAttributeType),
-        };
     }
 
-    public void EnsureEmitted(ICollection<CodeNamespace> codeNamespaces)
+    public void EnsureFractionDigitsAttributeEmitted(ICollection<CodeNamespace> codeNamespaces)
     {
         if (_configuration.MetadataEmissionMode == MetadataEmissionMode.None)
             return;
 
-        foreach (var requiredHelper in _configuration.RequiredMetadataHelpers.OrderBy(h => h, StringComparer.Ordinal))
-        {
-            if (_helperDescriptors.TryGetValue(requiredHelper, out var descriptor))
-                EnsureHelperEmitted(codeNamespaces, descriptor);
-        }
-    }
-
-    private void EnsureHelperEmitted(ICollection<CodeNamespace> codeNamespaces, MetadataHelperDescriptor descriptor)
-    {
         var existingNamespace = codeNamespaces.FirstOrDefault(ns => ns.Name == _configuration.MetadataNamespace);
 
         if (existingNamespace == null)
         {
             var metadataNamespace = GenerateMetadataNamespace(_configuration.MetadataNamespace);
-            metadataNamespace.Types.Add(descriptor.CreateTypeDeclaration());
+            metadataNamespace.Types.Add(CreateFractionDigitsAttributeType());
             codeNamespaces.Add(metadataNamespace);
             return;
         }
 
-        if (!ContainsType(existingNamespace, descriptor.TypeName))
-            existingNamespace.Types.Add(descriptor.CreateTypeDeclaration());
+        if (!ContainsType(existingNamespace, Attributes.FractionDigitsAttributeName))
+            existingNamespace.Types.Add(CreateFractionDigitsAttributeType());
     }
 
     private static bool ContainsType(CodeNamespace codeNamespace, string typeName)

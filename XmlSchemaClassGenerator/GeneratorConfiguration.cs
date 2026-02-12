@@ -46,8 +46,6 @@ public class GeneratorConfiguration
         MetadataEmissionMode = MetadataEmissionMode.None;
     }
 
-    internal HashSet<string> RequiredMetadataHelpers { get; } = new(StringComparer.Ordinal);
-
     public bool EnumAsString { get; set; }
 
     public bool MergeRestrictionsWithBase { get; set; }
