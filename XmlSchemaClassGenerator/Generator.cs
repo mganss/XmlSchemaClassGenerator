@@ -378,6 +378,24 @@ public class Generator
         set { _configuration.EnumCollection = value; }
     }
 
+    /// <summary>
+    /// Determines whether metadata helper attributes are emitted.
+    /// </summary>
+    public bool EmitMetadataAttributes
+    {
+        get { return _configuration.EmitMetadataAttributes; }
+        set { _configuration.EmitMetadataAttributes = value; }
+    }
+
+    /// <summary>
+    /// Namespace where generated metadata helper attributes are emitted.
+    /// </summary>
+    public string MetadataNamespace
+    {
+        get { return _configuration.MetadataNamespace; }
+        set { _configuration.MetadataNamespace = value; }
+    }
+
     public bool ValidationError { get; private set; }
 
     static Generator()

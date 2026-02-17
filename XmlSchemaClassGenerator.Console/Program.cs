@@ -73,6 +73,8 @@ static class Program
         var enumCollection = false;
         NamingScheme? namingScheme = null;
         var forceUriScheme = "none";
+        var emitMetadataAttributes = false;
+        var metadataNamespace = GeneratorConfiguration.DefaultMetadataNamespace;
 
 
         var options = new OptionSet {
@@ -185,7 +187,9 @@ with or without backing field initialization for collections
                     };
                 }
             },
-            { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v }
+            { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v },
+            { "ema|emitMetadataAttributes", "emit metadata helper attributes (default is false)", v => emitMetadataAttributes = v != null },
+            { "mn|metadataNamespace=", $"namespace for generated metadata helper attributes (default is {GeneratorConfiguration.DefaultMetadataNamespace})", v => metadataNamespace = v }
         };
 
         var globsAndUris = options.Parse(args);
@@ -276,7 +280,9 @@ with or without backing field initialization for collections
             AllowDtdParse = allowDtdParse,
             OmitXmlIncludeAttribute = omitXmlIncludeAttribute,
             EnumCollection = enumCollection,
-            ForceUriScheme = forceUriScheme
+            ForceUriScheme = forceUriScheme,
+            EmitMetadataAttributes = emitMetadataAttributes,
+            MetadataNamespace = metadataNamespace
         };
 
         if (namingScheme != null)

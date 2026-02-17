@@ -9,6 +9,8 @@ namespace XmlSchemaClassGenerator;
 
 public class GeneratorConfiguration
 {
+    public const string DefaultMetadataNamespace = "XmlSchemaClassGenerator.Metadata";
+
     public static Regex IdentifierRegex { get; } = new Regex(@"^@?[_\p{L}\p{Nl}][\p{L}\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\p{Cf}]*$", RegexOptions.Compiled);
 
     public GeneratorConfiguration()
@@ -41,6 +43,7 @@ public class GeneratorConfiguration
         CommandLineArgumentsProvider = CommandLineArgumentsProvider.CreateFromEnvironment();
         MergeRestrictionsWithBase = true;
         ForceUriScheme = "none";
+        EmitMetadataAttributes = false;
     }
 
     public bool EnumAsString { get; set; }
@@ -376,4 +379,20 @@ public class GeneratorConfiguration
     /// instead of falling back to string collections. Default is false.
     /// </summary>
     public bool EnumCollection { get; set; }
+
+    /// <summary>
+    /// Determines whether metadata helper types should be emitted.
+    /// </summary>
+    public bool EmitMetadataAttributes { get; set; }
+
+    private string metadataNamespace = DefaultMetadataNamespace;
+
+    /// <summary>
+    /// Namespace where generated metadata helper attributes are emitted.
+    /// </summary>
+    public string MetadataNamespace
+    {
+        get => metadataNamespace;
+        set => metadataNamespace = string.IsNullOrWhiteSpace(value) ? DefaultMetadataNamespace : value;
+    }
 }

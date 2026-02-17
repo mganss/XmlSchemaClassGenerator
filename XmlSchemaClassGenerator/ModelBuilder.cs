@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using XmlSchemaClassGenerator.Metadata;
 
 namespace XmlSchemaClassGenerator;
 
@@ -1179,20 +1180,34 @@ internal class ModelBuilder
     public static List<DocumentationModel> GetDocumentation(XmlSchemaAnnotated annotated)
     {
         return annotated.Annotation == null ? []
-		        : [.. annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
-		        .Where(d => d.Markup?.Length > 0)
-		        .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = m.OuterXml }))
-		        .SelectMany(d => d)
-		        .Where(d => !string.IsNullOrEmpty(d.Text))];
+                : [.. annotated.Annotation.Items.OfType<XmlSchemaDocumentation>()
+                .Where(d => d.Markup?.Length > 0)
+                .Select(d => d.Markup.Select(m => new DocumentationModel { Language = d.Language, Text = m.OuterXml }))
+                .SelectMany(d => d)
+                .Where(d => !string.IsNullOrEmpty(d.Text))];
     }
 
     public IEnumerable<CodeNamespace> GenerateCode()
     {
         var hierarchy = NamespaceHierarchyItem.Build(Namespaces.Values.GroupBy(x => x.Name).SelectMany(x => x))
             .MarkAmbiguousNamespaceTypes();
-        return hierarchy.Flatten()
-            .Select(nhi => NamespaceModel.Generate(nhi.FullName, nhi.Models, _configuration));
+        var codeNamespaces = hierarchy.Flatten()
+            .Select(nhi => NamespaceModel.Generate(nhi.FullName, nhi.Models, _configuration))
+            .ToList();
+
+        if (HasSupportedFractionDigitsRestrictions())
+        {
+            var metadataHelperEmitter = new MetadataHelperEmitter(_configuration);
+            metadataHelperEmitter.EnsureFractionDigitsAttributeEmitted(codeNamespaces);
+        }
+
+        return codeNamespaces;
     }
+
+    private bool HasSupportedFractionDigitsRestrictions()
+        => Types.Values
+            .OfType<SimpleModel>()
+            .Any(model => model.Restrictions.OfType<FractionDigitsRestrictionModel>().Any(restriction => restriction.IsSupported));
 
     private string BuildNamespace(Uri source, string xmlNamespace)
     {
