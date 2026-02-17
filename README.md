@@ -479,7 +479,8 @@ are all integer types, then the narrowest integer type will be used that can fit
 
 Note that semantic issues might arise with this approach. For example, `DateTime` values are serialized with both date and time information included. See discussion at [#397](https://github.com/mganss/XmlSchemaClassGenerator/issues/397).
 
-### Restriction attributes
+Restriction attributes
+----------------------
 
 When `EmitMetadataAttributes` is enabled, the generator emits custom attributes for XML schema restrictions that aren't covered by standard DataAnnotations. For example, `xs:fractionDigits` becomes `FractionDigitsAttribute`. 
 
