@@ -210,6 +210,11 @@ Options:
                              force URI scheme when resolving URLs (default is
                                none; can be: none, same, or any defined value
                                for scheme, like https or http)
+      --ema, --emitMetadataAttributes
+                             emit metadata helper attributes (default is false)
+      --mn, --metadataNamespace=VALUE
+                             namespace for generated metadata helper attributes (
+                               default is XmlSchemaClassGenerator.Metadata)
 </pre>
 
 For use from code use the [library NuGet package](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/):
@@ -236,11 +241,40 @@ Specifying the `NamespaceProvider` is optional. If you don't provide one, C# nam
 var generator = new Generator
 {
     NamespaceProvider = new NamespaceProvider
-    { 
+    {
         GenerateNamespace = key => ...
     }
 };
 ```
+
+### Metadata attributes
+
+When `EmitMetadataAttributes` is enabled, the generator emits custom attributes for XML schema restrictions that aren't covered by standard DataAnnotations. For example, `xs:fractionDigits` becomes `FractionDigitsAttribute`:
+
+**Schema:**
+```xml
+<xs:element name="price">
+  <xs:simpleType>
+    <xs:restriction base="xs:decimal">
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:element>
+```
+
+**Command line:**
+```
+xscgen --ema --mn MyApp.Metadata -o Generated schema.xsd
+```
+
+**Generated code:**
+```C#
+[System.ComponentModel.DataAnnotations.Required()]
+[MyApp.Metadata.FractionDigits(2)]
+public decimal Price { get; set; }
+```
+
+The attribute definition is automatically generated in the specified namespace. If not specified, the default namespace is `XmlSchemaClassGenerator.Metadata`.
 
 ### Mapping xsd files to C# namespaces
 
