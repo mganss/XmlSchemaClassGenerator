@@ -18,6 +18,7 @@ Features
 * Generate C# XML comments from schema annotations
 * Generate [DataAnnotations](http://msdn.microsoft.com/en-us/library/system.componentmodel.dataannotations.aspx) attributes 
 from schema restrictions
+* Generate custom attributes for schema restrictions that aren't covered by standard DataAnnotations (see [below](#restriction-attributes))
 * Use [`Collection<T>`](http://msdn.microsoft.com/en-us/library/ms132397.aspx) properties 
 (initialized in constructor and with private setter)
 * Map xs:integer and derived types to the closest possible .NET type, if not possible - fall back to string. Can be overriden by explicitly defined type (int, long, or decimal)
@@ -246,35 +247,6 @@ var generator = new Generator
     }
 };
 ```
-
-### Metadata attributes
-
-When `EmitMetadataAttributes` is enabled, the generator emits custom attributes for XML schema restrictions that aren't covered by standard DataAnnotations. For example, `xs:fractionDigits` becomes `FractionDigitsAttribute`:
-
-**Schema:**
-```xml
-<xs:element name="price">
-  <xs:simpleType>
-    <xs:restriction base="xs:decimal">
-      <xs:fractionDigits value="2"/>
-    </xs:restriction>
-  </xs:simpleType>
-</xs:element>
-```
-
-**Command line:**
-```
-xscgen --ema --mn MyApp.Metadata -o Generated schema.xsd
-```
-
-**Generated code:**
-```C#
-[System.ComponentModel.DataAnnotations.Required()]
-[MyApp.Metadata.FractionDigits(2)]
-public decimal Price { get; set; }
-```
-
-The attribute definition is automatically generated in the specified namespace. If not specified, the default namespace is `XmlSchemaClassGenerator.Metadata`.
 
 ### Mapping xsd files to C# namespaces
 
@@ -506,6 +478,12 @@ If you specify `--unionCommonType`, XmlSchemaClassGenerator will try to determin
 are all integer types, then the narrowest integer type will be used that can fit all member types.
 
 Note that semantic issues might arise with this approach. For example, `DateTime` values are serialized with both date and time information included. See discussion at [#397](https://github.com/mganss/XmlSchemaClassGenerator/issues/397).
+
+### Restriction attributes
+
+When `EmitMetadataAttributes` is enabled, the generator emits custom attributes for XML schema restrictions that aren't covered by standard DataAnnotations. For example, `xs:fractionDigits` becomes `FractionDigitsAttribute`. 
+
+The attribute definition is automatically generated in the namespace specified through `--metadataNamespace`. If not specified, the default namespace is `XmlSchemaClassGenerator.Metadata`.
 
 Contributing
 ------------
