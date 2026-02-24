@@ -316,8 +316,7 @@ public class XmlTests(ITestOutputHelper output)
                     this.Value = null;
                 }
             }
-        }
-    }";
+        }";
 
         Assert.Contains(expectedEnumValueProperty, writer.Content.First());
     }
