@@ -278,6 +278,50 @@ public class XmlTests(ITestOutputHelper output)
         Assert.Null(stringValue);
     }
 
+     /// <summary>
+    /// Verifies that the EnumValue property is generated with the generic Enum.TryParse<> form,
+    /// which is compatible with net48/netstandard2.0.
+    /// The non-generic overload Enum.TryParse(Type, string, bool, out object) is .NET 5+ only.
+    /// Regression guard: generator must never emit the typeof(T) form.
+    /// </summary>
+    [Fact, TestPriority(1)]
+    [UseCulture("en-US")]
+    public void TestSimpleContentEnum_EnumValueUsesGenericTryParse()
+    {
+        var writer = new MemoryOutputWriter();
+        var gen = new Generator { OutputWriter = writer };
+        gen.Generate(["xsd/simple/simplecontent-enum.xsd"]);
+
+        const string expectedEnumValueProperty = @"
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public virtual System.Nullable<TransConfirmationCodeTypeEnum> EnumValue
+        {
+            get
+            {
+                TransConfirmationCodeTypeEnum result;
+                if (System.Enum.TryParse<TransConfirmationCodeTypeEnum>(this.Value, true, out result))
+                {
+                    return result;
+                }
+                return null;
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    this.Value = value.ToString();
+                }
+                else
+                {
+                    this.Value = null;
+                }
+            }
+        }";
+
+        Assert.Contains(expectedEnumValueProperty, writer.Content.First());
+    }
+
+
     [Fact, TestPriority(1)]
     [UseCulture("en-US")]
     public void TestList()

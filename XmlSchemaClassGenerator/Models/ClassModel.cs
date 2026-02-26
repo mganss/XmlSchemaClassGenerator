@@ -123,28 +123,35 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                     enumValueProperty.CustomAttributes.Add(ignoreAttribute);
 
                     // Getter: Try to parse the Value property to enum
-                    // if (Enum.TryParse(typeof(EnumType), Value, true, out var result))
-                    //     return (EnumType)result;
+                    // if (System.Enum.TryParse<EnumType>(this.Value, true, out result))
+                    //     return result;
                     // return null;
-                    var resultVariable = new CodeVariableDeclarationStatement(typeof(object), "result");
-                    var tryParseCondition = new CodeMethodInvokeExpression(
+                    //
+                    // CodeMethodReferenceExpression accepts type parameters, which causes the C# code
+                    // provider to emit the generic Enum.TryParse<T> form. This is available since
+                    // .NET 4.0 and works on all target frameworks, unlike the non-generic overload
+                    // Enum.TryParse(Type, string, bool, out object) which only exists from .NET 5+.
+                    var resultVariable = new CodeVariableDeclarationStatement(enumTypeReference, "result");
+
+                    var tryParseMethodRef = new CodeMethodReferenceExpression(
                         new CodeTypeReferenceExpression(typeof(Enum)),
                         "TryParse",
-                        new CodeTypeOfExpression(enumTypeReference),
+                        enumTypeReference);
+
+                    var tryParseCondition = new CodeMethodInvokeExpression(
+                        tryParseMethodRef,
                         new CodePropertyReferenceExpression(
                             new CodeThisReferenceExpression(),
                             textName),
                         new CodePrimitiveExpression(true),
                         new CodeDirectionExpression(FieldDirection.Out, new CodeVariableReferenceExpression("result")));
 
-                    var returnCastResult = new CodeMethodReturnStatement(
-                        new CodeCastExpression(
-                            nullableEnumTypeReference,
-                            new CodeVariableReferenceExpression("result")));
+                    var returnResult = new CodeMethodReturnStatement(
+                        new CodeVariableReferenceExpression("result"));
 
                     var ifTryParse = new CodeConditionStatement(
                         tryParseCondition,
-                        returnCastResult);
+                        returnResult);
 
                     enumValueProperty.GetStatements.Add(resultVariable);
                     enumValueProperty.GetStatements.Add(ifTryParse);
