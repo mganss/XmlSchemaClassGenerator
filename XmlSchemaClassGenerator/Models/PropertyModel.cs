@@ -82,7 +82,7 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         {{
             get
             {{
-                return {backingField.Name};
+                return {backingFieldReference()};
             }}
             {setter}
             {{{(typeCode, withDataBinding) switch
@@ -90,16 +90,16 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             (PropertyValueTypeCode.ValueType, true) => $@"
                 if ({checkEquality()}){assignAndNotify()}",
             (PropertyValueTypeCode.Other or PropertyValueTypeCode.Array, true) => $@"
-                if ({backingField.Name} == value)
+                if ({backingFieldReference()} == value)
                     return;
-                if ({backingField.Name} == null || value == null || {checkEquality()}){assignAndNotify()}",
+                if ({backingFieldReference()} == null || value == null || {checkEquality()}){assignAndNotify()}",
             _ => assign(),
         }}
             }}
         }}");
 
         string assign() => $@"
-                {backingField.Name} = value;";
+                {backingFieldReference()} = value;";
 
         string assignAndNotify() => $@"
                 {{{assign()}
@@ -107,7 +107,9 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
                 }}";
 
         string checkEquality()
-            => $"!{backingField.Name}.{(typeCode is PropertyValueTypeCode.Array ? nameof(Enumerable.SequenceEqual) : EqualsMethod)}(value)";
+            => $"!{backingFieldReference()}.{(typeCode is PropertyValueTypeCode.Array ? nameof(Enumerable.SequenceEqual) : EqualsMethod)}(value)";
+
+        string backingFieldReference() => backingField.Name == "value" ? "this.value" : backingField.Name;
     }
 
     private ClassModel TypeClassModel => Type as ClassModel;
