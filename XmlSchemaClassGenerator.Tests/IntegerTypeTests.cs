@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml.Schema;
 using Xunit;
 
-namespace XmlSchemaClassGenerator.Tests; 
+namespace XmlSchemaClassGenerator.Tests;
 public sealed class IntegerTypeTests
 {
     private static IEnumerable<string> ConvertXml(string xsd, Generator generatorPrototype)
@@ -296,6 +296,101 @@ public sealed class IntegerTypeTests
 				{
 					GenerateNamespace = _ => "Test"
 				}
+			});
+
+			var expectedProperty = $"public {expectedType} SomeValue";
+			var generatedProperty = generatedType.First();
+
+			Assert.Contains(expectedProperty, generatedProperty);
+		}
+
+		[Theory]
+		[InlineData(typeof(sbyte), "sbyte")]
+		[InlineData(typeof(short), "short")]
+		[InlineData(typeof(int), "int")]
+		[InlineData(typeof(long), "long")]
+		[InlineData(typeof(nint), "System.IntPtr")]
+		[InlineData(typeof(byte), "byte")]
+		[InlineData(typeof(ushort), "ushort")]
+		[InlineData(typeof(uint), "uint")]
+		[InlineData(typeof(ulong), "ulong")]
+		[InlineData(typeof(nuint), "System.UIntPtr")]
+		[InlineData(typeof(decimal), "decimal")]
+		public void TestExplicitIntegerType(Type integerType, string expectedType)
+		{
+			// totalDigits=9 would auto-detect as int; the explicit override must always win
+			var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+			<xs:element name=""someValue"">
+				<xs:simpleType>
+					<xs:restriction base=""xs:integer"">
+						<xs:totalDigits value=""9""/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+			var generatedType = ConvertXml(xsd, new()
+			{
+				NamespaceProvider = new()
+				{
+					GenerateNamespace = _ => "Test"
+				},
+				IntegerDataType = integerType,
+				UseIntegerDataTypeAsFallback = false
+			});
+
+			var expectedProperty = $"public {expectedType} SomeValue";
+			var generatedProperty = generatedType.First();
+
+			Assert.Contains(expectedProperty, generatedProperty);
+		}
+
+		[Theory]
+		[InlineData(typeof(sbyte), 2, "sbyte")]           // auto = sbyte  → fallback not used
+		[InlineData(typeof(sbyte), 29, "sbyte")]          // auto = null   → fallback sbyte used
+		[InlineData(typeof(byte), 2, "sbyte")]            // auto = sbyte  → fallback byte not used
+		[InlineData(typeof(byte), 29, "byte")]            // auto = null   → fallback byte used
+		[InlineData(typeof(ushort), 4, "short")]          // auto = short  → fallback ushort not used
+		[InlineData(typeof(ushort), 29, "ushort")]        // auto = null   → fallback ushort used
+		[InlineData(typeof(uint), 9, "int")]              // auto = int    → fallback uint not used
+		[InlineData(typeof(uint), 29, "uint")]            // auto = null   → fallback uint used
+		[InlineData(typeof(ulong), 18, "long")]           // auto = long   → fallback ulong not used
+		[InlineData(typeof(ulong), 29, "ulong")]          // auto = null   → fallback ulong used
+		[InlineData(typeof(nint), 9, "int")]              // auto = int    → fallback nint not used
+		[InlineData(typeof(nint), 29, "System.IntPtr")]   // auto = null   → fallback nint used
+		[InlineData(typeof(nuint), 9, "int")]             // auto = int    → fallback nuint not used
+		[InlineData(typeof(nuint), 29, "System.UIntPtr")] // auto = null   → fallback nuint used
+		public void TestFallbackTypeExtended(Type fallbackType, int totalDigits, string expectedType)
+		{
+			// When UseIntegerDataTypeAsFallback=true the fallback is only used when auto-detection yields no result
+			var xsd = @$"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema elementFormDefault=""qualified"" xmlns:xs=""http://www.w3.org/2001/XMLSchema"">
+	<xs:complexType name=""document"">
+		<xs:sequence>
+			<xs:element name=""someValue"">
+				<xs:simpleType>
+					<xs:restriction base=""xs:integer"">
+						<xs:totalDigits value=""{totalDigits}""/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>";
+
+			var generatedType = ConvertXml(xsd, new()
+			{
+				NamespaceProvider = new()
+				{
+					GenerateNamespace = _ => "Test"
+				},
+				IntegerDataType = fallbackType,
+				UseIntegerDataTypeAsFallback = true
 			});
 
 			var expectedProperty = $"public {expectedType} SomeValue";
