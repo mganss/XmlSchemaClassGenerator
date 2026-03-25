@@ -97,7 +97,9 @@ Options:
                                 System.TimeOnly instead of System.DateTime
   -i, --integer=TYPE         map xs:integer and derived types to TYPE instead
                                of automatic approximation
-                               TYPE can be i[nt], l[ong], or d[ecimal]
+                               TYPE can be sb[yte], sh[ort], i[nt], l[ong], ni[
+                               nt], b[yte], us[hort], ui[nt], ul[ong], nui[nt],
+                               or d[ecimal]
       --fb, --fallback, --use-integer-type-as-fallback
                              use integer type specified via -i only if no type
                                can be deduced
