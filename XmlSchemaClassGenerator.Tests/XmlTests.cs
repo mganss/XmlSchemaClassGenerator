@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -2267,6 +2267,85 @@ namespace Test
         var level3InterfacePropertyInfo = level3Interface.GetProperties().FirstOrDefault(p => p.Name == "InterfaceProperty");
         Assert.NotNull(level3InterfacePropertyInfo);
 
+    }
+
+    [Fact]
+    public void ChoiceWithDuplicateElementsInSequencesEmitsCorrectOrder()
+    {
+        const string xsd = 
+            """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+                <xs:element name="Root">
+                    <xs:complexType>
+                        <xs:choice>
+                            <xs:sequence>
+                                <xs:element name="FirstChoiceElement1" type="xs:string"/>
+                                <xs:element name="FirstChoiceElement2" type="xs:string"/>
+                                <xs:element name="SharedElement1" type="xs:string"/>
+                                <xs:element name="FirstChoiceElement3" type="xs:string"/>
+                                <xs:element name="FirstChoiceElement4" type="xs:string"/>
+                                <xs:element name="SharedElement2" type="xs:string"/>
+                                <xs:element name="FirstChoiceElement5" type="xs:string"/>
+                                <xs:element name="FirstChoiceElement6" type="xs:string"/>
+                            </xs:sequence>
+                            <xs:sequence>
+                                <xs:element name="SecondChoiceElement1" type="xs:string"/>
+                                <xs:element name="SharedElement1" type="xs:string"/>
+                                <xs:element name="SecondChoiceElement2" type="xs:string"/>
+                                <xs:element name="SharedElement2" type="xs:string"/>
+                                <xs:element name="SecondChoiceElement3" type="xs:string"/>
+                            </xs:sequence>
+                        </xs:choice>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:schema>
+            """;
+        string[] expectedPropertiesInOrder =
+        [
+            "FirstChoiceElement1",
+            "FirstChoiceElement2",
+            "SecondChoiceElement1",
+            "SharedElement1",
+            "FirstChoiceElement3",
+            "FirstChoiceElement4",
+            "SecondChoiceElement2",
+            "SharedElement2",
+            "FirstChoiceElement5",
+            "FirstChoiceElement6",
+            "SecondChoiceElement3",
+        ];
+        var writer = new MemoryOutputWriter();
+        var gen = new Generator
+        {
+            OutputWriter = writer,
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = key => "Test"
+            },
+            AssemblyVisible = true,
+            EmitOrder = true,
+            // xs:choice branches sharing the same xs:element name violate UPA (Unique Particle Attribution),
+            EnableUpaCheck = false
+        };
+        gen.Generate([new StringReader(xsd)]);
+
+        var content = Assert.Single(writer.Content);
+
+        var assembly = Compiler.Compile(nameof(ChoiceWithDuplicateElementsInSequencesEmitsCorrectOrder), content);
+
+        var rootType = assembly.GetType("Test.Root");
+        Assert.NotNull(rootType);
+
+        var actualPropertiesInOrder = rootType.GetProperties()
+            .Where(property => Attribute.IsDefined(property, typeof(XmlElementAttribute)))
+            .OrderBy(property => property.GetCustomAttribute<XmlElementAttribute>().Order)
+            .Select(property => property.Name)
+            .ToArray();
+        Assert.Equal(expectedPropertiesInOrder, actualPropertiesInOrder);
     }
 
     [Fact]
