@@ -985,9 +985,22 @@ internal class ModelBuilder
         Substitute substitute = null, int order = 0, bool passProperties = true)
     {
         var properties = new List<PropertyModel>();
+        var initialOrder = order;
+        XmlSchemaObject prevParent = null;
+        int batchStart = -1;
 
         foreach (var item in items)
         {
+            // Track parent changes to detect transitions between choice branches.
+            // When elements from a new branch are encountered, batchStart marks where
+            // the new branch's properties begin in the list.
+            if (item.XmlParent != prevParent)
+            {
+                if (prevParent != null)
+                    batchStart = properties.Count;
+                prevParent = item.XmlParent;
+            }
+
             PropertyModel property = null;
 
             switch (item.XmlParticle)
@@ -1023,18 +1036,42 @@ internal class ModelBuilder
             // Discard duplicate property names. This is most likely due to:
             // - Choice or
             // - Element and attribute with the same name
-            if (property != null && !properties.Exists(p => p.Name == property.Name))
+            if (property != null)
             {
-                var itemDocs = GetDocumentation(item.XmlParticle);
-                property.Documentation.AddRange(itemDocs);
+                var existingIndex = properties.FindIndex(p => p.Name == property.Name);
+                if (existingIndex >= 0)
+                {
+                    // Duplicate found in a choice branch - move the current batch of
+                    // new-branch properties to just before the duplicate's position
+                    // so that the interleaved order across branches is preserved.
+                    if (batchStart >= 0 && batchStart < properties.Count)
+                    {
+                        var count = properties.Count - batchStart;
+                        var segment = properties.GetRange(batchStart, count);
+                        properties.RemoveRange(batchStart, count);
+                        var adjustedIndex = existingIndex >= batchStart ? existingIndex - count : existingIndex;
+                        properties.InsertRange(adjustedIndex, segment);
+                    }
+                    batchStart = properties.Count;
+                }
+                else
+                {
+                    var itemDocs = GetDocumentation(item.XmlParticle);
+                    property.Documentation.AddRange(itemDocs);
 
-                if (_configuration.EmitOrder)
-                    property.Order = order++;
+                    property.IsDeprecated = itemDocs.Exists(d => d.Text.StartsWith("DEPRECATED"));
 
-                property.IsDeprecated = itemDocs.Exists(d => d.Text.StartsWith("DEPRECATED"));
-
-                properties.Add(property);
+                    properties.Add(property);
+                }
             }
+        }
+
+        // Reassign Order values based on final property positions,
+        // accounting for any reordering due to choice branch interleaving.
+        if (_configuration.EmitOrder)
+        {
+            for (var i = 0; i < properties.Count; i++)
+                properties[i].Order = initialOrder + i;
         }
 
         return properties;
