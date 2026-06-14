@@ -2967,7 +2967,8 @@ namespace Test
             NamespaceProvider = new NamespaceProvider
             {
                 GenerateNamespace = key => "Test"
-            }
+            },
+            TextValuePropertyName = "Text"
         };
         var assembly = Compiler.Generate(nameof(TestNullableReferenceAttributes), NullableReferenceAttributesPattern, generator);
         void assertNullable(string typename, bool nullable)
@@ -2989,6 +2990,8 @@ namespace Test
         assertNullable("Test.AttributeReferenceNullable", true);
         assertNullable("Test.AttributeReferenceNonNullable", false);
         assertNullable("Test.AttributeValueNullableInt", false);
+        assertNullable("Test.TextValueNullable", true);
+        assertNullable("Test.TextValueNotNullable", false);
     }
 
     [Fact, TestPriority(1)]

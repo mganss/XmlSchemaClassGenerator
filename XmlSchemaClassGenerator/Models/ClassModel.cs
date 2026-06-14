@@ -224,6 +224,7 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                 };
 
                 var attribute = AttributeDecl<XmlTextAttribute>();
+                var valuePropertyModel = new PropertyModel(Configuration, textName, BaseClass, this);
 
                 if (BaseClass is SimpleModel simpleModel)
                 {
@@ -232,14 +233,20 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
 
                     if (BaseClass.GetQualifiedName() is { Namespace: XmlSchema.Namespace, Name: var name } && (simpleModel.XmlSchemaType.Datatype.IsDataTypeAttributeAllowed(Configuration) ?? simpleModel.UseDataTypeAttribute))
                         attribute.Arguments.Add(new CodeAttributeArgument(nameof(XmlTextAttribute.DataType), new CodePrimitiveExpression(name)));
+
+                    if (!simpleModel.ValueType.IsValueType
+                        && Configuration.EnableNullableReferenceAttributes
+                        && !simpleModel.Restrictions.OfType<MinLengthRestrictionModel>().Any(r => r.Value >= 1))
+                    {
+                        text.CustomAttributes.Add(new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.AllowNull, Configuration)));
+                        text.CustomAttributes.Add(new CodeAttributeDeclaration(CodeUtilities.CreateTypeReference(Attributes.MaybeNull, Configuration)));
+                    }
                 }
 
                 text.Comments.AddRange(GetComments(docs).ToArray());
 
                 text.CustomAttributes.Add(attribute);
                 classDeclaration.Members.Add(text);
-
-                var valuePropertyModel = new PropertyModel(Configuration, textName, BaseClass, this);
 
                 Configuration.MemberVisitor(text, valuePropertyModel);
             }
