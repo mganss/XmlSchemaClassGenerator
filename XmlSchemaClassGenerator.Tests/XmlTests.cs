@@ -61,6 +61,7 @@ public class XmlTests(ITestOutputHelper output)
             AllowDtdParse = generatorPrototype.AllowDtdParse,
             OmitXmlIncludeAttribute = generatorPrototype.OmitXmlIncludeAttribute,
             EnumCollection = generatorPrototype.EnumCollection,
+            TextValuePropertyName = generatorPrototype.TextValuePropertyName
         };
 
         gen.CommentLanguages.Clear();
@@ -127,6 +128,7 @@ public class XmlTests(ITestOutputHelper output)
                 { new NamespaceKey("http://www.w3.org/1999/xlink"), "XLink" },
                 { new NamespaceKey("http://www.yworks.com/xml/graphml"), "YEd" },
             }.ToNamespaceProvider(new GeneratorConfiguration { NamespacePrefix = "GraphML" }.NamespaceProvider.GenerateNamespace),
+            TextValuePropertyName = "MixedText"
         });
         SharedTestFunctions.TestSamples(Output, "GraphML", GraphMLPattern);
     }
@@ -936,6 +938,7 @@ public class XmlTests(ITestOutputHelper output)
             OutputFolder = outputPath,
             GenerateInterfaces = false,
             UniqueTypeNamesAcrossNamespaces = true,
+            TextValuePropertyName = "MixedText"
         };
 
         gen.NamespaceProvider.Add(new NamespaceKey("http://www.xbrl.org/2003/XLink"), "XbrlLink");
@@ -1275,11 +1278,12 @@ public class XmlTests(ITestOutputHelper output)
             NamespaceProvider = new NamespaceProvider
             {
                 GenerateNamespace = key => "Test"
-            }
+            },
+            TextValuePropertyName = "MixedText"
         });
 
         Assert.Contains(
-            @"public string[] Text_1 { get; set; }",
+            @"public string[] MixedText { get; set; }",
             generatedType.First());
     }
 
@@ -1299,11 +1303,12 @@ public class XmlTests(ITestOutputHelper output)
             NamespaceProvider = new NamespaceProvider
             {
                 GenerateNamespace = key => "Test"
-            }
+            },
+            TextValuePropertyName = "MixedText"
         });
 
         Assert.Contains(
-            @"public string[] Text_1 { get; set; }",
+            @"public string[] MixedText { get; set; }",
             generatedType.First());
     }
 

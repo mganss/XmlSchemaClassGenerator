@@ -293,18 +293,10 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
             Property.AddMembersTo(classDeclaration, Configuration.EnableDataBinding);
         }
 
-        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed))))
+        if (IsMixed && (BaseClass == null || (BaseClass is ClassModel && !AllBaseClasses.Any(b => b.IsMixed)))
+            && !string.IsNullOrEmpty(Configuration.TextValuePropertyName))
         {
-            var propName = "Text";
-            var propertyIndex = 1;
-
-            // To not collide with any existing members
-            while (Properties.Exists(x => x.Name.Equals(propName, StringComparison.Ordinal)) || propName.Equals(classDeclaration.Name, StringComparison.Ordinal))
-            {
-                propName = $"Text_{propertyIndex}";
-                propertyIndex++;
-            }
-            // hack to generate automatic property
+            var propName = Configuration.TextValuePropertyName;
             var text = new CodeMemberField(typeof(string[]), propName + PropertyModel.GetAccessors()) { Attributes = MemberAttributes.Public };
             text.CustomAttributes.Add(AttributeDecl<XmlTextAttribute>());
             classDeclaration.Members.Add(text);
@@ -357,9 +349,19 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
     {
         var rootClass = AllBaseTypes.LastOrDefault();
 
-        if (rootClass is SimpleModel || rootClass is EnumModel)
+        if (rootClass is SimpleModel || rootClass is EnumModel || IsMixed)
         {
-            var val = GenerateCSharpCodeFromExpression(rootClass.GetDefaultValueFor(defaultString, attribute));
+            var defaultVal = IsMixed switch
+            {
+                true => new CodeArrayCreateExpression(
+                    typeof(string),
+                    [
+                        new CodePrimitiveExpression(defaultString)
+                    ]
+                ),
+                _ => rootClass.GetDefaultValueFor(defaultString, attribute)
+            };
+            var val = GenerateCSharpCodeFromExpression(defaultVal);
             var reference = GenerateCSharpCodeFromExpression(new CodeTypeReferenceExpression(GetReferenceFor(referencingNamespace: null)));
 
             return new CodeSnippetExpression($"new {reference} {{ {Configuration.TextValuePropertyName} = {val} }};");
