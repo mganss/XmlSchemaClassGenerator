@@ -142,6 +142,11 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
 
     private bool IsPrivateSetter => IsEnumerable && Configuration.CollectionSettersMode == CollectionSettersMode.Private;
 
+    private bool IsPrimitiveType => Type is SimpleModel simpleModel
+        && (simpleModel.ValueType.IsPrimitive
+            || simpleModel.ValueType == typeof(string)
+            || simpleModel.ValueType == typeof(decimal));
+
     private CodeTypeReference TypeReference => PropertyType.GetReferenceFor(OwningType.Namespace, collection: IsEnumerable, attribute: IsAttribute);
 
     private void AddDocs(CodeTypeMember member)
@@ -473,6 +478,12 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         var attributes = GetAttributes(isArray).ToArray();
         member.CustomAttributes.AddRange(attributes);
 
+        CodeStatement choiceIdentifierInitStatement = null;
+        if (!IsPrimitiveType && Substitutes.Any(sub => sub.Type == Type))
+        {
+            choiceIdentifierInitStatement = AddChoiceIdentifier(typeDeclaration, member, isEnumerable);
+        }
+
         // initialize List<>
         if (isEnumerable && (Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
             && (Configuration.CollectionSettersMode != CollectionSettersMode.InitWithoutConstructorInitialization))
@@ -509,6 +520,11 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             }
 
             constructor.Statements.Add(new CodeAssignStatement(listReference, initExpression));
+
+            if (choiceIdentifierInitStatement != null)
+            {
+                constructor.Statements.Add(choiceIdentifierInitStatement);
+            }
         }
 
         if (isArray)
@@ -647,5 +663,49 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         }
 
         return attributes;
+    }
+
+    private CodeStatement AddChoiceIdentifier(CodeTypeDeclaration typeDeclaration, CodeMemberField memberField, bool isArray)
+    {
+        var enumName = Name + "Enum";
+        var propertyName = enumName + "Identifier";
+
+        var xmlElementNames = memberField.CustomAttributes
+            .OfType<CodeAttributeDeclaration>()
+            .Where(attribute => attribute.AttributeType.BaseType == typeof(XmlElementAttribute).FullName)
+            .Select(attribute => attribute.Arguments
+                .OfType<CodeAttributeArgument>()
+                .Where(argument => string.IsNullOrEmpty(argument.Name))
+                .Select(argument => argument.Value)
+                .OfType<CodePrimitiveExpression>()
+                .Select(primitive => primitive.Value?.ToString())
+                .FirstOrDefault(name => name != null))
+            .Where(name => name != null);
+
+        var choiceEnum = new CodeTypeDeclaration { Name = enumName, IsEnum = true };
+
+        foreach (var elementName in xmlElementNames)
+            choiceEnum.Members.Add(new CodeMemberField(enumName, elementName));
+
+        var choiceProperty = new CodeMemberField
+        {
+            Name = propertyName + " { get; set; }",
+            Type = new CodeTypeReference(enumName, isArray ? 1 : 0),
+            Attributes = MemberAttributes.Public | MemberAttributes.Final
+        };
+        choiceProperty.CustomAttributes.Add(AttributeDecl<XmlIgnoreAttribute>());
+
+        memberField.CustomAttributes.Add(AttributeDecl<XmlChoiceIdentifierAttribute>(
+            new CodeAttributeArgument(new CodePrimitiveExpression(propertyName))));
+
+        typeDeclaration.Members.Add(choiceEnum);
+        typeDeclaration.Members.Add(choiceProperty);
+
+        if (!isArray)
+            return null;
+
+        var choiceReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), propertyName);
+        var emptyArray = new CodeMethodInvokeExpression(new(TypeRefExpr<Array>(), nameof(Array.Empty), new CodeTypeReference(enumName)));
+        return new CodeAssignStatement(choiceReference, emptyArray);
     }
 }
