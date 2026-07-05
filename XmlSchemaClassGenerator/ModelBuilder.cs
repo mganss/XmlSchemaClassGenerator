@@ -421,7 +421,7 @@ internal class ModelBuilder
     {
         if (SubstitutionGroups.TryGetValue(name, out var substitutes))
         {
-            foreach (var substitute in substitutes.Where(s => s.Element.QualifiedName != name))
+            foreach (var substitute in substitutes.Where(s => !s.Element.IsAbstract && s.Element.QualifiedName != name))
             {
                 yield return substitute;
                 foreach (var recursiveSubstitute in GetSubstitutedElements(substitute.Element.QualifiedName))
