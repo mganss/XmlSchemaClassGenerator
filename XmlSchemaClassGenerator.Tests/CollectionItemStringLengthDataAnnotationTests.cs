@@ -74,6 +74,47 @@ public class CollectionItemStringLengthDataAnnotationTests
   </xs:simpleType>
 </xs:schema>";
 
+    private const string RepeatingStringWithOnlyMinLengthXsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:t=""urn:test"" targetNamespace=""urn:test"" elementFormDefault=""qualified"">
+  <xs:element name=""document"" type=""t:documentType"" />
+  <xs:complexType name=""documentType"">
+    <xs:sequence>
+      <xs:element name=""tag"" type=""t:tagType"" minOccurs=""0"" maxOccurs=""9"" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name=""tagType"">
+    <xs:restriction base=""xs:string"">
+      <xs:minLength value=""2"" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>";
+
+    private const string RepeatingUnrestrictedStringXsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:t=""urn:test"" targetNamespace=""urn:test"" elementFormDefault=""qualified"">
+  <xs:element name=""document"" type=""t:documentType"" />
+  <xs:complexType name=""documentType"">
+    <xs:sequence>
+      <xs:element name=""tag"" type=""xs:string"" minOccurs=""0"" maxOccurs=""9"" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>";
+
+    private const string RepeatingStringWithMaxLengthAndPatternXsd = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+<xs:schema xmlns:xs=""http://www.w3.org/2001/XMLSchema"" xmlns:t=""urn:test"" targetNamespace=""urn:test"" elementFormDefault=""qualified"">
+  <xs:element name=""document"" type=""t:documentType"" />
+  <xs:complexType name=""documentType"">
+    <xs:sequence>
+      <xs:element name=""tag"" type=""t:tagType"" minOccurs=""0"" maxOccurs=""9"" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name=""tagType"">
+    <xs:restriction base=""xs:string"">
+      <xs:maxLength value=""35"" />
+      <xs:pattern value=""[A-Za-z]+"" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>";
+
     [Fact]
     public void CollectionItemStringLengthAttribute_IsEmitted_ForRepeatingStringElement_WithMaxLength()
     {
@@ -129,6 +170,118 @@ public class CollectionItemStringLengthDataAnnotationTests
 
         var namedArg = attr.NamedArguments.Single(na => na.MemberName == "MinimumLength");
         Assert.Equal(2, (int)namedArg.TypedValue.Value);
+    }
+
+    [Fact]
+    public void CollectionItemStringLengthAttribute_IsEmitted_WithMinMaxLengthRestrictionModel_WhenDataAnnotationModeIsPartial()
+    {
+        var contents = ConvertXml([RepeatingStringWithMinAndMaxXsd], new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = _ => "My.Schema.Generated.Model",
+            },
+            DataAnnotationMode = DataAnnotationMode.Partial,
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+        }).ToArray();
+
+        var allContent = string.Join(Environment.NewLine, contents);
+
+        // DataAnnotationMode.Partial produces a single MinMaxLengthRestrictionModel instead of
+        // separate MinLengthRestrictionModel/MaxLengthRestrictionModel instances; the collection
+        // item attribute must still be built from it.
+        Assert.Contains("Minimum length: 2. Maximum length: 35.", allContent);
+
+        var assembly = Compiler.Compile(nameof(CollectionItemStringLengthAttribute_IsEmitted_WithMinMaxLengthRestrictionModel_WhenDataAnnotationModeIsPartial), contents);
+        var type = assembly.GetType("My.Schema.Generated.Model.DocumentType");
+        var tag = type.GetProperty("Tag");
+
+        var attr = tag.CustomAttributes.Single(a => a.AttributeType.FullName == "Shared.Metadata.CollectionItemStringLengthAttribute");
+        Assert.Equal(35, (int)attr.ConstructorArguments.Single().Value);
+
+        var namedArg = attr.NamedArguments.Single(na => na.MemberName == "MinimumLength");
+        Assert.Equal(2, (int)namedArg.TypedValue.Value);
+    }
+
+    [Fact]
+    public void CollectionItemStringLengthAttribute_UsesIntMaxValue_WhenOnlyMinLengthPresent()
+    {
+        var contents = ConvertXml([RepeatingStringWithOnlyMinLengthXsd], new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = _ => "My.Schema.Generated.Model",
+            },
+            DataAnnotationMode = DataAnnotationMode.All,
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+        }).ToArray();
+
+        var assembly = Compiler.Compile(nameof(CollectionItemStringLengthAttribute_UsesIntMaxValue_WhenOnlyMinLengthPresent), contents);
+        var type = assembly.GetType("My.Schema.Generated.Model.DocumentType");
+        var tag = type.GetProperty("Tag");
+
+        var attr = tag.CustomAttributes.Single(a => a.AttributeType.FullName == "Shared.Metadata.CollectionItemStringLengthAttribute");
+        Assert.Equal(int.MaxValue, (int)attr.ConstructorArguments.Single().Value);
+
+        var namedArg = attr.NamedArguments.Single(na => na.MemberName == "MinimumLength");
+        Assert.Equal(2, (int)namedArg.TypedValue.Value);
+    }
+
+    [Fact]
+    public void CollectionItemStringLengthAttribute_IsNotEmitted_WhenItemTypeHasNoLengthRestriction()
+    {
+        var contents = ConvertXml([RepeatingUnrestrictedStringXsd], new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = _ => "My.Schema.Generated.Model",
+            },
+            DataAnnotationMode = DataAnnotationMode.All,
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+        }).ToArray();
+
+        var allContent = string.Join(Environment.NewLine, contents);
+
+        // Nothing in the schema needs it, so the metadata attribute class itself shouldn't be emitted either.
+        Assert.DoesNotContain("CollectionItemStringLengthAttribute", allContent);
+
+        var assembly = Compiler.Compile(nameof(CollectionItemStringLengthAttribute_IsNotEmitted_WhenItemTypeHasNoLengthRestriction), contents);
+        var type = assembly.GetType("My.Schema.Generated.Model.DocumentType");
+        var tag = type.GetProperty("Tag");
+
+        Assert.DoesNotContain(tag.CustomAttributes, a => a.AttributeType.Name.Contains("Length"));
+    }
+
+    [Fact]
+    public void CollectionItemStringLengthAttribute_DocCommentAndAttributes_ExcludeNonLengthRestrictions_WhenPatternAlsoPresent()
+    {
+        var contents = ConvertXml([RepeatingStringWithMaxLengthAndPatternXsd], new Generator
+        {
+            NamespaceProvider = new NamespaceProvider
+            {
+                GenerateNamespace = _ => "My.Schema.Generated.Model",
+            },
+            DataAnnotationMode = DataAnnotationMode.All,
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+        }).ToArray();
+
+        var allContent = string.Join(Environment.NewLine, contents);
+
+        // Only the length restriction surfaces for collection properties; xs:pattern (and any other
+        // non-length restriction) is intentionally left unemitted for collections, same as today.
+        Assert.Contains("Maximum length: 35.", allContent);
+        Assert.DoesNotContain("Pattern:", allContent);
+
+        var assembly = Compiler.Compile(nameof(CollectionItemStringLengthAttribute_DocCommentAndAttributes_ExcludeNonLengthRestrictions_WhenPatternAlsoPresent), contents);
+        var type = assembly.GetType("My.Schema.Generated.Model.DocumentType");
+        var tag = type.GetProperty("Tag");
+
+        Assert.Single(tag.CustomAttributes, a => a.AttributeType.FullName == "Shared.Metadata.CollectionItemStringLengthAttribute");
+        Assert.DoesNotContain(tag.CustomAttributes, a => a.AttributeType.FullName == "System.ComponentModel.DataAnnotations.RegularExpressionAttribute");
     }
 
     [Fact]
