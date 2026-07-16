@@ -484,9 +484,18 @@ Note that semantic issues might arise with this approach. For example, `DateTime
 Restriction attributes
 ----------------------
 
-When `EmitMetadataAttributes` is enabled, the generator emits custom attributes for XML schema restrictions that aren't covered by standard DataAnnotations. For example, `xs:fractionDigits` becomes `FractionDigitsAttribute`. 
+When `EmitMetadataAttributes` is enabled, the generator emits custom attributes for XML schema restrictions that aren't covered by standard DataAnnotations:
 
-The attribute definition is automatically generated in the namespace specified through `--metadataNamespace`. If not specified, the default namespace is `XmlSchemaClassGenerator.Metadata`.
+<table>
+  <tr>
+    <th>XML Schema facet</th>
+    <th>Generated attribute</th>
+  </tr>
+  <tr><td>xs:fractionDigits</td><td><code>FractionDigitsAttribute</code></td></tr>
+  <tr><td>xs:maxLength / xs:minLength on a repeating element</td><td><code>CollectionItemStringLengthAttribute</code></td></tr>
+</table>
+
+The attribute definitions are automatically generated in the namespace specified through `--metadataNamespace`. If not specified, the default namespace is `XmlSchemaClassGenerator.Metadata`.
 
 Contributing
 ------------
