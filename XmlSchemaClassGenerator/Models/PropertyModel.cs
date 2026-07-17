@@ -680,12 +680,11 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
                 .OfType<CodePrimitiveExpression>()
                 .Select(primitive => primitive.Value?.ToString())
                 .FirstOrDefault(name => name != null))
-            .Where(name => name != null);
+            .Where(name => name != null)
+            .ToList();
 
-        var choiceEnum = new CodeTypeDeclaration { Name = enumName, IsEnum = true };
-
-        foreach (var elementName in xmlElementNames)
-            choiceEnum.Members.Add(new CodeMemberField(enumName, elementName));
+        var namespaceModel = OwningType.Namespace;
+        var choiceEnum = FindOrCreateChoiceEnum(namespaceModel, ref enumName, xmlElementNames);
 
         var choiceProperty = new CodeMemberField
         {
@@ -698,7 +697,6 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         memberField.CustomAttributes.Add(AttributeDecl<XmlChoiceIdentifierAttribute>(
             new CodeAttributeArgument(new CodePrimitiveExpression(propertyName))));
 
-        typeDeclaration.Members.Add(choiceEnum);
         typeDeclaration.Members.Add(choiceProperty);
 
         if (!isArray)
@@ -707,5 +705,37 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         var choiceReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), propertyName);
         var emptyArray = new CodeMethodInvokeExpression(new(TypeRefExpr<Array>(), nameof(Array.Empty), new CodeTypeReference(enumName)));
         return new CodeAssignStatement(choiceReference, emptyArray);
+    }
+
+    private static CodeTypeDeclaration FindOrCreateChoiceEnum(NamespaceModel namespaceModel, ref string enumName, List<string> memberNames)
+    {
+        bool NameTaken(string n) => namespaceModel.Types.ContainsKey(n) || namespaceModel.ChoiceIdentifierEnums.ContainsKey(n);
+
+        if (namespaceModel.ChoiceIdentifierEnums.TryGetValue(enumName, out var existingEnum))
+        {
+            var existingMemberNames = existingEnum.Members.OfType<CodeMemberField>().Select(m => m.Name).ToList();
+            if (existingMemberNames.SequenceEqual(memberNames))
+                return existingEnum;
+        }
+
+        if (NameTaken(enumName))
+        {
+            var baseName = enumName;
+            var i = 2;
+            do
+            {
+                enumName = baseName + i;
+                i++;
+            } while (NameTaken(enumName));
+        }
+
+        var choiceEnum = new CodeTypeDeclaration { Name = enumName, IsEnum = true };
+
+        foreach (var elementName in memberNames)
+            choiceEnum.Members.Add(new CodeMemberField(enumName, elementName));
+
+        namespaceModel.ChoiceIdentifierEnums.Add(enumName, choiceEnum);
+
+        return choiceEnum;
     }
 }
