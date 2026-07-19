@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_ifopt_site_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_ifopt_site_version">
 	<xsd:include schemaLocation="netex_ifopt_site_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipmentPlace_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_accessibility/netex_acsb_accessibility.xsd"/>
@@ -8,6 +8,7 @@
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_address_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_topographicPlace_version.xsd"/>
+	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gmlBasic2d-extract-v3_2_1-.xsd"/>
 	<xsd:include schemaLocation="netex_ifopt_checkConstraint_version.xsd"/>
 	<xsd:include schemaLocation="netex_ifopt_equipmentAll.xsd"/>
 	<!-- ======================================================================= -->
@@ -23,9 +24,11 @@
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date><Modified>2011-02-05</Modified>Name Space changes 
+				<Date><Modified>2011-02-05</Modified>Name Space changes
 				</Date>
-				<Date><Modified>2020-10-10</Modified>New Modes : Add PRESENTATGION To Site ELement
+				<Date><Modified>2020-10-10</Modified>New Modes : Add PRESENTATION To Site Element
+				</Date>
+				<Date><Modified>2023-12-10</Modified>Enhancement TM v6.2:  Add GROUP OF SITES, SITE STRUCTURE and LEVEL IN STRUCTURE
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -68,6 +71,7 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>NeTEx: SITE types.</xsd:documentation>
 	</xsd:annotation>
+	<!-- ======================================================================= -->
 	<xsd:element name="SiteElement" type="SiteElement_VersionStructure" abstract="true" substitutionGroup="Place">
 		<xsd:annotation>
 			<xsd:documentation>A physical PLACE to which passengers may go. May have ACCESSIBILITY ASSESMENT and other properties to describe it.</xsd:documentation>
@@ -129,36 +133,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Detailed properties of a SITE ELEMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicUse" type="PublicUseEnumeration" default="all" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether the component is available for public use or is restricted.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="Covered" type="CoveredEnumeration" default="indoors" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether the component is Indoors or outdoors. Default is Indoors.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="Gated" type="GatedEnumeration" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether the component is within a gated area or freely accessible without a pass or ticket.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="Lighting" type="LightingEnumeration" default="wellLit" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether the component is lit or not. Default is well Lit.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="AllAreasWheelchairAccessible" type="xsd:boolean" default="true" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether all areas of the component are wheelchair accessible.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="PersonCapacity" type="xsd:nonNegativeInteger" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Total number of people that component can contain.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:group ref="EnvironmentPropertiesGroup"/>
 			<xsd:element name="Presentation" type="PresentationStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Presentation defaults for SITE ELEMENT. +V1.2.2</xsd:documentation>
@@ -188,7 +163,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ======= SITE ====================================================== -->
 	<xsd:element name="Site" type="Site_VersionStructure" abstract="true" substitutionGroup="SiteElement">
 		<xsd:annotation>
 			<xsd:documentation>A type of PLACE, such as a STOP PLACE, POINT OF INTEREST or ADDRESS, to which passengers may wish to travel.</xsd:documentation>
@@ -235,7 +210,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element ref="Locale" minOccurs="0"/>
 			<xsd:choice minOccurs="0">
-				<xsd:element ref="OrganisationRef_"/>
+				<xsd:element ref="OrganisationRef_Dummy"/>
 				<xsd:element name="OperatingOrganisationView" type="Organisation_DerivedViewStructure">
 					<xsd:annotation>
 						<xsd:documentation>Reference to OPERATOR of SITE - derived details can be included.</xsd:documentation>
@@ -254,7 +229,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="entrances" type="siteEntrances_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Entrances to and within SITE.</xsd:documentation>
+					<xsd:documentation>ENTRANCEs to and within SITE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="siteStructures" type="siteStructures_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SITE STRUCTUREs within SITE. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="AllEquipmentGroup"/>
@@ -282,7 +262,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ======= SITE COMPONENT ==================================================== -->
 	<xsd:element name="SiteComponent" type="SiteComponent_VersionStructure" abstract="true" substitutionGroup="SiteElement">
 		<xsd:annotation>
 			<xsd:documentation>An element of a SITE describing part of its structure. SITE COMPONENTs share common properties for accessibility and other features.</xsd:documentation>
@@ -325,16 +305,16 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Mode Elements of a SITE COMPONENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Primary MODE of Vehicle transport associated by this component.</xsd:documentation>
+					<xsd:documentation>Primary PT MODE associated by this component.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="PtSubmodeChoiceGroup" minOccurs="0"/>
 			<xsd:element ref="ModeOfOperationRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ====== ENTRANCE ====================================================== -->
 	<xsd:complexType name="siteEntrances_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ENTRANCEs.</xsd:documentation>
@@ -352,12 +332,12 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="Entrance" type="SiteEntrance_VersionStructure" abstract="false" substitutionGroup="SiteComponent">
+	<xsd:element name="Entrance" type="SiteEntrance_VersionStructure" substitutionGroup="SiteComponent">
 		<xsd:annotation>
-			<xsd:documentation>A physical entrance or exit to/from a SITE. May be a door, barrier, gate or other recognizable point of access.</xsd:documentation>
+			<xsd:documentation>A physical entrance or exit to/from a SITE. May be a door, barrier, gate or other recognizable point of access. The ENTRANCE is an abstract Transmodel object and therefore should not be used as an instance (use specialisations like StopPlaceEntrance, PointOfInterestEntrance, etc.). It still has abstract="false" for backward compatibility, but using it as an instance is DEPRECATED from v2.0 and it will be formally changed to abstract in v3.0. -v2.0</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="SiteEntrance_VersionStructure" abstract="false">
+	<xsd:complexType name="SiteEntrance_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for SITE ENTRANCe.</xsd:documentation>
 		</xsd:annotation>
@@ -375,7 +355,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements of a SITE ENTRANCE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="xsd:normalizedString" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Alternative identifier of ENTRANCE shown to Public.</xsd:documentation>
 				</xsd:annotation>
@@ -387,7 +367,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="EntranceType" type="EntranceEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Classification of ENTRANCE. Use EQUIPMENT element to describe in further detail.</xsd:documentation>
+					<xsd:documentation>Classification of ENTRANCE. Use EntrancePurpose and EQUIPMENT elements to describe in further detail.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EntrancePurpose" type="EntrancePurposeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Classification of ENTRANCE regarding its purpose (e.g., main entrance, side entrance, etc.).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="IsExternal" type="xsd:boolean" default="true" minOccurs="0">
@@ -434,7 +419,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ==== VEHICLE ENTRANCE ================================================ -->
 	<xsd:complexType name="vehicleEntrances_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of VEHICLE ENTRANCEs.</xsd:documentation>
@@ -484,7 +469,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleEntranceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleEntranceIdType">
+					<xsd:attribute name="id" type="VehicleEntranceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE ENTRANCE.</xsd:documentation>
 						</xsd:annotation>
@@ -493,7 +478,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleEntrance_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleEntrance_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a VEHICLE ENTRANCE.</xsd:documentation>
 		</xsd:annotation>
@@ -517,7 +502,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ====Level=========================================================== -->
+	<!-- ==== LEVEL ========================================================== -->
 	<xsd:complexType name="levels_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of LEVELs.</xsd:documentation>
@@ -553,7 +538,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="LevelGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LevelIdType"/>
+					<xsd:attribute name="id" type="LevelIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -590,7 +575,7 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Description of LEVEL.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="PublicCode" type="xsd:normalizedString" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Public code for LEVEL.</xsd:documentation>
 				</xsd:annotation>
@@ -602,7 +587,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="RelativeLevelOrder" type="xsd:integer" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Order of LEVELs. The level numbers are not absolute, but only give a relative order within the SITE. 0 should be the ground floor, even when it is often difficult to determine which one that is in a complex structure. Complex buildings can be modelled with multiple SITEs and referenced by SiteRef.</xsd:documentation>
+					<xsd:documentation>Order of LEVELs. The level numbers are not absolute, but only give a relative order within the SITE. 0 should be the ground floor, even when it is often difficult to determine which one that is in a complex structure. Complex buildings can be modelled with multiple SITEs and referenced by SiteRef. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="AccessibilityAssessment" type="AccessibilityAssessment_VersionedChildStructure" minOccurs="0">
@@ -618,7 +603,205 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="SiteRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ===  GROUP OF SITES =================================================== -->
+	<xsd:complexType name="groupsOfSites_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for list of GROUP OF SITES.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfSites" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="GroupOfSites" substitutionGroup="GroupOfEntities">
+		<xsd:annotation>
+			<xsd:documentation>A grouping of SITEs which will be commonly referenced for a specific purpose. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GroupOfSites_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfEntitiesGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GroupOfSitesGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GroupOfSitesIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GroupOfSites_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for GROUP OF SITES.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="GroupOfEntities_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GroupOfSitesGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GroupOfSitesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for GROUP OF SITES.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="GroupOfSitesSpatialGroup"/>
+			<xsd:element name="alternativeNames" type="alternativeNames_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Alternative names.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Public code for GROUP OF SITES.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="members" type="siteRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>SITEs in a GROUP OF SITEs</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="GroupOfSitesSpatialGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for GROUP OF SITES.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Centroid" type="SimplePoint_VersionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Centre Coordinates of ZONE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="gml:Polygon" minOccurs="0"/>
+			<xsd:element name="projections" type="projections_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Projections of SITE onto another layer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===== SITE  STRUCTURE =============================================== -->
+	<xsd:complexType name="siteStructures_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for list of SITE STRUCTURES.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="SiteStructure" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="SiteStructure" type="SiteStructure_VersionStructure" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A building or a separate part thereof within a SITE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SiteStructure_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a SITE STRUCTURE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="SiteStructureGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SiteStructureGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a SITE STRUCTURE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of GROUP OF ENTITies.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Further Description of a GROUP OF ENTITies.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="SiteRef" minOccurs="0"/>
+			<xsd:element name="levelsInStructure" type="levelsInStructure_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>LEVELs found within a SITE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====== LEVEL IN STRUCTURE ============================================== -->
+	<xsd:complexType name="levelsInStructure_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ENTRANCEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="LevelInStructure" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="LevelInStructure" type="LevelInStructure_VersionStructure" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>A LEVEL that is accessible in a SITE STRUCTURE with its relative lateral order in that SITE STRUCTURE counted from the bottom and upwards. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LevelInStructure_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for LEVEL IN STRUCTURE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="LevelInStructureGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Order of LEVEL IN STRUCTURE within SITE STRUCTURE. -v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LevelInStructureGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a LEVEL IN STRUCTURE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="FloorLabel" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Label associated with LEVEL within SITE STRUCTURE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of Level in SITE STRUCTURE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="LevelRef"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===== ACCESS ZONES ======================================================= -->
 	<xsd:complexType name="accessZones_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ACCESS ZONEs.</xsd:documentation>
@@ -663,7 +846,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="AccessZoneGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AccessZoneIdType"/>
+					<xsd:attribute name="id" type="AccessZoneIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -697,7 +880,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ===== SERVICE SITE =================================================== -->
 	<xsd:element name="ServiceSite" substitutionGroup="Site">
 		<xsd:annotation>
 			<xsd:documentation>A sub-type of SITE which is of specific interest for the operator (e.g. where a joint service or a joint fee is proposed).</xsd:documentation>
@@ -733,7 +916,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ServiceSiteGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ServiceSiteIdType" use="optional">
+					<xsd:attribute name="id" type="ServiceSiteIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -761,22 +944,27 @@ Rail transport, Roads and Road transport
 		<xsd:sequence/>
 	</xsd:group>
 	<!-- ===DUMMY TYPES======================================================= -->
-	<xsd:element name="ParkingBay_" type="SiteComponent_VersionStructure" abstract="true" substitutionGroup="SiteComponent">
+	<xsd:element name="ParkingBay_Dummy" type="SiteComponent_VersionStructure" abstract="true" substitutionGroup="SiteComponent">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Type to get round SG limitations</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ParkingArea_" type="SiteComponent_VersionStructure" abstract="true" substitutionGroup="SiteComponent">
+	<xsd:element name="ParkingArea_Dummy" type="SiteComponent_VersionStructure" abstract="true" substitutionGroup="SiteComponent">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Type to get round SG limitations</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="StopPlace_" type="Site_VersionStructure" abstract="true" substitutionGroup="Site">
+	<xsd:element name="StopPlace_Dummy" type="Site_VersionStructure" abstract="true" substitutionGroup="Site">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Type to get round SG limitations. Can be a STOP PLACE, VEHICLE MEETING POINT, TAXI RANK.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="Quay_" type="Site_VersionStructure" abstract="true" substitutionGroup="Site">
+	<xsd:element name="Quay_Dummy" type="Site_VersionStructure" abstract="true" substitutionGroup="Site">
+		<xsd:annotation>
+			<xsd:documentation>Dummy Type to get round SG limitations</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="Parking_Dummy" type="Site_VersionStructure" abstract="true" substitutionGroup="Site">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Type to get round SG limitations</xsd:documentation>
 		</xsd:annotation>

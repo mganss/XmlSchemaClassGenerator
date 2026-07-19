@@ -3,11 +3,13 @@
 	<xsd:include schemaLocation="netex_nm_singleJourneyPath_support.xsd"/>
 	<xsd:include schemaLocation="netex_nm_singleJourneyService_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_vehicleType_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_vehicle_support.xsd"/>
 	<xsd:include schemaLocation="../part5_rc/netex_nm_mobilityService_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_journey_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_datedPassingTimes_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceCalendar_version.xsd"/>
 	<xsd:include schemaLocation="../part5_nd/netex_nm_vehicleMeetingPointAssignment_version.xsd"/>
+	<xsd:include schemaLocation="../part5_fm/netex_nm_individualTraveller_support.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -18,6 +20,8 @@
 				<Contributor>Christophe Duquesne</Contributor>
 				<Coverage>Europe</Coverage>
 				<Creator>First drafted for NeTEx version 1.2.2 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date><Created>2020-10-05</Created>Add for New Modes
+				</Date>
 				<Date><Created>2020-10-05</Created>Add for New Modes
 				</Date>
 				<Date>
@@ -77,9 +81,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="SingleJourney" abstract="false" substitutionGroup="Journey_" id="SingleJourney">
+	<xsd:element name="SingleJourney" substitutionGroup="Journey_Dummy" id="SingleJourney">
 		<xsd:annotation>
-			<xsd:documentation>The planned movement of a public transport vehicle on a DAY TYPE from the start point to the end point of a JOURNEY PATTERN on a specified ROUTE.  +v1.2.2</xsd:documentation>
+			<xsd:documentation>The planned movement of a public transport vehicle on a DAY TYPE from the start point to the end point of a JOURNEY PATTERN on a specified ROUTE. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -99,7 +103,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SingleJourneyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SingleJourneyIdType" use="optional"/>
+					<xsd:attribute name="id" type="SingleJourneyIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -118,7 +122,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="SingleJourneyGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for SINGLE JOURNEY. </xsd:documentation>
+			<xsd:documentation>Elements for SINGLE JOURNEY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:group ref="SingleJourneyReferencesGroup"/>
@@ -129,25 +133,30 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="DepartureDayOffset" type="DayOffsetType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Departure Time Day Offset</xsd:documentation>
+					<xsd:documentation>Departure Time Day Offset.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="OperatingDayRef" minOccurs="0"/>
 			<xsd:element name="datedPassingTimes" type="targetPassingTimes_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>DATED PASSING TIMEsfor SINGLE JOURNEY</xsd:documentation>
+					<xsd:documentation>DATED PASSING TIMEsfor SINGLE JOURNEY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="meetingPointAssignments" type="vehicleMeetingPointAssignments_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>MEETING POINT ASSIGNMENTS for SINGLE JOURNEY</xsd:documentation>
+					<xsd:documentation>MEETING POINT ASSIGNMENTS for SINGLE JOURNEY.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="VehiclePoolingDriverInfoRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Possible relation to a VEHICLE POOLING DRIVER, as defined in Transmodel.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="SingleJourneyReferencesGroup">
 		<xsd:annotation>
-			<xsd:documentation>Reference Elements for SINGLE JOURNEY. </xsd:documentation>
+			<xsd:documentation>Reference Elements for SINGLE JOURNEY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="CommonVehicleServiceRef" minOccurs="0"/>
@@ -168,7 +177,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="GroupOfSingleJourneys" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="GroupOfSingleJourneys" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A GROUP OF SINGLE JOURNEYs, often known to its users by a name or a number. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -189,7 +198,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="GroupOfSingleJourneysGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfSingleJourneysIdType"/>
+					<xsd:attribute name="id" type="GroupOfSingleJourneysIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -218,7 +227,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>NOTICEs  relevant for the whole GROUP OF SINGLE JOURNEYs.</xsd:documentation>
+					<xsd:documentation>NOTICEs relevant for the whole GROUP OF SINGLE JOURNEYs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

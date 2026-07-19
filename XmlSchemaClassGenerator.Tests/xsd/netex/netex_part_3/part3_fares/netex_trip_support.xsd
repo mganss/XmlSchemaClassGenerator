@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_trip_support">
-	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_pointAndLinkSequence_support.xsd"/>
-	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
 			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
@@ -12,6 +10,8 @@
 				<Creator>First drafted for NeTEx version 1.022EN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2021-05-14</Created>
+				</Date>
+				<Date><Modified>2025-04-27</Modified>Add extra leg types for 2.0
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -31,7 +31,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_usageParameterTravel_support.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-				 <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
+				 <Copyright>CEN, Crown Copyright 2009-2025</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -56,6 +56,19 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>NeTEX: Trip identifier types.</xsd:documentation>
 	</xsd:annotation>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_pointAndLinkSequence_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:group name="TripReferenceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elemenst for references to a Trip</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TripPatternRef" minOccurs="0"/>
+			<xsd:element ref="TripRef" minOccurs="0"/>
+			<xsd:element ref="LegRef" minOccurs="0"/>
+			<xsd:element ref="RidePartRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
 	<!-- ===  TRIP PATTERN ====================================================== -->
 	<xsd:simpleType name="TripPatternIdType">
 		<xsd:annotation>
@@ -63,7 +76,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="LinkSequenceIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TripPatternTripRef" type="TripPatternRefStructure" substitutionGroup="LinkSequenceRef">
+	<xsd:element name="TripPatternRef" type="TripPatternRefStructure" substitutionGroup="LinkSequenceRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a TRIP PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -79,6 +92,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TRIP PATTERN.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassLinkSequenceRefStructureType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -105,28 +139,458 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TRIP.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassLinkSequenceRefStructureType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- ===  TRIP PATTERN ====================================================== -->
-	<xsd:simpleType name="TripLegIdType">
+	<!-- ===  LEG ====================================================== -->
+	<xsd:simpleType name="LegIdType">
 		<xsd:annotation>
-			<xsd:documentation>Type for identifier of a TRIP LEG.</xsd:documentation>
+			<xsd:documentation>Type for identifier of a LEG.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="ObjectIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TripLegRef" type="TripLegRefStructure" substitutionGroup="VersionOfObjectRef">
+	<xsd:element name="LegRef" type="LegRefStructure" abstract="true" substitutionGroup="VersionOfObjectRef">
 		<xsd:annotation>
-			<xsd:documentation>Reference to a TRIP LEG.</xsd:documentation>
+			<xsd:documentation>Reference to a LEG. +V2.0</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="TripLegRefStructure">
+	<xsd:complexType name="LegRefStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for Reference to a TRIP LEG.</xsd:documentation>
+			<xsd:documentation>Type for Reference to a LEG.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="VersionOfObjectRefStructure"/>
-		</xsd:complexContent>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- === TRIP  P ====================================================== -->
+	<!-- ===  RIDE LEG ====================================================== -->
+	<xsd:simpleType name="RideLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a RIDE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="RideLegRef" type="RideLegRefStructure" abstract="true" substitutionGroup="LegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a RIDE LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RideLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a RIDE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  TRIP LEG ====================================================== -->
+	<xsd:element name="TripLegRef" type="PtRideLegRefStructure" substitutionGroup="RideLegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PT RIDE LEG. DEPRECATED Use PtRideLeg instead. v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<!-- ===  PT RIDE  LEG ====================================================== -->
+	<xsd:simpleType name="PtRideLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PT RIDE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="RideLegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PtRideLegRef" type="PtRideLegRefStructure" substitutionGroup="RideLegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PT RIDE LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PtRideLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a PT RIDE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="RideLegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  ALTERNATIVE MODE  LEG ====================================================== -->
+	<xsd:simpleType name="AlternativeModeLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a ALTERNATIVE MODE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="RideLegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="AlternativeModeLegRef" type="AlternativeModeLegRefStructure" substitutionGroup="RideLegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a ALTERNATIVE MODE LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AlternativeModeLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a ALTERNATIVE MODE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="RideLegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  PRIVATE  LEG ====================================================== -->
+	<xsd:simpleType name="PrivateLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PRIVATE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PrivateLegRef" type="PrivateLegRefStructure" substitutionGroup="LegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PRIVATE LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PrivateLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a PRIVATE LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  PRIVATE  LEG ====================================================== -->
+	<xsd:simpleType name="TransferLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TRANSFER LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TransferLegRef" type="TransferLegRefStructure" abstract="true" substitutionGroup="LegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TRANSFER LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TransferLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a TRANSFER LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  PT CONNECTION LEG ====================================================== -->
+	<xsd:simpleType name="PtConnectionLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PT CONNECTION LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TransferLegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PtConnectionLegRef" type="PtConnectionLegRefStructure" substitutionGroup="TransferLegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PT CONNECTION LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PtConnectionLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a PT CONNECTION LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TransferLegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  ACCESS LEG ====================================================== -->
+	<xsd:simpleType name="AccessLegIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a ACCESS LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TransferLegIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="AccessLegRef" type="AccessLegRefStructure" substitutionGroup="TransferLegRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a ACCESS LEG. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AccessLegRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a ACCESS LEG.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TransferLegRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===  TRIP LEG ====================================================== -->
+	<xsd:simpleType name="RidePartIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a RIDE PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="RidePartRef" type="RidePartRefStructure" abstract="true" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a RIDE PART. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RidePartRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a RIDE PART.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ========================================================== -->
 </xsd:schema>

@@ -3,6 +3,7 @@
 	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_servicePattern_support.xsd"/>
 	<xsd:include schemaLocation="netex_vehicleService_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_occupancy/netex_oc_occupancy_version.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -34,6 +35,9 @@
 				</Date>
 				<Date>
 					<Modified>2020-06-21  Issue JourneyPart #78 -NJSK:  MainJourneyPartRef should be a JourneyPartRef, not a  JourneyPartCoupleRef  </Modified>
+				</Date>
+				<Date>
+					<Modified>2025-05-27  Issue #906 -Ulf9: JourneyPartCouple including vehicle journeys on different operating day dates</Modified>
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -74,12 +78,12 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: COUPLED JOURNEY  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: COUPLED JOURNEY types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
 	<xsd:complexType name="journeyPartsInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  JOURNEY PARTs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of JOURNEY PARTs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -91,7 +95,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:complexType name="coupledJourneysInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  COUPLED JOURNEYs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of COUPLED JOURNEYs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -103,7 +107,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:complexType name="journeyPartCouplesInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  JOURNEY PART COUPLEs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of JOURNEY PART COUPLEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -127,7 +131,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="JourneyPart" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="JourneyPart" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A part of a VEHICLE JOURNEY created according to a specific functional purpose, for instance in situations when vehicle coupling or separating occurs.</xsd:documentation>
 		</xsd:annotation>
@@ -145,7 +149,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="JourneyPartGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="JourneyPartIdType"/>
+					<xsd:attribute name="id" type="JourneyPartIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -159,9 +163,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="JourneyPartGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of JOURNEY PART  within JOURNEY.</xsd:documentation>
+						<xsd:documentation>Order of JOURNEY PART within JOURNEY. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -182,13 +186,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Reference to parent of which this is part. If given by context does not need to be stated.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="DayOffsetRelativeToMainPart" type="DayOffsetType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>OPERATING DAY day offset of parent journey relative to OPERATING DAY date of main JOURNEY PART journey. Positive value indicates a later OPERATING DAY date for parent journey. Does not need to be stated if 0 or not relevant for context.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:group ref="JourneyPartReferencesGroup"/>
 			<xsd:group ref="JourneyPartTimeGroup"/>
 			<xsd:element name="VehicleOrientation" type="xsd:boolean" default="true" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Orientation of the vehicle carrying
-out the JOURNEY PART compared to the definition
-of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
+					<xsd:documentation>Orientation of the vehicle carrying out the JOURNEY PART compared to the definition of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="PurposeOfJourneyPartitionRef" minOccurs="0"/>
@@ -202,6 +209,12 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 					<xsd:documentation>Positions in Train of JOURNEY PART.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="occupancies" type="OccupancyView_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>OCCUPANCYs associated with this journey. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfProductCategoryRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="JourneyPartReferencesGroup">
@@ -269,7 +282,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="JourneyPartPosition" abstract="false" substitutionGroup="VersionedChild">
+	<xsd:element name="JourneyPartPosition" substitutionGroup="VersionedChild">
 		<xsd:annotation>
 			<xsd:documentation>Position in train of JOURNEY PART from a given stop. +v1.1.</xsd:documentation>
 		</xsd:annotation>
@@ -284,7 +297,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 							<xsd:group ref="JourneyPartPositionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="JourneyPartPositionIdType"/>
+					<xsd:attribute name="id" type="JourneyPartPositionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -302,9 +315,9 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:group>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of JOURNEY PART  POistion within JOURNEY PART.</xsd:documentation>
+						<xsd:documentation>Order of JOURNEY PART POSITION within JOURNEY PART. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -359,7 +372,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 							<xsd:group ref="CoupledJourneyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CoupledJourneyIdType"/>
+					<xsd:attribute name="id" type="CoupledJourneyIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -383,7 +396,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 		<xsd:sequence>
 			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Name of COUPLED JOURNEY.</xsd:documentation>
+					<xsd:documentation>Name of COUPLED JOURNEY. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
@@ -415,7 +428,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 	</xsd:complexType>
 	<xsd:element name="JourneyPartCouple" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
-			<xsd:documentation>Two or more  JOURNEY PARTs of different VEHICLE JOURNEYs served simultaneously by a train set up by coupling their single vehicles.</xsd:documentation>
+			<xsd:documentation>Two or more JOURNEY PARTs of different VEHICLE JOURNEYs served simultaneously by a train set up by coupling their single vehicles.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -431,7 +444,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 							<xsd:group ref="JourneyPartCoupleGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="JourneyPartCoupleIdType"/>
+					<xsd:attribute name="id" type="JourneyPartCoupleIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -445,9 +458,9 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 				<xsd:sequence>
 					<xsd:group ref="JourneyPartCoupleGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger" use="required">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of JOURNEY PART COUPLE. +v1.1</xsd:documentation>
+						<xsd:documentation>Order of JOURNEY PART COUPLE. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -455,12 +468,12 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 	</xsd:complexType>
 	<xsd:group name="JourneyPartCoupleGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for  JOURNEY PART COUPLe.</xsd:documentation>
+			<xsd:documentation>Elements for JOURNEY PART COUPLe.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Time of Departure.</xsd:documentation>
+					<xsd:documentation>Description.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="StartTime" type="xsd:time">
@@ -485,7 +498,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 			</xsd:element>
 			<xsd:element name="FromStopPointRef" type="ScheduledStopPointRefStructure">
 				<xsd:annotation>
-					<xsd:documentation>Point at which this  JOURNEY PART starts.</xsd:documentation>
+					<xsd:documentation>Point at which this JOURNEY PART starts.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ToStopPointRef" type="ScheduledStopPointRefStructure">
@@ -499,7 +512,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="BlockRef" minOccurs="0"/>
-			<xsd:element name="journeyParts" type="journeyPartRefs_RelStructure" minOccurs="0">
+			<xsd:element name="journeyParts" type="journeyParts_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>JOURNEY PARTs in JOURNEY PART COUPLE.</xsd:documentation>
 				</xsd:annotation>
@@ -508,7 +521,7 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="PurposeOfJourneyPartition" abstract="false" substitutionGroup="TypeOfValue">
+	<xsd:element name="PurposeOfJourneyPartition" substitutionGroup="TypeOfValue">
 		<xsd:annotation>
 			<xsd:documentation>An operational purpose changing within a JOURNEY PATTERN and with this subdividing the SERVICE JOURNEY into JOURNEY PARTs.</xsd:documentation>
 		</xsd:annotation>
@@ -526,12 +539,12 @@ of the corresponding VEHICLE TYPE. true for forward.</xsd:documentation>
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PurposeOfJourneyPartitionIdType"/>
+					<xsd:attribute name="id" type="PurposeOfJourneyPartitionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="PurposeOfJourneyPartition_ValueStructure" abstract="false">
+	<xsd:complexType name="PurposeOfJourneyPartition_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a PURPOSE OF JOURNEY PARTITION.</xsd:documentation>
 		</xsd:annotation>

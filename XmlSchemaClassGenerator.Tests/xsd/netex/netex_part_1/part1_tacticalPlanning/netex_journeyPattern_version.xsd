@@ -61,7 +61,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: JOURNEY PATTERN  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: JOURNEY PATTERN types.</xsd:documentation>
 	</xsd:annotation>
 	<!--CLOSE COUPLED WITH ServicePattern_version-->
 	<!-- ======================================================================= -->
@@ -85,18 +85,18 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="JourneyPattern_" maxOccurs="unbounded"/>
+					<xsd:element ref="JourneyPattern_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ===Journey Pattern===================================================== -->
-	<xsd:element name="JourneyPattern_" type="LinkSequence_VersionStructure" abstract="true" substitutionGroup="LinkSequence">
+	<xsd:element name="JourneyPattern_Dummy" type="LinkSequence_VersionStructure" abstract="true" substitutionGroup="LinkSequence">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Supertype for JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="JourneyPattern" abstract="false" substitutionGroup="JourneyPattern_">
+	<xsd:element name="JourneyPattern" substitutionGroup="JourneyPattern_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>An ordered list of SCHEDULED STOP POINTs and TIMING POINTs on a single ROUTE, describing the pattern of working for public transport vehicles. A JOURNEY PATTERN may pass through the same POINT more than once. The first point of a JOURNEY PATTERN is the origin. The last point is the destination.</xsd:documentation>
 		</xsd:annotation>
@@ -117,7 +117,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="JourneyPatternGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="JourneyPatternIdType"/>
+					<xsd:attribute name="id" type="JourneyPatternIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -197,7 +197,7 @@ Rail transport, Roads and Road transport
 				<xsd:element ref="RouteRef" minOccurs="1"/>
 				<xsd:element ref="RouteView"/>
 			</xsd:choice>
-			<xsd:element name="DirectionType" type="DirectionTypeEnumeration" minOccurs="0">
+			<xsd:element ref="DirectionType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>DIRECTION of JOURNEY PATTERN. Should be same as for ROUTE on which PATTERN is based.</xsd:documentation>
 				</xsd:annotation>
@@ -221,15 +221,20 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Reference to a TIMING PATTERN.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Booking Arrangements for JOURNEY PATTERN Points</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Notices for JOURNEY PATTERN Points may be </xsd:documentation>
+					<xsd:documentation>Notices for JOURNEY PATTERN Points may be</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="DeadRunJourneyPattern" abstract="false" substitutionGroup="JourneyPattern_">
+	<xsd:element name="DeadRunJourneyPattern" substitutionGroup="JourneyPattern_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A JOURNEY PATTERN to be used for DEAD RUNs.</xsd:documentation>
 		</xsd:annotation>
@@ -250,7 +255,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="JourneyPatternGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DeadRunJourneyPatternIdType"/>
+					<xsd:attribute name="id" type="DeadRunJourneyPatternIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -264,7 +269,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:complexType name="pointsInJourneyPattern_RelStructure" abstract="false">
+	<xsd:complexType name="pointsInJourneyPattern_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for POINT IN JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -278,7 +283,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="PointInJourneyPattern" abstract="false" substitutionGroup="PointInLinkSequence">
+	<xsd:element name="PointInJourneyPattern" substitutionGroup="PointInLinkSequence">
 		<xsd:annotation>
 			<xsd:documentation>A STOP POINT or TIMING POINT in a JOURNEY PATTERN with its order in that JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -299,12 +304,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PointInJourneyPatternGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PointInJourneyPatternIdType"/>
+					<xsd:attribute name="id" type="PointInJourneyPatternIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="PointInJourneyPattern_VersionedChildStructure" abstract="false">
+	<xsd:complexType name="PointInJourneyPattern_VersionedChildStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for POINT IN JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -367,7 +372,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:complexType name="linksInJourneyPattern_RelStructure" abstract="false">
+	<xsd:complexType name="linksInJourneyPattern_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for LINK IN JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -380,7 +385,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="LinkInJourneyPattern" abstract="false" substitutionGroup="LinkInLinkSequence">
+	<xsd:element name="LinkInJourneyPattern" substitutionGroup="LinkInLinkSequence">
 		<xsd:annotation>
 			<xsd:documentation>A SERVICE LINK or TIMING LINK in a JOURNEY PATTERN with its order in that JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -401,7 +406,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="LinkInJourneyPatternGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LinkInSequenceIdType" use="optional">
+					<xsd:attribute name="id" type="LinkInSequenceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -410,7 +415,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="LinkInJourneyPattern_VersionedChildStructure" abstract="false">
+	<xsd:complexType name="LinkInJourneyPattern_VersionedChildStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for LINK IN JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -432,7 +437,7 @@ Rail transport, Roads and Road transport
 		</xsd:choice>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="JourneyPatternView" type="JourneyPattern_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+	<xsd:element name="JourneyPatternView" type="JourneyPattern_DerivedViewStructure" substitutionGroup="DerivedView">
 		<xsd:annotation>
 			<xsd:documentation>Simplified view of a JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -452,7 +457,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<!-- ======================================================================= -->
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfJourneyPattern" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfJourneyPattern" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of JOURNEY PATTERNs according to their functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -470,12 +475,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfJourneyPatternIdType"/>
+					<xsd:attribute name="id" type="TypeOfJourneyPatternIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfJourneyPattern_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfJourneyPattern_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>

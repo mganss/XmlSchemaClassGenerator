@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_timetableFrame_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_timetableFrame_version">
 	<xsd:include schemaLocation="netex_timetableFrame_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_trainElement_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_frames/netex_serviceCalendarFrame_version.xsd"/>
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_journey_facility_support.xsd"/>
 	<xsd:include schemaLocation="../part2_journeyTimes/netex_datedVehicleJourney_version.xsd"/>
+	<xsd:include schemaLocation="../part2_journeyTimes/netex_deckPlanAssignment_version.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
 			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
@@ -17,11 +19,17 @@
 				<Date><Modified>2017-05-09</Modified>  Add Header
 				</Date>
 				<Date><Modified>2019-03-25</Modified>CR 51 CD Add VehicleJourneyStop Assignment.
-							NJSK Review make vehicleJourneyStopAssignmentsInFrame_RelStructure lower camel case consistent with NeTEx conventions. 
+							NJSK Review make vehicleJourneyStopAssignmentsInFrame_RelStructure lower camel case consistent with NeTEx conventions.
 							Also correct some documentation comments
 				</Date>
 				<Date><Modified>2020-10-08</Modified>New Modes: Widen VehicleType to TransportType
 				</Date>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date><Modified>2023-02-12</Modified>Add DECK PLAN ASSIGNMENTs
+          		</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines TIMETABLE FRAME types.</p>
 				</Description>
@@ -81,7 +89,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimetableFrameGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimetableFrameIdType"/>
+					<xsd:attribute name="id" type="TimetableFrameIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -106,7 +114,7 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="TimetablePropertiesGroup"/>
 			<xsd:group ref="TimetableDefaultsGroup">
 				<xsd:annotation>
-					<xsd:documentation>Default  properties of elements in TIMETABLE FRAME. Use these values on child elements if not specified on individual elements.</xsd:documentation>
+					<xsd:documentation>Default properties of elements in TIMETABLE FRAME. Use these values on child elements if not specified on individual elements.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:group>
 			<xsd:group ref="TimeDemandTypeInFrameGroup"/>
@@ -115,20 +123,25 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="InterchangeInFrameGroup"/>
 			<xsd:group ref="VehicleTypeInFrameGroup"/>
 			<xsd:group ref="JourneyAccountingInFrameGroup"/>
+			<xsd:group ref="OccupancyViewInFrameGroup">
+				<xsd:annotation>
+					<xsd:documentation>+v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="TimetableDefaultsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Default  properties of elements in TIMETABLE FRAME. Use these values if not specified on individual elements.</xsd:documentation>
+			<xsd:documentation>Default properties of elements in TIMETABLE FRAME. Use these values if not specified on individual elements.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="NetworkView" minOccurs="0"/>
 			<xsd:element ref="LineView" minOccurs="0"/>
 			<xsd:element ref="OperatorView" minOccurs="0"/>
 			<xsd:element ref="ServiceCalendarFrameRef" minOccurs="0"/>
-			<xsd:element name="DefaultMode" type="VehicleModeEnumeration" minOccurs="0">
+			<xsd:element name="DefaultMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Default VEHICLE MODE to use on JOURNEYs in TIMETABLE.</xsd:documentation>
+					<xsd:documentation>Default PT MODE to use on JOURNEYs in TIMETABLE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="JourneyAccountingRef" minOccurs="0"/>
@@ -146,9 +159,9 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Additional descriptive properties of TIMETABLE FRAME.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="VehicleModes" type="VehicleModeListOfEnumerations" minOccurs="0">
+			<xsd:element name="VehicleModes" type="AllPublicTransportModesListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Modes of VEHICLE JOURNEYs in timetable.</xsd:documentation>
+					<xsd:documentation>PT MODEs of VEHICLE JOURNEYs in timetable.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="HeadwayService" type="xsd:boolean" minOccurs="0">
@@ -166,7 +179,7 @@ Rail transport, Roads and Road transport
 	<!-- ==========================================-->
 	<xsd:group name="TimetableJourneyInFrameGroup">
 		<xsd:annotation>
-			<xsd:documentation>Properties of journeys in  TIMETABLE FRAME.</xsd:documentation>
+			<xsd:documentation>Properties of journeys in TIMETABLE FRAME.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="vehicleJourneys" type="journeysInFrame_RelStructure" minOccurs="0">
@@ -176,7 +189,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="frequencyGroups" type="frequencyGroupsInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>FREQUENCY GROUPs  In frame. Can be used to template VEHICLE JOURNEYs.</xsd:documentation>
+					<xsd:documentation>FREQUENCY GROUPs In frame. Can be used to template VEHICLE JOURNEYs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="groupsOfServices" type="groupsOfServicesInFrame_RelStructure" minOccurs="0">
@@ -191,17 +204,27 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="journeyPartCouples" type="journeyPartCouplesInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>JOURNEY COUPLINGs  in frame.</xsd:documentation>
+					<xsd:documentation>JOURNEY COUPLINGs in frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="coupledJourneys" type="coupledJourneysInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>JOURNEY COUPLINGs  in frame.</xsd:documentation>
+					<xsd:documentation>COUPLED JOURNEYs in frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="serviceFacilitySets" type="serviceFacilitySetsInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>SERVICE FACILITies  in frame.</xsd:documentation>
+					<xsd:documentation>SERVICE FACILITies in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="restrictedServiceFacilitySets" type="restrictedServiceFacilitySetsInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Restricted SERVICE FACILITies in frame. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="deckPlanAssignments" type="deckPlanAssignments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DECK PLAN ASSIGNMENTs in frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="typesOfService" type="typesOfServiceInFrame_RelStructure" minOccurs="0">

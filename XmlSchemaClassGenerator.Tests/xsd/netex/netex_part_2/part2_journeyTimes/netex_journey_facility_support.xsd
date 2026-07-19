@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_journey_facility_support">
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_servicePattern_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_call_support.xsd"/>
+	<!-- ====SERVICE FACILITY SET================================================================ -->
+	<xsd:complexType name="restrictedServiceFacilitySets_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>SERVICE FACILITY SETs associated with entity.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="RestrictedServiceFacilitySetRef"/>
+					<xsd:element ref="RestrictedServiceFacilitySet"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="restrictedServiceFacilitySetsInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of restricted SERVICE FACILITY SETs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="RestrictedServiceFacilitySetRef"/>
+					<xsd:element ref="RestrictedServiceFacilitySet"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="RestrictedServiceFacilitySetIdType">
+		<xsd:annotation>
+			<xsd:documentation>Identifier of a restricted SERVICE FACILITY SET.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ServiceFacilitySetIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="RestrictedServiceFacilitySetRef" type="RestrictedServiceFacilitySetRefStructure" substitutionGroup="ServiceFacilitySetRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a restricted SERVICE FACILITY SET.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="RestrictedServiceFacilitySet" substitutionGroup="FacilitySet">
+		<xsd:annotation>
+			<xsd:documentation>Restricted Service FACILITY. The restriction can be an AvailabilityCondition and/or a From - To relation. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="RestrictedServiceFacilitySet_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FacilitySetGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ServiceFacilitySetGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RestrictedServiceFacilitySetGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="RestrictedServiceFacilitySetIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="RestrictedServiceFacilitySet_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a restricted SERVICE FACILITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ServiceFacilitySet_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="RestrictedServiceFacilitySetGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RestrictedServiceFacilitySetGroup">
+		<xsd:annotation>
+			<xsd:documentation>Restriction .</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="ServiceFacilitySetRef"/>
+			<xsd:choice minOccurs="0">
+				<xsd:sequence>
+					<xsd:element name="FromCall" type="CallRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>CALL from which on the SERVICE FACILITY SET SET applies.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ToCall" type="CallRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>CALL after which applicability of the SERVICE FACILITY SET ends.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="FromStopPointInJourneyPattern" type="StopPointInJourneyPatternRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>POINT from which on the SERVICE FACILITY SET applies.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ToStopPointInJourneyPattern" type="StopPointInJourneyPatternRefStructure">
+						<xsd:annotation>
+							<xsd:documentation>POINT after which applicability of the SERVICE FACILITY SET ends.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:choice>
+			<xsd:element ref="AvailabilityConditionRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>AVAILABILITY CONDITION (further) restricting the applicabillity.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="RestrictedServiceFacilitySetRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a restricted SERVICE FACILITY SET.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="ServiceFacilitySetRefStructure">
+				<xsd:attribute name="ref" type="RestrictedServiceFacilitySetIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a restricted SERVICE FACILITY SET.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassRestrictedServiceFacilitySetRefStructureType" default="RestrictedServiceFacilitySet">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for RestrictedServiceFacilitySetRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+</xsd:schema>

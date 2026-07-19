@@ -25,6 +25,8 @@
 				</Date>
 				<Date><Modified>2017-012-05</Modified> Correct DayOffsetType  on Course of COurnet
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the VEHICLE SERVICE types.</p>
@@ -145,7 +147,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ===Block=================================================== -->
-	<xsd:element name="Block" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="Block" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>The work of a vehicle from the time it leaves a PARKING POINT after parking until its next return to park at a PARKING POINT. Any subsequent departure from a PARKING POINT after parking marks the start of a new BLOCK. The period of a BLOCK has to be covered by DUTies.</xsd:documentation>
 		</xsd:annotation>
@@ -163,7 +165,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="BlockGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="BlockIdType"/>
+					<xsd:attribute name="id" type="BlockIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -206,7 +208,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Description of BLOCK.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="BlockTimingGroup">
@@ -216,15 +222,15 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Time to complete BLOCK.</xsd:documentation>
+					<xsd:documentation>Preparation time before starting BLOCK.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="StartTime" type="xsd:time" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Start time of BLOCK- In principle this can be derived from the Start time of the first journey and the preparation duration but may be stated  explicitly as well.</xsd:documentation>
+					<xsd:documentation>Start time of BLOCK. In principle this can be derived from the Start time of the first journey and the preparation duration but may be stated explicitly as well.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="StartTimeDayOffset" type="xsd:integer" minOccurs="0">
+			<xsd:element name="StartTimeDayOffset" type="DayOffsetType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Day offset of Start time from current OPERATING DAY.</xsd:documentation>
 				</xsd:annotation>
@@ -236,10 +242,10 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="EndTime" type="xsd:time" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>End time of BLOCK. In principle this can be derived from the Start time of the last journey and the finishing duration but may be stated  explicitly as well.</xsd:documentation>
+					<xsd:documentation>End time of BLOCK. In principle this can be derived from the Start time of the last journey and the finishing duration but may be stated explicitly as well.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="EndTimeDayOffset" type="xsd:integer" minOccurs="0">
+			<xsd:element name="EndTimeDayOffset" type="DayOffsetType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Day offset of end time from current OPERATING DAY.</xsd:documentation>
 				</xsd:annotation>
@@ -303,9 +309,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TrainBlock" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="TrainBlock" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
-			<xsd:documentation>A composite train formed of several BLOCKs coupled together during a certain period. Any coupling or separation action marks the start of a new TRAIN BLOCK.</xsd:documentation>
+			<xsd:documentation>The vehicle work required by a train-based JOURNEY or sequence of JOURNEYs, from the time it leaves a PARKING POINT after parking until its next return to park at a PARKING POINT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -324,7 +330,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TrainBlockGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TrainBlockIdType"/>
+					<xsd:attribute name="id" type="TrainBlockIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -368,7 +374,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="BlockPart" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="BlockPart" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A part of a BLOCK.</xsd:documentation>
 		</xsd:annotation>
@@ -386,7 +392,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="BlockPartGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="BlockPartIdType"/>
+					<xsd:attribute name="id" type="BlockPartIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -400,9 +406,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="BlockPartGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of part within BLOCK.</xsd:documentation>
+						<xsd:documentation>Order of part within BLOCK. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -437,7 +443,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="CompoundBlock" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="CompoundBlock" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A composite BLOCK formed of several BLOCKs coupled together during a certain period. Any coupling or separation action marks the start of a new COMPOUND BLOCK.</xsd:documentation>
 		</xsd:annotation>
@@ -455,7 +461,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CompoundBlockGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CompoundBlockIdType"/>
+					<xsd:attribute name="id" type="CompoundBlockIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -506,9 +512,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TrainBlockPart" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="TrainBlockPart" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
-			<xsd:documentation>The work of a vehicle from the time it leaves a PARKING POINT after parking until its next return to park at a PARKING POINT. Any subsequent departure from a PARKING POINT after parking marks the start of a new TRAIN BLOCK PART. The period of a TRAIN BLOCK PART has to be covered by DUTies.</xsd:documentation>
+			<xsd:documentation>Part of a TRAIN BLOCK corresponding to a specific JOURNEY PART of the relevant JOURNEY of a TRAIN BLOCK. Note: Any train reversal, splitting, or joining operation marks the start of a new TRAIN BLOCK PART.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -527,7 +533,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TrainBlockPartGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TrainBlockPartIdType"/>
+					<xsd:attribute name="id" type="TrainBlockPartIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -551,20 +557,20 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="StartTime" type="xsd:time" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Start time of BLOCK PART- In principle this can be derived from the Start time of the first journey and the preparation duration but may be stated  explicitly as well.</xsd:documentation>
+					<xsd:documentation>Start time of BLOCK PART- In principle this can be derived from the Start time of the first journey and the preparation duration but may be stated explicitly as well.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="StartTimeDayOffset" type="xsd:integer" minOccurs="0">
+			<xsd:element name="StartTimeDayOffset" type="DayOffsetType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Day offset of Start time from current OPERATING DAY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="EndTime" type="xsd:time" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>End time of BLOCK PART. In principle this can be derived from the Start time of the last journey and the finishing duration but may be stated  explicitly as well.</xsd:documentation>
+					<xsd:documentation>End time of BLOCK PART. In principle this can be derived from the Start time of the last journey and the finishing duration but may be stated explicitly as well.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="EndTimeDayOffset" type="xsd:integer" minOccurs="0">
+			<xsd:element name="EndTimeDayOffset" type="DayOffsetType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Day offset of end time from current OPERATING DAY.</xsd:documentation>
 				</xsd:annotation>
@@ -578,7 +584,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<!-- ======================================================================= -->
 	<!-- ======================================================================= -->
-	<xsd:element name="VehicleService" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="VehicleService" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A work plan for a vehicle for a whole day, planned for a specific DAY TYPE. A VEHICLE SERVICE includes one or several VEHICLE SERVICE PARTs.</xsd:documentation>
 		</xsd:annotation>
@@ -596,7 +602,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleServiceIdType"/>
+					<xsd:attribute name="id" type="VehicleServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -649,7 +655,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="VehicleServicePart" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="VehicleServicePart" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A part of a VEHICLE SERVICE composed of one or more BLOCKs and limited by periods spent at the GARAGE managing the vehicle in question.</xsd:documentation>
 		</xsd:annotation>
@@ -667,7 +673,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleServicePartGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleServicePartIdType"/>
+					<xsd:attribute name="id" type="VehicleServicePartIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -718,7 +724,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CourseOfJourneys" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="CourseOfJourneys" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A part of a BLOCK composed of consecutive VEHICLE JOURNEYs defined for the same DAY TYPE, all operated on the same LINE.</xsd:documentation>
 		</xsd:annotation>
@@ -736,7 +742,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CourseOfJourneysGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CourseOfJourneysIdType"/>
+					<xsd:attribute name="id" type="CourseOfJourneysIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -773,7 +779,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Numeric identifier of COURSE of JOURNEYS.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>How long the run takes to prepare.</xsd:documentation>
@@ -817,7 +827,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ReliefOpportunity" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="ReliefOpportunity" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A time in a BLOCK where a vehicle passes a RELIEF POINT. This opportunity may or may not be actually used for a relief.</xsd:documentation>
 		</xsd:annotation>
@@ -835,7 +845,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ReliefOpportunityGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CourseOfJourneysIdType"/>
+					<xsd:attribute name="id" type="CourseOfJourneysIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

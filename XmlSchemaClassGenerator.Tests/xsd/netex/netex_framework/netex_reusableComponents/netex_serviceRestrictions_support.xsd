@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_serviceRestrictions_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_serviceRestrictions_support">
 	<xsd:include schemaLocation="../netex_responsibility/netex_responsibility_support.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -33,6 +33,11 @@
  				         Add  ServiceBookimngArrangements.
 				</Date>
 				<Date><Modified>2020-06-21</Modified>FIX: Issue #75 FareClassEnumeration    Remove space from end of secondClass enum value
+				</Date>
+				<Date><Modified>2023-12-18</Modified>FIX: Correct the #525 implementation of BOOKING ARRANGEMENT and SERVICE BOOKING ARRANGEMENT,
+					   SERVICE BOOKING ARRANGEMENT should inherit from BOOKING ARRANGEMENT and should have its own structure.
+				</Date>
+				<Date><Modified>2024-01-17</Modified>DECKPLANS did washbasin to sanitary facilities
 	 			</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines  NetEX:TRAVEL RIGHTS identifier  types.</p>
@@ -46,11 +51,11 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
 				</Rights>
 				<Source>
 					<ul>
-						<li>Derived from the SIRI standards.</li>
+						<li>Derived from Transmodel and the SIRI standards.</li>
 					</ul>
 				</Source>
 				<Status>Version 1.0</Status>
@@ -69,7 +74,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NetEX:TRAVEL RIGHTs identifier  types for NeTEx Network Exchange.</xsd:documentation>
+		<xsd:documentation>NetEX:TRAVEL RIGHTs identifier types for NeTEx Network Exchange.</xsd:documentation>
 	</xsd:annotation>
 	<xsd:simpleType name="ClassOfUseIdType">
 		<xsd:annotation>
@@ -98,6 +103,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a CLASS OF USE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassClassOfUseRefStructureType" default="ClassOfUse">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for ClassOfUseRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -194,8 +220,16 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="other"/>
 			<xsd:enumeration value="phoneAtStop"/>
 			<xsd:enumeration value="text"/>
-			<xsd:enumeration value="mobileApp"/>
-			<xsd:enumeration value="atOffice"/>
+			<xsd:enumeration value="mobileApp">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="atOffice">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="none"/>
 		</xsd:restriction>
 	</xsd:simpleType>
@@ -240,12 +274,12 @@ Rail transport, Roads and Road transport
 		<xsd:restriction base="xsd:normalizedString">
 			<xsd:enumeration value="onReservation">
 				<xsd:annotation>
-					<xsd:documentation>Purchase must   be made on reservation in advance of travel.</xsd:documentation>
+					<xsd:documentation>Purchase must be made on reservation in advance of travel.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="inAdvance">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can  be made in advance of travel.</xsd:documentation>
+					<xsd:documentation>Purchase can be made in advance of travel.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="inAdvanceOnly">
@@ -255,47 +289,52 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="beforeBoarding">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can   be made before boarding transport vehicle.</xsd:documentation>
+					<xsd:documentation>Purchase can be made before boarding transport vehicle.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="beforeBoardingOnly">
 				<xsd:annotation>
-					<xsd:documentation>Purchase must  be made before boarding transport vehicle.</xsd:documentation>
+					<xsd:documentation>Purchase must be made before boarding transport vehicle.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="onBoarding">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can   be made on boarding  transport vehicle.</xsd:documentation>
+					<xsd:documentation>Purchase can be made on boarding transport vehicle.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="onBoardingOnly">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can  only be made on boarding  transport vehicle.</xsd:documentation>
+					<xsd:documentation>Purchase can only be made on boarding transport vehicle.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="afterBoarding">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can  be made after boarding  transport vehicle.</xsd:documentation>
+					<xsd:documentation>Purchase can be made after boarding transport vehicle.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="onCheckIn">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can  be made on entering transport system.</xsd:documentation>
+					<xsd:documentation>Purchase can be made on entering transport system.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="onCheckOut">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can   be made on leaving transport system.</xsd:documentation>
+					<xsd:documentation>Purchase can be made on leaving transport system.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="subscriptionOnly">
 				<xsd:annotation>
-					<xsd:documentation>Purchase can  only be made on subscription.</xsd:documentation>
+					<xsd:documentation>Purchase can only be made on subscription.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="noTicketRequired">
+				<xsd:annotation>
+					<xsd:documentation>No ticket is required.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="other">
 				<xsd:annotation>
-					<xsd:documentation>Other moment of Purchase </xsd:documentation>
+					<xsd:documentation>Other moment of Purchase</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 		</xsd:restriction>
@@ -474,7 +513,7 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="cashAndCard">
 				<xsd:annotation>
-					<xsd:documentation>Payment with either cash or debit / credit card   accepted.</xsd:documentation>
+					<xsd:documentation>Payment with either cash or debit / credit card accepted.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="coin">
@@ -509,12 +548,12 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="creditCard">
 				<xsd:annotation>
-					<xsd:documentation>Payment by credit card  (E.g. Visa, MasterCard, etc).</xsd:documentation>
+					<xsd:documentation>Payment by credit card (E.g. Visa, MasterCard, etc).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="debitCard">
 				<xsd:annotation>
-					<xsd:documentation>Payment by Bank debit  card.</xsd:documentation>
+					<xsd:documentation>Payment by Bank debit card.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="cardsOnly">
@@ -529,7 +568,7 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="contactlessPaymentCard">
 				<xsd:annotation>
-					<xsd:documentation>NFC Payment by contactless credit or debit card </xsd:documentation>
+					<xsd:documentation>NFC Payment by contactless credit or debit card</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="contactlessTravelCard">
@@ -549,7 +588,7 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="epayDevice">
 				<xsd:annotation>
-					<xsd:documentation>Electronic payment with on device  application (e.g. ApplePay, GooglePay etc).</xsd:documentation>
+					<xsd:documentation>Electronic payment with on device application (e.g. ApplePay, GooglePay etc).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="epayAccount">
@@ -564,12 +603,12 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="mobilePhone">
 				<xsd:annotation>
-					<xsd:documentation>Payment with mobile device  / mobile app. [Use more specific MOBILE app] </xsd:documentation>
+					<xsd:documentation>Payment with mobile device / mobile app. [Use more specific MOBILE app]</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="mobileApp">
 				<xsd:annotation>
-					<xsd:documentation>Payment with mobile device  / mobile app. +v1.2.2</xsd:documentation>
+					<xsd:documentation>Payment with mobile device / mobile app. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="voucher">
@@ -616,16 +655,20 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Purchase and payment.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
-			<xsd:enumeration value="blockFullAmountOnCard"/>
+			<xsd:enumeration value="blockFullAmountOnCard">
+				<xsd:annotation>
+					<xsd:documentation>The full amount is blocked on card against customer’s credit limit but not charged.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="deposit">
 				<xsd:annotation>
-					<xsd:documentation>Purchase with deferred  payment.</xsd:documentation>
+					<xsd:documentation>Purchase with deferred payment.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="none"/>
 			<xsd:enumeration value="other">
 				<xsd:annotation>
-					<xsd:documentation>Reervation but not necessarily payment</xsd:documentation>
+					<xsd:documentation>Reservation but not necessarily payment.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 		</xsd:restriction>
@@ -633,7 +676,7 @@ Rail transport, Roads and Road transport
 	<!-- =================================================== -->
 	<xsd:complexType name="TypeOfPaymentMethodRefs_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a collection of one or more references to a  TYPE OF PAYMENT METHOD.</xsd:documentation>
+			<xsd:documentation>Type for a collection of one or more references to a TYPE OF PAYMENT METHOD.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="oneToManyRelationshipStructure">
@@ -670,6 +713,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TYPE OF PAYMENT METHOD.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfPaymentMethodRefStructureType" default="TypeOfPaymentMethod">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfPaymentMethodRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -681,6 +745,7 @@ Rail transport, Roads and Road transport
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="none"/>
 			<xsd:enumeration value="toilet"/>
+			<xsd:enumeration value="washbasin"/>
 			<xsd:enumeration value="wheelchairAccessToilet"/>
 			<xsd:enumeration value="shower"/>
 			<xsd:enumeration value="washingAndChangeFacilities"/>
@@ -751,7 +816,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="TypeOfValueIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TypeOfServiceRef" type="TypeOfServiceRefStructure" abstract="false" substitutionGroup="TypeOfEntityRef">
+	<xsd:element name="TypeOfServiceRef" type="TypeOfServiceRefStructure" substitutionGroup="TypeOfEntityRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a TYPE OF SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -767,6 +832,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Reference to a TYPE OF SERVICE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfServiceRefStructureType" default="TypeOfService">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfServiceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -789,7 +875,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="TypeOfValueIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TypeOfProductCategoryRef" type="TypeOfProductCategoryRefStructure" abstract="false" substitutionGroup="TypeOfValueRef">
+	<xsd:element name="TypeOfProductCategoryRef" type="TypeOfProductCategoryRefStructure" substitutionGroup="TypeOfValueRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a TYPE OF PRODUCT CATEGORY. Product of a JOURNEY. e.g. ICS, Thales etc
 See ERA B.4 7037 Characteristic description code.</xsd:documentation>
@@ -806,6 +892,27 @@ See ERA B.4 7037 Characteristic description code.</xsd:documentation>
 						<xsd:documentation>Reference to a TYPE OF PRODUCT CATEGORY.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfProductCategoryRefStructureType" default="TypeOfProductCategory">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfProductCategoryRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -821,5 +928,132 @@ See ERA B.4 7037 Characteristic description code.</xsd:documentation>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<!-- =================================================== -->
+	<!-- ===== Booking Arrangement ============================================== -->
+	<xsd:simpleType name="BookingArrangementIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a BookingArrangement</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="BookingArrangementRef" type="BookingArrangementRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a BOOKING ARRANGEMENT.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BookingArrangementRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a BOOKING ARRANGEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="BookingArrangementIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a BOOKING ARRANGEMENT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassBookingArrangementRefStructureType" default="BookingArrangement">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for BookingArrangementRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== Booking Arrangement ============================================== -->
+	<xsd:simpleType name="ServiceBookingArrangementIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SERVICE BOOKING ARRANGEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="BookingArrangementIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ServiceBookingArrangementRef" type="ServiceBookingArrangementRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SERVICE BOOKING ARRANGEMENT.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ServiceBookingArrangementRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SERVICE BOOKING ARRANGEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="BookingArrangementRefStructure">
+				<xsd:attribute name="ref" type="ServiceBookingArrangementIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a SERVICE BOOKING ARRANGEMENT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassServiceBookingArrangementRefStructureType" default="ServiceBookingArrangement">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for ServiceBookingArrangementRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== UserTypes============================================== -->
+	<xsd:simpleType name="UserTypeListOfEnumerations">
+		<xsd:annotation>
+			<xsd:documentation>List of user types.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:list itemType="UserTypeEnumeration"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="UserTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for USER TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="adult"/>
+			<xsd:enumeration value="child"/>
+			<xsd:enumeration value="infant"/>
+			<xsd:enumeration value="senior"/>
+			<xsd:enumeration value="student"/>
+			<xsd:enumeration value="youngPerson"/>
+			<xsd:enumeration value="schoolPupil"/>
+			<xsd:enumeration value="military"/>
+			<xsd:enumeration value="veteran"/>
+			<xsd:enumeration value="disabled"/>
+			<xsd:enumeration value="disabledCompanion"/>
+			<xsd:enumeration value="jobSeeker"/>
+			<xsd:enumeration value="employee"/>
+			<xsd:enumeration value="animal"/>
+			<xsd:enumeration value="guideDog"/>
+			<xsd:enumeration value="member"/>
+			<xsd:enumeration value="resident"/>
+			<xsd:enumeration value="other"/>
+			<xsd:enumeration value="anyone"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
 </xsd:schema>

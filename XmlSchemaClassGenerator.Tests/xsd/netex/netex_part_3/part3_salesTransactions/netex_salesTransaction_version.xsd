@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_salesTransaction_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_salesTransaction_version">
 	<xsd:include schemaLocation="netex_customerPurchasePackage_version.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -41,6 +41,8 @@
 				<Date><Modified>2019-04-06</Modified>Align with TM6 Add new elements RequestedTravelSpecification and OfferedTravelSpecification.  
 							Remodularise to spearae SalesTransactio from TravelSpecifcation and CustomerPurchase Package
 				</Date>
+				<Date><Modified>2023-12-15</Modified>Factor out Payment amount to FARE DEBIT PACKAGE
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the SALES TRANSACTION types.</p>
@@ -57,7 +59,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2023</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -80,7 +82,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: SALES TRANSACTION  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: SALES TRANSACTION types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
 	<xsd:group name="SalesTransactionInFrameGroup">
@@ -126,7 +128,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="SalesTransaction" abstract="false" substitutionGroup="FareContractEntry_">
+	<xsd:element name="SalesTransaction" substitutionGroup="FareContractEntry_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A SALE OF a FIXED PACKAGE or a SALE OF a RELOADABLE PACKAGE.</xsd:documentation>
 		</xsd:annotation>
@@ -147,7 +149,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SalesTransactionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SalesTransactionIdType"/>
+					<xsd:attribute name="id" type="SalesTransactionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -169,32 +171,19 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements for SALES TRANSACTION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:group ref="SalesTransactionPaymentGroup"/>
+			<xsd:group ref="FareDebitGroup"/>
 			<xsd:group ref="SalesTransactionPurchaseGroup"/>
 			<xsd:group ref="SalesTransactionFulfilmentGroup"/>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:group name="SalesTransactionPaymentGroup">
-		<xsd:annotation>
-			<xsd:documentation>Elements for SALES TRANSACTION.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:sequence>
-			<xsd:group ref="PaymentAmountGroup"/>
-			<xsd:element name="CardNumber" type="PrivateCodeStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Card number used,</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-		</xsd:sequence>
-	</xsd:group>
 	<xsd:group name="SalesTransactionPurchaseGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for SALES TRANSACTION.</xsd:documentation>
+			<xsd:documentation>Sales Purchase Elements for SALES TRANSACTION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="travelSpecifications" type="travelSpecifications_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Travel Specifcations bought  by Salles Transaction</xsd:documentation>
+					<xsd:documentation>Travel Specifcations bought by Salles Transaction</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="customerPurchasePackages" type="customerPurchasePackages_RelStructure" minOccurs="0">
@@ -206,7 +195,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="SalesTransactionFulfilmentGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for SALES TRANSACTION.</xsd:documentation>
+			<xsd:documentation>Fulfilment Elements for SALES TRANSACTION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="travelDocuments" type="travelDocuments_RelStructure" minOccurs="0">

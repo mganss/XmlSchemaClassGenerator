@@ -20,6 +20,8 @@
 					<Modified>2011-02-05</Modified>
 					<!-- Name Space changes -->
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the ACTIVATION types.</p>
@@ -111,7 +113,7 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:element ref="ActivationLink" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation>A LINK where a control process is activated when a vehicle passes it.  Activation links are directional - there will be separate links for each direction of a route.</xsd:documentation>
+							<xsd:documentation>A LINK where a control process is activated when a vehicle passes it. Activation links are directional - there will be separate links for each direction of a route.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -125,7 +127,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="ActivationPoint_" maxOccurs="unbounded"/>
+					<xsd:element ref="ActivationPoint_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -144,7 +146,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<!-- ==Activation============================================================ -->
 	<!-- ======================================================================= -->
-	<xsd:element name="ActivatedEquipment" abstract="false">
+	<xsd:element name="ActivatedEquipment">
 		<xsd:annotation>
 			<xsd:documentation>An EQUIPMENT activated by the passage of a vehicle at an ACTIVATION POINT or on an ACTIVATION LINK.</xsd:documentation>
 		</xsd:annotation>
@@ -165,12 +167,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ActivatedEquipmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ActivatedEquipmentIdType"/>
+					<xsd:attribute name="id" type="ActivatedEquipmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ActivatedEquipment_VersionStructure" abstract="false">
+	<xsd:complexType name="ActivatedEquipment_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for an ACTIVATED EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -197,12 +199,12 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ================================================================ -->
-	<xsd:element name="ActivationPoint_" type="Point_VersionStructure" abstract="true" substitutionGroup="Point">
+	<xsd:element name="ActivationPoint_Dummy" type="Point_VersionStructure" abstract="true" substitutionGroup="Point">
 		<xsd:annotation>
 			<xsd:documentation>A POINT where a control process is activated when a vehicle passes it. EQUIPMENT may be needed for the activation.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ActivationPoint" abstract="false" substitutionGroup="ActivationPoint_">
+	<xsd:element name="ActivationPoint" substitutionGroup="ActivationPoint_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A POINT where a control process is activated when a vehicle passes it. EQUIPMENT may be needed for the activation.</xsd:documentation>
 		</xsd:annotation>
@@ -223,12 +225,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ActivationPointGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ActivationPointIdType"/>
+					<xsd:attribute name="id" type="ActivationPointIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ActivationPoint_VersionStructure" abstract="false">
+	<xsd:complexType name="ActivationPoint_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for ACTIVATION POINT.</xsd:documentation>
 		</xsd:annotation>
@@ -255,12 +257,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Short Name of ACTIVATION POINT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="TypeOfActivationRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ================================================================== -->
-	<xsd:element name="BeaconPoint" abstract="false" substitutionGroup="ActivationPoint_">
+	<xsd:element name="BeaconPoint" substitutionGroup="ActivationPoint_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A POINT where a beacon or similar device to support the automatic detection of vehicles passing by is located.</xsd:documentation>
 		</xsd:annotation>
@@ -281,7 +287,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ActivationPointGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="BeaconPointIdType"/>
+					<xsd:attribute name="id" type="BeaconPointIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -295,7 +301,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TrafficControlPoint" abstract="false" substitutionGroup="Point">
+	<xsd:element name="TrafficControlPoint" substitutionGroup="Point">
 		<xsd:annotation>
 			<xsd:documentation>A POINT where the traffic flow can be influenced. Examples are: traffic lights (lanterns), barriers.</xsd:documentation>
 		</xsd:annotation>
@@ -316,12 +322,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TrafficControlPointGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TrafficControlPointIdType"/>
+					<xsd:attribute name="id" type="TrafficControlPointIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TrafficControlPoint_VersionStructure" abstract="false">
+	<xsd:complexType name="TrafficControlPoint_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for TRAFFIC CONTROL POINT.</xsd:documentation>
 		</xsd:annotation>
@@ -340,7 +346,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence/>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="ActivationLink" abstract="false" substitutionGroup="Link">
+	<xsd:element name="ActivationLink" substitutionGroup="Link">
 		<xsd:annotation>
 			<xsd:documentation>A LINK where a control process is activated when a vehicle passes it.</xsd:documentation>
 		</xsd:annotation>
@@ -361,12 +367,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ActivationLinkGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ActivationLinkIdType"/>
+					<xsd:attribute name="id" type="ActivationLinkIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ActivationLink_VersionStructure" abstract="false">
+	<xsd:complexType name="ActivationLink_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for an ACTIVATION LINK.</xsd:documentation>
 		</xsd:annotation>
@@ -410,7 +416,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ActivationAssignment" abstract="false" substitutionGroup="Assignment_">
+	<xsd:element name="ActivationAssignment" substitutionGroup="Assignment_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>An assignment of an ACTIVATION POINT/LINK to an ACTIVATED EQUIPMENT related on its turn to a TRAFFIC CONTROL POINT. The considered ACTIVATION POINT/LINK will be used to influence the control process for that TRAFFIC CONTROL POINT (e.g. to fix priorities as regards the processing of competing requests from different ACTIVATION POINTs/LINKs).</xsd:documentation>
 		</xsd:annotation>
@@ -433,12 +439,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ActivationAssignmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ActivationAssignmentIdType"/>
+					<xsd:attribute name="id" type="ActivationAssignmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ActivationAssignment_VersionStructure" abstract="false">
+	<xsd:complexType name="ActivationAssignment_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for an ACTIVATION ASSIGNMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -473,7 +479,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfActivation" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfActivation" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of real-time processes that are activated when vehicles passes an ACTIVATION POINT or an ACTIVATION LINK.</xsd:documentation>
 		</xsd:annotation>
@@ -492,12 +498,12 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:sequence/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfActivationIdType"/>
+					<xsd:attribute name="id" type="TypeOfActivationIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfActivation_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfActivation_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF ACTIVATION.</xsd:documentation>
 		</xsd:annotation>

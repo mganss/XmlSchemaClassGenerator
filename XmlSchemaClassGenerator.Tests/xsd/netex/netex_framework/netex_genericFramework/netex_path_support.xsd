@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_path_support">
+	<xsd:include schemaLocation="netex_place_support.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLink_support.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLinkSequence_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
+				<Date><Created>2024-01-05</Created>Factored out of Ifopt path
+				</Date>
+				<Date>
+					<Modified>2024-01-05</Modified>
+				</Date>
+				<Description>
+					<p>NeTEx - Network Exchange. This subschema defines PATH types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_ifopt}netex_ifopt_path_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the TRANSMODEL  standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange - PATH identifier types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: Generic PATH identifiertypes.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ====== PATH LINK ===================================================== -->
+	<xsd:complexType name="genericPathLinkRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of references to a GENERIC PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="GenericPathLinkRef"/>
+					<xsd:element ref="PathLinkRefByValue"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="GenericPathLinkIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a GENERIC PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LinkIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="GenericPathLinkRef" type="GenericPathLinkRefStructure" abstract="true" substitutionGroup="LinkRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a GENERIC PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GenericPathLinkRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a GENERIC PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LinkRefStructure">
+				<xsd:attribute name="ref" type="GenericPathLinkIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PATH LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassGenericPathLinkRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for GenericPathLinkRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:element name="PathLinkRefByValue" type="PathLinkRefByValueStructure" substitutionGroup="LinkRefByValue">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PATH LINK BY VALUE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PathLinkRefByValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PATH LINK BY VALUE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:restriction base="LinkRefByValueStructure">
+				<xsd:attribute name="fromPointRef" type="PointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a POINT. at which LINK starts.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="toPointRef" type="PointIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a POINT. at which LINK ends.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfPointRefClass" type="NameOfClass" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Class of POINT referenced by LINK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======= PATH JUNCTION =========================================== -->
+	<xsd:simpleType name="GenericPathJunctionIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a GENERIC PATH JUNCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="PlaceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="GenericPathJunctionRef" type="GenericPathJunctionRefStructure" substitutionGroup="PlaceRef_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PATH JUNCTION.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GenericPathJunctionRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PATH JUNCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="PlaceRefStructure">
+				<xsd:attribute name="ref" type="GenericPathJunctionIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PATH JUNCTION.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPlaceRefStructureType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======= PATH INSTRUCTION =========================================== -->
+	<xsd:simpleType name="PathInstructionIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PATH INSTRUCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PathInstructionRef" type="PathInstructionRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PATH INSTRUCTION.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PathInstructionRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PATH INSTRUCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="OrderedVersionOfObjectRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPathInstructionRefStructureType" default="PathInstruction">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PathInstructionRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="ObjectIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- Simple Type Definitions -->
+	<!-- ====== NAVIGATION PATH =============================================== -->
+	<xsd:complexType name="GenericNavigationPathRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of references to a GENERIC NAVIGATION PATH.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="GenericNavigationPathRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="GenericNavigationPathIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a GENERIC NAVIGATION PATH.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LinkSequenceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="GenericNavigationPathRef" type="GenericNavigationPathRefStructure" substitutionGroup="LinkSequenceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a NAVIGATION PATH.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="GenericNavigationPathRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for reference to a GENERIC NAVIGATION PATH.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LinkSequenceRefStructure">
+				<xsd:attribute name="ref" type="GenericNavigationPathIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a NAVIGATION PATH.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassGenericNavigationPathRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for GenericNavigationPathRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="AccessSummaryIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of an ACCESS SUMMARY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<!-- ======= PLACE IN SEQUENCE ========================================== -->
+	<xsd:simpleType name="PlaceInSequenceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of place step in a GENERIC NAVIGATION PATH.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="PointInSequenceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PlaceInSequenceRef" type="PlaceInSequenceRefStructure" substitutionGroup="PointInSequenceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PLACE IN SEQUENCE. If given by context does not need to be stated.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PlaceInSequenceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for reference to a PLACE IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="PointInSequenceRefStructure">
+				<xsd:attribute name="ref" type="PlaceInSequenceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PLACE IN SEQUENCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPlaceInSequenceRefStructureType" default="PlaceInSequence">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PlaceInSequenceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======= PATH LINK IN SEQUENCE============================================ -->
+	<xsd:complexType name="pathLinksInSequenceRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of references to a PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="PathLinkInSequenceRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="PathLinkInSequenceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of link step in a PATH LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LinkInSequenceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PathLinkInSequenceRef" type="PathLinkInSequenceRefStructure" substitutionGroup="LinkInSequenceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PATH LINK IN SEQUENCE. If given by context does not need to be stated.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PathLinkInSequenceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a PATH LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LinkInSequenceRefStructure">
+				<xsd:attribute name="ref" type="PathLinkInSequenceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PATH LINK IN SEQUENCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPathLinkInSequenceRefStructureType" default="PathLinkInSequence">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PathLinkInSequenceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- =======PATH LINK VIEW ============================================== -->
+	<xsd:simpleType name="PathLinkViewIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PATH LINK VIEW.;</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<!-- =====PATH  related ENums=================================================== -->
+	<xsd:simpleType name="PathDirectionEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for flow direction.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="oneWay"/>
+			<xsd:enumeration value="twoWay"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TransitionEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for path transition.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="up"/>
+			<xsd:enumeration value="down"/>
+			<xsd:enumeration value="level"/>
+			<xsd:enumeration value="upAndDown"/>
+			<xsd:enumeration value="downAndUp"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PathHeadingEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for path heading.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="left"/>
+			<xsd:enumeration value="right"/>
+			<xsd:enumeration value="forward"/>
+			<xsd:enumeration value="back"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

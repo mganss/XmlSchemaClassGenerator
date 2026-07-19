@@ -18,15 +18,17 @@
 				</Date>
 				<Date><Modified>2011-02-05</Modified>Name Space changes
 				</Date>
-				<Date><Modified>2017-12-10</Modified>Fix add notice assignments as per spec 
+				<Date><Modified>2017-12-10</Modified>Fix add notice assignments as per spec
 				</Date>
 				<Date><Modified>2019-03-01</Modified>EURA-(nk) Add DistanceMatrixInverseRef for backwards direction of reference to a DIstance Matrix Element
 				</Date>
 				<Date><Modified>2019-03-08</Modified>UK-44 Improve ability to construct large tariffs
 											Add UseToExclude flag to GroupOfDistanceMatrixElements
 				</Date>
-				<Date><Modified>2019-03-25</Modified>Fix #40 by Skinkie from 2019.01.07 . Fix typo on DistanceMatrixElement.IsDirect.  
-					 NB this will break existing XML that uses IsDirect. 
+				<Date><Modified>2019-03-25</Modified>Fix #40 by Skinkie from 2019.01.07 . Fix typo on DistanceMatrixElement.IsDirect.
+					NB this will break existing XML that uses IsDirect.
+				</Date>
+				<Date><Modified>2021-02-05</Modified>Add DynamicDistanceMatrixElement for on-the-fly creation when pre-computing all possible combinations is not feasible
 				</Date>
 				<Date><Modified>2021-01-08</Modified>NewModes:  DistanceMatrix add STarteetingPointRef and EndMeeting{pointRefnt
 				</Date>
@@ -127,7 +129,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="GroupOfDistanceMatrixElements" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="GroupOfDistanceMatrixElements" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A group of DISTANCE MATRIX ELEMENTs; may set common properties for a given set of origin and destination pairs.</xsd:documentation>
 		</xsd:annotation>
@@ -148,7 +150,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="GroupOfDistanceMatrixElementsGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfDistanceMatrixElementsIdType"/>
+					<xsd:attribute name="id" type="GroupOfDistanceMatrixElementsIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -172,7 +174,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="UseToExclude" type="xsd:boolean" default="false" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include  (i.e.false) </xsd:documentation>
+					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include (i.e.false)</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="PriceableObjectPricesGroup"/>
@@ -222,7 +224,12 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DistanceMatrixElement" abstract="false" substitutionGroup="PriceableObject">
+	<xsd:element name="DistanceMatrixElement_Dummy" type="PriceableObject_VersionStructure" abstract="true" substitutionGroup="PriceableObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy SERVICE JOURNEY supertype.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="DistanceMatrixElement" substitutionGroup="DistanceMatrixElement_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A cell of an origin-destination matrix for TARIFF ZONEs or STOP POINTs, expressing a fare distance for the corresponding trip: value in km, number of fare units etc.</xsd:documentation>
 		</xsd:annotation>
@@ -243,7 +250,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DistanceMatrixElementGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DistanceMatrixElementIdType"/>
+					<xsd:attribute name="id" type="DistanceMatrixElementIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -303,12 +310,12 @@ Rail transport, Roads and Road transport
 				</xsd:choice>
 				<xsd:element name="StartMeetingPointRef" type="PointRefStructure">
 					<xsd:annotation>
-						<xsd:documentation>Start MeetingPoint for  Cell of  DISTANCE MATRIX.</xsd:documentation>
+						<xsd:documentation>Start MeetingPoint for cell of DISTANCE MATRIX. +v1.2.2</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="FromFareSectionRef" type="FareSectionRefStructure" minOccurs="0">
 					<xsd:annotation>
-						<xsd:documentation>FARE SECTION at which  element begins.</xsd:documentation>
+						<xsd:documentation>FARE SECTION at which element begins.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="FromFarePointInPatternRef" type="FarePointInPatternRefStructure" minOccurs="0">
@@ -344,12 +351,12 @@ Rail transport, Roads and Road transport
 				</xsd:choice>
 				<xsd:element name="EndMeetingPointRef" type="PointRefStructure">
 					<xsd:annotation>
-						<xsd:documentation>ENd MeetingPoint for  Cell of  DISTANCE MATRIX.</xsd:documentation>
+						<xsd:documentation>End MeetingPoint for cell of DISTANCE MATRIX.+v1.2.2</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="ToFareSectionRef" type="FareSectionRefStructure" minOccurs="0">
 					<xsd:annotation>
-						<xsd:documentation>FARE SECTION at which  element ends.</xsd:documentation>
+						<xsd:documentation>FARE SECTION at which element ends.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="ToFarePointInPatternRef" type="FarePointInPatternRefStructure" minOccurs="0">
@@ -399,7 +406,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="InverseAllowed" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether an inverse element in the opposite direction can be assumed with the same prices. (Optimisation to reduce  data exchanged)</xsd:documentation>
+					<xsd:documentation>Whether an inverse element in the opposite direction can be assumed with the same prices. (Optimisation to reduce data exchanged)</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -432,12 +439,12 @@ Rail transport, Roads and Road transport
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="DistanceMatrixElementPriceRef"/>
 					<xsd:element ref="DistanceMatrixElementPrice"/>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DistanceMatrixElementPrice" substitutionGroup="FarePrice_">
+	<xsd:element name="DistanceMatrixElementPrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a DISTANCE MATRIX ELEMENT: default total price etc.
 .</xsd:documentation>
@@ -459,7 +466,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DistanceMatrixElementPriceGroup" minOccurs="0"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DistanceMatrixElementPriceIdType"/>
+					<xsd:attribute name="id" type="DistanceMatrixElementPriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -486,10 +493,46 @@ Rail transport, Roads and Road transport
 		</xsd:choice>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<!-- == DISTANCE MATRIX ELEMENT View-->
-	<xsd:element name="DistanceMatrixElementView" type="DistanceMatrixElement_DerivedViewStructure" abstract="false" substitutionGroup="DerivedView">
+	<!-- === DYNAMIC DISTANCE MATRIX ELEMENT  ================================================= -->
+	<xsd:element name="DynamicDistanceMatrixElement" substitutionGroup="DistanceMatrixElement_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>Simplified  view of CONNECTING JOURNEY.</xsd:documentation>
+			<xsd:documentation>A dynamic free-standing distance matrix element. Used when a pre-computed distance matrix element is not feasible.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="DynamicDistanceMatrixElement_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PriceableObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DistanceMatrixElementGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="DynamicDistanceMatrixElementIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="DynamicDistanceMatrixElement_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for DYNAMIC DISTANCE MATRIX ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DistanceMatrixElement_VersionStructure">
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- == DISTANCE MATRIX ELEMENT View-->
+	<xsd:element name="DistanceMatrixElementView" type="DistanceMatrixElement_DerivedViewStructure" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>Simplified view of CONNECTING JOURNEY.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="DistanceMatrixElement_DerivedViewStructure">

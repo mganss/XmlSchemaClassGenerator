@@ -83,7 +83,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="Parking" maxOccurs="unbounded">
+					<xsd:element ref="Parking_Dummy" maxOccurs="unbounded">
 						<xsd:annotation>
 							<xsd:documentation>A designated path between two PLACEs. May include an Ordered sequence of references to PATH LINKS.</xsd:documentation>
 						</xsd:annotation>
@@ -93,7 +93,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="Parking" substitutionGroup="Site">
+	<xsd:element name="Parking" substitutionGroup="Parking_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A named place where Parking may be accessed. May be a building complex (e.g. a station) or an on-street location.</xsd:documentation>
 		</xsd:annotation>
@@ -132,7 +132,7 @@ Rail transport, Roads and Road transport
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingIdType" use="optional">
+					<xsd:attribute name="id" type="ParkingIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -165,7 +165,7 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="SiteAccessGroup" minOccurs="0"/>
 			<xsd:group ref="ParkingIdentifierGroup"/>
 			<xsd:group ref="ParkingDetailsGroup"/>
-			<xsd:group ref="ParkingChargeGroup" minOccurs="0"/>
+			<xsd:group ref="ParkingFeesGroup" minOccurs="0"/>
 			<xsd:group ref="ParkingPassengerGroup" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Group of Passenger related children of Site.</xsd:documentation>
@@ -193,7 +193,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Type of PARKING.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="TypeOfParkingRef" minOccurs="0"/>
+			<xsd:element ref="TypeOfParkingRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a TYPE OF PARKING. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="ParkingVehicleTypes" type="ParkingVehicleListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Types of Vehicle allowed in PARKING.</xsd:documentation>
@@ -201,7 +205,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="vehicleTypes" type="transportTypeRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TRANSPORT TYPEs  that may use PARKING - open codes.  +v1.2.2</xsd:documentation>
+					<xsd:documentation>TRANSPORT TYPEs that may use PARKING - open codes. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ParkingLayout" type="ParkingLayoutEnumeration" minOccurs="0">
@@ -237,6 +241,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="RechargingAvailable" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether car park has recharging points.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumPowerAvailable" type="WattageType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum power available at Parking bays. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Secure" type="xsd:boolean" minOccurs="0">
@@ -280,9 +289,9 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:group name="ParkingChargeGroup">
+	<xsd:group name="ParkingFeesGroup">
 		<xsd:annotation>
-			<xsd:documentation>Group of spatial associations of a PARKING.</xsd:documentation>
+			<xsd:documentation>Group of Fee related elements of a PARKING.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="ParkingPaymentProcess" type="ParkingPaymentProcessListOfEnumerations" minOccurs="0">
@@ -297,7 +306,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="typesOfPaymentMethod" type="TypeOfPaymentMethodRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Method of Payment - open values.  =V1.1</xsd:documentation>
+					<xsd:documentation>Method of Payment - open values. =V1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DefaultCurrency" type="CurrencyType" minOccurs="0">
@@ -425,7 +434,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ParkingEntranceForVehiclesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingEntranceForVehiclesIdType"/>
+					<xsd:attribute name="id" type="ParkingEntranceForVehiclesIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -447,10 +456,14 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements of a PARKING ENTRANCE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element ref="ModeOfOperationRef" minOccurs="0"/>
+			<xsd:element ref="ModeOfOperationRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to MODE of OPERATION. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="areas" type="parkingAreaRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>PARKING AREAs to which ENtrance gives access appky +v1.1.</xsd:documentation>
+					<xsd:documentation>PARKING AREAs to which ENTRANCE gives access. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -503,7 +516,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingPassengerEntranceIdType" use="optional">
+					<xsd:attribute name="id" type="ParkingPassengerEntranceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -565,7 +578,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ParkingPropertiesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingPropertiesIdType"/>
+					<xsd:attribute name="id" type="ParkingPropertiesIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -605,7 +618,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="vehicleTypes" type="transportTypeRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TRANSPORT TYPEs  that may use PARKING - open codes.  +v1.2.2</xsd:documentation>
+					<xsd:documentation>TRANSPORT TYPEs that may use PARKING - open codes. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="ParkingPropertiesDetailsGroup">
@@ -627,7 +640,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="ParkingPropertiesDetailsGroup">
 		<xsd:annotation>
-			<xsd:documentation>EClassifying lements of a PARKING PROPERTies.</xsd:documentation>
+			<xsd:documentation>Classifying elements of a PARKING PROPERTies.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="ParkingStayList" type="ParkingStayListOfEnumerations" minOccurs="0">
@@ -647,12 +660,17 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="BayGeometry" type="BayGeometryEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Relative positioning of Parking bays.  +v1.2.2</xsd:documentation>
+					<xsd:documentation>Relative positioning of Parking bays. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ParkingVisibility" type="ParkingVisibilityEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Visibible Indication of parking area.  +v1.2.2</xsd:documentation>
+					<xsd:documentation>Visibible Indication of parking area. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MonitoredBays" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether real-time availability data is normally available for any of the individual BAYs of the PARKING or PARKING AREA.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -689,7 +707,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ParkingCapacityGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingCapacityIdType"/>
+					<xsd:attribute name="id" type="ParkingCapacityIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -714,7 +732,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="ParkingRef" minOccurs="0"/>
 			<xsd:element name="ParentRef" type="ParkingPropertiesRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>DEPRECATED As not integrity checked. </xsd:documentation>
+					<xsd:documentation>DEPRECATED As not integrity checked.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="ParkingPropertiesRef" minOccurs="0"/>
@@ -728,7 +746,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Type of vehicle that PARKING allows.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="TransportTypeRef" minOccurs="0"/>
+			<xsd:element ref="TransportTypeRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a TRANSPORT TYPE. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="ParkingStayType" type="ParkingStayEnumeration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Type of Stay allowed in PARKING.</xsd:documentation>
@@ -782,7 +804,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ParkingComponentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SiteComponentIdType"/>
+					<xsd:attribute name="id" type="SiteComponentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -845,7 +867,7 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="ParkingAreaRef"/>
-					<xsd:element ref="ParkingArea_">
+					<xsd:element ref="ParkingArea_Dummy">
 						<xsd:annotation>
 							<xsd:documentation>An area within a Site. May be connected to Quays by PATH LINKs.</xsd:documentation>
 						</xsd:annotation>
@@ -854,7 +876,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ParkingArea" substitutionGroup="ParkingArea_">
+	<xsd:element name="ParkingArea" substitutionGroup="ParkingArea_Dummy">
 		<xsd:annotation>
 			<xsd:documentation> Area within a PARKING.</xsd:documentation>
 		</xsd:annotation>
@@ -892,7 +914,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ParkingAreaGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingAreaIdType"/>
+					<xsd:attribute name="id" type="ParkingAreaIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -921,7 +943,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="NumberOfBaysWithRecharging" type="xsd:nonNegativeInteger" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Total number of parking places supportig Electirc car recharging  in PARKING AREA.</xsd:documentation>
+					<xsd:documentation>Total number of parking places supportig Electirc car recharging in PARKING AREA.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:choice minOccurs="0">
@@ -953,7 +975,7 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="ParkingBayRef"/>
-					<xsd:element ref="ParkingBay_">
+					<xsd:element ref="ParkingBay_Dummy">
 						<xsd:annotation>
 							<xsd:documentation>An area within a Site. May be connected to Quays by PATH LINKs.</xsd:documentation>
 						</xsd:annotation>
@@ -962,7 +984,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ParkingBay" substitutionGroup="ParkingBay_">
+	<xsd:element name="ParkingBay" substitutionGroup="ParkingBay_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>An individual place to park a VEHICLE.</xsd:documentation>
 		</xsd:annotation>
@@ -1000,7 +1022,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ParkingBayGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ParkingBayIdType"/>
+					<xsd:attribute name="id" type="ParkingBayIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -1022,10 +1044,14 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements of a PARKING BAY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element ref="ParkingAreaRef" minOccurs="0"/>
+			<xsd:element ref="ParkingAreaRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="ParkingUserTypes" type="ParkingUserListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Type of users: disabled, all etc.</xsd:documentation>
+					<xsd:documentation>Type of users: disabled, all etc. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ParkingVehicleType" type="ParkingVehicleEnumeration" minOccurs="0">
@@ -1033,8 +1059,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Type of vehicle in PARKING BAY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="TransportTypeRef" minOccurs="0"/>
-			<xsd:group ref="ParkingPropertiesDetailsGroup"/>
+			<xsd:element ref="TransportTypeRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="ParkingPropertiesDetailsGroup">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
 			<xsd:element name="Length" type="LengthType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Length of PARKING BAY.</xsd:documentation>
@@ -1050,7 +1084,7 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Height of PARKING BAY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="Weight" type="LengthType" minOccurs="0">
+			<xsd:element name="Weight" type="WeightType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Maximum Weight allowed in PARKING BAY. +v1.1</xsd:documentation>
 				</xsd:annotation>
@@ -1063,7 +1097,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== TYPE OF FLEET ============================================================ -->
-	<xsd:element name="TypeOfParking" abstract="false" substitutionGroup="TypeOfValue">
+	<xsd:element name="TypeOfParking" substitutionGroup="TypeOfValue">
 		<xsd:annotation>
 			<xsd:documentation>A classification for a PARKING. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -1081,7 +1115,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfParkingIdType">
+					<xsd:attribute name="id" type="TypeOfParkingIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of TYPE OF PARKING.</xsd:documentation>
 						</xsd:annotation>
@@ -1090,7 +1124,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfParking_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfParking_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF PARKING.</xsd:documentation>
 		</xsd:annotation>

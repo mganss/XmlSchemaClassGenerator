@@ -26,6 +26,8 @@
 				<Date><Modified>2019-03-11</Modified>EURA-72 Add arrivalTtime to TimeAtAstop and indicate into / out of / through constraint.. 
 					 Also Make Start Time at STop Optional
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the QUALIY STRUCTURE FACTOR types.</p>
@@ -65,7 +67,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: QUALITY STRUCTURE FACTOR  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: QUALITY STRUCTURE FACTOR types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
 	<xsd:group name="QualityFactorsInFrameGroup">
@@ -75,7 +77,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="qualityStructureFactors" type="qualityStructureFactors_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>QUALITY STRUCTURE FACTORS in  Frame.</xsd:documentation>
+					<xsd:documentation>QUALITY STRUCTURE FACTORS in Frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -89,17 +91,17 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="strictContainmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="QualityStructureFactorRef"/>
-					<xsd:element ref="QualityStructureFactor_"/>
+					<xsd:element ref="QualityStructureFactor_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="QualityStructureFactor_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="PriceableObject_">
+	<xsd:element name="QualityStructureFactor_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="PriceableObject_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Dummy type.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="QualityStructureFactor" abstract="false" substitutionGroup="QualityStructureFactor_">
+	<xsd:element name="QualityStructureFactor" substitutionGroup="QualityStructureFactor_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The value of a QUALITY INTERVAL or a DISTANCE MATRIX ELEMENT expressed by a QUALITY UNIT.</xsd:documentation>
 		</xsd:annotation>
@@ -117,7 +119,11 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PriceableObjectGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
-							<xsd:element ref="PrivateCode" minOccurs="0"/>
+							<xsd:element ref="PrivateCode" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
 							<xsd:element ref="TypeOfFareStructureFactorRef" minOccurs="0"/>
 							<xsd:element name="Factor" type="xsd:anyType" minOccurs="0">
 								<xsd:annotation>
@@ -129,7 +135,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="QualityStructureFactorGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="QualityStructureFactorIdType" use="optional"/>
+					<xsd:attribute name="id" type="QualityStructureFactorIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -177,12 +183,12 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>A set of all possible price features of a QUALITY STRUCTURE FACTOR : default total price, discount in value or percentage etc.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="QualityStructureFactorPrice" substitutionGroup="FarePrice_">
+	<xsd:element name="QualityStructureFactorPrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a QUALITY STRUCTURE FACTOR: default total price etc.</xsd:documentation>
 		</xsd:annotation>
@@ -203,7 +209,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="QualityStructureFactorPriceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="QualityStructureFactorPriceIdType"/>
+					<xsd:attribute name="id" type="QualityStructureFactorPriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -242,7 +248,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareDemandFactor" abstract="false" substitutionGroup="QualityStructureFactor_">
+	<xsd:element name="FareDemandFactor" substitutionGroup="QualityStructureFactor_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The value of a QUALITY INTERVAL or a DISTANCE MATRIX ELEMENT expressed by a QUALITY UNIT.</xsd:documentation>
 		</xsd:annotation>
@@ -260,7 +266,11 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PriceableObjectGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
-							<xsd:element ref="PrivateCode" minOccurs="0"/>
+							<xsd:element ref="PrivateCode" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
 							<xsd:element ref="TypeOfFareStructureFactorRef" minOccurs="0"/>
 							<xsd:element name="Factor" type="xsd:anyType" minOccurs="0">
 								<xsd:annotation>
@@ -275,7 +285,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareDemandFactorGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareDemandFactorIdType" use="optional"/>
+					<xsd:attribute name="id" type="FareDemandFactorIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -310,7 +320,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="startTimesAtStopPoints" type="startTimeAtStopPoints_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Start times at SCHEDULED STOP POINTS refining  FARE DEMAND FACTOR.</xsd:documentation>
+					<xsd:documentation>Start times at SCHEDULED STOP POINTS refining FARE DEMAND FACTOR.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -329,7 +339,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareQuotaFactor" abstract="false" substitutionGroup="QualityStructureFactor_">
+	<xsd:element name="FareQuotaFactor" substitutionGroup="QualityStructureFactor_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A named set of parameters defining the number of quota fares available. of a given denomination.</xsd:documentation>
 		</xsd:annotation>
@@ -347,7 +357,11 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PriceableObjectGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
-							<xsd:element ref="PrivateCode" minOccurs="0"/>
+							<xsd:element ref="PrivateCode" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
 							<xsd:element ref="TypeOfFareStructureFactorRef" minOccurs="0"/>
 							<xsd:element name="Factor" type="xsd:anyType" minOccurs="0">
 								<xsd:annotation>
@@ -362,7 +376,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareQuotaFactorGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareQuotaFactorIdType" use="optional"/>
+					<xsd:attribute name="id" type="FareQuotaFactorIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -405,10 +419,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="StartTimeAtStopPoint" abstract="false" substitutionGroup="VersionedChild">
+	<xsd:element name="StartTimeAtStopPoint" substitutionGroup="VersionedChild">
 		<xsd:annotation>
-			<xsd:documentation>A time at which a Fare demand  time band ( peak, off peak, etc  ) is deemed to begin  or end for trips at a particular SCHEDULED STOP POINT.
-</xsd:documentation>
+			<xsd:documentation>A time at which a Fare demand time band ( peak, off peak, etc ) is deemed to begin or end for trips at a particular SCHEDULED STOP POINT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -421,7 +434,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="StartTimeAtStopPointGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="StartTimeAtStopPointIdType" use="optional"/>
+					<xsd:attribute name="id" type="StartTimeAtStopPointIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

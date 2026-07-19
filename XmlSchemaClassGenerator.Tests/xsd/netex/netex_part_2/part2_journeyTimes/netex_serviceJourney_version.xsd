@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_serviceJourney_Version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_serviceJourney_Version">
 	<xsd:include schemaLocation="netex_vehicleJourney_version.xsd"/>
 	<xsd:include schemaLocation="netex_flexibleService_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceCalendar_version.xsd"/>
@@ -45,7 +45,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2023</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -68,7 +68,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: SERVICE JOURNEY  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: SERVICE JOURNEY types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ======================================================================= -->
 	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
@@ -86,12 +86,12 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<!-- ======================================================================= -->
 	<!-- ===SERVICE JOURNEY===================================================== -->
-	<xsd:element name="ServiceJourney_" type="Journey_VersionStructure" abstract="true" substitutionGroup="VehicleJourney_">
+	<xsd:element name="ServiceJourney_Dummy" type="Journey_VersionStructure" abstract="true" substitutionGroup="VehicleJourney_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Dummy SERVICE JOURNEY Supertype.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ServiceJourney" abstract="false" substitutionGroup="VehicleJourney_">
+	<xsd:element name="ServiceJourney" substitutionGroup="VehicleJourney_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A passenger carrying VEHICLE JOURNEY for one specified DAY TYPE. The pattern of working is in principle defined by a SERVICE JOURNEY PATTERN.
 
@@ -113,7 +113,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 						<xsd:group ref="JourneyGroup"/>
 						<xsd:group ref="ServiceJourneyGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ServiceJourneyIdType"/>
+					<xsd:attribute name="id" type="ServiceJourneyIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -153,7 +153,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 	</xsd:group>
 	<xsd:group name="ServiceJourneyPartsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for parts of  a SERVICE JOURNEY, i.</xsd:documentation>
+			<xsd:documentation>Elements for parts of a SERVICE JOURNEY, i.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="parts" type="journeyParts_RelStructure" minOccurs="0">
@@ -173,7 +173,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:element>
 			<xsd:element name="checkConstraints" type="checkConstraints_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>CHECK CONSTRAINTs  which apply to SERVICE JOURNEY, e.g. check in time, security time. These are advisory only and not for use in  journey planning.</xsd:documentation>
+					<xsd:documentation>CHECK CONSTRAINTs which apply to SERVICE JOURNEY, e.g. check in time, security time. These are advisory only and not for use in journey planning.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -189,7 +189,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:choice>
 			<xsd:choice minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>LINE followed by SERVICE JOURNEY Use view to get derived values.</xsd:documentation>
+					<xsd:documentation>LINE followed by SERVICE JOURNEY Use view to get derived values. NOTE: Use LineView over FlexibleLineView as FLEXIBLE LINE is marked deprecated in v2.0.</xsd:documentation>
 				</xsd:annotation>
 				<xsd:element ref="LineRef"/>
 				<xsd:element ref="LineView"/>
@@ -199,7 +199,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			<xsd:element ref="JourneyPatternView" minOccurs="0"/>
 			<xsd:element name="groupsOfServices" type="groupOfServicesRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Grouping of services  of a journey - for a multi-part journey only.</xsd:documentation>
+					<xsd:documentation>Grouping of services of a journey - for a multi-part journey only.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="timeDemandTypes" type="timeDemandTypeRefs_RelStructure" minOccurs="0">
@@ -209,7 +209,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:element>
 			<xsd:element name="trainNumbers" type="trainNumberRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TRAIN NUMBERs -= derived through JOURNEY PARTs  of a journey - for a multi-part journey only.</xsd:documentation>
+					<xsd:documentation>TRAIN NUMBERs -= derived through JOURNEY PARTs of a journey - for a multi-part journey only.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -248,7 +248,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:element>
 			<xsd:element name="JourneyDuration" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Total length of Journey. Can be computed from individual times.  Add to Departure time to obtain JOURNEY arrival time.</xsd:documentation>
+					<xsd:documentation>Total length of Journey. Can be computed from individual times. Add to Departure time to obtain JOURNEY arrival time.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -260,24 +260,24 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 		<xsd:sequence>
 			<xsd:element name="ServiceAlteration" type="ServiceAlterationEnumeration" default="planned" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether journey is as planned, a cancellation or an extra journey.  Default is as Planned.</xsd:documentation>
+					<xsd:documentation>Whether journey is as planned, a cancellation or an extra journey. Default is as Planned.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="ServiceJourneyEndpointsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for  origin and destination of  JOURNEY. Can be derived from the Pattern. Must not  contradict the calls.</xsd:documentation>
+			<xsd:documentation>Elements for origin and destination of JOURNEY. Can be derived from the Pattern. Must not contradict the calls.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Origin" type="JourneyEndpointStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Origin  for JOURNEY.</xsd:documentation>
+					<xsd:documentation>Origin for JOURNEY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Destination" type="JourneyEndpointStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Destination  for JOURNEY.</xsd:documentation>
+					<xsd:documentation>Destination for JOURNEY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -294,7 +294,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 		</xsd:sequence>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TemplateServiceJourney" abstract="false" substitutionGroup="ServiceJourney_">
+	<xsd:element name="TemplateServiceJourney" substitutionGroup="ServiceJourney_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A VEHICLE JOURNEY with a set of frequencies that may be used to represent a set of similar journeys differing only by their time of departure.</xsd:documentation>
 		</xsd:annotation>
@@ -317,7 +317,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 							<xsd:group ref="TemplateVehicleJourneyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TemplateServiceJourneyIdType"/>
+					<xsd:attribute name="id" type="TemplateServiceJourneyIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -348,7 +348,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="SpecialService" abstract="false" substitutionGroup="Journey_">
+	<xsd:element name="SpecialService" substitutionGroup="Journey_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A passenger carrying VEHICLE JOURNEY for one specified DAY TYPE. The pattern of working is in principle defined by a SERVICE JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
@@ -370,7 +370,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 							<xsd:group ref="SpecialServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SpecialServiceIdType"/>
+					<xsd:attribute name="id" type="SpecialServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -416,11 +416,21 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			<xsd:group ref="ServiceJourneyEndpointsGroup"/>
 			<xsd:group ref="ServiceJourneyAdvertisementGroup"/>
 			<xsd:group ref="FlexibleServiceCharacteristicsGroup"/>
-			<xsd:group ref="BookingArrangementsGroup"/>
+			<xsd:choice>
+				<xsd:annotation>
+					<xsd:documentation>Usage of BookingArrangementGroup is DEPRECATED: use bookingArrangements</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Set of possible Booking Arrangements for stop if different from those for SERVICE JOURNEY. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:group ref="DeprecatedBookingArrangementGroup"/>
+			</xsd:choice>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==Group of Services============================================================ -->
-	<xsd:element name="GroupOfServices" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="GroupOfServices" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A group of SERVICEs, often known to its users by a name or a number.</xsd:documentation>
 		</xsd:annotation>
@@ -441,7 +451,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 							<xsd:group ref="GroupOfServicesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfServicesIdType"/>
+					<xsd:attribute name="id" type="GroupOfServicesIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -471,14 +481,14 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:element>
 			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>NOTICEs  relevant for the whole GROUP OF SERVICEs.</xsd:documentation>
+					<xsd:documentation>NOTICEs relevant for the whole GROUP OF SERVICEs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="GroupOfServicesCommonGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for common properties  a GROUP OF SERVICEs.</xsd:documentation>
+			<xsd:documentation>Elements for common properties a GROUP OF SERVICEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="dayTypes" minOccurs="0">
@@ -518,7 +528,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:complexType name="GroupOfServicesEndPoint_DerivedViewStructure" abstract="false">
+	<xsd:complexType name="GroupOfServicesEndPoint_DerivedViewStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for SIMPLE SCHEDULED STOP POINT VIEW.</xsd:documentation>
 		</xsd:annotation>
@@ -547,7 +557,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 				<xsd:sequence>
 					<xsd:element name="GroupOfServicesMember" type="GroupOfServicesMemberStructure" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation> Member of GROUP OF SERVICE Garage Member.</xsd:documentation>
+							<xsd:documentation> Member of GROUP OF SERVICE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -563,7 +573,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 				<xsd:sequence>
 					<xsd:element name="GroupOfServicesRef" type="GroupOfServicesRefStructure" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>Parent  GROUP OF SERVICEs to which this  GROUP OF SERVICEs MEMBER assigns a JOURNEY.</xsd:documentation>
+							<xsd:documentation>Parent GROUP OF SERVICEs to which this GROUP OF SERVICEs MEMBER assigns a JOURNEY.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:choice>
@@ -574,7 +584,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 					</xsd:choice>
 					<xsd:element name="noticeAssignments" type="noticeAssignmentViews_RelStructure" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>NOTICEs  Relevant for this grouping.</xsd:documentation>
+							<xsd:documentation>NOTICEs Relevant for this grouping.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -614,24 +624,24 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 	</xsd:group>
 	<xsd:group name="DeadRunEndpointsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for  origin and destination of  DEAD RUN Can be derived from the Pattern. Must not  contradict the JOURNEY PATTERN.</xsd:documentation>
+			<xsd:documentation>Elements for origin and destination of DEAD RUN Can be derived from the Pattern. Must not contradict the JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Origin" type="DeadRunEndpointStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Origin  for DEAD RUN. Can be Derived from JORUNEY PATTERN.</xsd:documentation>
+					<xsd:documentation>Origin for DEAD RUN. Can be Derived from JORUNEY PATTERN.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Destination" type="DeadRunEndpointStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Destination  for DEAD RUN. Can be derived from JORUNEY PATTERN.</xsd:documentation>
+					<xsd:documentation>Destination for DEAD RUN. Can be derived from JORUNEY PATTERN.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:complexType name="DeadRunEndpointStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for  DEAD RUN ENDPOINT (Production Timetable Service). Should not Contradict EDEAD RUN JOURNEY PATTERN.</xsd:documentation>
+			<xsd:documentation>Type for DEAD RUN ENDPOINT (Production Timetable Service). Should not Contradict EDEAD RUN JOURNEY PATTERN.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="PointRef" minOccurs="0"/>
@@ -653,12 +663,12 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 			</xsd:element>
 			<xsd:element name="trainNumbers" type="trainNumberRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TRAIN NUMBERs -= derived through JOURNEY PARTs  of a JOURNEY - for a multi-part JOURNEY only.</xsd:documentation>
+					<xsd:documentation>TRAIN NUMBERs -= derived through JOURNEY PARTs of a JOURNEY - for a multi-part JOURNEY only.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:element name="DeadRun" abstract="false" substitutionGroup="VehicleJourney_">
+	<xsd:element name="DeadRun" substitutionGroup="VehicleJourney_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A non-service VEHICLE JOURNEY.</xsd:documentation>
 		</xsd:annotation>
@@ -686,14 +696,14 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 							<xsd:group ref="DeadRunWithCallsGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DeadRunIdType" use="optional"/>
+					<xsd:attribute name="id" type="DeadRunIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:complexType name="DeadRunWithCalls_VersionStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for  DEAD RUN.</xsd:documentation>
+			<xsd:documentation>Type for DEAD RUN.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="DeadRun_VersionStructure">
@@ -705,7 +715,7 @@ The VIEW includes derived ancillary data from referenced entities.</xsd:document
 	</xsd:complexType>
 	<xsd:group name="DeadRunWithCallsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for  DEAD RUN.</xsd:documentation>
+			<xsd:documentation>Elements for DEAD RUN.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="calls" type="deadRunCalls_RelStructure" minOccurs="0">

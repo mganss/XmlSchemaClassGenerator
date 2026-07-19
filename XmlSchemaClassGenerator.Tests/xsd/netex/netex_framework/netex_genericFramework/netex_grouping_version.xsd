@@ -23,6 +23,8 @@
 				</Date>
 				<Date><Modified>2017-10-01</Modified>CR0006 Add infolinks to  GroupOfEntities so can have links on timetable etc.
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines GROUPING types.</p>
 				</Description>
@@ -115,7 +117,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Reference to a PURPOSE OF GROUPING.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="infoLinks" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Hyperlinks associated with GROUP OF ENTITIES.</xsd:documentation>
@@ -129,7 +135,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- =====GROUPING=============================================== -->
-	<xsd:element name="GeneralGroupOfEntities" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="GeneralGroupOfEntities" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A grouping of ENTITies which will be commonly referenced for a specific purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -150,7 +156,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="GeneralGroupOfEntitiesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfEntitiesIdType" use="optional">
+					<xsd:attribute name="id" type="GroupOfEntitiesIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -159,7 +165,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="GeneralGroupOfEntities_VersionStructure" abstract="false">
+	<xsd:complexType name="GeneralGroupOfEntities_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a GENERAL GROUP OF ENTITies.</xsd:documentation>
 		</xsd:annotation>
@@ -183,7 +189,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="members" type="objectRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Members of  GROUP OF ENTITies.</xsd:documentation>
+					<xsd:documentation>Members of GROUP OF ENTITies.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -211,7 +217,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PurposeOfGroupingGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PurposeOfGroupingIdType"/>
+					<xsd:attribute name="id" type="PurposeOfGroupingIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -230,7 +236,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="PurposeOfGroupingGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements of a  PURPOSE OF GROUPING.</xsd:documentation>
+			<xsd:documentation>Elements of a PURPOSE OF GROUPING.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="classes" type="classRefs_RelStructure" minOccurs="0">
@@ -254,7 +260,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VersionedChildGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupMemberIdType"/>
+					<xsd:attribute name="id" type="GroupMemberIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -268,9 +274,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:element name="Description" type="MultilingualString" minOccurs="0"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of member within parent group.</xsd:documentation>
+						<xsd:documentation>Order of member within parent group. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -291,7 +297,7 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:element name="GroupRef" type="VersionOfObjectRefStructure" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>Parent GROUP OF ENTITies to which this member assigns service  -  If given by context, can be omitted.</xsd:documentation>
+							<xsd:documentation>Parent GROUP OF ENTITies to which this member assigns service - If given by context, can be omitted.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element name="MemberObjectRef" type="VersionOfObjectRefStructure">
@@ -304,7 +310,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="GroupConstraintMember" type="GroupConstraintMember_VersionedChildStructure" abstract="false" substitutionGroup="VersionedChild">
+	<xsd:element name="GroupConstraintMember" type="GroupConstraintMember_VersionedChildStructure" substitutionGroup="VersionedChild">
 		<xsd:annotation>
 			<xsd:documentation>Specifies a member of a set.</xsd:documentation>
 		</xsd:annotation>
@@ -318,7 +324,7 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:element name="PurposeOfGroupingRef" type="PurposeOfGroupingRefStructure" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>Reference to a PUPOSE OF GROUPING  to which this member belongs.  If given by context does not need to be specified.</xsd:documentation>
+							<xsd:documentation>Reference to a PUPOSE OF GROUPING to which this member belongs. If given by context does not need to be specified.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element name="MemberClassRef" type="ClassRefStructure">

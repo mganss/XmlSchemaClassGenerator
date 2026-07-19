@@ -24,6 +24,9 @@
 				</Date>
 				<Date><Modified>2020-06-21</Modified>FIX - Issue #73 Recursive inclusion  NJSK Remove cycle dependency in includes  
 				</Date>
+				<Date><Modified>2023-12-18</Modified>FIX: Correct the #525 implementation of BOOKING ARRANGEMENT and SERVICE BOOKING ARRANGEMENT,
+					   SERVICE BOOKING ARRANGEMENT should inherit from BOOKING ARRANGEMENT and should have its own structure.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the FLEXIBLE SERVICE types.</p>
@@ -68,7 +71,7 @@ Rail transport, Roads and Road transport
 	<!-- ======================================================================= -->
 	<xsd:complexType name="flexibleServicePropertiesInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  FLEXIBLE SERVICE PROPERTies.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of FLEXIBLE SERVICE PROPERTies.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -92,7 +95,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FlexibleServiceProperties" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="FlexibleServiceProperties" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Additional characteristics of a FLEXIBLE SERVICE. A service may be partly fixed, partly flexible.</xsd:documentation>
 		</xsd:annotation>
@@ -115,7 +118,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="FlexibleServiceProperties_VersionStructure" abstract="false">
+	<xsd:complexType name="FlexibleServiceProperties_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for FLEXIBLE SERVICE PROPERTies.</xsd:documentation>
 		</xsd:annotation>
@@ -134,7 +137,17 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element ref="JourneyRef" minOccurs="0"/>
 			<xsd:group ref="FlexibleServiceCharacteristicsGroup"/>
-			<xsd:group ref="BookingArrangementsGroup"/>
+			<xsd:choice>
+				<xsd:annotation>
+					<xsd:documentation>Usage of BookingArrangementGroup is DEPRECATED: use bookingArrangements</xsd:documentation>
+				</xsd:annotation>
+				<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Set of possible Booking Arrangements for stop if different from those for SERVICE JOURNEY. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:group ref="DeprecatedBookingArrangementGroup"/>
+			</xsd:choice>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="FlexibleServiceCharacteristicsGroup">
@@ -161,7 +174,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="FlexibleStopAssignment" abstract="false" substitutionGroup="StopAssignment">
+	<xsd:element name="FlexibleStopAssignment" substitutionGroup="StopAssignment">
 		<xsd:annotation>
 			<xsd:documentation>Assignment of a SCHEDULED STOP POINT to a FLEXIBLE STOP PLACE and quay. etc.</xsd:documentation>
 		</xsd:annotation>
@@ -187,7 +200,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FlexibleStopAssignmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FlexibleStopAssignmentIdType"/>
+					<xsd:attribute name="id" type="FlexibleStopAssignmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -214,7 +227,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfFlexibleService" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfFlexibleService" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of FLEXIBLE SERVICEs according to their functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -232,12 +245,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfFlexibleServiceIdType"/>
+					<xsd:attribute name="id" type="TypeOfFlexibleServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfFlexibleService_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfFlexibleService_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF FLEXIBLE SERVICE.</xsd:documentation>
 		</xsd:annotation>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_equipmentVehiclePassenger_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_equipmentVehiclePassenger_version">
 	<xsd:annotation>
 		<xsd:appinfo>
 			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
@@ -18,13 +18,16 @@
 				</Date>
 				<Date><Modified>2021-01-29</Modified>BUG Issue #143: Correct data type on GapToPlatform
 				</Date>
+				<Date><Modified>2023-02-07</Modified>Add actual Vehicle Equipment list. Make Actual
+				</Date>
+				<Date><Modified>2019-03-25</Modified>Fix #41 by Skinkie from 2019.01.07. Fix typo on MobilityList.
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines passenger vehicle EQUIPMENT </p>
 				</Description>
 				<Format>
 					<MediaType>text/xml</MediaType>
-					<Syntax>http://www.w3.org/2				<Date><Modified>2019-03-25</Modified>Fix #41 by Skinkie from 2019.01.07. Fix typo on MobilityList.
-				</Date>001/XMLSchema</Syntax>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
 					<Description>XML schema, W3C Recommendation 2001</Description>
 				</Format>
 				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_reusableComponents}netex_equipmentVehiclePassenger_version.xsd</Identifier>
@@ -85,12 +88,24 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ====ACCESS=================================================================== -->
-	<xsd:element name="ActualVehicleEquipment" type="ActualVehicleEquipment_VersionStructure" abstract="true" substitutionGroup="PassengerEquipment">
+	<xsd:complexType name="actualVehicleEquipments_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>List of ACTUAL VEHICLE EQUIPMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="ActualVehicleEquipment" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="ActualVehicleEquipment" type="ActualVehicleEquipment_VersionStructure" substitutionGroup="PassengerEquipment">
 		<xsd:annotation>
 			<xsd:documentation>An item of EQUIPMENT of a particular type actually available in an individual VEHICLE.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ActualVehicleEquipment_VersionStructure" abstract="true">
+	<xsd:complexType name="ActualVehicleEquipment_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Abstract Type for an ACTUAL VEHICLE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -101,6 +116,7 @@ Rail transport, Roads and Road transport
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
+		<!-- changed -->
 	</xsd:complexType>
 	<xsd:group name="ActualVehicleEquipmentGroup">
 		<xsd:annotation>
@@ -149,12 +165,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="AccessVehicleEquipmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AccessVehicleEquipmentIdType"/>
+					<xsd:attribute name="id" type="AccessVehicleEquipmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="AccessVehicleEquipment_VersionStructure" abstract="false">
+	<xsd:complexType name="AccessVehicleEquipment_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for an ACCESS VEHICLE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -178,7 +194,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="AccessVehicleEquipmentBoardingGroup">
 		<xsd:annotation>
-			<xsd:documentation>Borading Elements for an ACCESS VEHICLE EQUIPMENT type.</xsd:documentation>
+			<xsd:documentation>Boarding Elements for an ACCESS VEHICLE EQUIPMENT type.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="LowFloor" type="xsd:boolean" minOccurs="0">
@@ -193,17 +209,22 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Hoist" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>VEHICLE Hoist can be used at VEHICLE has a hoist or lift  for wheelchairs.</xsd:documentation>
+					<xsd:documentation>VEHICLE has a hoist or lift for wheelchairs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="HoistOperatingRadius" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Distance from VEHICLE needed to operate hoist.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Ramp" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether  a ramp may be used to access VEHICLE.</xsd:documentation>
+					<xsd:documentation>Whether a ramp may be used to access VEHICLE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="BearingCapacity" type="WeightType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Maximum weight that the EQUIPMENT can bear.</xsd:documentation>
+					<xsd:documentation>Maximum weight that the EQUIPMENT can bear. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="NumberOfSteps" type="xsd:nonNegativeInteger" minOccurs="0">
@@ -218,12 +239,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="EquipmentLength" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Length of the EQUIPMENT be it hoist or ramp. When fully extended and only the part outside the VEHICLE.</xsd:documentation>
+					<xsd:documentation>Length of the EQUIPMENT be it hoist or ramp. When fully extended and only the part outside the VEHICLE. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="EquipmentWidth" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Width of the EQUIPMENT be it hoist or ramp. When fully extended and only the part outside the VEHICLE.</xsd:documentation>
+					<xsd:documentation>Width of the EQUIPMENT be it hoist or ramp. When fully extended and only the part outside the VEHICLE. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="GapToPlatform" type="LengthType" minOccurs="0">
@@ -272,7 +293,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="AssistedBoardingLocation" type="AssistedBoardingLocationEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether special position on platform  is needed for boarding.</xsd:documentation>
+					<xsd:documentation>Whether special position on platform is needed for boarding.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="GuideDogsAllowed" type="xsd:boolean" default="true" minOccurs="0">
@@ -314,12 +335,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="WheelchairVehicleEquipmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="WheelchairVehicleEquipmentIdType"/>
+					<xsd:attribute name="id" type="WheelchairVehicleEquipmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="WheelchairVehicleEquipment_VersionStructure" abstract="false">
+	<xsd:complexType name="WheelchairVehicleEquipment_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a WHEELCHAIR VEHICLE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -371,7 +392,48 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether there is a companion seat.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="suitableFor" type="typeOfWheelchairRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Wheelchair types for which EQUIPMENT is suitable. v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
+	<!-- =========TYPE OF DECK ENTRANCE. ============================================ -->
+	<xsd:element name="TypeOfWheelchair" substitutionGroup="TypeOfValue">
+		<xsd:annotation>
+			<xsd:documentation>Classification for TYPE OF WHEELCHAIR. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfWheelchair_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfWheelchairIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of TYPE OF WHEELCHAIR,</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfWheelchair_ValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF WHEELCHAIR.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfValue_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<!-- ======================================================================= -->
 </xsd:schema>

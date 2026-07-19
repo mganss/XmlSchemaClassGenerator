@@ -21,6 +21,8 @@
 				</Date>
 				<Date><Modified>2010-11-30</Modified> Add projections, revise for revised Section Mode
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines POINT AND LINK SEQUENCE types.</p>
 				</Description>
@@ -101,7 +103,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Overall distance of LINK SEQUENCE. Can be derived from component LINKs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="projections" type="projections_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>PROJECTIONs of LINK SEQUENCE onto another ENTITY or layer.</xsd:documentation>
@@ -119,7 +125,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="sectionsInSequence" type="sectionsInSequence_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>SECTIONS that make up route.  Can be used as an alternative to  points in Seqnece. POINTS and LINKS must be of same type as sequence, eg ROUTE, ROUTE POINT, ROUTE LINK</xsd:documentation>
+					<xsd:documentation>SECTIONS that make up route. Can be used as an alternative to points in sequence. POINTS and LINKS must be of same type as sequence, eg ROUTE, ROUTE POINT, ROUTE LINK</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -139,9 +145,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="PointInLinkSequenceGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of POINT within parent.</xsd:documentation>
+						<xsd:documentation>Order of POINT within parent. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -180,9 +186,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="LinkInLinkSequenceGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of LINK in sequence.</xsd:documentation>
+						<xsd:documentation>Order of LINK in sequence. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -207,7 +213,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfLinkSequence" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfLinkSequence" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of LINK SEQUENCEs according to their functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -222,8 +228,8 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfLinkSequenceIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="LinkSequence">
+					<xsd:attribute name="id" type="TypeOfLinkSequenceIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -232,7 +238,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfLinkSequence_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfLinkSequence_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF LINK SEQUENCE.</xsd:documentation>
 		</xsd:annotation>
@@ -253,7 +259,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="GroupOfLinkSequences" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="GroupOfLinkSequences" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A grouping of LINK SEQUENCEs.</xsd:documentation>
 		</xsd:annotation>
@@ -274,7 +280,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="GroupOfLinkSequencesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfLinkSequencesIdType"/>
+					<xsd:attribute name="id" type="GroupOfLinkSequencesIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

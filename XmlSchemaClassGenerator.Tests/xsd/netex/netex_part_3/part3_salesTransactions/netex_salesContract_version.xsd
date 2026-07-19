@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_salesContract_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_salesContract_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_loggable_version.xsd"/>
 	<xsd:include schemaLocation="netex_customerPurchasePackage_support.xsd"/>
 	<xsd:include schemaLocation="netex_retailConsortium_support.xsd"/>
 	<xsd:include schemaLocation="netex_salesContract_support.xsd"/>
 	<xsd:include schemaLocation="netex_customerEligibility_version.xsd"/>
+	<xsd:include schemaLocation="netex_customerPaymentMeans_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_securityList_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_address_version.xsd"/>
-	<xsd:include schemaLocation="netex_customerPaymentMeans_version.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -52,6 +52,10 @@
 				</Date>
 				<Date><Modified>2021.01.10</Modified>New Modes: Add EMail and Phone  verification flag
 				</Date>
+				<Date><Modified>2023.12.14</Modified>Enhancement: allow Customer Purchase Package to hold Package History
+				</Date>
+				<Date><Modified>2023-12-15</Modified>Factor out Paymount amount to FARE DEBIT PACKAGE
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the SALES FARE CONTRACT types.</p>
@@ -91,7 +95,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx SALES CONTRACT  types.</xsd:documentation>
+		<xsd:documentation>NeTEx SALES CONTRACT types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
 	<xsd:include schemaLocation="netex_mediumApplication_support.xsd"/>
@@ -107,12 +111,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="customerAccounts" type="customerAccountsInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>CUSTOMER ACCOUNTs  in FRAME.</xsd:documentation>
+					<xsd:documentation>CUSTOMER ACCOUNTs in FRAME.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="fareContracts" type="fareContractsInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>FARE CONTRACTs  in FRAME.</xsd:documentation>
+					<xsd:documentation>FARE CONTRACTs in FRAME.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -167,10 +171,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="Customer" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="Customer" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
-			<xsd:documentation>An identified person or organisation involved in a fare process. There may be a FARE CONTRACT between the CUSTOMER and the OPERATOR or the AUTHORITY ruling the consumption of services.
- 		</xsd:documentation>
+			<xsd:documentation>An identified person or organisation involved in a fare process. There may be a FARE CONTRACT between the CUSTOMER and the OPERATOR or the AUTHORITY ruling the consumption of services.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -186,7 +189,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CustomerGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CustomerIdType" use="optional">
+					<xsd:attribute name="id" type="CustomerIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -244,12 +247,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Title" type="xsd:normalizedString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Title  of CUSTOMER.</xsd:documentation>
+					<xsd:documentation>Title of CUSTOMER.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DateOfBirth" type="xsd:date" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Date of birth of  CUSTOMER.</xsd:documentation>
+					<xsd:documentation>Date of birth of CUSTOMER.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Gender" type="GenderEnumeration" minOccurs="0">
@@ -291,12 +294,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Phone" type="TelephoneContactStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Phone number. (Usually personal  mobile phone). </xsd:documentation>
+					<xsd:documentation>Phone number (usually personal mobile phone.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="PhoneVerified" type="xsd:dateTime" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Phone of CUSTOMER last verified +v1.2.2</xsd:documentation>
+					<xsd:documentation>Phone of CUSTOMER last verified. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="PostalAddress" minOccurs="0"/>
@@ -314,7 +317,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="customerEligibilities" type="customerEligibilities_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Eligibilities  for CUSTOMER.</xsd:documentation>
+					<xsd:documentation>Eligibilities for CUSTOMER.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -333,12 +336,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareContract" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="FareContract" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
-			<xsd:documentation>A contract with a particular (but possibly anonymous) customer, ruling the consumption of transport services (and joint services). A FARE CONTRACT may be designed for a fixed SALES OFFER PACKAGE (e.g. ticket) or to allow successive purchases of SALES OFFER PACKAGEs.
-
-
-</xsd:documentation>
+			<xsd:documentation>A contract with a particular (but possibly anonymous) customer, ruling the consumption of transport services (and joint services). A FARE CONTRACT may be designed for a fixed SALES OFFER PACKAGE (e.g. ticket) or to allow successive purchases of SALES OFFER PACKAGEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -354,7 +354,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareContractGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareContractIdType" use="optional">
+					<xsd:attribute name="id" type="FareContractIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -424,21 +424,19 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="FareContractEntryRef"/>
-					<xsd:element ref="FareContractEntry_"/>
+					<xsd:element ref="FareContractEntry_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareContractEntry_" type="DataManagedObjectStructure" substitutionGroup="DataManagedObject">
+	<xsd:element name="FareContractEntry_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Dummy type for FARE CONTRACT ENTRY.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="FareContractEntry" abstract="true" substitutionGroup="FareContractEntry_">
+	<xsd:element name="FareContractEntry" abstract="true" substitutionGroup="FareContractEntry_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A log entry describing an event referring to the life of a FARE CONTRACT: initial contracting, sales, validation entries, etc. A subset of a FARE CONTRACT ENTRY is often materialised on a TRAVEL DOCUMENT.
-
-</xsd:documentation>
+			<xsd:documentation>A log entry describing an event referring to the life of a FARE CONTRACT: initial contracting, sales, validation entries, etc. A subset of a FARE CONTRACT ENTRY is often materialised on a TRAVEL DOCUMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -457,7 +455,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareContractEntryGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareContractEntryIdType" use="optional">
+					<xsd:attribute name="id" type="FareContractEntryIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -518,7 +516,7 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="TypeOfEntity_VersionStructure"/>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TypeOfFareContract" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfFareContract" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of FARE CONTRACT.</xsd:documentation>
 		</xsd:annotation>
@@ -536,7 +534,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfFareContractIdType"/>
+					<xsd:attribute name="id" type="TypeOfFareContractIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -552,15 +550,14 @@ Rail transport, Roads and Road transport
 					<xsd:element ref="TypeOfFareContractEntryRef"/>
 					<xsd:element ref="TypeOfFareContractEntry">
 						<xsd:annotation>
-							<xsd:documentation>A TYPE OF FARE CONTRACT ENTRY specifying access rights for the FARE CONTRACT ENTRY ELEMENTs within the range of this UNIT: 0-5 km, 4-6 zones etc.
-</xsd:documentation>
+							<xsd:documentation>A TYPE OF FARE CONTRACT ENTRY specifying access rights for the FARE CONTRACT ENTRY ELEMENTs within the range of this UNIT: 0-5 km, 4-6 zones etc.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TypeOfFareContractEntry" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfFareContractEntry" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of a FARE CONTRACT ENTRY.</xsd:documentation>
 		</xsd:annotation>
@@ -578,7 +575,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfFareContractEntryIdType"/>
+					<xsd:attribute name="id" type="TypeOfFareContractEntryIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -605,12 +602,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CustomerAccount" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="CustomerAccount" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
-			<xsd:documentation>A contract with a particular (but possibly anonymous) customer, ruling the consumption of transport services (and joint services). A CUSTOMER ACCOUNT may be designed for a fixed SALES OFFER PACKAGE (e.g. ticket) or to allow successive purchases of SALES OFFER PACKAGEs.
-
-
-</xsd:documentation>
+			<xsd:documentation>A contract with a particular (but possibly anonymous) customer, ruling the consumption of transport services (and joint services). A CUSTOMER ACCOUNT may be designed for a fixed SALES OFFER PACKAGE (e.g. ticket) or to allow successive purchases of SALES OFFER PACKAGEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -626,7 +620,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CustomerAccountGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CustomerAccountIdType" use="optional">
+					<xsd:attribute name="id" type="CustomerAccountIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -701,9 +695,14 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>FARE CONTRACTs for CUSTOMER ACCOUNT +v1.1.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="customerAccountEntries" type="fareContractEntries_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FARE CONTRACT ENTRIES that relate to the CUSTOMER ACCOUNT. Normally these are embedded in a FARE CONTRACT governing the account itself. For convenience they may also be referenced or embedded directly in the CUSTOMER ACCOUNT. +V2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="customerPurchasePackages" type="customerPurchasePackageRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>CUSTOMER PURCHASE PACKAGES  for CUSTOMER ACCOUT.</xsd:documentation>
+					<xsd:documentation>CUSTOMER PURCHASE PACKAGES for CUSTOMER ACCOUT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="CustomerPaymentMeansRef" minOccurs="0"/>
@@ -733,7 +732,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TypeOfCustomerAccount" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfCustomerAccount" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of a CUSTOMER ACCOUNT.</xsd:documentation>
 		</xsd:annotation>
@@ -751,7 +750,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfCustomerAccountIdType"/>
+					<xsd:attribute name="id" type="TypeOfCustomerAccountIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -778,7 +777,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CustomerAccountStatus" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="CustomerAccountStatus" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of a CUSTOMER ACCOUNT.</xsd:documentation>
 		</xsd:annotation>
@@ -796,7 +795,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CustomerAccountStatusIdType"/>
+					<xsd:attribute name="id" type="CustomerAccountStatusIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -810,7 +809,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ==== CUSTOMER ACCOUNT SECURITY LISTING ======================================== -->
-	<xsd:element name="CustomerAccountSecurityListing" abstract="false" substitutionGroup="SecurityListing_">
+	<xsd:element name="CustomerAccountSecurityListing" substitutionGroup="SecurityListing_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A listing of a CUSTOMER ACCOUNT on a SECURITY LIST.</xsd:documentation>
 		</xsd:annotation>
@@ -835,7 +834,7 @@ Rail transport, Roads and Road transport
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CustomerAccountSecurityListingIdType" use="optional">
+					<xsd:attribute name="id" type="CustomerAccountSecurityListingIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -858,14 +857,14 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="CustomerAccountSecurityListingGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for CUSTOMER ACCOUNT  SECURITY LISTING.</xsd:documentation>
+			<xsd:documentation>Elements for CUSTOMER ACCOUNT SECURITY LISTING.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="CustomerAccountRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== CUSTOMER SECURITY LISTING ======================================== -->
-	<xsd:element name="CustomerSecurityListing" abstract="false" substitutionGroup="SecurityListing_">
+	<xsd:element name="CustomerSecurityListing" substitutionGroup="SecurityListing_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A listing of a CUSTOMER on a SECURITY LIST.</xsd:documentation>
 		</xsd:annotation>
@@ -890,7 +889,7 @@ Rail transport, Roads and Road transport
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CustomerSecurityListingIdType" use="optional">
+					<xsd:attribute name="id" type="CustomerSecurityListingIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -920,7 +919,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== FARE CONTRACT SECURITY LISTING ======================================== -->
-	<xsd:element name="FareContractSecurityListing" abstract="false" substitutionGroup="SecurityListing_">
+	<xsd:element name="FareContractSecurityListing" substitutionGroup="SecurityListing_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A listing of a FARE CONTRACT on a SECURITY LIST.</xsd:documentation>
 		</xsd:annotation>
@@ -945,7 +944,7 @@ Rail transport, Roads and Road transport
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareContractSecurityListingIdType" use="optional">
+					<xsd:attribute name="id" type="FareContractSecurityListingIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -968,7 +967,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="FareContractSecurityListingGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for FARE CONTRACT  SECURITY LISTING.</xsd:documentation>
+			<xsd:documentation>Elements for FARE CONTRACT SECURITY LISTING.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="FareContractRef" minOccurs="0"/>

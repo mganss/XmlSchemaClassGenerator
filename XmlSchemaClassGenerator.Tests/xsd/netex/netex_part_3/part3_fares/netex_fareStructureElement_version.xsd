@@ -27,6 +27,8 @@
 				</Date>
 				<Date><Modified>2020-10-12</Modified>NewModes add LocalService and MobilityService to Tariff applicability 
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the FARE STRUCTURE ELEMENT types.</p>
@@ -66,7 +68,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEX FARE STRUCTURE ELEMENT  types.</xsd:documentation>
+		<xsd:documentation>NeTEX FARE STRUCTURE ELEMENT types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME==== ================================================== -->
 	<xsd:group name="FareFactorsInFrameGroup">
@@ -121,7 +123,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ====FARE STRUCTURE=================================================== -->
-	<xsd:element name="Tariff" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="Tariff" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A particular tariff, described by a combination of parameters.</xsd:documentation>
 		</xsd:annotation>
@@ -139,7 +141,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TariffGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TariffIdType"/>
+					<xsd:attribute name="id" type="TariffIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -162,7 +164,11 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:group ref="TariffDescriptionGroup"/>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:group ref="TariffOrganisationGroup" minOccurs="0"/>
 			<xsd:group ref="TariffApplicabilityGroup" minOccurs="0"/>
 			<xsd:group ref="TariffCalculationGroup"/>
@@ -208,7 +214,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="documentLinks" type="infoLinks_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Timetable documents associated with the Tariff  e.g pdf files +v1.1</xsd:documentation>
+					<xsd:documentation>Timetable documents associated with the Tariff e.g pdf files +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -221,12 +227,12 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="TypeOfTariffRef" minOccurs="0"/>
 			<xsd:element name="TariffBasis" type="TariffBasisEnumeration" default="route" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Classification of  Tariff Butasis. Defaut is Route (Tap TSI)</xsd:documentation>
+					<xsd:documentation>Classification of Tariff Butasis. Defaut is Route (Tap TSI)</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ReturnFareTwiceSingle" type="xsd:boolean" default="true" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether return fare is  normally twice single fare. Default is true.</xsd:documentation>
+					<xsd:documentation>Whether return fare is normally twice single fare. Default is true.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -236,7 +242,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Calculation Elements for TARIFF.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:choice>
-			<xsd:element ref="OrganisationRef_"/>
+			<xsd:element ref="OrganisationRef_Dummy"/>
 			<xsd:element ref="GroupOfOperatorsRef"/>
 		</xsd:choice>
 	</xsd:group>
@@ -266,7 +272,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="GeographicalUnitRef" minOccurs="0"/>
 			<xsd:element name="geographicalIntervals" type="geographicalIntervals_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>GEOGRAPHICAL INTERVALs  making up TARIFF.</xsd:documentation>
+					<xsd:documentation>GEOGRAPHICAL INTERVALs making up TARIFF.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="geographicalStructureFactors" type="geographicalStructureFactors_RelStructure" minOccurs="0">
@@ -347,7 +353,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==TYPE OF TARIFF======================================================= -->
-	<xsd:element name="TypeOfTariff" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfTariff" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of TARIFFs according to their functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -365,8 +371,8 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfTariffIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Tariff">
+					<xsd:attribute name="id" type="TypeOfTariffIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -375,7 +381,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfTariff_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfTariff_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF TARIFF.</xsd:documentation>
 		</xsd:annotation>
@@ -401,7 +407,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareStructureElement" abstract="false" substitutionGroup="PriceableObject">
+	<xsd:element name="FareStructureElement" substitutionGroup="PriceableObject">
 		<xsd:annotation>
 			<xsd:documentation>A sequence or set of CONTROLLABLE ELEMENTs to which rules for limitation of access rights and calculation of prices (fare structure) are applied.</xsd:documentation>
 		</xsd:annotation>
@@ -422,7 +428,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareStructureElementGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareStructureElementIdType"/>
+					<xsd:attribute name="id" type="FareStructureElementIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -438,7 +444,7 @@ Rail transport, Roads and Road transport
 				</xsd:sequence>
 				<xsd:attribute name="nameOfClassOfUnit" type="NameOfClass">
 					<xsd:annotation>
-						<xsd:documentation>Name of  class associated with FARE STRUCTURE ELEMENT, eg DistanceMatrixElement, Series, UserProfile, ClassOfUSe.</xsd:documentation>
+						<xsd:documentation>Name of class associated with FARE STRUCTURE ELEMENT, eg DistanceMatrixElement, Series, UserProfile, ClassOfUSe.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -477,7 +483,7 @@ Rail transport, Roads and Road transport
 				<xsd:element ref="GeographicalIntervalRef"/>
 				<xsd:element name="geographicalIntervals" type="geographicalIntervals_RelStructure">
 					<xsd:annotation>
-						<xsd:documentation>References to GEOGRAPHICAL INTERVALS  pertaining to FARE STRUCTURE ELEMENT.</xsd:documentation>
+						<xsd:documentation>References to GEOGRAPHICAL INTERVALS pertaining to FARE STRUCTURE ELEMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="geographicalStructureFactors" type="geographicalStructureFactors_RelStructure" minOccurs="0">
@@ -546,7 +552,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareStructureElementInSequence" abstract="false" substitutionGroup="VersionedChild">
+	<xsd:element name="FareStructureElementInSequence" substitutionGroup="VersionedChild">
 		<xsd:annotation>
 			<xsd:documentation>A FARE STRUCTURE ELEMENT as a part of a VALIDABLE ELEMENT, including its possible order in the sequence of FARE STRUCTURE ELEMENTs forming that VALIDABLE ELEMENT, and its possible quantitative limitation.</xsd:documentation>
 		</xsd:annotation>
@@ -564,7 +570,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareStructureElementInSequenceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareStructureElementInSequenceIdType" use="optional"/>
+					<xsd:attribute name="id" type="FareStructureElementInSequenceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -605,12 +611,12 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>A set of all possible price features of a FARE STRUCTURE ELEMENT: default total price, discount in value or percentage etc.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareStructureElementPrice" substitutionGroup="FarePrice_">
+	<xsd:element name="FareStructureElementPrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a FARE STRUCTURE ELEMENT: default total price, discount in value or percentage etc.</xsd:documentation>
 		</xsd:annotation>
@@ -628,7 +634,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareStructureElementPriceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareStructureElementPriceIdType"/>
+					<xsd:attribute name="id" type="FareStructureElementPriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -654,10 +660,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====TYPE OF FARE STRUCTURE ELEMENT======================================= -->
-	<xsd:element name="TypeOfFareStructureElement" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfFareStructureElement" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
-			<xsd:documentation>A classification of FARE STRUCTURE ELEMENTs expressing their general functionalities .
-</xsd:documentation>
+			<xsd:documentation>A classification of FARE STRUCTURE ELEMENTs expressing their general functionalities .</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -674,7 +679,7 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:sequence/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfFareStructureElementIdType"/>
+					<xsd:attribute name="id" type="TypeOfFareStructureElementIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

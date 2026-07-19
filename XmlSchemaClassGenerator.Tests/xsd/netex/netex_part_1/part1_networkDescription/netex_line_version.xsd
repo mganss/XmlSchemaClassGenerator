@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_line_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_line_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_utility/netex_utility_types.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_transportOrganisation_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
@@ -7,8 +7,10 @@
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_grouping_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_accessibility/netex_acsb_accessibility.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_noticeAssignment_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceRestrictions_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_journeyTimes/netex_vehicleJourneyStopAssignment_support.xsd"/>
 	<xsd:include schemaLocation="netex_line_support.xsd"/>
 	<xsd:include schemaLocation="netex_route_support.xsd"/>
 	<xsd:annotation>
@@ -31,7 +33,7 @@
 					<Modified>2017-06-01</Modified>Add Additional Networks to service Frame.
 					<Modified>2017-06-28</Modified>CRxx Add LineType and GroupOfLineType.
 					<Modified>2017-06-28</Modified>CRxx Add PRESENTATION to Allowed Line Direction.
-					<Modified>2017-07-03</Modified>CR25 Add Secondary Name to Detsination Display.
+					<Modified>2017-07-03</Modified>CR25 Add Secondary Name to Destination Display.
 				</Date>
 				<Date>
 					<Modified>2017-04-22 CR16 Timetable pdf links to Line</Modified>
@@ -41,8 +43,7 @@
 						Also add tariff and scheduling to GroupOfLinesType enumeration	
 						Add UseToExclude flag to GroupOfLines
 				</Date>
-				<Date><Modified>2019-03-25</Modified>NL-27  CD Add additional  defaults to line for  TypeProductCategory, TypeOfService
-					 	
+				<Date><Modified>2019-03-25</Modified>NL-27  CD Add additional  defaults to line for  TypeProductCategory, TypeOfService					 	
 						NJSK Review; Move  TypeProductCategory  TypeOfService
 						NJSK Review;  Move position of  Line  /TypeProductCategory and  TypeOfService to LineClassificationGroup 
 				</Date>
@@ -52,6 +53,15 @@
 				</Date>
 				<Date>
 					<Modified>2020-10-05 New modes - add MODE of OPERATION to LINE.</Modified>
+				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
+				<Date>
+					<Modified>2023-12-14 #391 Fix linesInDirection to also allow Allowed line diretcion ref. Remove commented out code</Modified>
+				</Date>
+				<Date><Modified>2023-12-18</Modified>FIX: revise the  #525 implementation of BOOKING ARRANGEMENT 
+					; move booking arrangements up up to LINE and deprecate use on FLEXIBLE LINE
+					Also delete commented out constraint code - now all in publication.xsd.
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -69,7 +79,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2023</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -97,7 +107,7 @@ Rail transport, Roads and Road transport
 	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
 	<xsd:group name="NetworkInFrameGroup">
 		<xsd:annotation>
-			<xsd:documentation> NETWORK elements in frame. </xsd:documentation>
+			<xsd:documentation> NETWORK elements in frame.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="Network" minOccurs="0"/>
@@ -179,7 +189,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ==GROUP OF LINES============================================================ -->
-	<xsd:element name="GroupOfLines" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="GroupOfLines" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A grouping of LINEs which will be commonly referenced for a specific purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -200,7 +210,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="GroupOfLinesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfLinesIdType"/>
+					<xsd:attribute name="id" type="GroupOfLinesIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -224,7 +234,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="UseToExclude" type="xsd:boolean" default="false" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include  (i.e.false) </xsd:documentation>
+					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include (i.e.false)</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="members" type="lineRefs_RelStructure" minOccurs="0">
@@ -237,13 +247,17 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Primary LINE in GROUP OF LINEs, if relevant.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Primary Transport MODE of NETWORK.</xsd:documentation>
+					<xsd:documentation>Primary PUBLIC TRANSPORT MODE of NETWORK.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="TransportSubmode" minOccurs="0"/>
-			<xsd:element ref="ModeOfOperationRef" minOccurs="0"/>
+			<xsd:element ref="ModeOfOperationRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="GroupOfLinesType" type="GroupOfLinesTypeEnumeration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Classification of GROUP OF LINES. +v1.1</xsd:documentation>
@@ -260,54 +274,20 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="Line_" maxOccurs="unbounded"/>
+					<xsd:element ref="Line_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="Line_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+	<xsd:element name="Line_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Supertype for LINE &amp; FLEXIBLE LINe.</xsd:documentation>
 		</xsd:annotation>
-		<!--
-		<xsd:unique name="AnyLine">
-			<xsd:selector xpath=".//netex:Line"/>
-			<xsd:field xpath="Id"/>
-		</xsd:unique>
-		<xsd:unique name="AnyLineDirection">
-			<xsd:selector xpath=".//netex:allowedDirections/DirectionRef"/>
-			<xsd:field xpath="@ref"/>
-		</xsd:unique>
-	<xsd:unique name="UniqueLineId">
-			<xsd:annotation>
-				<xsd:appinfo>Line identifiers must be unique for Type/Version</xsd:appinfo>
-			</xsd:annotation>
-			<xsd:selector xpath=".//netex:Line"/>
-			<xsd:field xpath="@version"/>
-			<xsd:field xpath="./netex:Id"/>
-		</xsd:unique> -->
 	</xsd:element>
-	<xsd:element name="Line" abstract="false" substitutionGroup="Line_" id="Line">
+	<xsd:element name="Line" substitutionGroup="Line_Dummy" id="Line">
 		<xsd:annotation>
 			<xsd:documentation>A group of ROUTEs which is generally known to the public by a similar name or number.</xsd:documentation>
 		</xsd:annotation>
-		<!--
-		<xsd:unique name="AnyLine">
-			<xsd:selector xpath=".//netex:Line"/>
-			<xsd:field xpath="Id"/>
-		</xsd:unique>
-		<xsd:unique name="AnyLineDirection">
-			<xsd:selector xpath=".//netex:allowedDirections/DirectionRef"/>
-			<xsd:field xpath="@ref"/>
-		</xsd:unique>
-	<xsd:unique name="UniqueLineId">
-			<xsd:annotation>
-				<xsd:appinfo>Line identifiers must be unique for Type/Version</xsd:appinfo>
-			</xsd:annotation>
-			<xsd:selector xpath=".//netex:Line"/>
-			<xsd:field xpath="@version"/>
-			<xsd:field xpath="./netex:Id"/>
-		</xsd:unique> -->
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:restriction base="Line_VersionStructure">
@@ -322,7 +302,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="LineGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LineIdType"/>
+					<xsd:attribute name="id" type="LineIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -373,9 +353,9 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Description of LINE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Transport MODE of LINE.</xsd:documentation>
+					<xsd:documentation>PT MODE of LINE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="TransportSubmode" minOccurs="0"/>
@@ -391,15 +371,19 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Alternative Code Elements of a LINE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="xsd:normalizedString" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Public identifier of a LINe.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="ExternalLineRef" type="ExternalObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>An alternative  code that uniquely identifies the LINE specifically for use in AVMS systems. For VDV compatibility.</xsd:documentation>
+					<xsd:documentation>An alternative code that uniquely identifies the LINE specifically for use in AVMS systems. For VDV compatibility. DEPRECATED - use privateCodes -v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -416,7 +400,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element ref="OperatorRef" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>An OPERATOR should be set, even when the same as the AUTHORITY. In some cases OPERATOR or AUTHORITY are managed through a ResponsibilitySet. However, for compatibility OperatorRef and AuthorityRef still should be filled in.</xsd:documentation>
+					<xsd:documentation>An OPERATOR should be set, even when the same as the AUTHORITY. In some cases OPERATOR or AUTHORITY are managed through a ResponsibilitySet. However, for compatibility OperatorRef and AuthorityRef still should be filled in. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="additionalOperators" type="transportOrganisationRefs_RelStructure" minOccurs="0">
@@ -453,7 +437,7 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="LinePresentationGroup"/>
 			<xsd:group ref="LinePaymentMethodGroup">
 				<xsd:annotation>
-					<xsd:documentation>Default  payment methods supported for LINE or NETWORK+v1.1</xsd:documentation>
+					<xsd:documentation>Default payment methods supported for LINE or NETWORK+v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:group>
 			<xsd:element name="ContactDetails" type="ContactStructure" minOccurs="0">
@@ -467,6 +451,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Allowed directions for routes of LINE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="facilities" type="serviceFacilitySets_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>FACILITies available associated with LINE. It is always recommended to also model accessibility relevant things as equipment on the VEHICLE and physical elements, if real-time information is needed.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="noticeAssignments" type="noticeAssignments_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>NOTICES assigned to LINE.</xsd:documentation>
@@ -475,6 +464,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="documentLinks" type="infoLinks_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Timetable documents associated with the LINE, e.g pdf files</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Set of possible Booking Arrangements for this LINE. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -486,17 +480,32 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="LineType" type="LineTypeEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Classification of LINE. +v1.1.</xsd:documentation>
+					<xsd:documentation>Classification of LINE, including flexible options. +v2.0.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="TypeOfLineRef" minOccurs="0"/>
 			<xsd:element name="ExternalProductCategoryRef" type="ExternalObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>An default product classification for all journeys of the lin e for use in AVMS systems. For VDV compatibility. +v1.1</xsd:documentation>
+					<xsd:documentation>An default product classification for all journeys of the lin e for use in AVMS systems. For VDV compatibility. +v1.1. DEPRECATED - use privateCodes -v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="TypeOfProductCategoryRef" minOccurs="0"/>
 			<xsd:element ref="TypeOfServiceRef" minOccurs="0"/>
+			<xsd:element name="AccessModes" type="AccessModeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>List of ACCESS MODEs that are allowed for this line. If not specified means all the usual ones for classic public transport. Can be used for example to indicate in vehicle only access. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RestrictedLine" type="xsd:boolean" default="false" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the LINE is restricted to special groups of passengers and not open to the general public, or restricted by the access modes supported. Default is false. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="UserTypes" type="UserTypeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>If only specific user types are allowed on the LINE, they can be indicated in this list. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="LinePresentationGroup">
@@ -523,7 +532,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="LinePaymentMethodGroup">
 		<xsd:annotation>
-			<xsd:documentation>Defauly Mayment methods supported for l LINE. +v1.1</xsd:documentation>
+			<xsd:documentation>Default Payment methods supported for LINE. +v1.1</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="PaymentMethods" type="PaymentMethodListOfEnumerations" minOccurs="0">
@@ -533,7 +542,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="typesOfPaymentMethod" type="TypeOfPaymentMethod_ValueStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TYPES OF PAYMENT yment Methods allowed on LINE. +v1.1</xsd:documentation>
+					<xsd:documentation>TYPES OF PAYMENT METHOD allowed on LINE. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="PurchaseMoment" type="PurchaseMomentListOfEnumerations" minOccurs="0">
@@ -544,7 +553,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="Network" abstract="false" substitutionGroup="GroupOfEntities">
+	<xsd:element name="Network" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A named grouping of LINEs under which a Transport network is known.</xsd:documentation>
 		</xsd:annotation>
@@ -568,12 +577,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="NetworkGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="NetworkIdType"/>
+					<xsd:attribute name="id" type="NetworkIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="Network_VersionStructure" abstract="false">
+	<xsd:complexType name="Network_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a NETWORK.</xsd:documentation>
 		</xsd:annotation>
@@ -597,7 +606,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="TransportOrganisationRef" minOccurs="0"/>
 			<xsd:element name="groupsOfOperators" type="groupsOfOperatorsRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Groups of OPERATORs  AUTHORTies or OPERATORS) (in NETWORK.</xsd:documentation>
+					<xsd:documentation>Groups of OPERATORs AUTHORTies or OPERATORS) (in NETWORK.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="groupsOfLines" type="groupsOfLinesInFrame_RelStructure" minOccurs="0">
@@ -613,7 +622,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="DestinationDisplay" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="DestinationDisplay" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>An advertised destination of a specific JOURNEY PATTERN, usually displayed on a head sign or at other on-board locations.</xsd:documentation>
 		</xsd:annotation>
@@ -631,12 +640,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DestinationDisplayGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DestinationDisplayIdType"/>
+					<xsd:attribute name="id" type="DestinationDisplayIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="DestinationDisplay_VersionStructure" abstract="false">
+	<xsd:complexType name="DestinationDisplay_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a DESTINATION DISPLAY.</xsd:documentation>
 		</xsd:annotation>
@@ -662,12 +671,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="vias" type="vias_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Headings that distinguish the route by which the service runs to the Destination  Name .</xsd:documentation>
+					<xsd:documentation>Headings that distinguish the route by which the service runs to the Destination Name .</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="variants" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>DEITINATION DISPLAY VARIANT for DESTINATION DISPLAY. Variants may  be for use in a specifc context or on a specifc media, or a combination of both. </xsd:documentation>
+					<xsd:documentation>DESTINATION DISPLAY VARIANT for DESTINATION DISPLAY. Variants may be for use in a specifc context or on a specifc media, or a combination of both.</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:complexContent>
@@ -719,12 +728,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Short code associated with Destination display used vehicle display controller which describes the format of the destination text in the front and side display in the vehicle. (VDV).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="PublicCode" type="xsd:normalizedString" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Public code to show for Destination.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
@@ -740,7 +753,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DestinationDisplayVariant" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="DestinationDisplayVariant" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A variant text of a DESTINATION DISPLAY for informational purposes.</xsd:documentation>
 		</xsd:annotation>
@@ -758,7 +771,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DestinationDisplayVariantGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DestinationDisplayVariantIdType"/>
+					<xsd:attribute name="id" type="DestinationDisplayVariantIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -783,7 +796,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="DestinationDisplayRef" minOccurs="0"/>
 			<xsd:element name="DestinationDisplayContext" type="DestinationDisplayContextEnumeration" default="any" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Context in which to use the secondary name.  Default is 'any'+v1.1</xsd:documentation>
+					<xsd:documentation>Context in which to use the secondary name. Default is 'any'+v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DestinationDisplayVariantMediaType" type="DeliveryVariantTypeEnumeration" default="any">
@@ -820,7 +833,7 @@ Rail transport, Roads and Road transport
 					<xsd:sequence maxOccurs="1">
 						<xsd:element name="Via" type="Via_VersionedChildStructure" maxOccurs="unbounded">
 							<xsd:annotation>
-								<xsd:documentation>A secondary heading  (e.g. ROUTE POINT or other place) showing intermediate places on the way to a destination.</xsd:documentation>
+								<xsd:documentation>A secondary heading (e.g. ROUTE POINT or other place) showing intermediate places on the way to a destination.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
 					</xsd:sequence>
@@ -846,11 +859,16 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:complexType name="Via_VersionedChildStructure">
 		<xsd:annotation>
-			<xsd:documentation>A secondary heading  (e.g. ROUTE POINT or other place) showing intermediate places on the way to a destination.</xsd:documentation>
+			<xsd:documentation>A secondary heading (e.g. ROUTE POINT or other place) showing intermediate places on the way to a destination.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="VersionedChildStructure">
 				<xsd:group ref="ViaGroup"/>
+				<xsd:attribute name="order" type="xsd:integer" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Relative order of ASSIGNMENT. -v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -890,7 +908,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="AllowedLineDirection" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="AllowedLineDirection" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A set of allowed DIRECTIONs that can be used on a given ROUTE.</xsd:documentation>
 		</xsd:annotation>
@@ -908,7 +926,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="AllowedLineDirectionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AllowedLineDirectionIdType"/>
+					<xsd:attribute name="id" type="AllowedLineDirectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -942,19 +960,24 @@ Rail transport, Roads and Road transport
 	<!-- ======================================================================= -->
 	<xsd:complexType name="linesInDirectionRefs_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a list of LINE in a specific DIRECTION</xsd:documentation>
+			<xsd:documentation>Type for a list of LINEs in a specific DIRECTION</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
-				<xsd:sequence>
-					<xsd:element ref="LineInDirectionRef" maxOccurs="unbounded"/>
-				</xsd:sequence>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="LineInDirectionRef">
+						<xsd:annotation>
+							<xsd:documentation>Reference to a LINE in a specific DIRECTION</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element ref="AllowedLineDirectionRef"/>
+				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="LineInDirectionRef" type="LineInDirectionRef_Structure" abstract="false">
+	<xsd:element name="LineInDirectionRef" type="LineInDirectionRef_Structure">
 		<xsd:annotation>
-			<xsd:documentation> Refrence to LINE in a specific DIRECTION</xsd:documentation>
+			<xsd:documentation>Reference to LINEs in a specific DIRECTION</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="LineInDirectionRef_Structure">
@@ -966,18 +989,18 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="DirectionRef" minOccurs="0"/>
 			<xsd:element name="ExternalLineRef" type="ExternalObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Alternative  LINE Reference  for AVMS system.</xsd:documentation>
+					<xsd:documentation>Alternative LINE Reference for AVMS system. DEPRECATED - v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ExternalDirectionRef" type="ExternalObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Alternative DIRECTION Reference  for AVMS system.</xsd:documentation>
+					<xsd:documentation>Alternative DIRECTION Reference for AVMS system. DEPRECATED -v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="NetworkView" abstract="false" substitutionGroup="DerivedView">
+	<xsd:element name="NetworkView" substitutionGroup="DerivedView">
 		<xsd:annotation>
 			<xsd:documentation>Simplified view of a NETWORK.</xsd:documentation>
 		</xsd:annotation>
@@ -1000,9 +1023,9 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>Name of NETWORK.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+					<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>TRANSPORT MODE of NETWORK.</xsd:documentation>
+							<xsd:documentation>PUBLIC TRANSPORT MODE of NETWORK.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
@@ -1010,7 +1033,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="LineView" abstract="false" substitutionGroup="DerivedView">
+	<xsd:element name="LineView" substitutionGroup="DerivedView">
 		<xsd:annotation>
 			<xsd:documentation>Simplified view of a LINE.</xsd:documentation>
 		</xsd:annotation>
@@ -1028,7 +1051,7 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="DerivedViewStructure">
 				<xsd:sequence>
 					<xsd:element ref="LineRef" minOccurs="0"/>
-					<xsd:element name="PublicCode" type="xsd:normalizedString" minOccurs="0">
+					<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of LINE.</xsd:documentation>
 						</xsd:annotation>
@@ -1043,9 +1066,9 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>Short name of LINE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+					<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>TRANSPORT MODE of LINE.</xsd:documentation>
+							<xsd:documentation>PUBLIC TRANSPORT MODE of LINE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:element ref="TransportSubmode" minOccurs="0"/>
@@ -1069,7 +1092,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DestinationDisplayView" abstract="false" substitutionGroup="DerivedView">
+	<xsd:element name="DestinationDisplayView" substitutionGroup="DerivedView">
 		<xsd:annotation>
 			<xsd:documentation>Simplified view of a DESTINATION DISPLAY. Includes derived properties of the DESTINATION DISPLAY.</xsd:documentation>
 		</xsd:annotation>
@@ -1099,7 +1122,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfLine" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfLine" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of a LINE according to its functional purpose. +v1.1.</xsd:documentation>
 		</xsd:annotation>
@@ -1117,8 +1140,8 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfLineIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Line">
+					<xsd:attribute name="id" type="TypeOfLineIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -1127,7 +1150,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfLine_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfLine_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF LINE. +v1.1</xsd:documentation>
 		</xsd:annotation>

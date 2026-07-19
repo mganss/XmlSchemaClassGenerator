@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_siteFrame_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_siteFrame_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_frames/netex_commonFrame_version.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_flexibleStopPlace_version.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_pointOfInterest_version.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_parking_version.xsd"/>
+	<xsd:include schemaLocation="../part1_ifopt/netex_rechargingPointAssignment_version.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_taxiPlace_version.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -26,6 +27,9 @@
 				</Date>
 				<Date>
 					<Modified>2017-05-27 CR0031 Add Countries to Places in Frame</Modified>
+				</Date>
+				<Date>
+					<Modified>2023-12-10 ENhancement: Add GROUP OF SITEs and GROUP OF TARIFF ZONEs to frame</Modified>
 				</Date>
 				<Description>
 					<p>NeTEx Network Exchange Site Frame.
@@ -75,23 +79,44 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="VersionFrameIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="SiteFrameRef" type="SiteFrameRefStructure" abstract="false" substitutionGroup="VersionFrameRef">
+	<xsd:element name="SiteFrameRef" type="SiteFrameRefStructure" substitutionGroup="VersionFrameRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a SITE FRAME.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="SiteFrameRefStructure" abstract="false">
+	<xsd:complexType name="SiteFrameRefStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a reference to a SITE FRAME.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
 			<xsd:restriction base="VersionFrameRefStructure">
 				<xsd:attribute name="ref" type="SiteFrameIdType" use="required"/>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassSiteFrameRefStructureType" default="SiteFrame">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for SiteFrameRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="SiteFrame" abstract="false" substitutionGroup="CommonFrame">
+	<xsd:element name="SiteFrame" substitutionGroup="CommonFrame">
 		<xsd:annotation>
 			<xsd:documentation>A coherent set of SITE data to which the same frame VALIDITY CONDITIONs have been assigned.</xsd:documentation>
 		</xsd:annotation>
@@ -112,12 +137,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SiteFrameGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SiteFrameIdType"/>
+					<xsd:attribute name="id" type="SiteFrameIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="Site_VersionFrameStructure" abstract="false">
+	<xsd:complexType name="Site_VersionFrameStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a SITE FRAME.</xsd:documentation>
 		</xsd:annotation>
@@ -145,6 +170,7 @@ Rail transport, Roads and Road transport
 				</xsd:annotation>
 			</xsd:group>
 			<xsd:group ref="SiteFacilitySetsInFrameGroup"/>
+			<xsd:group ref="RechargingPointAssignmentInFrameGroup"/>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
@@ -154,6 +180,11 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>SITE related elements in frame.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
+			<xsd:element name="groupsOfSites" type="groupsOfSites_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>GROUPS of SITESs in frame. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="groupsOfStopPlaces" type="groupsOfStopPlacesInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>GROUPS of STOP PLACEs in frame.</xsd:documentation>
@@ -171,7 +202,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="taxiRanks" type="taxiRanksInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TAXI RANKs in frame.</xsd:documentation>
+					<xsd:documentation>TAXI RANKs in frame. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="pointsOfInterest" type="pointsOfInterestInFrame_RelStructure" minOccurs="0">
@@ -215,7 +246,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="TariffZoneInFrameGroup">
 		<xsd:annotation>
-			<xsd:documentation>Service related elements in frame.</xsd:documentation>
+			<xsd:documentation>TARIFF ZONE related elements in frame.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="tariffZones" type="tariffZonesInFrame_RelStructure" minOccurs="0">

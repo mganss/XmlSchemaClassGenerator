@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_salesTransactionFrame_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_salesTransactionFrame_version">
 	<xsd:include schemaLocation="../part3_fares/netex_all_objects_part3_fares.xsd"/>
 	<xsd:include schemaLocation="../part3_salesTransactions/netex_all_objects_part3_salesTransactions.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_frames/netex_commonFrame_version.xsd"/>
@@ -16,9 +16,7 @@
 				<Date>
 					<Created>2012-11-00</Created>
 				</Date>
-				<Date>
-					<Modified>2017-06-20</Modified>
-					<!-- Add White lists, add Travel Documents -->
+				<Date><Modified>2017-06-20</Modified> Add White lists, add Travel Documents 
 				</Date>
 				<Date>
 					<Modified>2017-08-10</Modified>
@@ -29,8 +27,10 @@
 					Adjust References in Dependent packages.
 					-->
 				</Date>
+				<Date><Modified>2025-04-26</Modified> Add Spot Allocations
+				</Date>
 				<Description>
-					<p>NeTEx Network Exchange Sales Transaction  Frame.</p>
+					<p>NeTEx Network Exchange Sales Transaction Frame.</p>
 				</Description>
 				<Format>
 					<MediaType>text/xml</MediaType>
@@ -44,7 +44,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/ifopt/netex_xxxxx.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2025</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -63,7 +63,7 @@ Rail transport, Roads and Road transport
 </Category>
 					<Project>CEN TC278 WG3 SG9.</Project>
 				</Subject>
-				<Title>NeTEx Network Exchange   - SALES TRANSACTION FRAME types.</Title>
+				<Title>NeTEx Network Exchange- SALES TRANSACTION FRAME types.</Title>
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
@@ -78,7 +78,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="VersionFrameIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="SalesTransactionFrameRef" type="SalesTransactionFrameRefStructure" abstract="false" substitutionGroup="VersionFrameRef">
+	<xsd:element name="SalesTransactionFrameRef" type="SalesTransactionFrameRefStructure" substitutionGroup="VersionFrameRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a SALES TRANSACTION FRAME.</xsd:documentation>
 		</xsd:annotation>
@@ -94,6 +94,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a SALES TRANSACTION FRAME.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassSalesTransactionFrameRefStructureType" default="SalesTransactionFrame">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for SalesTransactionFrameRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -119,7 +140,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SalesTransactionFrameGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SalesTransactionFrameIdType"/>
+					<xsd:attribute name="id" type="SalesTransactionFrameIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -143,11 +164,16 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:group ref="RetailConsortiumInFrameGroup"/>
 			<xsd:group ref="FareContractsInFrameGroup"/>
-			<xsd:group ref="MediumAccessDevicesInFrameGroup"/>
+			<xsd:group ref="MediumAccessDevicesInFrameGroup">
+				<xsd:annotation>
+					<xsd:documentation>Elements for MEDIUM ACCESS DEVICES In FRAME. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
 			<xsd:group ref="SecurityListsInFrameGroup"/>
 			<xsd:group ref="SalesTransactionInFrameGroup"/>
 			<xsd:group ref="TravelDocumentsInFrameGroup"/>
 			<xsd:group ref="CustomerPurchasePackageInFrameGroup"/>
+			<xsd:group ref="SpotAllocationsInFrameGroup"/>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====Jouurney========================================-->

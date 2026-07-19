@@ -4,6 +4,7 @@
 	<xsd:include schemaLocation="netex_vehicleJourney_support.xsd"/>
 	<xsd:include schemaLocation="netex_passingTimes_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_journeyTiming_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_2/part2_occupancy/netex_oc_occupancy_version.xsd"/>
 	<!-- ======================================================================= -->
 	<!-- ==CLOSELY COUPLED ===================================================== -->
 	<xsd:annotation>
@@ -40,7 +41,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+					<Copyright>CEN, Crown Copyright 2009-2017</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -59,14 +60,14 @@ Rail transport, Roads and Road transport
 </Category>
 					<Project>CEN TC278 WG3 SG9.</Project>
 				</Subject>
-				<Title>NeTEx PASSING TIME    types.</Title>
+				<Title>NeTEx PASSING TIME types.</Title>
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: PASSING TIMES  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: PASSING TIMES types.</xsd:documentation>
 	</xsd:annotation>
-	<!-- ======================================================================= -->
-	<xsd:element name="PassingTime" type="PassingTime_VersionedChildStructure" abstract="false" substitutionGroup="VersionedChild">
+	<!-- ======PASSING TIME ================================================ -->
+	<xsd:element name="PassingTime" type="PassingTime_VersionedChildStructure" abstract="true" substitutionGroup="VersionedChild">
 		<xsd:annotation>
 			<xsd:documentation>PASSING TIME.</xsd:documentation>
 		</xsd:annotation>
@@ -94,10 +95,10 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether can alight and reboard at stop.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PointInJourneyPatternRef" minOccurs="0"/>
+			<xsd:element ref="PointInJourneyPatternRef"/>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ===WaitTime===================================================== -->
+	<!-- === TIMETABLED PASSING TIME ============================================ -->
 	<xsd:complexType name="timetabledPassingTimes_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of TIMETABLED PASSING TIME.</xsd:documentation>
@@ -110,7 +111,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TimetabledPassingTime" abstract="false" substitutionGroup="PassingTime">
+	<xsd:element name="TimetabledPassingTime" substitutionGroup="PassingTime">
 		<xsd:annotation>
 			<xsd:documentation>TIMETABLED PASSING TIME at TIMING POINT.</xsd:documentation>
 		</xsd:annotation>
@@ -131,6 +132,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimetabledPassingTimeGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
+					<xsd:attribute name="id" type="TimetabledPassingTimeIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -149,7 +151,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="TimetabledPassingTimeGroup">
 		<xsd:annotation>
-			<xsd:documentation>TIEMTABLED PASSING TIME elements.</xsd:documentation>
+			<xsd:documentation>TIMETABLED PASSING TIME elements.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="ArrivalTime" type="xsd:time" minOccurs="0">
@@ -159,7 +161,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="ArrivalDayOffset" type="DayOffsetType" default="0" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Number of days after the starting time of the journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+					<xsd:documentation>Number of days after the starting time of the journey if not same calendar day. Default is 0 for same day.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DepartureTime" type="xsd:time" minOccurs="0">
@@ -169,7 +171,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="DepartureDayOffset" type="DayOffsetType" default="0" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Number of days after the starting time of the journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+					<xsd:documentation>Number of days after the starting time of the journey if not same calendar day. Default is 0 for same day.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="WaitingTime" type="xsd:duration" minOccurs="0">
@@ -189,7 +191,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="LatestArrivalDayOffset" type="DayOffsetType" default="0" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Number of days after the starting time of the journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+					<xsd:documentation>Number of days after the starting time of the journey if not same calendar day. Default is 0 for same day.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="EarliestDepartureTime" type="xsd:time" minOccurs="0">
@@ -199,7 +201,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="EarliestDepartureDayOffset" type="DayOffsetType" default="0" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Number of days after the starting time of the journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
+					<xsd:documentation>Number of days after the starting time of the journey if not same calendar day. Default is 0 for same day.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="occupancies" type="OccupancyView_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>OCCUPANCYs associated with this journey. +v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

@@ -22,6 +22,8 @@
 				</Date>
 				<Date><Modified>2021-07-07</Modified>NewModesAdd TimeOfDayEnumeration with dawn, dusk 
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines DAY TYPE types </p>
 				</Description>
@@ -67,7 +69,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="DayType_" maxOccurs="unbounded"/>
+					<xsd:element ref="DayType_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -86,7 +88,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:complexType name="groupOfTimebandsInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  GROUP OF TIME BANDs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of GROUP OF TIME BANDs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -105,7 +107,7 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="DayTypeRef"/>
-					<xsd:element ref="DayType_">
+					<xsd:element ref="DayType_Dummy">
 						<xsd:annotation>
 							<xsd:documentation>A type of day characterized by one or more properties which affect public transport operation. For example: weekday in school holidays.</xsd:documentation>
 						</xsd:annotation>
@@ -114,12 +116,12 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DayType_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+	<xsd:element name="DayType_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Supertype for DAY TYPE.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="DayType" substitutionGroup="DayType_">
+	<xsd:element name="DayType" substitutionGroup="DayType_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A type of day characterized by one or more properties which affect public transport operation. For example: weekday in school holidays.</xsd:documentation>
 		</xsd:annotation>
@@ -137,7 +139,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DayTypeGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DayTypeIdType"/>
+					<xsd:attribute name="id" type="DayTypeIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -174,7 +176,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Description of DAY TYPE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:group ref="DaySpanGroup">
 				<xsd:annotation>
 					<xsd:documentation>DAY TYPE length.</xsd:documentation>
@@ -247,7 +253,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimeSpanGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimebandIdType"/>
+					<xsd:attribute name="id" type="TimebandIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -286,7 +292,7 @@ Rail transport, Roads and Road transport
 				</xsd:element>
 				<xsd:element name="StartEvent" type="TimeOfDayEnumeration">
 					<xsd:annotation>
-						<xsd:documentation>Event marking start of timeband, e.,g  , dusk +V1.2.2 dawn</xsd:documentation>
+						<xsd:documentation>Event marking start of timeband, e.g., dusk, dawn. +v1.2.2</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 			</xsd:choice>
@@ -300,7 +306,7 @@ Rail transport, Roads and Road transport
 						</xsd:element>
 						<xsd:element name="EndEvent" type="TimeOfDayEnumeration" minOccurs="0">
 							<xsd:annotation>
-								<xsd:documentation>Event marking start of timeband, e.,g  dawn, dusk. +V1.2.2 dawn</xsd:documentation>
+								<xsd:documentation>Event marking end of timeband, e.g., dusk, dawn. +v1.2.2</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
 					</xsd:choice>
@@ -361,7 +367,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfTimebandsIdType"/>
+					<xsd:attribute name="id" type="GroupOfTimebandsIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

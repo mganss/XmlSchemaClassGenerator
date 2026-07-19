@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_call_support">
 	<xsd:include schemaLocation="../../netex_part_1/part1_tacticalPlanning/netex_journeyPattern_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_responsibility/netex_relationship_support.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -66,12 +67,6 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="PointInJourneyPatternIdType"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="DatedCallIdType">
-		<xsd:annotation>
-			<xsd:documentation>Type for identifier of a DATED CALL.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:restriction base="CallIdType"/>
-	</xsd:simpleType>
 	<!-- ======================================================================= -->
 	<xsd:simpleType name="DeadRunCallIdType">
 		<xsd:annotation>
@@ -79,4 +74,44 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="CallIdType"/>
 	</xsd:simpleType>
+	<xsd:element name="CallRef" type="CallRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a CALL.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="CallRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to an ADDRESSED PLACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="CallIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of an AddressedPlace.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassCallRefStructureType" default="Call">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for CallRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
 </xsd:schema>

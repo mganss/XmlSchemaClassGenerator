@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_vehicleType_version">
+	<xsd:include schemaLocation="netex_vehicle_support.xsd"/>
+	<xsd:include schemaLocation="netex_vehicleType_version.xsd"/>
+	<xsd:include schemaLocation="netex_trainElementType_support.xsd"/>
+	<xsd:include schemaLocation="netex_nm_fleetEquipment_support.xsd"/>
+	<xsd:include schemaLocation="netex_nm_fleet_support.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date>
+					<Created>2010-09-04</Created>
+				</Date>
+				<Date><Modified>2011-02-05</Modified>Name Space changes
+				</Date>
+				<Date><Modified>2017-03-27</Modified>CR0001 - Vehicle Dimensions added.
+				</Date>
+				<Date><Modified>2019-03-25</Modified>NL31 CD #60 Add new attributes BoardingHeight and GapToPlatform attributes to VehicleType. 
+					 NJSK Review correct data types of new attributes to be of LengthType
+				</Date>
+				<Date><Modified>2021-07-07</Modified>NewModes-Power Description attribute to NVehicleEquipmentProfile
+				</Date>
+				<Date><Modified>2020-10-05</Modified> New Modes: Add Vehicle  mode  to VehicleType					
+					 Refactor VehicleType into TarnsportType, VehicleType and PesonalVehicleType
+					   Replace Vehicle OperatorRef with TransportOrganisationRef.
+					   Add VehicleModelRef to Vehicle.
+					   Add ModelProfileRef to VehicleModel
+					   Add Description to Vehicle.
+					   Add PropulsionType . and MaximumRange to TransportType
+				</Date>
+				<Date><Modified>2021-07-08</Modified>NewModes: Correction Add missing VehicleEquipmentProfile relationship to VehicleModel
+				</Date>
+				<Date><Modified>2023-01-30</Modified>TM CR: Enhancement Add Accepted Driver Permit
+				</Date>
+				<Date><Modified>2024-02-07</Modified>Fix - allow default DEck Plan or TRANSPORT TYPE, move VehiclesInFramegroup her 
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the VEHICLE TYPE types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_reusableComponents}netex_vehicleType_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx VEHICLE TYPE types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>VEHICLE data types</xsd:documentation>
+	</xsd:annotation>
+	<xsd:group name="VehicleInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a VEHICLE in frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="vehicles" type="vehiclesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLEs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="rollingStockInventories" type="rollingStockInventories_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ROLLING STOCK INVENTORies in frame. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="vehiclesInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of VEHICLEs. NB SLight breaaka v2.0 v2 Vehicle ELement moved to</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Vehicle" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==== VEHICLE ===================================================== -->
+	<xsd:complexType name="vehicles_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="VehicleRef"/>
+					<xsd:element ref="Vehicle">
+						<xsd:annotation>
+							<xsd:documentation>An area within a Site. May be connected to Quays by PATH LINKs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Vehicle" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A public transport vehicle used for carrying passengers.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Vehicle_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of VEHICLE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Vehicle_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="VehicleGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="VehicleParticularsGroup"/>
+			<xsd:group ref="VehicleCodeGroup"/>
+			<xsd:element ref="TransportOrganisationRef" minOccurs="0"/>
+			<xsd:element ref="ContactRef" minOccurs="0"/>
+			<xsd:element ref="TransportTypeRef" minOccurs="0"/>
+			<xsd:element ref="VehicleModelRef" minOccurs="0"/>
+			<xsd:element name="equipmentProfiles" type="vehicleEquipmentProfileRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Equipment profiles associated with model. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="VehicleModelProfileRef" minOccurs="0"/>
+			<xsd:element name="actualVehicleEquipments" type="equipments_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ACTUAL EQUIPMENT found in VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Monitored" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether real-time data is available for the VEHICLE (this can be the vehicle position, but also the speed, charging level, passenger counting, etc.). Overrides the corresponding value in VehicleType.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="VehicleParticularsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Short Name of VEHICLE or item</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description +V1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BuildDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Build date _V2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ChassisNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Chassis number +V2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RegistrationNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Registration number of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RegistrationDate" type="xsd:date" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Date of registration or commissioning - may be used to determine the age of a vehice.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== ROLLING STOCK INVENTORY ================================================= -->
+	<xsd:element name="RollingStockItem_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A specific instance of an elementary unit of rolling stock (e.g., railcar, wagon, locomotive). Its properties are given by a TRAIN ELEMENT TYPE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="rollingStockItems_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ROLLING STOCK ITEMs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="RollingStockItemRef"/>
+					<xsd:element ref="RollingStockItem_Dummy">
+						<xsd:annotation>
+							<xsd:documentation>An area within a Site. May be connected to Quays by PATH LINKs.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RollingStockItem" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A specific instance of an elementary unit of rolling stock (e.g., railcar, wagon, locomotive). Its properties are given by a TRAIN ELEMENT TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="RollingStockItem_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RollingStockItemGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="RollingStockItemIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ROLLING STOCK ITEM.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="RollingStockItem_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Vehicle_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="RollingStockItemGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RollingStockItemGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="RollingStockType" type="TrainElementTypeTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Fixed classication of ROLLING STOCK ITEM.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfRollingStockRef" minOccurs="0"/>
+			<xsd:element name="facilities" type="ServiceFacilitySet_VersionStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Faciliies found in ROLLING STOCK ITEM.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== TRAILING ROLLING STOCK ITEM ===================================================== -->
+	<xsd:element name="TrailingRollingStockItem" substitutionGroup="RollingStockItem_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>An unpowered item of rolling stock such as a specific passenger carriage, luggage van, passenger vehicle carrier wagon or freight wagon. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TrailingRollingStockItem_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RollingStockItemGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TrailingRollingStockItemGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TrailingRollingStockItemIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of TRAILING ROLLING STOCK ITEM</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TrailingRollingStockItem_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TRAILING ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="RollingStockItem_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TrailingRollingStockItemGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TrailingRollingStockItemGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for TRAILING ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TrailingElementTypeRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== TRACTIVE ROLLING STOCK ITEM ===================================================== -->
+	<xsd:element name="TractiveRollingStockItem" substitutionGroup="RollingStockItem_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A powered item of rolling stock, such as a specific locomotive or powered railcar. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TractiveRollingStockItem_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VehicleGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RollingStockItemGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TractiveRollingStockItemGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TractiveRollingStockItemIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TractiveRollingStockItem_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TRACTIVE ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="RollingStockItem_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TractiveRollingStockItemGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TractiveRollingStockItemGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for TRACTIVE ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="TractiveElementTypeRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== ROLLING STOCK INVENTORY ===================================================== -->
+	<xsd:complexType name="rollingStockInventories_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ROLLING STOCK INVENTORies..</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="RollingStockInventory">
+						<xsd:annotation>
+							<xsd:documentation>A collection of ROLLING STOCK ITEMs of any type used to assemble trains. +v.2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RollingStockInventory" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>A collection of rolling stock of any type used to assemble trains. +v.2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="RollingStockInventory_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RollingStockInventoryGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TrailingRollingStockItemIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ROLLING STOCK ITEM.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="RollingStockInventory_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a ROLLING STOCK INVENTORY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="RollingStockInventoryGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RollingStockInventoryGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for ROLLING STOCK INVENTORY</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of ROLLING STOCK INVENTORY</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TransportOrganisationRef" minOccurs="0"/>
+			<xsd:element name="rollingStockItems" type="rollingStockItems_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Faciliies found in ROLLING STOCK ITEM.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ===== TYPE OF ROLLING STOCK =================================================== -->
+	<xsd:element name="TypeOfRollingStock" type="TypeOfRollingStock_ValueStructure" substitutionGroup="TypeOfEntity">
+		<xsd:annotation>
+			<xsd:documentation>A classification of a ROLLING STOCK ITEM according to its functional purpose. +v1.1.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfRollingStock_ValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF ROLLING STOCK. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfEntity_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

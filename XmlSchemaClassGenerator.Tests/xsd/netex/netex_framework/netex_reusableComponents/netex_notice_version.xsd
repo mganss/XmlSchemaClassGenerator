@@ -18,6 +18,8 @@
 				<Date>
 					<Modified>2017-03-24  CR004 Add Short name</Modified>
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines common NOTICE identifier  types.</p>
 				</Description>
@@ -53,13 +55,13 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NetEX: NOTICE  types for NeTEx Network Exchange.</xsd:documentation>
+		<xsd:documentation>NetEX: NOTICE types for NeTEx Network Exchange.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ======================================================================= -->
 	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
 	<xsd:complexType name="noticesInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  NOTICEs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of NOTICEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -83,7 +85,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="Notice" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="Notice" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A note or footnote about any aspect of a service, e.g. an announcement, notice, etc. May have different DELIVERY VARIANTs for different media.</xsd:documentation>
 		</xsd:annotation>
@@ -101,7 +103,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="NoticeGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="NoticeIdType"/>
+					<xsd:attribute name="id" type="NoticeIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -156,7 +158,7 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Text content of NOTICe.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="PublicCode" type="xsd:normalizedString" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Alternative code associated with Notice.</xsd:documentation>
 				</xsd:annotation>
@@ -166,7 +168,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Alternative short code associated with Notice.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="TypeOfNoticeRef" minOccurs="0"/>
 			<xsd:element name="CanBeAdvertised" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
@@ -189,7 +195,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DeliveryVariant" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="DeliveryVariant" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A variant text of a NOTICE for use in a specific media or delivery channel (voice, printed material, etc).</xsd:documentation>
 		</xsd:annotation>
@@ -207,7 +213,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DeliveryVariantGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DeliveryVariantIdType"/>
+					<xsd:attribute name="id" type="DeliveryVariantIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -221,9 +227,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="DeliveryVariantGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Presentation Order of variant.</xsd:documentation>
+						<xsd:documentation>Presentation Order of variant. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -236,7 +242,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="ParentRef" type="VersionOfObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Parent of  DELIVERY VARIANT.</xsd:documentation>
+					<xsd:documentation>Parent of DELIVERY VARIANT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DeliveryVariantMediaType" type="DeliveryVariantTypeEnumeration" default="other" minOccurs="0">
@@ -247,13 +253,13 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="TypeOfDeliveryVariantRef" minOccurs="0"/>
 			<xsd:element name="VariantText" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>NOTICE variant  text.</xsd:documentation>
+					<xsd:documentation>NOTICE variant text.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfNotice" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfNotice" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of a NOTICE according to its functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -271,12 +277,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfNoticeIdType"/>
+					<xsd:attribute name="id" type="TypeOfNoticeIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfNotice_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfNotice_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF NOTICe.</xsd:documentation>
 		</xsd:annotation>
@@ -285,7 +291,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfDeliveryVariant" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfDeliveryVariant" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of DELIVERY VARIANT according to its functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -303,12 +309,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfDeliveryVariantIdType"/>
+					<xsd:attribute name="id" type="TypeOfDeliveryVariantIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfDeliveryVariant_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfDeliveryVariant_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF DELIVERY VARIANT.</xsd:documentation>
 		</xsd:annotation>

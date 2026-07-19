@@ -18,7 +18,7 @@
 					<Modified>2021-09-02</Modified>
 				</Date>
 				<Description>
-					<p>NeTEx - Network Exchange. This subschema defines CHARGING EQUIPMENT PROFILE base types.</p>
+					<p>NeTEx - Network Exchange. This subschema defines RECHARGING EQUIPMENT PROFILE base types.</p>
 				</Description>
 				<Format>
 					<MediaType>text/xml</MediaType>
@@ -48,36 +48,20 @@ Rail transport, Roads and Road transport
 </Category>
 					<Project>CEN TC278 WG3 SG9.</Project>
 				</Subject>
-				<Title>NeTEx Network Exchange - CHARGING EQUIPMENT PROFILE Types of Equipment.</Title>
+				<Title>NeTEx Network Exchange - RECHARGING EQUIPMENT PROFILE Types of Equipment.</Title>
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>CHARGING EQUIPMENT PROFILE types for NeTEx.</xsd:documentation>
+		<xsd:documentation>RECHARGING EQUIPMENT PROFILE types for NeTEx.</xsd:documentation>
 	</xsd:annotation>
-	<!-- === VEHICLE CHARGING EQUIPMENT PROFILE ============================================ -->
-	<xsd:complexType name="chargingEquipmenProfilesInFrame_RelStructure">
-		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of CHARGING EQUIPMENT PROFILEs.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="containmentAggregationStructure">
-				<xsd:sequence>
-					<xsd:element ref="ChargingEquipmentProfile" maxOccurs="unbounded">
-						<xsd:annotation>
-							<xsd:documentation>Charging equipment profile for VEHICLE.</xsd:documentation>
-						</xsd:annotation>
-					</xsd:element>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-	<xsd:element name="ChargingEquipmentProfile" substitutionGroup="DataManagedObject">
+	<!-- === VEHICLE RECHARGING EQUIPMENT PROFILE ============================================ -->
+	<xsd:element name="RechargingEquipmentProfile" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Specialisation of VEHICLE EQUIPMENT PROFILE describing vehicle charging features.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:restriction base="ChargingEquipmentProfile_VersionStructure">
+				<xsd:restriction base="RechargingEquipmentProfile_VersionStructure">
 					<xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
@@ -87,36 +71,36 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:group ref="VehicleEquipmentProfileGroup"/>
 						<xsd:sequence>
-							<xsd:group ref="ChargingEquipmentProfileGroup"/>
+							<xsd:group ref="RechargingEquipmentProfileGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ChargingEquipmentProfileIdType" use="optional">
+					<xsd:attribute name="id" type="RechargingEquipmentProfileIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+							<xsd:documentation>Identifier of RECHARGING EQUIPMENT PROFILE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ChargingEquipmentProfile_VersionStructure" abstract="false">
+	<xsd:complexType name="RechargingEquipmentProfile_VersionStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a CHARGING EQUIPMENT PROFILE.</xsd:documentation>
+			<xsd:documentation>Type for a RECHARGING EQUIPMENT PROFILE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="VehicleEquipmentProfile_VersionStructure">
 				<xsd:sequence>
-					<xsd:group ref="ChargingEquipmentProfileGroup"/>
+					<xsd:group ref="RechargingEquipmentProfileGroup"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:group name="ChargingEquipmentProfileGroup">
+	<xsd:group name="RechargingEquipmentProfileGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for CHARGING EQUIPMENT PROFILE.</xsd:documentation>
+			<xsd:documentation>Elements for RECHARGING EQUIPMENT PROFILE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="CouplingType" type="CouplingTypeEnumeration" minOccurs="0">
+			<xsd:element name="PowerCouplingType" type="PowerCouplingTypeEnumeration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Type of coupling. See allowed values.</xsd:documentation>
 				</xsd:annotation>
@@ -134,26 +118,27 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="ChargingVoltage" type="VoltageType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>CHarging voltage in Volts.
-</xsd:documentation>
+					<xsd:documentation>Charging voltage in volts.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="MaximumChargingPower" type="WattageType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Maximum charging power in Watts, available, determining how long charging willtake
-
-</xsd:documentation>
+					<xsd:documentation>Maximum charging power in watts, determining how long charging will take.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="PreparationDuration" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Normal period need to set up charging.
-</xsd:documentation>
+					<xsd:documentation>Typical time period needed to set up the charging process.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="FinalisationDuration" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Normal time to decouple after charging.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="compatibleWith" type="compatibleEquipmentRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Compatible equipment. +V2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

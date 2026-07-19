@@ -21,6 +21,8 @@
 				</Date>
 				<Date><Modified>2011-03-12</Modified>NORWAY-105 Add MinimumDuration to TimeInterval.
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the TIME STRUCTURE FACTOR types.</p>
@@ -60,7 +62,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: TIME STRUCTURE FACTOR   types.</xsd:documentation>
+		<xsd:documentation>NeTEx: TIME STRUCTURE FACTOR types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME==== ================================================== -->
 	<xsd:group name="TimeFactorsInFrameGroup">
@@ -70,17 +72,17 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="timeUnits" type="timeUnits_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TIME UNITs in  Frame.</xsd:documentation>
+					<xsd:documentation>TIME UNITs in Frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="timeIntervals" type="timeIntervals_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TIME INTERVALs in  Frame.</xsd:documentation>
+					<xsd:documentation>TIME INTERVALs in Frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="timeStructureFactors" type="timeStructureFactors_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TIME STRUCTURE FACTORS in  Frame.</xsd:documentation>
+					<xsd:documentation>TIME STRUCTURE FACTORS in Frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -103,7 +105,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TimeUnit" abstract="false" substitutionGroup="PriceableObject">
+	<xsd:element name="TimeUnit" substitutionGroup="PriceableObject">
 		<xsd:annotation>
 			<xsd:documentation>A factor influencing access rights definition or calculation of prices.</xsd:documentation>
 		</xsd:annotation>
@@ -125,7 +127,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 							<xsd:element name="Duration" type="xsd:duration" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Duration of Unit, eg   P1D,  P1S, etc.</xsd:documentation>
+									<xsd:documentation>Duration of Unit, eg P1D, P1S, etc.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 							<xsd:element name="prices" type="timeUnitPrices_RelStructure" minOccurs="0">
@@ -135,7 +137,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimeUnitIdType"/>
+					<xsd:attribute name="id" type="TimeUnitIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -162,7 +164,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Duration" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Duration of Unit, eg   P1D,  P1S, etc.</xsd:documentation>
+					<xsd:documentation>Duration of Unit, eg P1D, P1S, etc.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="prices" type="timeUnitPrices_RelStructure" minOccurs="0">
@@ -190,7 +192,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TimeInterval" abstract="false" substitutionGroup="PriceableObject_">
+	<xsd:element name="TimeInterval" substitutionGroup="PriceableObject_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A factor influencing access rights definition or calculation of prices.</xsd:documentation>
 		</xsd:annotation>
@@ -211,7 +213,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimeIntervalGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimeIntervalIdType"/>
+					<xsd:attribute name="id" type="TimeIntervalIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -283,7 +285,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TimeStructureFactor" abstract="false" substitutionGroup="PriceableObject">
+	<xsd:element name="TimeStructureFactor" substitutionGroup="PriceableObject">
 		<xsd:annotation>
 			<xsd:documentation>The value of a TIME INTERVAL or a DISTANCE MATRIX ELEMENT expressed by a TIME UNIT.</xsd:documentation>
 		</xsd:annotation>
@@ -301,7 +303,11 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PriceableObjectGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
-							<xsd:element ref="PrivateCode" minOccurs="0"/>
+							<xsd:element ref="PrivateCode" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
 							<xsd:element ref="TypeOfFareStructureFactorRef" minOccurs="0"/>
 							<xsd:element name="Factor" type="xsd:anyType" minOccurs="0">
 								<xsd:annotation>
@@ -313,7 +319,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimeStructureFactorGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimeStructureFactorIdType" use="optional"/>
+					<xsd:attribute name="id" type="TimeStructureFactorIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -343,7 +349,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- == TIME UNIT PRICE.================================ -->
-	<xsd:element name="TimeUnitPrice" substitutionGroup="FarePrice_">
+	<xsd:element name="TimeUnitPrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a TIME UNIT: default total price etc.</xsd:documentation>
 		</xsd:annotation>
@@ -364,7 +370,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimeUnitPriceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimeUnitPriceIdType"/>
+					<xsd:attribute name="id" type="TimeUnitPriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -382,7 +388,7 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>A set of all possible price features of a TIME UNIT : default total price, discount in value or percentage etc.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -408,7 +414,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- == TIME INTERVAL PRICE.================================ -->
-	<xsd:element name="TimeIntervalPrice" substitutionGroup="FarePrice_">
+	<xsd:element name="TimeIntervalPrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a TIME INTERVAL: default total price etc.</xsd:documentation>
 		</xsd:annotation>
@@ -429,7 +435,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TimeIntervalPriceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TimeIntervalPriceIdType"/>
+					<xsd:attribute name="id" type="TimeIntervalPriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -447,7 +453,7 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>A set of all possible price features of a TIME INTERVAL : default total price, discount in value or percentage etc.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>

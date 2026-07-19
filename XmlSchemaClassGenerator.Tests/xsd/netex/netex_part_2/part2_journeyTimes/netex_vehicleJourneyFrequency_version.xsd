@@ -64,12 +64,12 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: VEHICLE JOURNEY FREQUENCY  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: VEHICLE JOURNEY FREQUENCY types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SERVICE FRAME)=================================================== -->
 	<xsd:complexType name="frequencyGroupsInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of  OURNEY FREQUENCY GROUPs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of OURNEY FREQUENCY GROUPs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
@@ -99,7 +99,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Descriptive phrase to use for frequency. e.g. "Every x minus"  If not specified generate from individual elements.</xsd:documentation>
+					<xsd:documentation>Descriptive phrase to use for frequency. e.g. "Every x minus" If not specified generate from individual elements.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -122,7 +122,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="VehicleJourneyHeadway" abstract="false" substitutionGroup="JourneyTiming">
+	<xsd:element name="VehicleJourneyHeadway" substitutionGroup="JourneyTiming">
 		<xsd:annotation>
 			<xsd:documentation>Headway interval information that is available for a VEHICLE JOURNEY (to be understood as the delay between the previous and the next VEHICLE JOURNEY). This information must be consistent with HEADWAY JOURNEY GROUP if available (HEADWAY JOURNEY GROUP being a more detailed way of describing headway services).</xsd:documentation>
 		</xsd:annotation>
@@ -146,7 +146,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleJourneyHeadwayGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleJourneyHeadwayIdType"/>
+					<xsd:attribute name="id" type="VehicleJourneyHeadwayIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -199,7 +199,7 @@ Rail transport, Roads and Road transport
 	</xsd:element>
 	<xsd:complexType name="JourneyFrequencyGroup_VersionStructure" abstract="true">
 		<xsd:annotation>
-			<xsd:documentation>Type for   JOURNEY FREQUENCY GROUP.</xsd:documentation>
+			<xsd:documentation>Type for JOURNEY FREQUENCY GROUP.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="GroupOfEntities_VersionStructure">
@@ -212,26 +212,52 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements for a JOURNEY FREQUENCY GROUP.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="FirstDepartureTime" type="xsd:time">
-				<xsd:annotation>
-					<xsd:documentation>Time of first departure in JOURNEY FREQUENCY GROUP.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="FirstDayOffset" type="DayOffsetType" default="0" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Offset days for end time. Number of days after the starting operational day if journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="LastDepartureTime" type="xsd:time" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Time of last departure in JOURNEY FREQUENCY GROUP.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="LastDayOffset" type="DayOffsetType" default="0" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Offset days for end time. Number of days after the starting departure time of the journey if  not same calendar day. Default is 0 for same day.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:element name="FirstDepartureTime" type="xsd:time">
+						<xsd:annotation>
+							<xsd:documentation>Time of first departure in JOURNEY FREQUENCY GROUP at the first stop.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="FirstDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Offset days for the first departure time. Number of days after the starting operational day if journey if not on the same calendar day. Default is 0 for the same day.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="LastDepartureTime" type="xsd:time" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Time of last departure in JOURNEY FREQUENCY GROUP.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="LastDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Offset days for the last departure time. Number of days after the last departure time of the journey if not same calendar day. Default is 0 for the same day.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="FirstArrivalTime" type="xsd:time">
+						<xsd:annotation>
+							<xsd:documentation>Time of first arrival in JOURNEY FREQUENCY GROUP at the last stop.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="FirstDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Offset days for the first arrival time. Number of days after the first arrival time of the journey if not same calendar day. Default is 0 for the same day.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="LastArrivalTime" type="xsd:time" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Time of last arrival in JOURNEY FREQUENCY GROUP.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="LastDayOffset" type="DayOffsetType" default="0" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Offset days for the last arrival time. Number of days after the last arrival time of the journey if not same calendar day. Default is 0 for the same day.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:choice>
 			<xsd:element name="timeDemandTypes" type="timeDemandTypeRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>TIME DEMAND TYPES associated with JOURNEY FREQUENCY GROUP.</xsd:documentation>
@@ -245,7 +271,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="HeadwayJourneyGroup" abstract="false" substitutionGroup="JourneyFrequencyGroup">
+	<xsd:element name="HeadwayJourneyGroup" substitutionGroup="JourneyFrequencyGroup">
 		<xsd:annotation>
 			<xsd:documentation>A group of VEHICLE JOURNEYs following the same JOURNEY PATTERN and having the same headway interval between a specified start and end time (for example, ‘every 10 minutes’). This is especially useful for presenting passenger information.</xsd:documentation>
 		</xsd:annotation>
@@ -265,12 +291,12 @@ Rail transport, Roads and Road transport
 						<xsd:group ref="JourneyFrequencyGroupGroup"/>
 						<xsd:group ref="HeadwayJourneyGroupGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="HeadwayJourneyGroupIdType"/>
+					<xsd:attribute name="id" type="HeadwayJourneyGroupIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="HeadwayJourneyGroup_VersionStructure" abstract="false">
+	<xsd:complexType name="HeadwayJourneyGroup_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for HEADWAY JOURNEY GROUP.</xsd:documentation>
 		</xsd:annotation>
@@ -294,9 +320,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="RhythmicalJourneyGroup" abstract="false" substitutionGroup="JourneyFrequencyGroup">
+	<xsd:element name="RhythmicalJourneyGroup" substitutionGroup="JourneyFrequencyGroup">
 		<xsd:annotation>
-			<xsd:documentation>A group of VEHICLE JOURNEYS following  the same JOURNEY PATTERN having the same "rhythm" every hour (for example runs all xxh10, xxh25 and xxh45... e) between a specified start and end time.</xsd:documentation>
+			<xsd:documentation>A group of VEHICLE JOURNEYS following the same JOURNEY PATTERN having the same "rhythm" every hour (for example runs all xxh10, xxh25 and xxh45... e) between a specified start and end time.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -314,14 +340,14 @@ Rail transport, Roads and Road transport
 						<xsd:group ref="JourneyFrequencyGroupGroup"/>
 						<xsd:group ref="RhythmicalJourneyGroupGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="RhythmicalJourneyGroupIdType"/>
+					<xsd:attribute name="id" type="RhythmicalJourneyGroupIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="RhythmicalJourneyGroup_VersionStructure" abstract="false">
+	<xsd:complexType name="RhythmicalJourneyGroup_VersionStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for   Rhythmical JOURNEY GROUP.</xsd:documentation>
+			<xsd:documentation>Type for Rhythmical JOURNEY GROUP.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="JourneyFrequencyGroup_VersionStructure">

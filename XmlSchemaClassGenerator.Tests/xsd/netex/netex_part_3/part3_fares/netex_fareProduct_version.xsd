@@ -39,6 +39,8 @@
 					Add new atrribute   ProductType to     AmountOfPriceUnitFareProduct with values  tripCarnet, passCarnet, unitCoupons, other., 																					     </Date>
 				<Date><Modified>2020-12-12</Modified>NEWMdoes - allow any type of ORGANMISATION to own product 
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the FARE PRODUCT types.</p>
@@ -78,7 +80,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: FARE PRODUCT  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: FARE PRODUCT types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in FARE FRAME)=================================================== -->
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in FARE FRAME)=================================================== -->
@@ -111,22 +113,20 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="frameContainmentStructure">
 				<xsd:sequence>
-					<xsd:element ref="FareProduct_" maxOccurs="unbounded"/>
+					<xsd:element ref="FareProduct_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ====FARE PRODUCT=================================================== -->
-	<xsd:element name="ServiceAccessRight_" type="DataManagedObjectStructure" abstract="false" substitutionGroup="PriceableObject_">
+	<xsd:element name="ServiceAccessRight_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="PriceableObject_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>An immaterial marketable element 
-</xsd:documentation>
+			<xsd:documentation>An immaterial marketable element</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="ServiceAccessRight" abstract="false" substitutionGroup="ServiceAccessRight_">
+	<xsd:element name="ServiceAccessRight" substitutionGroup="ServiceAccessRight_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>An immaterial marketable element dedicated to accessing some services.
-</xsd:documentation>
+			<xsd:documentation>An immaterial marketable element dedicated to accessing some services.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -145,14 +145,14 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ServiceAccessRightGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ServiceAccessRightIdType"/>
+					<xsd:attribute name="id" type="ServiceAccessRightIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:complexType name="ServiceAccessRight_VersionStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for  SERVICE ACCESS RIGHT.</xsd:documentation>
+			<xsd:documentation>Type for SERVICE ACCESS RIGHT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="PriceableObject_VersionStructure">
@@ -164,7 +164,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="ServiceAccessRightGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for a  SERVICE ACCESS RIGHT.</xsd:documentation>
+			<xsd:documentation>Elements for a SERVICE ACCESS RIGHT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:group ref="ProductDescriptionGroup"/>
@@ -172,10 +172,14 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="ProductDescriptionGroup">
 		<xsd:annotation>
-			<xsd:documentation>DescriptionElements for a  PRODUCT.</xsd:documentation>
+			<xsd:documentation>DescriptionElements for a PRODUCT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="InfoUrl" type="xsd:anyURI" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>URL for further information.</xsd:documentation>
@@ -189,16 +193,14 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====FARE PRODUCT=================================================== -->
-	<xsd:element name="FareProduct_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="ServiceAccessRight_">
+	<xsd:element name="FareProduct_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="ServiceAccessRight_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>An immaterial marketable element (access rights, discount rights etc), specific to a CHARGING MOMENT.
-</xsd:documentation>
+			<xsd:documentation>An immaterial marketable element (access rights, discount rights etc), specific to a CHARGING MOMENT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="FareProduct" abstract="true" substitutionGroup="FareProduct_">
+	<xsd:element name="FareProduct" abstract="true" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>An immaterial marketable element (access rights, discount rights etc), specific to a CHARGING MOMENT.
-</xsd:documentation>
+			<xsd:documentation>An immaterial marketable element (access rights, discount rights etc), specific to a CHARGING MOMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -220,7 +222,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareProductGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareProductIdType"/>
+					<xsd:attribute name="id" type="FareProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -271,7 +273,11 @@ Rail transport, Roads and Road transport
 					</xsd:annotation>
 				</xsd:element>
 			</xsd:choice>
-			<xsd:element ref="OrganisationRef_" minOccurs="0"/>
+			<xsd:element ref="OrganisationRef_Dummy" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>ORGANISATION in charge of the FARE PRODUCT. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="ConditionSummary" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
@@ -300,12 +306,12 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="tariffs" type="tariffRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TARIFFs  used by FARE PRODUCT. These may be derived from lower level references.</xsd:documentation>
+					<xsd:documentation>TARIFFs used by FARE PRODUCT. These may be derived from lower level references.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="prices" type="fareProductPrices_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>PRICEs  making up FARE PRODUCT.</xsd:documentation>
+					<xsd:documentation>PRICEs making up FARE PRODUCT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -332,10 +338,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TypeOfFareProduct" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfFareProduct" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
-			<xsd:documentation>A classification of FARE PRODUCTs expressing their general functionalities and local functional characteristics specific to the operator. Types of FARE PRODUCTs like e.g. throw-away ticket, throw-away ticket unit, value card, electronic purse allowing access, public transport credit card etc. may be used to define these categories.
-</xsd:documentation>
+			<xsd:documentation>A classification of FARE PRODUCTs expressing their general functionalities and local functional characteristics specific to the operator. Types of FARE PRODUCTs like e.g. throw-away ticket, throw-away ticket unit, value card, electronic purse allowing access, public transport credit card etc. may be used to define these categories.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -352,7 +357,7 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:sequence/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfFareProductIdType"/>
+					<xsd:attribute name="id" type="TypeOfFareProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -374,10 +379,9 @@ Rail transport, Roads and Road transport
 		<xsd:sequence/>
 	</xsd:group>
 	<!-- ==== SALES DISCOUNT RIGHT.=============================================== -->
-	<xsd:element name="SaleDiscountRight" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="SaleDiscountRight" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A FARE PRODUCT allowing a customer to benefit from discounts when purchasing SALES OFFER PACKAGEs.
-</xsd:documentation>
+			<xsd:documentation>A FARE PRODUCT allowing a customer to benefit from discounts when purchasing SALES OFFER PACKAGEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -402,7 +406,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SaleDiscountRightGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SaleDiscountRightIdType"/>
+					<xsd:attribute name="id" type="SaleDiscountRightIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -446,11 +450,9 @@ Rail transport, Roads and Road transport
 		</xsd:choice>
 	</xsd:group>
 	<!-- ==== ENTITLEMENT PRODUCT.=============================================== -->
-	<xsd:element name="EntitlementProduct" abstract="false" substitutionGroup="ServiceAccessRight_">
+	<xsd:element name="EntitlementProduct" substitutionGroup="ServiceAccessRight_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A precondition to access a service or to purchase a FARE PRODUCT issued by an organisation that may not be a PT operator (e.g. military card). 
-
-</xsd:documentation>
+			<xsd:documentation>A precondition to access a service or to purchase a FARE PRODUCT issued by an organisation that may not be a PT operator (e.g. military card).</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -472,7 +474,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="EntitlementProductGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="EntitlementProductIdType"/>
+					<xsd:attribute name="id" type="EntitlementProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -503,7 +505,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== THIRD PARTY PRODUCT.=============================================== -->
-	<xsd:element name="ThirdPartyProduct" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="ThirdPartyProduct" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A FARE PRODUCT that is marketed together with a Public Transport Fare Product.</xsd:documentation>
 		</xsd:annotation>
@@ -530,7 +532,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ThirdPartyProductGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ThirdPartyProductIdType"/>
+					<xsd:attribute name="id" type="ThirdPartyProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -556,10 +558,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== USAGE DISCOUNT RIGHT.=============================================== -->
-	<xsd:element name="UsageDiscountRight" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="UsageDiscountRight" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A FARE PRODUCT allowing a customer to benefit from discounts when consuming VALIDABLE ELEMENTs.
-</xsd:documentation>
+			<xsd:documentation>A FARE PRODUCT allowing a customer to benefit from discounts when consuming VALIDABLE ELEMENTs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -584,7 +585,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="UsageDiscountRightGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="UsageDiscountRightIdType"/>
+					<xsd:attribute name="id" type="UsageDiscountRightIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -602,10 +603,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== CAPPED DISCOUNT RIGHT.=============================================== -->
-	<xsd:element name="CappedDiscountRight" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="CappedDiscountRight" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A FARE PRODUCT allowing a customer to benefit from discounts when consuming VALIDABLE ELEMENTs.
-</xsd:documentation>
+			<xsd:documentation>A FARE PRODUCT allowing a customer to benefit from discounts when consuming VALIDABLE ELEMENTs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -633,7 +633,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CappedDiscountRightGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CappedDiscountRightIdType"/>
+					<xsd:attribute name="id" type="CappedDiscountRightIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -675,7 +675,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CappingRule" abstract="false" substitutionGroup="PriceableObject_">
+	<xsd:element name="CappingRule" substitutionGroup="PriceableObject_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Rule about capping for a mode.</xsd:documentation>
 		</xsd:annotation>
@@ -704,7 +704,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CappingRuleGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CappingRuleIdType"/>
+					<xsd:attribute name="id" type="CappingRuleIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -758,7 +758,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="CappingStartConstraintType" type="CappingPeriodStartConstraintTypeEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Indicates if start of cappig period   is  variable  on fixed. +v1.1</xsd:documentation>
+					<xsd:documentation>Indicates if start of cappig period is variable on fixed. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="startOnlyOn" minOccurs="0">
@@ -771,12 +771,12 @@ Rail transport, Roads and Road transport
 							<xsd:sequence>
 								<xsd:element name="StartMonth" type="xsd:gMonth" minOccurs="0">
 									<xsd:annotation>
-										<xsd:documentation>Start date of  USAGE VALIDITY PERIOD.</xsd:documentation>
+										<xsd:documentation>Start date of USAGE VALIDITY PERIOD.</xsd:documentation>
 									</xsd:annotation>
 								</xsd:element>
 								<xsd:element name="StartDay" type="xsd:gDay" minOccurs="0">
 									<xsd:annotation>
-										<xsd:documentation>Start time of  USAGE VALIDITY PERIOD.</xsd:documentation>
+										<xsd:documentation>Start time of USAGE VALIDITY PERIOD.</xsd:documentation>
 									</xsd:annotation>
 								</xsd:element>
 							</xsd:sequence>
@@ -799,11 +799,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="AmountOfPriceUnitProduct" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="AmountOfPriceUnitProduct" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A FARE PRODUCT consisting in a stored value of PRICE UNITs: an amount of money on an electronic purse, amount of units on a value card etc.
-
-</xsd:documentation>
+			<xsd:documentation>A FARE PRODUCT consisting in a stored value of PRICE UNITs: an amount of money on an electronic purse, amount of units on a value card etc.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -828,7 +826,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="AmountOfPriceUnitProductGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AmountOfPriceUnitProductIdType"/>
+					<xsd:attribute name="id" type="AmountOfPriceUnitProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -858,16 +856,15 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="PriceUnitRef" minOccurs="0"/>
 			<xsd:element name="Amount" type="xsd:decimal" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Number of units. If only ine. Otherwise use TARIFF with  FARE QUALITY FACTOR to specify a range</xsd:documentation>
+					<xsd:documentation>Number of units. If only ine. Otherwise use TARIFF with FARE QUALITY FACTOR to specify a range</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== PREASSIGNED FARE PRODUC=============================================== -->
-	<xsd:element name="PreassignedFareProduct" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="PreassignedFareProduct" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A FARE PRODUCT consisting of one or several VALIDABLE ELEMENTs, specific to a CHARGING MOMENT.
-</xsd:documentation>
+			<xsd:documentation>A FARE PRODUCT consisting of one or several VALIDABLE ELEMENTs, specific to a CHARGING MOMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -892,7 +889,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PreassignedFareProductGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PreassignedFareProductIdType"/>
+					<xsd:attribute name="id" type="PreassignedFareProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -922,10 +919,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== PREASSIGNED FARE PRODUC=============================================== -->
-	<xsd:element name="SupplementProduct" abstract="false" substitutionGroup="FareProduct_">
+	<xsd:element name="SupplementProduct" substitutionGroup="FareProduct_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A FARE PRODUCT consisting of one or several VALIDABLE ELEMENTs, specific to a CHARGING MOMENT.
-</xsd:documentation>
+			<xsd:documentation>A FARE PRODUCT consisting of one or several VALIDABLE ELEMENTs, specific to a CHARGING MOMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -953,7 +949,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SupplementProductGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PreassignedFareProductIdType"/>
+					<xsd:attribute name="id" type="PreassignedFareProductIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -1011,11 +1007,31 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="AccessRightInProduct" type="AccessRightInProduct_VersionedChildStructure" abstract="false" substitutionGroup="VersionedChild">
+	<xsd:element name="AccessRightInProduct" substitutionGroup="VersionedChild">
 		<xsd:annotation>
-			<xsd:documentation>A VALIDABLE ELEMENT as a part of a PRE-ASSIGNED FARE PRODUCT, including its possible order in the set of all VALIDABLE ELEMENTs grouped together to define the access right assigned to that PRE-ASSIGNED FARE PRODUCT.
-</xsd:documentation>
+			<xsd:documentation>A VALIDABLE ELEMENT as a part of a PRE-ASSIGNED FARE PRODUCT, including its possible order in the set of all VALIDABLE ELEMENTs grouped together to define the access right assigned to that PRE-ASSIGNED FARE PRODUCT.</xsd:documentation>
 		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="AccessRightInProduct_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareElementInSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="AccessRightInProductGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="AccessRightInProductIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
 	</xsd:element>
 	<xsd:complexType name="AccessRightInProduct_VersionedChildStructure">
 		<xsd:annotation>
@@ -1039,10 +1055,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="ChargingMoment" abstract="false" substitutionGroup="TypeOfValue">
+	<xsd:element name="ChargingMoment" substitutionGroup="TypeOfValue">
 		<xsd:annotation>
-			<xsd:documentation>A classification of FARE PRODUCTs according to the payment method and the account location: pre-payment with cancellation (throw-away), pre-payment with debit on a value card, pre-payment without consumption registration (pass), post-payment etc.
-</xsd:documentation>
+			<xsd:documentation>A classification of FARE PRODUCTs according to the payment method and the account location: pre-payment with cancellation (throw-away), pre-payment with debit on a value card, pre-payment without consumption registration (pass), post-payment etc.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -1058,7 +1073,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ChargingMomentIdType">
+					<xsd:attribute name="id" type="ChargingMomentIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of CHARGING MOMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -1067,7 +1082,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ChargingMoment_ValueStructure" abstract="false">
+	<xsd:complexType name="ChargingMoment_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a CHARGING MOMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -1084,13 +1099,13 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="strictContainmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="FareProductPriceRef"/>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 					<xsd:element ref="FareProductPrice"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FareProductPrice" abstract="false" substitutionGroup="FarePrice_">
+	<xsd:element name="FareProductPrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a FARE PRODUCT default total price, discount in value or percentage etc.</xsd:documentation>
 		</xsd:annotation>
@@ -1111,7 +1126,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FareProductPriceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FareProductPriceIdType"/>
+					<xsd:attribute name="id" type="FareProductPriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -1146,13 +1161,13 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="strictContainmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="CappingRulePriceRef"/>
-					<xsd:element ref="CellRef_"/>
+					<xsd:element ref="CellRef_Dummy"/>
 					<xsd:element ref="CappingRulePrice"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CappingRulePrice" abstract="false" substitutionGroup="FarePrice_">
+	<xsd:element name="CappingRulePrice" substitutionGroup="FarePrice_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features of a CAPPING RULE default total price, discount in value or percentage etc.</xsd:documentation>
 		</xsd:annotation>
@@ -1173,7 +1188,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CappingRulePriceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CappingRulePriceIdType"/>
+					<xsd:attribute name="id" type="CappingRulePriceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

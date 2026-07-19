@@ -40,6 +40,8 @@
 						Add  FarePrice AmountWithResultsGroup and refactor  FarePriceAmount groups to be clearer
 					   Also  revise PriceRuleStepResult:  add AdjustmentAmount, AdjustmentUnits .  RoundingRef, RoundingStepRef, and   NARRATIVE text element 
 				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the FARE PRICE   types.</p>
@@ -79,7 +81,7 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx: FARE PRICE  types.</xsd:documentation>
+		<xsd:documentation>NeTEx: FARE PRICE types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in FARE FRAME)=================================================== -->
 	<xsd:complexType name="farePricesInFrame_RelStructure">
@@ -89,18 +91,18 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="frameContainmentStructure">
 				<xsd:choice maxOccurs="unbounded">
-					<xsd:element ref="PriceGroup_"/>
+					<xsd:element ref="PriceGroup_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ===FARE PRICE================================================= -->
-	<xsd:element name="PriceableObject_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+	<xsd:element name="PriceableObject_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Abstract price.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="PriceableObject" type="PriceableObject_VersionStructure" abstract="true" substitutionGroup="PriceableObject_" id="PriceableObject">
+	<xsd:element name="PriceableObject" type="PriceableObject_VersionStructure" abstract="true" substitutionGroup="PriceableObject_Dummy" id="PriceableObject">
 		<xsd:annotation>
 			<xsd:documentation>An element that may have a FARE PRICE.</xsd:documentation>
 		</xsd:annotation>
@@ -172,12 +174,12 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="PriceableObjectPricesGroup">
 		<xsd:annotation>
-			<xsd:documentation>Price  Elements for GROUP OF SALES OFFER PACKAGEs.</xsd:documentation>
+			<xsd:documentation>Price Elements for GROUP OF SALES OFFER PACKAGEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="priceGroups" type="priceGroups_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>PRICE GROUPSs  making up FARE PRODUCT.</xsd:documentation>
+					<xsd:documentation>PRICE GROUPSs making up FARE PRODUCT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="fareTables" type="fareTables_RelStructure" minOccurs="0">
@@ -187,9 +189,9 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:element name="FareTable_" type="GroupOfEntities_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
+	<xsd:element name="FareTable_Dummy" type="GroupOfEntities_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
-			<xsd:documentation>A grouping of prices that may be associated with a DISTANCE MATRIX ELEMENT, FARE STRUCTURE ELEMENT or  other PRICEABLE OBJECT.</xsd:documentation>
+			<xsd:documentation>A grouping of prices that may be associated with a DISTANCE MATRIX ELEMENT, FARE STRUCTURE ELEMENT or other PRICEABLE OBJECT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="fareTables_RelStructure">
@@ -200,7 +202,7 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="strictContainmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="FareTableRef"/>
-					<xsd:element ref="FareTable_"/>
+					<xsd:element ref="FareTable_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -214,18 +216,18 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="strictContainmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="FarePriceRef"/>
-					<xsd:element ref="CellRef_"/>
-					<xsd:element ref="FarePrice_"/>
+					<xsd:element ref="CellRef_Dummy"/>
+					<xsd:element ref="FarePrice_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="FarePrice_" type="VersionedChildStructure" abstract="true" substitutionGroup="VersionedChild">
+	<xsd:element name="FarePrice_Dummy" type="VersionedChildStructure" abstract="true" substitutionGroup="VersionedChild">
 		<xsd:annotation>
 			<xsd:documentation>Dummy Abstract PRICE.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="FarePrice" abstract="true" substitutionGroup="FarePrice_" id="FarePrice">
+	<xsd:element name="FarePrice" abstract="true" substitutionGroup="FarePrice_Dummy" id="FarePrice">
 		<xsd:annotation>
 			<xsd:documentation>A set of all possible price features for a Fare element.</xsd:documentation>
 		</xsd:annotation>
@@ -235,7 +237,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="FarePrice_VersionedChildStructure" abstract="false">
+	<xsd:complexType name="FarePrice_VersionedChildStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for FARE PRICE.</xsd:documentation>
 		</xsd:annotation>
@@ -262,7 +264,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Description of FARE PRICE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="StartDate" type="xsd:date" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Start date for selling product or service at the PRICE.</xsd:documentation>
@@ -300,7 +306,7 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="FarePriceAmountGroup"/>
 			<xsd:element name="ruleStepResults" type="priceRuleStepResults_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Interim amounts for any pricing rules  applied to derive price , for example VAT amount  charged.  +v1.1</xsd:documentation>
+					<xsd:documentation>Interim amounts for any pricing rules applied to derive price , for example VAT amount charged. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -336,7 +342,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="FarePriceRef" minOccurs="0"/>
 			<xsd:choice minOccurs="0">
 				<xsd:element ref="PricingRuleRef"/>
-				<xsd:element ref="PricingRule_"/>
+				<xsd:element ref="PricingRule_Dummy"/>
 			</xsd:choice>
 			<xsd:element name="CanBeCumulative" type="xsd:boolean" default="true" minOccurs="0">
 				<xsd:annotation>
@@ -348,7 +354,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:complexType name="priceRuleStepResults_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a list of rules step calculation results </xsd:documentation>
+			<xsd:documentation>Type for a list of rules step calculation results</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="strictContainmentAggregationStructure">
@@ -358,14 +364,14 @@ Rail transport, Roads and Road transport
 							<xsd:documentation>Record of amount deducted by a price rule calculation, e.g. an additional tax step. If PRICING RULES are chained there may be multiple steps to record.  
 The source of the input price can be indicated by a FARE PRICE REF of some sort. 
 The RULE STEP RESULT Amount is the resulting  net price after the pricing rule has been applied to the input amount.  
-The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original input price and the RULE STEP RESULT  Amount (so it is possible to derive the input price amount  by adding the the Adjustment to the  Net Amount.  A similar computation can be done for any units.  </xsd:documentation>
+The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original input price and the RULE STEP RESULT  Amount (so it is possible to derive the input price amount  by adding the the Adjustment to the  Net Amount.  A similar computation can be done for any units.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="PriceRuleStepResultStructure" abstract="false">
+	<xsd:complexType name="PriceRuleStepResultStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for FARE STEP RESULT.</xsd:documentation>
 		</xsd:annotation>
@@ -373,7 +379,7 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 			<xsd:element ref="FarePriceRef" minOccurs="0"/>
 			<xsd:group ref="FarePriceAmountGroup">
 				<xsd:annotation>
-					<xsd:documentation>An amount for a fair price in either  currency. arbitrary units, or both</xsd:documentation>
+					<xsd:documentation>An amount for a fair price in either currency. arbitrary units, or both</xsd:documentation>
 				</xsd:annotation>
 			</xsd:group>
 			<xsd:group ref="StepCalculationAmountGroup">
@@ -383,12 +389,12 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 			</xsd:group>
 			<xsd:group ref="PriceRuleStepRateGroup">
 				<xsd:annotation>
-					<xsd:documentation>Rules used to  perform step</xsd:documentation>
+					<xsd:documentation>Rules used to perform step</xsd:documentation>
 				</xsd:annotation>
 			</xsd:group>
 			<xsd:element name="Narrative" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Explanation of calcuation step as text.  +v1.1</xsd:documentation>
+					<xsd:documentation>Explanation of calcuation step as text. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -399,7 +405,7 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 		</xsd:attribute>
 		<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 			<xsd:annotation>
-				<xsd:documentation>Order of step.</xsd:documentation>
+				<xsd:documentation>Order of step. -v2.0</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
@@ -415,12 +421,12 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 			</xsd:element>
 			<xsd:element name="AdjustmentAmount" type="CurrencyAmountType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Step calculation amount,  in same currency as STEP RESULT Amount. ( i.e. difference between  Base Amount and result Amount. PRICE) +v1.1</xsd:documentation>
+					<xsd:documentation>Step calculation amount, in same currency as STEP RESULT Amount. ( i.e. difference between Base Amount and result Amount. PRICE) +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="AdjustmentUnits" type="xsd:decimal" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Step calculation Units,  in same  PRICE UNIT as STEP RESULT Amount.  ( i.e. difference between base Units and Result Units. +v1.1</xsd:documentation>
+					<xsd:documentation>Step calculation Units, in same PRICE UNIT as STEP RESULT Amount. ( i.e. difference between base Units and Result Units. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -446,8 +452,8 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="FarePriceRef"/>
 					<xsd:element ref="PriceGroupRef"/>
-					<xsd:element ref="FarePrice_"/>
-					<xsd:element ref="PriceGroup_"/>
+					<xsd:element ref="FarePrice_Dummy"/>
+					<xsd:element ref="PriceGroup_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -460,21 +466,19 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 			<xsd:extension base="strictContainmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="PriceGroupRef"/>
-					<xsd:element ref="PriceGroup_"/>
+					<xsd:element ref="PriceGroup_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="PriceGroup_" type="GroupOfEntities_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
+	<xsd:element name="PriceGroup_Dummy" type="GroupOfEntities_VersionStructure" abstract="true" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
-			<xsd:documentation>A grouping of prices, allowing the grouping of numerous possible consumption elements into a limited number of price references, or to apply grouped increase, in value or percentage.
-</xsd:documentation>
+			<xsd:documentation>A grouping of prices, allowing the grouping of numerous possible consumption elements into a limited number of price references, or to apply grouped increase, in value or percentage.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="PriceGroup" abstract="false" substitutionGroup="PriceGroup_">
+	<xsd:element name="PriceGroup" substitutionGroup="PriceGroup_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A grouping of prices, allowing the grouping of numerous possible consumption elements into a limited number of price references, or to apply grouped increase, in value or percentage.
-</xsd:documentation>
+			<xsd:documentation>A grouping of prices, allowing the grouping of numerous possible consumption elements into a limited number of price references, or to apply grouped increase, in value or percentage.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -499,7 +503,7 @@ The RULE STEP RESULT  Adjustment Amount is  the difference beteen the original i
 							<xsd:element ref="FarePriceRef" minOccurs="0"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PriceGroupIdType"/>
+					<xsd:attribute name="id" type="PriceGroupIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_assistanceBooking_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_assistanceBooking_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_transportOrganisation_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_modeOfOperation_support.xsd"/>
 	<xsd:include schemaLocation="../part1_networkDescription/netex_line_support.xsd"/>
@@ -23,6 +23,8 @@
 				</Date>
 				<Date><Modified>2020-10-05</Modified> New Modes: Add mode of operation to assistance booking, allow booking fro all modes
 				</Date>
+				<Date><Modified>2023-12-18</Modified>FIX: revise the  #525 implementation of BOOKING ARRANGEMENT and SERVICE BOOKING ARRANGEMENT, 
+				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the ASSISTANCE BOOKING SERVICE types.</p>
@@ -39,7 +41,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/xsd//netex_framework/netex_responsibility/netex_relationship.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					<Copyright>CEN, Crown Copyright 2009-2021</Copyright>
+					<Copyright>CEN, Crown Copyright 2009-2023</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -78,7 +80,7 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="AssistanceBookingService" abstract="false" substitutionGroup="LocalService">
+	<xsd:element name="AssistanceBookingService" substitutionGroup="LocalService">
 		<xsd:annotation>
 			<xsd:documentation>Information about how to book assistance for wheelchair and disabled users.</xsd:documentation>
 		</xsd:annotation>
@@ -102,7 +104,7 @@
 							<xsd:group ref="AssistanceBookingServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AssistanceBookingServiceIdType"/>
+					<xsd:attribute name="id" type="AssistanceBookingServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -139,11 +141,18 @@
 					<xsd:documentation>Contact details for ASSISTANCE BOOKING SERVICE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="BookingArrangements" type="BookingArrangementsStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Booking conditions for ASSISTANCE BOOKING SERVICE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Set of possible Booking Arrangements for this booking service. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="BookingArrangements" type="BookingArrangementsStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Booking conditions for ASSISTANCE BOOKING SERVICE. DEPRECATED: use bookingArrangements</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
 			<xsd:group ref="AssistanceBookingServiceReferencesGroup">
 				<xsd:annotation>
 					<xsd:documentation>Reference Elements for ASSISTANCE BOOKING SERVICE.</xsd:documentation>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_nm_equipmentEnergy_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_nm_equipmentEnergy_support">
 	<xsd:include schemaLocation="netex_equipment_support.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -12,9 +12,13 @@
 				<Date>
 					<Created>2007-06-12</Created>
 				</Date>
-				<Date><Modified>2020-10-07</Modified>Split out from PArking Equipoment
+				<Date><Modified>2020-10-07</Modified>Split out from Parking Equipment
 				</Date>
-				<Date><Modified>2021-09-02</Modified>NewMO)DEs: Add Battery and TypeOfBatteryChemistry, PlugType etc
+				<Date><Modified>2021-09-02</Modified>New Modes: Add Battery and TypeOfBatteryChemistry, PlugType, etc.
+				</Date>
+				<Date><Modified>2023-11-21</Modified>CR0545 CouplingTypeEnumeration: deprecated pantographAbove.
+				</Date>
+				<Date><Modified>2025-05-27</Modified>Rename CouplingTypeEnumeration to PowerCouplingTypeEnumeration to avoid confusion with train coupling.
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines ENERGY EQUIPMENT types for Place access.</p>
@@ -28,7 +32,7 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>CEN TC278 WG3 SG9</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
+				 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -51,8 +55,22 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>ENERGY EQUIPMENT identifier types for  NeTEx.</xsd:documentation>
+		<xsd:documentation>ENERGY EQUIPMENT identifier types for NeTEx.</xsd:documentation>
 	</xsd:annotation>
+	<xsd:complexType name="compatibleEquipmentRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>List of VEHICLE CHarging or REFUELLING EQUIPMENT with which is compatible.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="VehicleChargingEquipmentRef"/>
+					<xsd:element ref="RefuellingEquipmentRef"/>
+					<xsd:element ref="BatteryEquipmentRef"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<!-- ==== VEHICLE CHARGING EQUIPMENT =========================================== -->
 	<xsd:simpleType name="VehicleChargingEquipmentIdType">
 		<xsd:annotation>
@@ -76,6 +94,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassVehicleChargingEquipmentRefStructureType" default="VehicleChargingEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for VehicleChargingEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -102,6 +141,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a REFUELLING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassRefuellingEquipmentRefStructureType" default="RefuellingEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for RefuellingEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -128,6 +188,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a BATTERY EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassBatteryEquipmentRefStructureType" default="BatteryEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for BatteryEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -138,7 +219,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="TypeOfValueIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TypeOfBatteryChemistryRef" type="TypeOfBatteryChemistryRefStructure" abstract="false" substitutionGroup="TypeOfEntityRef">
+	<xsd:element name="TypeOfBatteryChemistryRef" type="TypeOfBatteryChemistryRefStructure" substitutionGroup="TypeOfEntityRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a TYPE OF BATTERY CHEMISTRY. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -154,6 +235,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Reference to a TYPE OF BATTERY CHEMISTRY.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfBatteryChemistryRefStructureType" default="TypeOfBatteryChemistry">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfBatteryChemistryRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -164,7 +266,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="TypeOfValueIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TypeOfPlugRef" type="TypeOfPlugRefStructure" abstract="false" substitutionGroup="TypeOfEntityRef">
+	<xsd:element name="TypeOfPlugRef" type="TypeOfPlugRefStructure" substitutionGroup="TypeOfEntityRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a TYPE OF PLUG. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -180,9 +282,62 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Reference to a TYPE OF PLUG.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfPlugRefStructureType" default="TypeOfPlug">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfPlugRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="FuelTypeListOfEnumerations">
+		<xsd:annotation>
+			<xsd:documentation>List of allowed values for file type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:list itemType="FuelTypeEnumeration"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FuelTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for type of fuel.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="battery"/>
+			<xsd:enumeration value="biodiesel"/>
+			<xsd:enumeration value="diesel"/>
+			<xsd:enumeration value="dieselBatteryHybrid"/>
+			<xsd:enumeration value="electricContact"/>
+			<xsd:enumeration value="electricity"/>
+			<xsd:enumeration value="ethanol"/>
+			<xsd:enumeration value="hydrogen"/>
+			<xsd:enumeration value="liquidGas"/>
+			<xsd:enumeration value="tpg"/>
+			<xsd:enumeration value="methane"/>
+			<xsd:enumeration value="naturalGas"/>
+			<xsd:enumeration value="petrol"/>
+			<xsd:enumeration value="petrolBatteryHybrid"/>
+			<xsd:enumeration value="petrolLeaded"/>
+			<xsd:enumeration value="petrolUnleaded"/>
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
 	<!-- ======================================================================= -->
 	<xsd:simpleType name="PlugTypeEnumeration">
 		<xsd:annotation>
@@ -207,20 +362,19 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="shockproof"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="CouplingTypeEnumeration">
+	<xsd:simpleType name="PowerCouplingTypeEnumeration">
 		<xsd:annotation>
-			<xsd:documentation>Values for Coupling Types +v1.2.2</xsd:documentation>
+			<xsd:documentation>Values for Power Coupling Types +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:NMTOKEN">
 			<xsd:enumeration value="undefined"/>
 			<xsd:enumeration value="plug"/>
 			<xsd:enumeration value="pantographAbove">
 				<xsd:annotation>
-					<xsd:documentation>DEPRECATED. Will be panthograph.</xsd:documentation>
+					<xsd:documentation>DEPRECATED. Will be panthograph. -v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
-			<xsd:enumeration value="pantograph">
-			</xsd:enumeration>
+			<xsd:enumeration value="pantograph"/>
 			<xsd:enumeration value="induction"/>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>

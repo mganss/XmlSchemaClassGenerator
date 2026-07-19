@@ -59,7 +59,7 @@ Rail transport, Roads and Road transport
 		<xsd:documentation>PROJECTION elements for NeTEx.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ======================================================================= -->
-	<xsd:complexType name="projections_RelStructure" abstract="false">
+	<xsd:complexType name="projections_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of PROJECTIONS.</xsd:documentation>
 		</xsd:annotation>
@@ -73,12 +73,25 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
+	<xsd:group name="ProjectionInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>projections elements in frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="projections" type="projections_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PROJECTIONs of LINK SEQUENCE onto another ENTITY or layer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
 	<xsd:element name="Projection" type="Projection_VersionStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>An oriented correspondence - of the shape of an ENTITY on a source layer, - onto a ENTITY in a target layer: e.g. POINT, LINK, LINK SEQUENCE, COMPLEX FEATURE, - within a defined TYPE OF PROJECTION.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="Projection_VersionStructure" abstract="false">
+	<xsd:complexType name="Projection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -91,11 +104,9 @@ Rail transport, Roads and Road transport
 						</xsd:annotation>
 					</xsd:group>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>
-					Order of Order in which to process PROJECTION.
-				</xsd:documentation>
+						<xsd:documentation>Order of Order in which to process PROJECTION. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -120,9 +131,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="PointProjection" abstract="false" substitutionGroup="Projection">
+	<xsd:element name="PointProjection" substitutionGroup="Projection">
 		<xsd:annotation>
-			<xsd:documentation>An oriented correspondence from one POINT of a source layer, onto a entity in a target layer:  e.g. POINT, LINK, LINK SEQUENCE, COMPLEX FEATURE, within a defined TYPE OF PROJECTION.</xsd:documentation>
+			<xsd:documentation>An oriented correspondence from one POINT of a source layer, onto a entity in a target layer: e.g. POINT, LINK, LINK SEQUENCE, COMPLEX FEATURE, within a defined TYPE OF PROJECTION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -159,17 +170,17 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 							<xsd:element name="Distance" type="LengthType" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Distance along link to which point p[projects.</xsd:documentation>
+									<xsd:documentation>Distance along link to which point projects.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PointProjectionIdType"/>
+					<xsd:attribute name="id" type="PointProjectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="PointProjection_VersionStructure" abstract="false">
+	<xsd:complexType name="PointProjection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a POINT PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -201,7 +212,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="LinkProjection" abstract="false" substitutionGroup="Projection">
+	<xsd:element name="LinkProjection" substitutionGroup="Projection">
 		<xsd:annotation>
 			<xsd:documentation>An oriented correspondence from one LINK of a source layer, onto an entity in a target layer: e.g. LINK SEQUENCE, COMPLEX FEATURE, within a defined TYPE OF PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -226,12 +237,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="LinkProjectionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LinkProjectionIdType"/>
+					<xsd:attribute name="id" type="LinkProjectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="LinkProjection_VersionStructure" abstract="false">
+	<xsd:complexType name="LinkProjection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a LINK PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -261,7 +272,7 @@ Rail transport, Roads and Road transport
 			<xsd:choice>
 				<xsd:element name="StartPointOnLinkRef" type="PointOnLinkRefStructure" minOccurs="0">
 					<xsd:annotation>
-						<xsd:documentation>Start POINT of PROJECTION on link  . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
+						<xsd:documentation>Start POINT of PROJECTION on link . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="StartPointOnLinkByValue" type="PointOnLinkByValueStructure" minOccurs="0">
@@ -273,7 +284,7 @@ Rail transport, Roads and Road transport
 			<xsd:choice>
 				<xsd:element name="EndPointOnLinkRef" type="PointOnLinkRefStructure" minOccurs="0">
 					<xsd:annotation>
-						<xsd:documentation>End POINTof PROJECTION on link  . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
+						<xsd:documentation>End POINTof PROJECTION on link . May be omitted if same as start POINT of POINT ON LINK.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:element>
 				<xsd:element name="EndPointOnLinkByValue" type="PointOnLinkByValueStructure" minOccurs="0">
@@ -285,7 +296,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="LinkSequenceProjection" abstract="false" substitutionGroup="Projection">
+	<xsd:element name="LinkSequenceProjection" substitutionGroup="Projection">
 		<xsd:annotation>
 			<xsd:documentation>A Projection of a whole LINK SEQUENCE as an ordered series of POINTs.</xsd:documentation>
 		</xsd:annotation>
@@ -314,18 +325,18 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 							<xsd:element name="Distance" type="DistanceType" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Distance Travelled.</xsd:documentation>
+									<xsd:documentation>Length of line along LINKs in LINK SEQUENCE.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 							<xsd:group ref="LinkSequenceProjectionGroup" minOccurs="0"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LinkSequenceProjectionIdType"/>
+					<xsd:attribute name="id" type="LinkSequenceProjectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="LinkSequenceProjection_VersionStructure" abstract="false">
+	<xsd:complexType name="LinkSequenceProjection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a LINK SEQUENCE PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -361,9 +372,9 @@ Rail transport, Roads and Road transport
 		</xsd:choice>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="ComplexFeatureProjection" abstract="false" substitutionGroup="Projection">
+	<xsd:element name="ComplexFeatureProjection" substitutionGroup="Projection">
 		<xsd:annotation>
-			<xsd:documentation>An oriented correspondence:  from one COMPLEX FEATURE in the source layer, onto an entity in a target layer: e.g. POINT, COMPLEX FEATURE,  within a defined TYPE OF PROJECTION.</xsd:documentation>
+			<xsd:documentation>An oriented correspondence: from one COMPLEX FEATURE in the source layer, onto an entity in a target layer: e.g. POINT, COMPLEX FEATURE, within a defined TYPE OF PROJECTION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -386,12 +397,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ComplexFeatureProjectionGroup" minOccurs="0"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ComplexFeatureProjectionIdType"/>
+					<xsd:attribute name="id" type="ComplexFeatureProjectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ComplexFeatureProjection_VersionStructure" abstract="false">
+	<xsd:complexType name="ComplexFeatureProjection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a COMPLEX FEATURE PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -408,9 +419,9 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements of a COMPLEX FEATURE PROJECTION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="ProjectedFeartureRef" type="ComplexFeatureRefStructure">
+			<xsd:element name="ProjectedFeatureRef" type="ComplexFeatureRefStructure">
 				<xsd:annotation>
-					<xsd:documentation>COMPLEX FEATURE which is being projetced.</xsd:documentation>
+					<xsd:documentation>COMPLEX FEATURE which is being projected.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="OntoFeatureRef" type="ComplexFeatureRefStructure" minOccurs="0">
@@ -427,7 +438,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="LineShape" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="LineShape" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>The graphical shape of a LINK obtained from a formula or other means, using the LOCATION of its limiting POINTs and depending on the LOCATING SYSTEM used for the graphical representation.</xsd:documentation>
 		</xsd:annotation>
@@ -460,7 +471,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LineShapeIdType" use="optional">
+					<xsd:attribute name="id" type="LineShapeIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -469,7 +480,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="LineShapeStructure" abstract="false">
+	<xsd:complexType name="LineShapeStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a LINE SHAPE.</xsd:documentation>
 		</xsd:annotation>
@@ -497,7 +508,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfProjection" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfProjection" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>Classification of a PROJECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -515,12 +526,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfProjectionIdType"/>
+					<xsd:attribute name="id" type="TypeOfProjectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfProjection_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfProjection_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF PROJECTION.</xsd:documentation>
 		</xsd:annotation>

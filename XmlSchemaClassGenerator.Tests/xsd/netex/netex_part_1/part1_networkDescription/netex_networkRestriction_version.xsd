@@ -58,7 +58,7 @@ Rail transport, Roads and ROAD transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx  NETWORK RESTRICTION types.</xsd:documentation>
+		<xsd:documentation>NeTEx NETWORK RESTRICTION types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
 	<!-- ======================================================================= -->
@@ -96,7 +96,7 @@ Rail transport, Roads and ROAD transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ===NETWORK RESTRICTIONs================================================= -->
-	<xsd:element name="NetworkRestriction" type="NetworkRestriction_VersionStructure" abstract="true" substitutionGroup="Assignment_">
+	<xsd:element name="NetworkRestriction" type="NetworkRestriction_VersionStructure" abstract="true" substitutionGroup="Assignment_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A constraint on use of a network of INFRASTRUCTURE POINTs and INFRASTUCTURE LINKs.</xsd:documentation>
 		</xsd:annotation>
@@ -120,14 +120,14 @@ Rail transport, Roads and ROAD transport
 		<xsd:sequence>
 			<xsd:element name="Restricted" type="xsd:boolean" default="true">
 				<xsd:annotation>
-					<xsd:documentation>Whether a NETWORK RESTRICTION is allowed or forbidden. Default is true,, i.e.  this is a restriction..</xsd:documentation>
+					<xsd:documentation>Whether a NETWORK RESTRICTION is allowed or forbidden. Default is true,, i.e. this is a restriction..</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
 	<!-- ====Point Restriction====================================================== -->
-	<xsd:element name="VehicleTypeAtPoint" abstract="false" substitutionGroup="NetworkRestriction">
+	<xsd:element name="VehicleTypeAtPoint" substitutionGroup="NetworkRestriction">
 		<xsd:annotation>
 			<xsd:documentation>NETWORK RESTRICTION. specifying whether a vehicle of a specified VEHICLE TYPE may visit a point.</xsd:documentation>
 		</xsd:annotation>
@@ -151,12 +151,12 @@ Rail transport, Roads and ROAD transport
 						</xsd:sequence>
 						<xsd:group ref="VehicleTypeAtPointGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleTypeAtPointIdType"/>
+					<xsd:attribute name="id" type="VehicleTypeAtPointIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleTypeAtPoint_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleTypeAtPoint_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a VEHICLE TYPE AT POINT.</xsd:documentation>
 		</xsd:annotation>
@@ -219,7 +219,7 @@ Rail transport, Roads and ROAD transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="NetworkRestrictionIdType"/>
+					<xsd:attribute name="id" type="NetworkRestrictionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -252,7 +252,7 @@ Rail transport, Roads and ROAD transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="RestrictedManoeuvre" abstract="false" substitutionGroup="NetworkRestriction">
+	<xsd:element name="RestrictedManoeuvre" substitutionGroup="NetworkRestriction">
 		<xsd:annotation>
 			<xsd:documentation>A specification of a move for a certain type of vehicle. It specifies from which INFRASTRUCTURE LINK to which other (adjacent) INFRASTRUCTURE LINK a certain can or cannot VEHICLE TYPE cannot proceed, due to physical restrictions.</xsd:documentation>
 		</xsd:annotation>
@@ -288,7 +288,7 @@ Rail transport, Roads and ROAD transport
 						</xsd:sequence>
 						<xsd:group ref="RestrictedManoeuvreGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="RestrictedManoeuvreIdType"/>
+					<xsd:attribute name="id" type="RestrictedManoeuvreIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -308,12 +308,16 @@ Rail transport, Roads and ROAD transport
 			<xsd:documentation>Elements for a MANOEUVRE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element ref="TransportTypeRef" minOccurs="0"/>
+			<xsd:element ref="TransportTypeRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
 	<!-- ======================================================================= -->
-	<xsd:element name="MeetingRestriction" abstract="false" substitutionGroup="NetworkRestriction">
+	<xsd:element name="MeetingRestriction" substitutionGroup="NetworkRestriction">
 		<xsd:annotation>
 			<xsd:documentation>A pair of INFRASTRUCTURE LINKs where vehicles of specified VEHICLE TYPEs are not allowed to meet.</xsd:documentation>
 		</xsd:annotation>
@@ -338,7 +342,7 @@ Rail transport, Roads and ROAD transport
 						<xsd:group ref="InfrastructureLinkRestrictionGroup"/>
 						<xsd:group ref="MeetingRestrictionGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="MeetingRestrictionIdType" use="optional">
+					<xsd:attribute name="id" type="MeetingRestrictionIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -369,16 +373,16 @@ Rail transport, Roads and ROAD transport
 			</xsd:element>
 			<xsd:element name="AgainstVehicleTypeRef" type="TransportTypeRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Type of vehicle that may use backwards direction of INFRASTRUCTURE LINK. For a meeting restriction this is for the vehicle going in the  reveser sense of the link. For overtaking possibility this is for the vehicle being  overtaken.</xsd:documentation>
+					<xsd:documentation>Type of vehicle that may use backwards direction of INFRASTRUCTURE LINK. For a meeting restriction this is for the vehicle going in the reveser sense of the link. For overtaking possibility this is for the vehicle being overtaken.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
 	<!-- ======================================================================= -->
-	<xsd:element name="OvertakingPossibility" abstract="false" substitutionGroup="NetworkRestriction">
+	<xsd:element name="OvertakingPossibility" substitutionGroup="NetworkRestriction">
 		<xsd:annotation>
-			<xsd:documentation>NETWORK RESTRICTION specifying a POINT or a LINK where vehicles of specified VEHICLE TYPEs are or are  not allowed to overtake each other.</xsd:documentation>
+			<xsd:documentation>NETWORK RESTRICTION specifying a POINT or a LINK where vehicles of specified VEHICLE TYPEs are or are not allowed to overtake each other.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -407,7 +411,7 @@ Rail transport, Roads and ROAD transport
 								</xsd:element>
 								<xsd:element name="OvertakingOnLinkRef" type="LinkRefStructure">
 									<xsd:annotation>
-										<xsd:documentation>Identifier of an INFRASTRUCTURE LINK over which two vehicles of the specified VEHICLE TYPE may pass in the  directions of the link.</xsd:documentation>
+										<xsd:documentation>Identifier of an INFRASTRUCTURE LINK over which two vehicles of the specified VEHICLE TYPE may pass in the directions of the link.</xsd:documentation>
 									</xsd:annotation>
 								</xsd:element>
 								<xsd:element name="OvertakingAtPointRef" type="PointRefStructure">
@@ -417,18 +421,18 @@ Rail transport, Roads and ROAD transport
 								</xsd:element>
 								<xsd:element name="OvertakingVehicleTypeRef" type="TransportTypeRefStructure" minOccurs="0">
 									<xsd:annotation>
-										<xsd:documentation>TYPE OF VEHICLE  that may overtake.</xsd:documentation>
+										<xsd:documentation>TYPE OF VEHICLE that may overtake.</xsd:documentation>
 									</xsd:annotation>
 								</xsd:element>
 								<xsd:element name="OvertakenVehicleTypeRef" type="TransportTypeRefStructure" minOccurs="0">
 									<xsd:annotation>
-										<xsd:documentation>TYPE OF VEHICLE  that may be overtaken.</xsd:documentation>
+										<xsd:documentation>TYPE OF VEHICLE that may be overtaken.</xsd:documentation>
 									</xsd:annotation>
 								</xsd:element>
 							</xsd:sequence>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OvertakingPossibilityIdType"/>
+					<xsd:attribute name="id" type="OvertakingPossibilityIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -457,7 +461,7 @@ Rail transport, Roads and ROAD transport
 			</xsd:element>
 			<xsd:element name="OvertakingOnLinkRef" type="LinkRefStructure">
 				<xsd:annotation>
-					<xsd:documentation>Identifier of an INFRASTRUCTURE LINK over which two vehicles of the specified VEHICLE TYPE may pass in the  directions of the link.</xsd:documentation>
+					<xsd:documentation>Identifier of an INFRASTRUCTURE LINK over which two vehicles of the specified VEHICLE TYPE may pass in the directions of the link.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="OvertakingAtPointRef" type="PointRefStructure" minOccurs="0">
@@ -467,12 +471,12 @@ Rail transport, Roads and ROAD transport
 			</xsd:element>
 			<xsd:element name="OvertakingVehicleTypeRef" type="TransportTypeRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TYPE OF VEHICLE  that may overtake.</xsd:documentation>
+					<xsd:documentation>TYPE OF VEHICLE that may overtake.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="OvertakenVehicleTypeRef" type="TransportTypeRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TYPE OF VEHICLE  that may be overtaken.</xsd:documentation>
+					<xsd:documentation>TYPE OF VEHICLE that may be overtaken.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

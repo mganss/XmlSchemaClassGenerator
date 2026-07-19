@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_checkConstraint_version">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_ifopt_checkConstraint_version">
 	<xsd:include schemaLocation="netex_ifopt_checkConstraint_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_environment_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipment_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceRestrictions_version.xsd"/>
@@ -26,6 +27,8 @@
 				</Date>
 				<Date><Modified>2019-04-09</Modified> FIX  Make data type of throughut counts NumberOfPassengers. 
 				</Date>
+				<Date><Modified>2024-02-01</Modified> Remodularise - add include  to access_support 
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines common Check types.</p>
 				</Description>
@@ -38,7 +41,7 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -140,7 +143,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CheckConstraint" substitutionGroup="Assignment_">
+	<xsd:element name="CheckConstraint" substitutionGroup="Assignment_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Characteristics of a SITE COMPONENT representing a process, such as check-in, security
 screening, ticket control or immigration, that may potentially incur a time penalty that should be allowed for when journey planning. Used to mark PATH LINKs to determine transit routes through interchanges.</xsd:documentation>
@@ -164,7 +167,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 							<xsd:group ref="CheckConstraintGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CheckConstraintIdType"/>
+					<xsd:attribute name="id" type="CheckConstraintIdType" use="required"/>
 					<xsd:attribute name="responsibilitySetRef" type="ResponsibilitySetIdType" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Reference to RESPONSIBILITY SET for managing the object. If absent, then responsibility is same as for containing context of this object.</xsd:documentation>
@@ -274,7 +277,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CheckConstraintDelay" substitutionGroup="Assignment_">
+	<xsd:element name="CheckConstraintDelay" substitutionGroup="Assignment_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Time penalty associated with a CHECK CONSTRAINT.</xsd:documentation>
 		</xsd:annotation>
@@ -301,7 +304,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CheckConstraintDelayIdType"/>
+					<xsd:attribute name="id" type="CheckConstraintDelayIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -364,7 +367,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CheckConstraintThroughput" substitutionGroup="Assignment_">
+	<xsd:element name="CheckConstraintThroughput" substitutionGroup="Assignment_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Throughput of a CHECK CONSTRAINT. the number of passengers who can pass through it.</xsd:documentation>
 		</xsd:annotation>
@@ -387,7 +390,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 							<xsd:group ref="CheckConstraintThroughputGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CheckConstraintThroughputIdType"/>
+					<xsd:attribute name="id" type="CheckConstraintThroughputIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -433,7 +436,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfCongestion" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfCongestion" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of CONGESTIONs according to their functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -451,8 +454,8 @@ screening, ticket control or immigration, that may potentially incur a time pena
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfCongestionIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Congestion">
+					<xsd:attribute name="id" type="TypeOfCongestionIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -461,7 +464,7 @@ screening, ticket control or immigration, that may potentially incur a time pena
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfCongestion_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfCongestion_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF CONGESTION.</xsd:documentation>
 		</xsd:annotation>

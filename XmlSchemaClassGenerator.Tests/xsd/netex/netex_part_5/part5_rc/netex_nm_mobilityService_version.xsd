@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_nm_mobilityService_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_nm_mobilityService_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipment_version.xsd"/>
 	<xsd:include schemaLocation="netex_nm_mobilityService_support.xsd"/>
 	<xsd:include schemaLocation="netex_nm_onlineService_support.xsd"/>
@@ -31,6 +31,9 @@
 				</Date>
 				<Date><Modified>2021-08-01</Modified>NewModes Feedback: Add PolicyUrl attribute to VehiclePoolingService,  VehicleSharingService.
 				</Date>
+				<Date><Modified>2023-12-18</Modified>FIX: Correct the  #525 implementation of BOOKING ARRANGEMENT and SERVICE BOOKING ARRANGEMENT,
+					   SERVICE BOOKING ARRANGEMENT should inherit from BOOKING ARRANGEMENT and should have its own structure.
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines MOBILITY SERVICE types.</p>
 				</Description>
@@ -43,7 +46,7 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>CEN TC278 WG3 SG9</Publisher>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2019-2021</Copyright>
+					 <Copyright>CEN, Crown Copyright 2019-2023</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -77,20 +80,19 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="MobilityService_" maxOccurs="unbounded"/>
+					<xsd:element ref="MobilityService_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="MobilityService_" type="Equipment_VersionStructure" abstract="true" substitutionGroup="Equipment">
+	<xsd:element name="MobilityService_Dummy" type="Equipment_VersionStructure" abstract="true" substitutionGroup="Equipment">
 		<xsd:annotation>
 			<xsd:documentation>Dummy type to work around SG limitation.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="MobilityService" type="MobilityService_VersionStructure" abstract="true" substitutionGroup="MobilityService_">
+	<xsd:element name="MobilityService" type="MobilityService_VersionStructure" abstract="true" substitutionGroup="MobilityService_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A named service  available over  a widespread area, for example car pooling, rental, etc. The service may be accessible at designated SITES it for which it can be considered as a n additional form of immaterial EQUIPMENT.  +v1.2.2
-</xsd:documentation>
+			<xsd:documentation>A named service available over a widespread area, for example car pooling, rental, etc. The service may be accessible at designated SITES it for which it can be considered as a n additional form of immaterial EQUIPMENT. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="MobilityService_VersionStructure" abstract="true">
@@ -125,22 +127,29 @@ Rail transport, Roads and Road transport
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="TypeOfMobilityServiceRef" minOccurs="0"/>
-			<xsd:element ref="OrganisationRef_" minOccurs="0"/>
+			<xsd:element ref="OrganisationRef_Dummy" minOccurs="0"/>
 			<xsd:element ref="TopographicPlaceRef" minOccurs="0"/>
-			<xsd:element name="ServiceBookingArrangements" type="ServiceBookingArrangementsStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Booking Arrangements for service.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="serviceBookingArrangements" type="serviceBookingArrangements_RelStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Service Booking Arrangements for service. +2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="ServiceBookingArrangements" type="ServiceBookingArrangement_VersionStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Booking Arrangements for service. DEPRECATED: use serviceBookingArrangements</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ===== COMMON VEHICLE SERVICE ============================================= -->
-	<xsd:element name="CommonVehicleService_" type="Equipment_VersionStructure" abstract="true" substitutionGroup="MobilityService_">
+	<xsd:element name="CommonVehicleService_Dummy" type="Equipment_VersionStructure" abstract="true" substitutionGroup="MobilityService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Dummy type to work around SG limitation.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="CommonVehicleService" abstract="true" substitutionGroup="CommonVehicleService_">
+	<xsd:element name="CommonVehicleService" abstract="true" substitutionGroup="CommonVehicleService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A transport service offer related to VEHICLEs. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -164,12 +173,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CommonVehicleServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CommonVehicleServiceIdType" use="optional"/>
+					<xsd:attribute name="id" type="CommonVehicleServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="CommonVehicleService_VersionStructure" abstract="false">
+	<xsd:complexType name="CommonVehicleService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for COMMON VEHICLE SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -204,14 +213,14 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- =====  VEHICLE POOLING SERVICE ============================================= -->
-	<xsd:element name="VehiclePoolingService_" type="MobilityService_VersionStructure" abstract="true" substitutionGroup="CommonVehicleService_">
+	<xsd:element name="VehiclePoolingService_Dummy" type="MobilityService_VersionStructure" abstract="true" substitutionGroup="CommonVehicleService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Dummy type to work around SG limitation.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="VehiclePoolingService" abstract="true" substitutionGroup="VehiclePoolingService_">
+	<xsd:element name="VehiclePoolingService" abstract="true" substitutionGroup="VehiclePoolingService_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A transport service that connects users (driver and passenger(s)) for carrying out trips.  +v1.2.2</xsd:documentation>
+			<xsd:documentation>A transport service that connects users (driver and passenger(s)) for carrying out trips. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -236,12 +245,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehiclePoolingServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehiclePoolingServiceIdType" use="optional"/>
+					<xsd:attribute name="id" type="VehiclePoolingServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehiclePoolingService_VersionStructure" abstract="false">
+	<xsd:complexType name="VehiclePoolingService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for VEHICLE POOLING SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -267,7 +276,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- =====  TAXI SERVICE ============================================= -->
-	<xsd:element name="TaxiService" substitutionGroup="VehiclePoolingService_">
+	<xsd:element name="TaxiService" substitutionGroup="VehiclePoolingService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A type of VEHICLE POOLING SERVICE where the service may be regulated according to a particular taxi policy.
 .  +v1.2.2</xsd:documentation>
@@ -302,7 +311,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TaxiServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TaxiServiceIdType" use="optional">
+					<xsd:attribute name="id" type="TaxiServiceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of TAXI SERVICE</xsd:documentation>
 						</xsd:annotation>
@@ -311,7 +320,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TaxiService_VersionStructure" abstract="false">
+	<xsd:complexType name="TaxiService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for TAXI SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -330,9 +339,9 @@ Rail transport, Roads and Road transport
 		<xsd:sequence/>
 	</xsd:group>
 	<!-- =====  GENERAL POOLING SERVICE ============================================= -->
-	<xsd:element name="CarPoolingService" substitutionGroup="VehiclePoolingService_">
+	<xsd:element name="CarPoolingService" substitutionGroup="VehiclePoolingService_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A transport service that connects users (driver and passenger(s)) for carrying out trips.  +v1.2.2</xsd:documentation>
+			<xsd:documentation>A transport service that connects users (driver and passenger(s)) for carrying out trips. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -364,7 +373,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CarPoolingServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CarPoolingServiceIdType" use="optional">
+					<xsd:attribute name="id" type="CarPoolingServiceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of GENERAL POOLIMG SERVICE.</xsd:documentation>
 						</xsd:annotation>
@@ -373,7 +382,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="CarPoolingService_VersionStructure" abstract="false">
+	<xsd:complexType name="CarPoolingService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for CAR POOLING SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -392,7 +401,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence/>
 	</xsd:group>
 	<!-- =====  ChauffeuredVehicle SERVICE ============================================= -->
-	<xsd:element name="ChauffeuredVehicleService" substitutionGroup="VehiclePoolingService_">
+	<xsd:element name="ChauffeuredVehicleService" substitutionGroup="VehiclePoolingService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A type of VEHICLE POOLING SERVICE which can only be used by prior arrangement and where the driver has a commercial agreement with the user. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -426,7 +435,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ChauffeuredVehicleServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ChauffeuredVehicleServiceIdType" use="optional">
+					<xsd:attribute name="id" type="ChauffeuredVehicleServiceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of CHAUFFEURED VEHICLE SERVICE</xsd:documentation>
 						</xsd:annotation>
@@ -435,7 +444,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="ChauffeuredVehicleService_VersionStructure" abstract="false">
+	<xsd:complexType name="ChauffeuredVehicleService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for ChauffeuredVehicle SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -454,7 +463,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence/>
 	</xsd:group>
 	<!-- =====  VEHICLE SHARING SERVICE ============================================= -->
-	<xsd:element name="VehicleSharingService" substitutionGroup="CommonVehicleService_">
+	<xsd:element name="VehicleSharingService" substitutionGroup="CommonVehicleService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A transport service offer related to VEHICLE SHARING. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -481,12 +490,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleSharingServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleSharingServiceIdType" use="optional"/>
+					<xsd:attribute name="id" type="VehicleSharingServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleSharingService_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleSharingService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for VEHICLE SHARING SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -532,7 +541,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- =====  VEHICLE RENTAL SERVICE ============================================= -->
-	<xsd:element name="VehicleRentalService" substitutionGroup="CommonVehicleService_">
+	<xsd:element name="VehicleRentalService" substitutionGroup="CommonVehicleService_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A transport service offer related to VEHICLE RENTAL. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
@@ -563,12 +572,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleRentalServiceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleRentalServiceIdType" use="optional"/>
+					<xsd:attribute name="id" type="VehicleRentalServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleRentalService_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleRentalService_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for VEHICLE RENTAL SERVICE.</xsd:documentation>
 		</xsd:annotation>
@@ -609,9 +618,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====== TYPE OF MOBILITY SERVICE ======================================== -->
-	<xsd:element name="TypeOfMobilityService" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfMobilityService" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
-			<xsd:documentation>A classification of a MOBILITY SERVICE according to its functional purpose.  +v1.2.2</xsd:documentation>
+			<xsd:documentation>A classification of a MOBILITY SERVICE according to its functional purpose. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -627,12 +636,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfMobilityServiceIdType"/>
+					<xsd:attribute name="id" type="TypeOfMobilityServiceIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfMobilityService_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfMobilityService_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF MobilityService.</xsd:documentation>
 		</xsd:annotation>

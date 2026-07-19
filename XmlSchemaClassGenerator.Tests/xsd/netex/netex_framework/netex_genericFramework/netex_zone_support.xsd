@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_zone_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_zone_version">
 	<xsd:include schemaLocation="netex_pointAndLink_support.xsd"/>
+	<xsd:include schemaLocation="netex_zone_version.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
 			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
@@ -14,8 +15,7 @@
 				<Date>
 					<Modified>2011-02-05</Modified>
 				</Date>
-				<Date>
-					<Modified>2010-11-05</Modified>
+				<Date><Modified>2023-13-11</Modified>Add GROUPP OF TARIFF ZONES
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines ZONE types.</p>
@@ -29,8 +29,7 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
-				</Rights>
+ <Copyright>CEN, Crown Copyright 2009-2014</Copyright></Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
@@ -54,29 +53,54 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>ZONE identifier types for NeTEx.</xsd:documentation>
 	</xsd:annotation>
-	<!-- ====Zone======================================================= -->
+	<!-- ==== ZONE ===================================================== -->
 	<xsd:simpleType name="ZoneIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="GroupOfPointsIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="ZoneRef" type="ZoneRefStructure" substitutionGroup="GroupOfPointsRef_">
+	<xsd:element name="ZoneRef" type="ZoneRefStructure" substitutionGroup="GroupOfPointsRef_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a ZONE.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="ZoneRefStructure" abstract="false">
+	<xsd:complexType name="ZoneRefStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a reference to a ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="GroupOfPointsRefStructure"/>
+			<xsd:restriction base="GroupOfPointsRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassZoneRefStructureType" default="Zone">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for ZoneRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="GroupOfPointsIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="zoneRefs_RelStructure">
-		<xsd:annotation>
-		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="oneToManyRelationshipStructure">
 				<xsd:sequence>
@@ -85,8 +109,8 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
-	<xsd:element name="TariffZoneRef_" type="ZoneRefStructure" abstract="true" substitutionGroup="ZoneRef">
+	<!-- ==== TARIFF ZONE ======================================================== -->
+	<xsd:element name="TariffZoneRef_Dummy" type="ZoneRefStructure" abstract="true" substitutionGroup="ZoneRef">
 		<xsd:annotation>
 			<xsd:documentation>Dummy type Reference to a TARIFF ZONE.</xsd:documentation>
 		</xsd:annotation>
@@ -97,14 +121,14 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="ZoneIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="TariffZoneRef" substitutionGroup="TariffZoneRef_">
+	<xsd:element name="TariffZoneRef" substitutionGroup="TariffZoneRef_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a TARIFF ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:complexContent>
+			<xsd:simpleContent>
 				<xsd:extension base="TariffZoneRefStructure"/>
-			</xsd:complexContent>
+			</xsd:simpleContent>
 		</xsd:complexType>
 	</xsd:element>
 	<xsd:complexType name="TariffZoneRefStructure">
@@ -112,7 +136,34 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for a reference to a TARIFF ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="ZoneRefStructure"/>
+			<xsd:restriction base="ZoneRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTariffZoneRefStructureType" default="TariffZone">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TariffZoneRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="GroupOfPointsIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<xsd:complexType name="tariffZoneRefs_RelStructure">
@@ -122,7 +173,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="oneToManyRelationshipStructure">
 				<xsd:sequence>
-					<xsd:element ref="TariffZoneRef_" maxOccurs="unbounded"/>
+					<xsd:element ref="TariffZoneRef_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -150,6 +201,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Reference to a TYPE OF ZONE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfZoneRefStructureType" default="TypeOfZone">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfZoneRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -161,6 +233,25 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="oneToManyRelationshipStructure">
 				<xsd:sequence>
 					<xsd:element ref="TypeOfZoneRef" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==  GROUP OF TARIFFZONEs  ============================================== -->
+	<xsd:simpleType name="GroupOfTariffZonesIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a GROUP OF TARIFF ZONEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="GroupOfEntitiesIdType"/>
+	</xsd:simpleType>
+	<xsd:complexType name="groupOfTariffZoneRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of GROUP OF TARIFF ZONEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="GroupOfTariffZonesRef" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

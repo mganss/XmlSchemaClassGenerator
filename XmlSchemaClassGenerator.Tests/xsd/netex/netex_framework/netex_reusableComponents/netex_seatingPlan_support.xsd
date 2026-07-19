@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_seatingPlan_support">
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="../netex_responsibility/netex_relationship.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date>
+					<Created>2023-02-02</Created>
+				</Date>
+				<Date><Modified>2023-02-05</Modified>Name Space changes
+				</Date>
+				<Date><Modified>2023-12-08</Modified>Move SENSOR IN SPOT declarations to here
+				</Date>
+				<Date><Modified>2024-01-17</Modified>Add bed to locatable spot type enumerations
+				</Date>
+				<Date><Modified>2024-02-18</Modified>Norway review comment - Revise Aisle /Window to use enumeration.
+				</Date>
+				<Date><Modified>2025-04-26</Modified>Rename EquipableSpace to  OnboardSpace.
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the SEATING PLAN types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_reusableComponents}netex_seatingPlan_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>
+          Unclassified
+          <Copyright>CEN, Crown Copyright 2022-2025</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel  standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+            Air transport, Airports,
+            Ports and maritime transport, Ferries (marine),
+            Public transport, Bus services, Coach
+            services, Bus stops and stations,
+            Rail transport, Railway stations and track, Train services, Underground trains,
+            Business and industry, Transport, Air transport , Ports and maritime
+            transport, Public transport,
+            Rail transport, Roads and Road transport
+          </Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx SEATING PLAN types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>SEATING PLAN identifier types</xsd:documentation>
+	</xsd:annotation>
+	<!-- ==== SPOT ROW ==================================================== -->
+	<xsd:complexType name="spotRowRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of SPOT ROWs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="SpotRowRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="SpotRowIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SPOT ROW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="SpotRowRef" type="SpotRowRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SPOT ROW. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SpotRowRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SPOT ROW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="SpotRowIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a SPOT ROW.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassSpotRowRefStructureType" default="SpotRow">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for SpotRowRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ==== SPOT COLUMN ================================================= -->
+	<xsd:complexType name="spotColumnRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of SPOT COLUMNs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="SpotColumnRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="SpotColumnIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a SPOT COLUMN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="SpotColumnRef" type="SpotColumnRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a SPOT COLUMN. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="SpotColumnRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a SPOT COLUMN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="SpotColumnIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a SPOT COLUMN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassSpotColumnRefStructureType" default="SpotColumn">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for SpotColumnRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== LOCATABLE SPOT ======================================================== -->
+	<xsd:simpleType name="OnboardSpaceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of an ONBOARD SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="OnboardSpaceRef" type="OnboardSpaceRefStructure" abstract="true" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to an ONBOARD SPACE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OnboardSpaceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to an ONBOARD SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="OnboardSpaceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassOnboardSpaceRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for OnboardSpaceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== LOCATABLE SPOT ======================================================== -->
+	<xsd:complexType name="locatableSpotRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of references to LOCATABLE SPOTs</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="LocatableSpotRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="LocatableSpotIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a LOCATABLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="OnboardSpaceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="LocatableSpotRef" type="LocatableSpotRefStructure" abstract="true" substitutionGroup="OnboardSpaceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a LOCATABLE SPOT. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LocatableSpotRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a LOCATABLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="OnboardSpaceRefStructure">
+				<xsd:attribute name="ref" type="LocatableSpotIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassLocatableSpotRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for LocatableSpotRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== LOCATABLE SPOT RANGE ======================================================== -->
+	<xsd:group name="LocatableSpotRangeGroup">
+		<xsd:annotation>
+			<xsd:documentation>A Range of LOCATABLE SPOTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="StartSpot" type="LocatableSpotRangeRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Start of range of LOCATABLE SPOTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndSpot" type="LocatableSpotRangeRefStructure" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>End of range of LOCATABLE SPOTs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="LocatableSpotRangeRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a LOCATABLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="LocatableSpotRef"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ====== PASSENGER SPOT ======================================= -->
+	<xsd:simpleType name="PassengerSpotIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PASSENGER SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LocatableSpotIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PassengerSpotRef" type="PassengerSpotRefStructure" substitutionGroup="LocatableSpotRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PASSENGER SPOT. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PassengerSpotRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PASSENGER SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LocatableSpotRefStructure">
+				<xsd:attribute name="ref" type="PassengerSpotIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PASSENGER SPOT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPassengerSpotRefStructureType" default="PassengerSpot">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PassengerSpotRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== PASSENGER VEHICLE SPOT ======================================= -->
+	<xsd:simpleType name="PassengerVehicleSpotIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PASSENGER VEHICLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LocatableSpotIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PassengerVehicleSpotRef" type="PassengerVehicleSpotRefStructure" substitutionGroup="LocatableSpotRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PASSENGER VEHICLE SPOT. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PassengerVehicleSpotRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PASSENGER VEHICLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LocatableSpotRefStructure">
+				<xsd:attribute name="ref" type="PassengerVehicleSpotIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PASSENGER VEHICLE SPOT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPassengerVehicleSpotRefStructureType" default="PassengerVehicleSpot">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PassengerVehicleSpotRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== LOGGAGE SPOT ======================================= -->
+	<xsd:simpleType name="LuggageSpotIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a LUGGAGE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="LocatableSpotIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="LuggageSpotRef" type="LuggageSpotRefStructure" substitutionGroup="LocatableSpotRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a LUGGAGE SPOT. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LuggageSpotRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a LUGGAGE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="LocatableSpotRefStructure">
+				<xsd:attribute name="ref" type="LuggageSpotIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a LUGGAGE SPOT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassLuggageSpotRefStructureType" default="LuggageSpot">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for LuggageSpotRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--==== TYPE OF LOCATABLE SPOT =========================================================-->
+	<xsd:simpleType name="TypeOfLocatableSpotIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF LOCATABLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfLocatableSpotRef" type="TypeOfLocatableSpotRefStructure" substitutionGroup="TypeOfValueRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF LOCATABLE SPOT. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfLocatableSpotRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TYPE OF LOCATABLE SPOT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfLocatableSpotIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF LOCATABLE SPOT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfLocatableSpotRefStructureType" default="TypeOfLocatableSpot">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfLocatableSpotRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="TypeOfLocatableSpotEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for type of passenger space.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="seat"/>
+			<xsd:enumeration value="bed"/>
+			<xsd:enumeration value="standingSpace"/>
+			<xsd:enumeration value="wheelchairSpace"/>
+			<xsd:enumeration value="pushchairSpace"/>
+			<xsd:enumeration value="luggageSpace"/>
+			<xsd:enumeration value="bicycleSpace"/>
+			<xsd:enumeration value="vehicleSpace"/>
+			<xsd:enumeration value="specialSpace"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ComponentOrientationEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Spot Orientation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="forwards"/>
+			<xsd:enumeration value="backwards"/>
+			<xsd:enumeration value="unknown"/>
+			<xsd:enumeration value="leftwards"/>
+			<xsd:enumeration value="rightwards"/>
+			<xsd:enumeration value="angledLeft"/>
+			<xsd:enumeration value="angledRight"/>
+			<xsd:enumeration value="angledBackLeft"/>
+			<xsd:enumeration value="angledBackRight"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="TableTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Type of Table.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="none">
+				<xsd:annotation>
+					<xsd:documentation>No table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="fixedFlat">
+				<xsd:annotation>
+					<xsd:documentation>Table is fixed horizontal in front of seat.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="foldDownFlat">
+				<xsd:annotation>
+					<xsd:documentation>Table folds fown to be horizontal in front of seat.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="seatBackFolding">
+				<xsd:annotation>
+					<xsd:documentation>Table folds down from seat back in front.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="armRestFolding">
+				<xsd:annotation>
+					<xsd:documentation>Table folds out from arm rest.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="seatClipon">
+				<xsd:annotation>
+					<xsd:documentation>Table clips on to seat arm rests.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Other type of table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="unknown">
+				<xsd:annotation>
+					<xsd:documentation>Unknown whether there is table.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+</xsd:schema>

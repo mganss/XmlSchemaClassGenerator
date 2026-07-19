@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_vehicle_support">
+	<xsd:include schemaLocation="../netex_responsibility/netex_relationship.xsd"/>
+	<!-- =====VEHICLE  types=========================================== -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Christophe Duquesne</Contributor>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date><Created>2024-02-11</Created>Factor out from vehicleType_support package
+				</Date>
+				<Date><Modified>2024-02-11</Modified>Add RollinhgSTockInvenotry, RollingSTock item etc
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the VEHICLE  identifier Types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_reusableComponents}netex_vehicle_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx VEHICLE TYPE types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx VEHICLE types</xsd:documentation>
+	</xsd:annotation>
+	<!-- ====== VEHICLE ================================================== -->
+	<xsd:complexType name="vehicleRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLEs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehicleRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="VehicleIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="VehicleRef" type="VehicleRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="VehicleRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="VehicleIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a VEHICLE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassVehicleRefStructureType" default="Vehicle">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for VehicleRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== ROLLING STOCK ITEM ================================================== -->
+	<xsd:complexType name="rollingStockItemRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ROLLING STOCK ITEMs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="RollingStockItemRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="RollingStockItemIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="VehicleIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="RollingStockItemRef" type="RollingStockItemRefStructure" abstract="true" substitutionGroup="VehicleRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a ROLLING STOCK ITEM. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RollingStockItemRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VehicleRefStructure">
+				<xsd:attribute name="ref" type="RollingStockItemIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a ROLLING STOCK ITEM.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassRollingStockItemRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for RollingStockItemRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== TRACTIVE ROLLING STOCK ITEM ========================================= -->
+	<xsd:simpleType name="TractiveRollingStockItemIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TRACTIVE ROLLING STOCKITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="RollingStockItemIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TractiveRollingStockItemRef" type="TractiveRollingStockItemRefStructure" substitutionGroup="RollingStockItemRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TRACTIVE ROLLING STOCK ITEM. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TractiveRollingStockItemRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TRACTIVE ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="RollingStockItemRefStructure">
+				<xsd:attribute name="ref" type="TractiveRollingStockItemIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a TRACTIVE ROLLING STOCK ITEM.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTractiveRollingStockItemRefStructureType" default="TractiveRollingStockItem">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TractiveRollingStockItemRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== TRAILING ROLLING STOCK ITEM ========================================= -->
+	<xsd:simpleType name="TrailingRollingStockItemIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TRAILING ROLLING STOCKITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="RollingStockItemIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TrailingRollingStockItemRef" type="TrailingRollingStockItemRefStructure" substitutionGroup="RollingStockItemRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TRAILING ROLLING STOCK ITEM. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TrailingRollingStockItemRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TRAILING ROLLING STOCK ITEM.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="RollingStockItemRefStructure">
+				<xsd:attribute name="ref" type="TrailingRollingStockItemIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a TRAILING ROLLING STOCK ITEM.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTrailingRollingStockItemRefStructureType" default="TrailingRollingStockItem">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TrailingRollingStockItemRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======  ROLLING STOCK INVENTORY ==================================== -->
+	<xsd:complexType name="rollingStockInventoryRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ROLLING STOCK INVENTORYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="RollingStockInventoryRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="RollingStockInventoryIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a ROLLING STOCK INVENTORY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="RollingStockInventoryRef" type="RollingStockInventoryRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a ROLLING STOCK INVENTORY. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="RollingStockInventoryRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a ROLLING STOCK INVENTORY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="RollingStockInventoryIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a ROLLING STOCK INVENTORY.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassRollingStockInventoryRefStructureType" default="RollingStockInventory">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for RollingStockInventoryRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== TYPE OF ROLLING STOCK ======================================= -->
+	<xsd:simpleType name="TypeOfRollingStockIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF ROLLING STOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfRollingStockRef" type="TypeOfRollingStockRefStructure" substitutionGroup="TypeOfEntityRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF ROLLING STOCK. +V2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfRollingStockRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF ROLLING STOCK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfRollingStockIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF ROLLING STOCK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfRollingStockRefStructureType" default="TypeOfRollingStock">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfRollingStockRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

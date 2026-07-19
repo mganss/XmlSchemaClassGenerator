@@ -149,9 +149,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="StopPlace" substitutionGroup="StopPlace_">
+	<xsd:element name="StopPlace" substitutionGroup="StopPlace_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>Version of a named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location. Can be a STOP PLACE, VEHICLE MEETING POINT, TAXI RANK.</xsd:documentation>
+			<xsd:documentation>Version of a named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location. Can be a STOP PLACE, VEHICLE MEETING POINT, TAXI RANK. Note: If a master id exists for a StopPlace (must be stable and globally unique), then it is best used in the id. Optimally it would be built according IFOPT. It can also be put into one of the privateCodes in addition. If it is stored in KeyValue, then it should be documented well, so that importing systems know, which id is the relevant one.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -184,7 +184,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="StopPlaceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="StopPlaceIdType">
+					<xsd:attribute name="id" type="StopPlaceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of STOP PLACE.</xsd:documentation>
 						</xsd:annotation>
@@ -350,9 +350,9 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Mode Elements of a SITE COMPONENT. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:group>
-			<xsd:element name="OtherTransportModes" type="VehicleModeListOfEnumerations" minOccurs="0">
+			<xsd:element name="OtherTransportModes" type="AllPublicTransportModesListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Public transport MODES which may be accessed through associated place.</xsd:documentation>
+					<xsd:documentation>PUBLIC TRANSPORT MODES which may be accessed through associated place.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="tariffZones" type="tariffZoneRefs_RelStructure" minOccurs="0">
@@ -500,7 +500,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="QuayGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="QuayIdType">
+					<xsd:attribute name="id" type="QuayIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of QUAY.</xsd:documentation>
 						</xsd:annotation>
@@ -573,7 +573,7 @@ contained within its parent QUAY.</xsd:documentation>
 			<xsd:documentation>Alternative identifiers of a QUAY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Pubic identifier code of QUAY.</xsd:documentation>
 				</xsd:annotation>
@@ -610,17 +610,22 @@ contained within its parent QUAY.</xsd:documentation>
 							</xsd:element>
 							<xsd:element name="Lang" type="xsd:language" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Language of the names.</xsd:documentation>
+									<xsd:documentation>Language of the ALTERNATIVE NAME.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
-							<xsd:element name="TypeOfName" type="xsd:normalizedString">
+							<xsd:element name="NameType" type="NameTypeEnumeration" default="alias" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Type of Name.</xsd:documentation>
+									<xsd:documentation>Type of Name - fixed value. Default is alias.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="TypeOfName" type="xsd:normalizedString" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Type of Name - open value.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 							<xsd:element name="Name" type="MultilingualString">
 								<xsd:annotation>
-									<xsd:documentation>Name of the entity.</xsd:documentation>
+									<xsd:documentation>ALTERNATIVE NAME of the entity.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 							<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
@@ -635,7 +640,7 @@ contained within its parent QUAY.</xsd:documentation>
 							</xsd:element>
 							<xsd:element name="QualifierName" type="MultilingualString" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Additional Qualifier of the ENTITY name.</xsd:documentation>
+									<xsd:documentation>Additional Qualifier of the ENTITY.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 						</xsd:sequence>
@@ -740,7 +745,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="AccessSpaceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AccessSpaceIdType">
+					<xsd:attribute name="id" type="AccessSpaceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ACCESS SPACE.</xsd:documentation>
 						</xsd:annotation>
@@ -846,7 +851,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="BoardingPositionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="BoardingPositionIdType">
+					<xsd:attribute name="id" type="BoardingPositionIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of BOARDING POSITION.</xsd:documentation>
 						</xsd:annotation>
@@ -872,7 +877,7 @@ contained within its parent QUAY.</xsd:documentation>
 			<xsd:documentation>Elements of a BOARDING POSITION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Pubic identifier code of BOARDING POSITION.</xsd:documentation>
 				</xsd:annotation>
@@ -892,7 +897,7 @@ contained within its parent QUAY.</xsd:documentation>
 	</xsd:group>
 	<!-- ======================================================================= -->
 	<!-- ======================================================================= -->
-	<xsd:element name="StopPlaceEntrance" abstract="false" substitutionGroup="Entrance">
+	<xsd:element name="StopPlaceEntrance" substitutionGroup="Entrance">
 		<xsd:annotation>
 			<xsd:documentation>Passenger Entrance to a STOP PLACE.</xsd:documentation>
 		</xsd:annotation>
@@ -928,7 +933,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="StopPlaceEntranceIdType">
+					<xsd:attribute name="id" type="StopPlaceEntranceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of STOP PLACE ENTRANCE.</xsd:documentation>
 						</xsd:annotation>
@@ -937,7 +942,7 @@ contained within its parent QUAY.</xsd:documentation>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="StopPlaceEntrance_VersionStructure" abstract="false">
+	<xsd:complexType name="StopPlaceEntrance_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for Passenger STOP PLACE ENTRANCE.</xsd:documentation>
 		</xsd:annotation>
@@ -963,7 +968,7 @@ contained within its parent QUAY.</xsd:documentation>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="StopPlaceVehicleEntrance" abstract="false" substitutionGroup="Entrance">
+	<xsd:element name="StopPlaceVehicleEntrance" substitutionGroup="Entrance">
 		<xsd:annotation>
 			<xsd:documentation>A physical entrance or exit to/from a SITE for a VEHICLE. May be a door, barrier, gate or other recognizable point of access.</xsd:documentation>
 		</xsd:annotation>
@@ -1002,7 +1007,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="StopPlaceComponentPropertyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="StopPlaceVehicleEntranceIdType">
+					<xsd:attribute name="id" type="StopPlaceVehicleEntranceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of STOP PLACE ENTRANCE.</xsd:documentation>
 						</xsd:annotation>
@@ -1011,7 +1016,7 @@ contained within its parent QUAY.</xsd:documentation>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="StopPlaceVehicleEntrance_VersionStructure" abstract="false">
+	<xsd:complexType name="StopPlaceVehicleEntrance_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for STOP PLACE VEHICLE ENTRANCE.</xsd:documentation>
 		</xsd:annotation>
@@ -1078,7 +1083,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="VehicleStoppingPlaceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleStoppingPositionIdType">
+					<xsd:attribute name="id" type="VehicleStoppingPositionIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE STOPPING POSITION.</xsd:documentation>
 						</xsd:annotation>
@@ -1188,7 +1193,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="VehicleStoppingPositionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleStoppingPositionIdType" use="optional">
+					<xsd:attribute name="id" type="VehicleStoppingPositionIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE STOPPING POSITION.</xsd:documentation>
 						</xsd:annotation>
@@ -1268,7 +1273,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="VehicleQuayAlignmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleQuayAlignmentIdType" use="optional">
+					<xsd:attribute name="id" type="VehicleQuayAlignmentIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE QUAY ALIGNMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -1286,9 +1291,9 @@ contained within its parent QUAY.</xsd:documentation>
 				<xsd:sequence>
 					<xsd:group ref="VehicleQuayAlignmentGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of element.</xsd:documentation>
+						<xsd:documentation>Order of element. -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -1338,7 +1343,7 @@ contained within its parent QUAY.</xsd:documentation>
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehiclePositionAlignmentIdType" use="optional">
+					<xsd:attribute name="id" type="VehiclePositionAlignmentIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE POSTION ALIGNMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -1356,9 +1361,9 @@ contained within its parent QUAY.</xsd:documentation>
 				<xsd:sequence>
 					<xsd:group ref="VehiclePositionAlignmentGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:positiveInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Order of attribute</xsd:documentation>
+						<xsd:documentation>Order of attribute -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -1396,7 +1401,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:group ref="GroupOfStopPlacesGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfStopPlacesIdType">
+					<xsd:attribute name="id" type="GroupOfStopPlacesIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of GROUP of STOP PLACEs.</xsd:documentation>
 						</xsd:annotation>
@@ -1422,7 +1427,7 @@ contained within its parent QUAY.</xsd:documentation>
 			<xsd:documentation>Elements of a GROUP of STOP PLACEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0"/>
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0"/>
 			<xsd:element name="members" type="stopPlaceRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Stations and stops in GROUP of STOP PLACEs.</xsd:documentation>
@@ -1439,16 +1444,20 @@ contained within its parent QUAY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="gml:Polygon" minOccurs="0"/>
-			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Primary MODE of Vehicle transport associated by this component.</xsd:documentation>
+					<xsd:documentation>Primary PT MODE associated by this component. +v1.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:group ref="PtSubmodeChoiceGroup" minOccurs="0"/>
+			<xsd:group ref="PtSubmodeChoiceGroup" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PUBLIC TRANSPORT subMODE. +v1.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="StopPlaceView" abstract="false" substitutionGroup="DerivedView">
+	<xsd:element name="StopPlaceView" substitutionGroup="DerivedView">
 		<xsd:annotation>
 			<xsd:documentation>Simplified view of STOP PLACE. Contains.</xsd:documentation>
 		</xsd:annotation>
@@ -1478,9 +1487,9 @@ contained within its parent QUAY.</xsd:documentation>
 								<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
-						<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+						<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 							<xsd:annotation>
-								<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+								<xsd:documentation>Primary PT MODE.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
 					</xsd:sequence>
@@ -1493,7 +1502,7 @@ contained within its parent QUAY.</xsd:documentation>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="StopPlace_DerivedViewStructure" abstract="false">
+	<xsd:complexType name="StopPlace_DerivedViewStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for STOP PLACE VIEW.</xsd:documentation>
 		</xsd:annotation>
@@ -1522,9 +1531,9 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
+					<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+							<xsd:documentation>Primary PT MODE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:sequence>

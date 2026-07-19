@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_journeyAccounting_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_journeyAccounting_support">
 	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_assignment_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_responsibility/netex_responsibilitySet_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_responsibility/netex_relationship.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -15,9 +16,9 @@
 				<Date>
 					<Created>2011-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified>
-					<!-- Name Space changes -->
+				<Date><Modified>2011-02-05</Modified>Name Space changes
+				</Date>
+				<Date><Modified>2024-03-01</Modified>Tie in to Contract 
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -35,7 +36,7 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/xsd//netex_framework/netex_responsibility/netex_relationship.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
 				</Rights>
 				<Source>
 					<ul>
@@ -106,33 +107,80 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of JOURNEY ACCOUNTING.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassJourneyAccountingRefStructureType" default="JourneyAccounting">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for JourneyAccountingRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
 	<xsd:simpleType name="SupplyContractIdType">
 		<xsd:annotation>
-			<xsd:documentation>Type for identifier of a SUPPLY CONTRACT.</xsd:documentation>
+			<xsd:documentation>Type for identifier of a Supplier CONTRACT.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="ObjectIdType"/>
+		<xsd:restriction base="ContractIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="SupplyContractRef" type="SupplyContractRefStructure" substitutionGroup="VersionOfObjectRef">
+	<xsd:element name="SupplyContractRef" type="SupplyContractRefStructure" substitutionGroup="ContractRef">
 		<xsd:annotation>
-			<xsd:documentation>Reference to a SUPPLY CONTRACT.</xsd:documentation>
+			<xsd:documentation>Reference to a Supplier CONTRACT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="SupplyContractRefStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a reference to a SUPPLY CONTRACT.</xsd:documentation>
+			<xsd:documentation>Type for a reference to a Supplier CONTRACT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="VersionOfObjectRefStructure">
+			<xsd:restriction base="ContractRefStructure">
 				<xsd:attribute name="ref" type="SupplyContractIdType" use="required">
 					<xsd:annotation>
-						<xsd:documentation>Identifier of SUPPLY CONTRACT.</xsd:documentation>
+						<xsd:documentation>Identifier of Supplier CONTRACT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassContractRefStructureType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<xsd:attribute name="version" type="VersionIdType">
+		<xsd:annotation>
+			<xsd:documentation>Version number of referenced entity.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:attribute>
 </xsd:schema>
