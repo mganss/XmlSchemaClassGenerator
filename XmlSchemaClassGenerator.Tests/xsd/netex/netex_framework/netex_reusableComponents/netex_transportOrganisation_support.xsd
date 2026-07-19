@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_transportOrganisation_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_transportOrganisation_version">
 	<xsd:include schemaLocation="../netex_genericFramework/netex_organisation_support.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -8,15 +7,18 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
 				<Date>
 					<Modified>2014-03-31</Modified>
 				</Date>
-				<Date>
-					<Modified>2019-03-08</Modified>UK-44 Add additional  groupsOfOperatorss  to Network.   
+				<Date><Modified>2019-03-08</Modified>UK-44 Add additional  groupsOfOperators  to Network.   
+				</Date>
+				<Date><Modified>2020-10-15</Modified>NewModes: Add TransportOperator PublicTransportOperator, Add alternativeTransportOperatorrk.   
+				</Date>
+				<Date><Modified>2020-11-24</Modified>NewModes: Drop  PublicTransportOperator,   alternativeTransportOperatorrk.   
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines  NetEX:TRANSPORT  ORGANISATION identifier  types.</p>
@@ -30,14 +32,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the SIRI standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -55,12 +57,29 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>NetEX:TRANSPORT ORGANISATION identifier  types for NeTEx Network Exchange.</xsd:documentation>
 	</xsd:annotation>
-	<!-- ==== TRANSPORT OPERATOR ========================================== -->
-	<xsd:element name="TransportOrganisationRef" type="OrganisationRefStructure" abstract="true" substitutionGroup="OrganisationRef">
+	<xsd:element name="AllTransportOrganisationsRef" type="AllTransportOrganisationsRefStructure" substitutionGroup="AllOrganisationsRef">
 		<xsd:annotation>
-			<xsd:documentation>Reference to an  TRANSPORT ORGANISATION.</xsd:documentation>
+			<xsd:documentation>Reference to all  TRANSPORT ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
+	<xsd:complexType name="AllTransportOrganisationsRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to  all TRANSPORT ORGANISATIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="AllOrganisationsRefStructure"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:group name="OneOrAllTransportOrganisationsRefGroup">
+		<xsd:annotation>
+			<xsd:documentation>One or all TRANSPORT ORGANISATIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="AllTransportOrganisationsRef"/>
+			<xsd:element ref="TransportOrganisationRef"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ==== TRANSPORT ORGANISATION ========================================== -->
 	<xsd:complexType name="transportOrganisationRefs_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of references to an OPERATOR.</xsd:documentation>
@@ -73,40 +92,50 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="AllTransportOrganisationsRef" type="AllTransportOrganisationsRefStructure" substitutionGroup="AllOrganisationsRef">
+	<xsd:element name="TransportOrganisationRef" type="TransportOrganisationRefStructure" abstract="true" substitutionGroup="OrganisationRef_">
 		<xsd:annotation>
-			<xsd:documentation>Reference to all  TRANSPORT ORGANISATION.</xsd:documentation>
+			<xsd:documentation>Reference to a TRANSPORT ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="AllTransportOrganisationsRefStructure">
+	<xsd:simpleType name="TransportOrganisationIdType">
 		<xsd:annotation>
-			<xsd:documentation>Type for a reference to  all TRANSPORT ORGANISATIONs.</xsd:documentation>
+			<xsd:documentation>Type for identifier of a TRANSPORT ORGANISATION..</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="OrganisationIdType"/>
+	</xsd:simpleType>
+	<xsd:complexType name="TransportOrganisationRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to an TRANSPORT ORGANISATION..</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="AllOrganisationsRefStructure">
-				<xsd:attribute name="ref" type="OrganisationIdType" use="required" fixed="All">
+			<xsd:restriction base="OrganisationRefStructure">
+				<xsd:attribute name="ref" type="TransportOrganisationIdType" use="required">
 					<xsd:annotation>
-						<xsd:documentation>Identifier of an OPERATOR.</xsd:documentation>
+						<xsd:documentation>Identifier of an TRANSPORT ORGANISATION.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:group name="OneOrAllTransportOperatorsRefGroup">
-		<xsd:annotation>
-			<xsd:documentation>One or all TRANSPORT ORGANISATIONs.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:choice>
-			<xsd:element ref="AllTransportOrganisationsRef"/>
-			<xsd:element ref="TransportOrganisationRef"/>
-		</xsd:choice>
-	</xsd:group>
 	<!-- ====  OPERATOR ======================================================= -->
+	<xsd:element name="AllPublicTransportOrganisationsRef" type="AllPublicTransportOrganisationsRefStructure" substitutionGroup="AllTransportOrganisationsRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to all PUBLIC TRANSPORT ORGANISATIONs.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="AllPublicTransportOrganisationsRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to  all TRANSPORT ORGANISATIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AllTransportOrganisationsRefStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<xsd:simpleType name="OperatorIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of an OPERATOR.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="OrganisationIdType"/>
+		<xsd:restriction base="TransportOrganisationIdType"/>
 	</xsd:simpleType>
 	<xsd:element name="OperatorRef" type="OperatorRefStructure" substitutionGroup="TransportOrganisationRef">
 		<xsd:annotation>
@@ -118,7 +147,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for a reference to an OPERATOR.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="OrganisationRefStructure">
+			<xsd:restriction base="TransportOrganisationRefStructure">
 				<xsd:attribute name="ref" type="OperatorIdType" use="required">
 					<xsd:annotation>
 						<xsd:documentation>Identifier of an OPERATOR.</xsd:documentation>
@@ -127,11 +156,19 @@ Rail transport, Roads and Road transport
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:element name="AllOperatorsRef" type="AllTransportOrganisationsRefStructure" substitutionGroup="AllTransportOrganisationsRef">
+	<xsd:element name="AllOperatorsRef" type="AllOperatorsRefStructure" substitutionGroup="AllPublicTransportOrganisationsRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to all OPERATORs.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
+	<xsd:complexType name="AllOperatorsRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to  all OPERATORss.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AllAuthoritiesRefStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<xsd:group name="OneOrAllOperatorsRefGroup">
 		<xsd:annotation>
 			<xsd:documentation>One or all OPERATORs.</xsd:documentation>
@@ -146,19 +183,24 @@ Rail transport, Roads and Road transport
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of an AUTHORITY.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="OrganisationIdType"/>
+		<xsd:restriction base="TransportOrganisationIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="AuthorityRef" type="AuthorityRefStructure" substitutionGroup="TransportOrganisationRef">
+	<xsd:element name="AuthorityRef" substitutionGroup="TransportOrganisationRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to an AUTHORITY.</xsd:documentation>
 		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:restriction base="AuthorityRefStructure"/>
+			</xsd:simpleContent>
+		</xsd:complexType>
 	</xsd:element>
 	<xsd:complexType name="AuthorityRefStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a reference to an AUTHORITY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="OrganisationRefStructure">
+			<xsd:restriction base="TransportOrganisationRefStructure">
 				<xsd:attribute name="ref" type="AuthorityIdType" use="required">
 					<xsd:annotation>
 						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
@@ -167,11 +209,19 @@ Rail transport, Roads and Road transport
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:element name="AllAuthoritiesRef" type="AllTransportOrganisationsRefStructure" substitutionGroup="AllTransportOrganisationsRef">
+	<xsd:element name="AllAuthoritiesRef" type="AllAuthoritiesRefStructure" substitutionGroup="AllPublicTransportOrganisationsRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to all AUTHORITIies.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
+	<xsd:complexType name="AllAuthoritiesRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to  all AUTHORITIES.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AllPublicTransportOrganisationsRefStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<xsd:group name="OneOrAllAuthoritiesRefGroup">
 		<xsd:annotation>
 			<xsd:documentation>One or all AUTHORITIies.</xsd:documentation>
@@ -181,10 +231,10 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="AuthorityRef"/>
 		</xsd:choice>
 	</xsd:group>
-	<!-- ===== AUTHORITY ========================================================= -->
-	<xsd:complexType name="groupsOfTransportOrganisationsRefs_RelStructure">
+	<!-- ==GROUP OF OPERATORss============================================================ -->
+	<xsd:complexType name="groupsOfOperatorsRefs_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a list of references to list of GROUPs OF TRANSPORT ORGANISATIONS.</xsd:documentation>
+			<xsd:documentation>Type for a list of references to list of GROUPs OF OPERATORS.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="oneToManyRelationshipStructure">
@@ -194,7 +244,6 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<!-- ==GROUP OF OPERATORss============================================================ -->
 	<xsd:simpleType name="GroupOfOperatorsIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a GROUP OF OPERATORs. (In fact TRNASPORT ORGANISATION)</xsd:documentation>

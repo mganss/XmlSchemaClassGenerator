@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_equipmentAccess_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_ifopt_equipmentAccess_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_facility_support.xsd"/>
+	<xsd:include schemaLocation="netex_ifopt_path_support.xsd"/>
 	<xsd:include schemaLocation="netex_ifopt_equipmentAccess_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipmentPlace_version.xsd"/>
 	<!-- ======================================================================= -->
@@ -11,7 +11,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -21,11 +21,9 @@
 				<Date>
 					<Modified>2011-12-16</Modified>
 				</Date>
-				<Date>
-					<Modified>2017-05-25</Modified> Integrate NPR documentation correction to lift passable
+				<Date><Modified>2017-05-25</Modified> Integrate NPR documentation correction to lift passable
 				</Date>
-				<Date>
-					<Modified>2019-03-25</Modified>FR49 CD #65  Accessibility changes
+				<Date><Modified>2019-03-25</Modified>FR49 CD #65  Accessibility changes
 					CD add new attribute NecessaryForceEnumeration with values noForce, lightForce, mediumForce,  heavyForce, unknown
 					CD add new attributeLightingMethod  to PlaceLighting with values movementDetector, stepDetector, switchOnTheWall, atDoorOpening, onlyAtNight, other
 						NJSK Review:  correct typo on stepDetector
@@ -44,17 +42,16 @@
 								  NJSK Review: NB AudioOrVideoIntercom overlap with EntranceAttention								  
 					CD Add new attributes  to QueuingEquipment:  DisabledPriority QueuingSeatedPossible.
  				</Date>
-				<Date>
-					<Modified>2019-05-27</Modified>Fix add missing DropKerbOutside value to Entrance Eqeuipment
+				<Date><Modified>2019-05-27</Modified>Fix add missing DropKerbOutside value to Entrance Eqeuipment
 					Rename Slope to Gradient to be conistent
 					Move WIthoutRaiser to be specifc to Staircase.
 				</Date>
-				<Date>
-					<Modified>2019-05-27</Modified>Doc tidy up 
+				<Date><Modified>2019-05-27</Modified>Doc tidy up 
 					Rename Accoustic(six)  to AUdio 
 					Correct comments
-				</Date>				
-				
+				</Date>
+				<Date><Modified>2021-07-14</Modified>Fix catch up - Make Access Equipment Abstarct 
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines EQUIPMENT base types.</p>
 				</Description>
@@ -67,14 +64,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the TransModel standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -102,6 +99,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="EntranceEquipment"/>
 			<xsd:element ref="StaircaseEquipment"/>
 			<xsd:element ref="LiftEquipment"/>
+			<xsd:element ref="LiftCallEquipment"/>
 			<xsd:element ref="EscalatorEquipment"/>
 			<xsd:element ref="TravelatorEquipment"/>
 			<xsd:element ref="RampEquipment"/>
@@ -119,6 +117,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="EntranceEquipment" minOccurs="0"/>
 			<xsd:element ref="EscalatorEquipment" minOccurs="0"/>
 			<xsd:element ref="LiftEquipment" minOccurs="0"/>
+			<xsd:element ref="LiftCallEquipment" minOccurs="0"/>
 			<xsd:element ref="PlaceLighting" minOccurs="0"/>
 			<xsd:element ref="QueueingEquipment" minOccurs="0"/>
 			<xsd:element ref="RampEquipment" minOccurs="0"/>
@@ -128,7 +127,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====ACCESS=================================================================== -->
-	<xsd:element name="AccessEquipment" type="AccessEquipment_VersionStructure" substitutionGroup="InstalledEquipment">
+	<xsd:element name="AccessEquipment" type="AccessEquipment_VersionStructure" abstract="true" substitutionGroup="PlaceEquipment">
 		<xsd:annotation>
 			<xsd:documentation>Specialisation of PLACE EQUIPMENT dedicated to access (e.g. lifts, entrances, stairs, ramps, etc.).</xsd:documentation>
 		</xsd:annotation>
@@ -138,7 +137,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for an ACCESS EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="InstalledEquipment_VersionStructure">
+			<xsd:extension base="PlaceEquipment_VersionStructure">
 				<xsd:sequence>
 					<xsd:group ref="AccessEquipmentGroup">
 						<xsd:annotation>
@@ -157,6 +156,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="Width" type="LengthType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Width of EQUIPMENT or entrance to EQUIPMENT (e.g. Lift).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Height" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Height of EQUIPMENT or entrance to EQUIPMENT (e.g. Lift).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DirectionOfUse" type="DirectionOfUseEnumeration" default="both" minOccurs="0">
@@ -239,6 +243,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="SurfaceType" type="SurfaceTypeEnumeration">
 				<xsd:annotation>
 					<xsd:documentation>Type of Surface.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VisualContrast" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is visual contrast compared to the immediate surroundings.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="SuitableForCycles" type="xsd:boolean" minOccurs="0">
@@ -364,12 +373,22 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="StepHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Depth of an individual step.</xsd:documentation>
+					<xsd:documentation>Depth of an individual step, in metres rounded to the nearest cm.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StepLength" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The length of the step, in metres rounded to the nearest cm.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="StepColourContrast" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether there is a colour contrast on step nosings.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StepCondition" type="StepConditionEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the regularity of the steps.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="HandrailType" type="HandrailEnumeration" minOccurs="0">
@@ -385,6 +404,16 @@ Rail transport, Roads and Road transport
 			<xsd:element name="LowerHandrailHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Height of any additional lower handrail from step.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TactileWriting" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence of signage that can be read tactilely (in Braille for example) on the handrail.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StairRamp" type="StairRampEnumeration" default="none" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence and type of a ramp included within the staircase.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="TopEnd" type="StairEndStructure" minOccurs="0">
@@ -459,7 +488,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="TactileActuators" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether ESCALATOR has a tactile actuator.</xsd:documentation>
+					<xsd:documentation>Whether there are buttons to start the ESCALATOR if it is not moving, and whether these buttons are intended and suited for the visually impaired.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="EnergySaving" type="xsd:boolean" minOccurs="0">
@@ -475,6 +504,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="EscalatorWithLanding" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether ESCALATOR has a landing. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MonitoringRemoteControl" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the escalator is equipped with a remote operation control system.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -689,7 +723,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="TactileActuators" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether Travelator has a tactile actuator.</xsd:documentation>
+					<xsd:documentation>Whether there are buttons to start the TRAVELATOR if it is not moving, and whether these buttons are intended and suited for the visually impaired.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="EnergySaving" type="xsd:boolean" minOccurs="0">
@@ -709,7 +743,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Gradient" type="xsd:decimal" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Slope (integer in meters) for inclined moving walks.+v1.1</xsd:documentation>
+					<xsd:documentation>Maximum gradient in degrees for inclined moving walks.+v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="IntegratesAnEscalatorPart" type="xsd:boolean" minOccurs="0">
@@ -804,6 +838,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Height of lower handrail from floor.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="TactileWriting" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence of signage that can be read tactilely (in Braille for example) on the handrail.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="LiftDimensionsGroup">
@@ -836,6 +875,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Internal width of lift.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="InternalHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Internal height of lift.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="LiftButtonsGroup">
@@ -845,32 +889,32 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="CallButtonHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Height of call button from ground.</xsd:documentation>
+					<xsd:documentation>Height of call button from ground (outside the cabin).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DirectionButtonHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Height of direction call button from ground.</xsd:documentation>
+					<xsd:documentation>Height of direction call button from ground (outside the cabin).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="RaisedButtons" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether buttons are raised.</xsd:documentation>
+					<xsd:documentation>Whether buttons are raised (inside and outside the cabin).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="BrailleButtons" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether buttons have braille.</xsd:documentation>
+					<xsd:documentation>Whether buttons have braille (inside and outside the cabin).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="TactileGroundFloorButton" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Indicates whether there is a tactile marker on the go to ground  floor button. +v1.1</xsd:documentation>
+					<xsd:documentation>Indicates whether there is a tactile marker on the go to ground floor button (inside the cabin). +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="GroundMarkAlignedWithButton" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Indicates a tactile marker on floor under the buttons (or aligned with) +v1.1 .</xsd:documentation>
+					<xsd:documentation>Indicates a tactile marker on the floor under, or aligned with, the buttons (outside the cabin). +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -912,7 +956,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="TactileActuators" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether Lift has a tactile actuator.</xsd:documentation>
+					<xsd:documentation>Whether all buttons have tactile markers suited for the visually impaired.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="AudioAnnouncements" type="xsd:boolean" minOccurs="0">
@@ -923,6 +967,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="AccousticAnnouncements" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>DEPRECATED - Spelling correction  renamed to audio announcements. THis value will be dropped at  - so</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ReachedFloorAnnouncement" type="ReachedFloorAnnouncementEnumeration" default="visual" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the elevator car has a visual, tactile or audible display to announce the floor reached. This is different from AudioAnnouncements since AudioAnnouncements can be about different topics than reached floor (closing doors, up-down movement, etc.), and the ReachedFloorAnnouncement can be visual or tactile, and not only audio.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="MagneticInductionLoop" type="xsd:boolean" minOccurs="0">
@@ -938,6 +987,105 @@ Rail transport, Roads and Road transport
 			<xsd:element name="SuitableForCycles" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether equipment is suitable for cycles.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ButtonsHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates buttons height (in metres, uppermost button inside the cabin).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="LiftCallEquipment" substitutionGroup="AccessEquipment">
+		<xsd:annotation>
+			<xsd:documentation>Specialisation of PLACE ACCESS EQUIPMENT for calling LIFTs (provides specific characteristics that may differ from floor to floor like button height, door, etc.).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="LiftCallEquipment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="AccessEquipmentGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements for an ACCESS EQUIPMENT.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LiftCallEquipmentGroup">
+								<xsd:annotation>
+									<xsd:documentation>Elements for calling a LIFT that are specific to a floor.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="LiftCallEquipmentIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="LiftCallEquipment_VersionStructure" abstract="false">
+		<xsd:complexContent>
+			<xsd:extension base="AccessEquipment_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="LiftCallEquipmentGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="LiftCallEquipmentGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for LIFT call EQUIPMENT type, outside the cabin and specific to a floor.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CallButtonHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Height of call button from ground.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RaisedButtons" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether buttons are raised.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BrailleButtons" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether buttons have braille.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GroundMarkAlignedWithButton" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates a tactile marker on floor under the buttons (or aligned with). +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AudioAnnouncements" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether LIFT has AudioAnnouncements.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MagneticInductionLoop" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates existence of a magnetic induction loop. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DoorOrientation" type="CompassBearing8Enumeration" minOccurs="0" maxOccurs="2">
+				<xsd:annotation>
+					<xsd:documentation>The direction from which to approach the door(s).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MonitoringRemoteControl" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the lift is equipped with a remote operation control system</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -999,7 +1147,12 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="Length" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Length of ramp in metres.</xsd:documentation>
+					<xsd:documentation>Length of ramp in metres. In the case of a mobile ramp associated with a vehicle this element is used to convey the length the ramp needs to be extended from the vehicle. This indicates the minimally necessary width of the Quay.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumLoad" type="WeightType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum load in kilograms. Mainly used for mobile ramps.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Gradient" type="xsd:positiveInteger" minOccurs="0">
@@ -1017,14 +1170,24 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether ramp is on a pedestal.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="HandrailType" type="HandrailEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of handrail.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="HandrailHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Height of handrail.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="HandrailType" type="HandrailEnumeration" minOccurs="0">
+			<xsd:element name="LowerHandrailHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Type of handrail.</xsd:documentation>
+					<xsd:documentation>Height of any additional lower handrail.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TactileWriting" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence of signage that can be read tactilely (in Braille for example) on the handrail.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="TactileGuidanceStrips" type="xsd:boolean" minOccurs="0">
@@ -1045,6 +1208,21 @@ Rail transport, Roads and Road transport
 			<xsd:element name="SuitableForCycles" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether equipment is suitable for cycles.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RestStopDistance" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The maximum distance between two resting levels, in metres rounded to the nearest cm. It is recommended to install a rest platform at the bottom and top of each ramp, as well as every 10 metres in the case of a long ramp.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SafetyEdge" type="SafetyEdgeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is a wheel guard (side border intended to block the wheel of the wheelchair to prevent falls).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TurningSpace" type="RampTurningSpacePositionEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Position of the manoeuvring space (for wheelchairs).</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -1111,6 +1289,17 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether there is a door in the entrance. If false, opening does not have door.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="DoorOrientation" type="CompassBearing8Enumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Pointing towards outside (or, for doors within a StopPlace, to label the side as outside).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DoorHandleOutside" type="DoorHandleEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of door handle.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DoorHandleInside" type="DoorHandleEnumeration" minOccurs="0"/>
 			<xsd:element name="KeptOpen" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether the door is kept open.</xsd:documentation>
@@ -1180,6 +1369,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether doors are automatic.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="DoorControlElementHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates door control element height. This could be e.g. a door handle or a door button.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="GlassDoor" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether door is made of glass.</xsd:documentation>
@@ -1195,7 +1389,7 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Door can be passed in a wheel chair.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="WheechairUnaided" type="xsd:boolean" minOccurs="0">
+			<xsd:element name="WheelchairUnaided" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Can be passed in a wheel chair unaided.</xsd:documentation>
 				</xsd:annotation>
@@ -1220,14 +1414,34 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Necessary force to open the door. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="AudioPassthroughIndicator" type="xsd:boolean" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether there is an audio signal indicating passing through. +v1.1</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
 			<xsd:element name="SuitableForCycles" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether equipment is suitable for cycles.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AudioPassthroughIndicator" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether there is an audio signal indicating passing through.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="RampDoorbell" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>When there is a removable ramp, whether the entrance has a dedicated doorbell to ask for the ramp.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Recognizable" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether the entrance is easily identifiable in its environment taking into account architecture, signage and visual contrast.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TurningSpacePosition" type="EntranceTurningSpacePositionEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Position of the turning space: the manoeuvring space for wheelchairs is a space left in the immediate vicinity of the door to operate it correctly and is (should be) materialised by a rectangle located at the base of the door.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="WheelchairTurningCircle" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Turning circle within the turning space for a wheelchair.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -1401,7 +1615,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="VisualGuidanceBands" type="xsd:boolean" default="false" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether crossing has tactile guidance strips.</xsd:documentation>
+					<xsd:documentation>Whether crossing has visual guidance bands or guidance strips.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="DroppedKerb" type="xsd:boolean" minOccurs="0">
@@ -1412,6 +1626,31 @@ Rail transport, Roads and Road transport
 			<xsd:element name="SuitableForCycles" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether equipment is suitable for cycles.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MarkingStatus" type="MarkingStatusEnumeration" default="good" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Status of the ground marking of the crossing.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VibratingCrossingAids" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence of a device delivering vibrations to facilitate the crossing of visually impaired people.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BumpCrossing" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates whether the pedestrian crossing is convex, curved (it goes up then down).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VisualObstacle" type="VisualObstacleEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence and type of visual obstacle to visibility. The visual obstacle is an element, positioned up to 5 metres upstream of the crossing, and which hinders the pedestrian from seeing and being seen when crossing.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BollardCrossing" type="BollardCrossingEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Indicates the presence of bollards intended to protect pedestrians. </xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

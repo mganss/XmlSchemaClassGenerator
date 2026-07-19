@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_stopPlace_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_ifopt_stopPlace_version">
 	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gml_extract_all_objects_v_3_2_1.xsd"/>
 	<!--Actual dependency-->
 	<xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../gml/gmlBasic2d-extract-v3_2_1-.xsd"/>
@@ -18,8 +18,7 @@
 				<Date>
 					<Modified>2006-09-21</Modified>
 				</Date>
-				<Date>
-					<Modified>2007-03-22</Modified>23 Add repeating name
+				<Date><Modified>2007-03-22</Modified>23 Add repeating name
 				</Date>
 				<Date>
 					<Modified>2017-03-28 CR0015 Add  Group Of Stop Places In Frame</Modified>
@@ -27,14 +26,19 @@
 				<Date>
 					<Modified>2018-07-18   Add  Centroid to  Group Of Stop Places. Fix cardinality on GroupofStopPlacesInFrame</Modified>
 				</Date>
-				<Date>
-					<Modified>2019-03-25</Modified>CR055 CD Change #52 Add Add new attribute  StopPlaceWeight  to  StopPlace  with values _international, national, regional, local_. 
+				<Date><Modified>2019-03-25</Modified>CR055 CD Change #52 Add Add new attribute  StopPlaceWeight  to  StopPlace  with values _international, national, regional, local_. 
 				</Date>
 				<Date>
 					<Modified>2019-04-09  Add  MODE and SUBMODE to Group of Stop Places - in doc but missing from schema</Modified>
 				</Date>
 				<Date>
 					<Modified>2019-04-13 Fix add misisng elements from VEHICLE STOPPING POSITION, fix restricted attributes in StopPlaceEntrance etc</Modified>
+				</Date>
+				<Date>
+					<Modified>2020-10-05 New modes - add MODE of OPERATION to stop place compoment group.
+					 Allow selfDrive and TAxi modes for component mode.
+					 Group MOdes for use on SUbcompinents
+					 </Modified>
 				</Date>
 				<Description>
 					<Title>NeTEx Network Exchange - STOP PLACE types.</Title>
@@ -66,7 +70,7 @@
 						<li>Evolved from NaPTAN, SIRI and other schemas.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -90,6 +94,7 @@ Rail transport, Roads and Road transport
 	<xsd:include schemaLocation="netex_ifopt_stopPlace_support.xsd"/>
 	<xsd:include schemaLocation="netex_ifopt_vehicleStopping_support.xsd"/>
 	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_modeOfOperation_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_version.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_address_version.xsd"/>
 	<xsd:include schemaLocation="../part1_networkDescription/netex_line_version.xsd"/>
@@ -100,12 +105,16 @@ Rail transport, Roads and Road transport
 	<!-- ===ENTIITY IN VERSION IN FRAME====(Used in SITE FRAME)=================================================== -->
 	<xsd:complexType name="stopPlacesInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of STOP PLACE.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of STOP PLACE</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="StopPlace" maxOccurs="unbounded"/>
+					<xsd:element ref="StopPlace" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>A STOP PLACE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -140,9 +149,9 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="StopPlace" substitutionGroup="Site">
+	<xsd:element name="StopPlace" substitutionGroup="StopPlace_">
 		<xsd:annotation>
-			<xsd:documentation>Version of a named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location.</xsd:documentation>
+			<xsd:documentation>Version of a named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location. Can be a STOP PLACE, VEHICLE MEETING POINT, TAXI RANK.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -336,12 +345,11 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Property Elements of a STOP PLACE COMPONENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+			<xsd:group ref="SiteComponentModeGroup">
 				<xsd:annotation>
-					<xsd:documentation>Primary MODE of Vehicle transport associated by this component.</xsd:documentation>
+					<xsd:documentation>Mode Elements of a SITE COMPONENT. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
-			</xsd:element>
-			<xsd:group ref="PtSubmodeChoiceGroup" minOccurs="0"/>
+			</xsd:group>
 			<xsd:element name="OtherTransportModes" type="VehicleModeListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Public transport MODES which may be accessed through associated place.</xsd:documentation>
@@ -395,6 +403,16 @@ Rail transport, Roads and Road transport
 			<xsd:element name="entrances" type="siteEntrances_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>ENTRANCEs to SPACE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Length" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Length of SPACE in metres.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Width" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Width of SPACE in metres.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -510,6 +528,7 @@ contained within its parent QUAY.</xsd:documentation>
 		<xsd:sequence>
 			<xsd:group ref="QuayIdentifierGroup"/>
 			<xsd:group ref="QuayDescriptorGroup"/>
+			<xsd:group ref="PlatformAccessibilitySpecificGroup"/>
 			<xsd:element name="ParentQuayRef" type="QuayRefStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>if QUAY is a subzone of another QUAY, identifies parent.</xsd:documentation>
@@ -649,6 +668,24 @@ contained within its parent QUAY.</xsd:documentation>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
+	<xsd:group name="PlatformAccessibilitySpecificGroup">
+		<xsd:annotation>
+			<xsd:documentation>Additional details for accessibility of QUAYs and BOARDING POSITIONs</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PlatformHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Height of the platform relative to the ground (bus) or the rail track.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EdgeToTrackCenterDistance" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Distance between the track centre and the platform edge parallel to the running plane (bq), as defined in chapter 13 of EN 15273-3:2013.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
 	<xsd:complexType name="accessSpaces_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ACCESS SPACEs.</xsd:documentation>
@@ -749,7 +786,7 @@ contained within its parent QUAY.</xsd:documentation>
 			</xsd:element>
 			<xsd:element name="PassageType" type="PassageTypeEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Type of ACCESS SPACE.</xsd:documentation>
+					<xsd:documentation>Type of passage associated with ACCESS SPACE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -850,6 +887,7 @@ contained within its parent QUAY.</xsd:documentation>
 					<xsd:documentation>Entrances to BOARDING POSITION.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:group ref="PlatformAccessibilitySpecificGroup"/>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
@@ -1248,7 +1286,7 @@ contained within its parent QUAY.</xsd:documentation>
 				<xsd:sequence>
 					<xsd:group ref="VehicleQuayAlignmentGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:nonNegativeInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger">
 					<xsd:annotation>
 						<xsd:documentation>Order of element.</xsd:documentation>
 					</xsd:annotation>
@@ -1318,7 +1356,7 @@ contained within its parent QUAY.</xsd:documentation>
 				<xsd:sequence>
 					<xsd:group ref="VehiclePositionAlignmentGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:nonNegativeInteger">
+				<xsd:attribute name="order" type="xsd:positiveInteger">
 					<xsd:annotation>
 						<xsd:documentation>Order of attribute</xsd:documentation>
 					</xsd:annotation>
@@ -1401,7 +1439,7 @@ contained within its parent QUAY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="gml:Polygon" minOccurs="0"/>
-			<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Primary MODE of Vehicle transport associated by this component.</xsd:documentation>
 				</xsd:annotation>
@@ -1440,7 +1478,7 @@ contained within its parent QUAY.</xsd:documentation>
 								<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:element>
-						<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+						<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
 							<xsd:annotation>
 								<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
 							</xsd:annotation>
@@ -1484,7 +1522,7 @@ contained within its parent QUAY.</xsd:documentation>
 							<xsd:documentation>Type of STOP PLACE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
-					<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+					<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
 						</xsd:annotation>

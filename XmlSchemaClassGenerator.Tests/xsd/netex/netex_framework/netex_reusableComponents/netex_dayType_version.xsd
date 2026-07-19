@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by christophe duquesne (Dryade SARL) -->
 <xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_day_type_version">
 	<xsd:include schemaLocation="netex_dayType_propertiesOfDay.xsd"/>
 	<xsd:include schemaLocation="netex_dayType_support.xsd"/>
@@ -11,7 +10,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -20,6 +19,8 @@
 				</Date>
 				<Date>
 					<Modified>2014-03-16</Modified>
+				</Date>
+				<Date><Modified>2021-07-07</Modified>NewModesAdd TimeOfDayEnumeration with dawn, dusk 
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines DAY TYPE types </p>
@@ -40,7 +41,7 @@
 						<li>Derived from the SIRI standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -277,18 +278,32 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements defining a span of time.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="StartTime" type="xsd:time">
-				<xsd:annotation>
-					<xsd:documentation>The (inclusive) start time.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice minOccurs="0">
+				<xsd:element name="StartTime" type="xsd:time">
+					<xsd:annotation>
+						<xsd:documentation>The (inclusive) start time.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="StartEvent" type="TimeOfDayEnumeration">
+					<xsd:annotation>
+						<xsd:documentation>Event marking start of timeband, e.,g  , dusk +V1.2.2 dawn</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
 			<xsd:choice>
 				<xsd:sequence>
-					<xsd:element name="EndTime" type="xsd:time">
-						<xsd:annotation>
-							<xsd:documentation>The (inclusive) end time.</xsd:documentation>
-						</xsd:annotation>
-					</xsd:element>
+					<xsd:choice>
+						<xsd:element name="EndTime" type="xsd:time">
+							<xsd:annotation>
+								<xsd:documentation>The (inclusive) end time.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="EndEvent" type="TimeOfDayEnumeration" minOccurs="0">
+							<xsd:annotation>
+								<xsd:documentation>Event marking start of timeband, e.,g  dawn, dusk. +V1.2.2 dawn</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:choice>
 					<xsd:element name="DayOffset" type="DayOffsetType" default="0" minOccurs="0">
 						<xsd:annotation>
 							<xsd:documentation>Number of days after start time that end time is.</xsd:documentation>

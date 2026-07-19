@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2011 rel. 2 sp1 (x64) (http://www.altova.com) by Christophe Duquesne (Dryade) -->
 <xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_serviceCalendar_version">
 	<xsd:include schemaLocation="netex_serviceCalendar_support.xsd"/>
 	<xsd:include schemaLocation="netex_dayType_version.xsd"/>
@@ -10,12 +9,14 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
 				<Date>
 					<Modified>2014-03-31</Modified>
+				</Date>
+				<Date><Modified>2020-08-09</Modified>Issues #107 Fix UIcOperatingPeriod 
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines  SERVICE CALENDAR    types.</p>
@@ -36,7 +37,7 @@
 						<li>Derived from the SIRI standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -355,7 +356,12 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="OperatingPeriod" substitutionGroup="DataManagedObject">
+	<xsd:element name="OperatingPeriod_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy Operating Period</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="OperatingPeriod" substitutionGroup="OperatingPeriod_">
 		<xsd:annotation>
 			<xsd:documentation>A continuous interval of time between two OPERATING DAYs which will be used to define validities.</xsd:documentation>
 		</xsd:annotation>
@@ -363,6 +369,9 @@ Rail transport, Roads and Road transport
 			<xsd:complexContent>
 				<xsd:restriction base="OperatingPeriod_VersionStructure">
 					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="DataManagedObjectGroup"/>
 						</xsd:sequence>
@@ -444,7 +453,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="UicOperatingPeriod" substitutionGroup="DataManagedObject">
+	<xsd:element name="UicOperatingPeriod" substitutionGroup="OperatingPeriod_">
 		<xsd:annotation>
 			<xsd:documentation>An OPERATING PERIOD coded in UIC style as a bit string between two dates.</xsd:documentation>
 		</xsd:annotation>
@@ -462,7 +471,11 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="UicOperatingPeriodGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OperatingPeriodIdType" use="optional"/>
+					<xsd:attribute name="id" type="UicOperatingPeriodIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -486,12 +499,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="ValidDayBits" type="xsd:normalizedString">
 				<xsd:annotation>
-					<xsd:documentation>String of bits, one for each day in period: whether valid or not valid on the day.  Normally there will be a bit for every day between start and end date.  If bit is missing, assume available.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="DaysOfWeek" type="DaysOfWeekListOfEnumerations" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Days of week to which bits correspond.</xsd:documentation>
+					<xsd:documentation>String of bits, one for each day in period: whether valid or not valid on the day. Normally there will be a bit for every day between start and end date. If bit is missing, assume available.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_parking_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_ifopt_parking_support">
 	<xsd:include schemaLocation="netex_ifopt_site_support.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -8,7 +7,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -18,17 +17,25 @@
 				<Date>
 					<Modified>2011-12-16</Modified>
 				</Date>
-				<Date>
-					<Modified>2017-05-25</Modified> NPR Request Vehicle Type enum corrected.
+				<Date><Modified>2017-05-25</Modified> NPR Request Vehicle Type enum corrected.
 				</Date>
-				<Date>
-					<Modified>2019-04-11</Modified>Correct name of Parking PropertyId to ParkimgPropertiesId
+				<Date><Modified>2019-04-11</Modified>Correct name of Parking PropertyId to ParkimgPropertiesId
 				</Date>
-				<Date>
-					<Modified>2019-04-25</Modified>Fix to use  Parking Passenger ENtrances
+				<Date><Modified>2019-04-25</Modified>Fix to use Parking Passenger Entrances
+				</Date>
+				<Date><Modified>2020-10-06</Modified>New Modes: Add TYPE OF PARKING. Fix SG on ParkingAreaRef
+				</Date>
+				<Date><Modified>2021-04-17</Modified>New Modes: Align parking vehicle types with Vehicle vehicleTypes. add values 
+					 cycle, eScooter, transporter
+					 Add BayGeometryEnumeration, ParkingVisibilityEnumeration
+					 Add enclosed, onPavement ParkingLayout enumeration
+				</Date>
+				<Date><Modified>2020-07-07</Modified>New Modes: Add further enums for PaymentProcessENum,  ParkingUser TYpesENum  
+				</Date>
+				<Date><Modified>2021-09-01</Modified>New Modes: Add list of bays/areas to enable PoolOfVehicles 
 				</Date>
 				<Description>
-					<p>NeTEx - Network Exchange. This subschema defines PARKING    base types.</p>
+					<p>NeTEx - Network Exchange. This subschema defines PARKING base types.</p>
 				</Description>
 				<Format>
 					<MediaType>text/xml</MediaType>
@@ -39,14 +46,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2021.</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Created for the Ifopt standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -252,13 +259,26 @@ Rail transport, Roads and Road transport
 		</xsd:simpleContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
+	<xsd:complexType name="parkingComponentRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a collection of one or more references to a PARKING AREA or PARKING BAU.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="ParkingAreaRef" maxOccurs="unbounded"/>
+					<xsd:element ref="ParkingBayRef" maxOccurs="unbounded"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<xsd:simpleType name="ParkingAreaIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a PARKING AREA.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="SiteComponentIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="ParkingAreaRef" type="ParkingAreaRefStructure" substitutionGroup="VersionOfObjectRef">
+	<xsd:element name="ParkingAreaRef" type="ParkingAreaRefStructure" substitutionGroup="SiteComponentRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a PARKING AREA.</xsd:documentation>
 		</xsd:annotation>
@@ -359,7 +379,12 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="roadside"/>
 			<xsd:enumeration value="undefined"/>
 			<xsd:enumeration value="other"/>
-			<xsd:enumeration value="cycleHire"/>
+			<xsd:enumeration value="onPavement"/>
+			<xsd:enumeration value="cycleHire">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED 1.2.2 Use onPavement instead</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="ParkingTypeEnumeration">
@@ -378,8 +403,8 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="motorwayParking"/>
 			<xsd:enumeration value="roadside"/>
 			<xsd:enumeration value="parkingZone"/>
-			<xsd:enumeration value="undefined"/>
 			<xsd:enumeration value="cycleRental"/>
+			<xsd:enumeration value="undefined"/>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
 	</xsd:simpleType>
@@ -401,6 +426,8 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="payAtMachineOnFootPriorToExit"/>
 			<xsd:enumeration value="payByPrepaidToken"/>
 			<xsd:enumeration value="payByMobileDevice"/>
+			<xsd:enumeration value="payByPlate"/>
+			<xsd:enumeration value="prepayForPermit"/>
 			<xsd:enumeration value="undefined"/>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
@@ -436,7 +463,9 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Allowed values for PARKING VEHICLE types.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="cycle"/>
 			<xsd:enumeration value="pedalCycle"/>
+			<xsd:enumeration value="eCycle"/>
 			<xsd:enumeration value="moped"/>
 			<xsd:enumeration value="motorcycle"/>
 			<xsd:enumeration value="motorcycleWithSidecar"/>
@@ -444,6 +473,8 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="twoWheeledVehicle"/>
 			<xsd:enumeration value="threeWheeledVehicle"/>
 			<xsd:enumeration value="car"/>
+			<xsd:enumeration value="microCar"/>
+			<xsd:enumeration value="miniCar"/>
 			<xsd:enumeration value="smallCar"/>
 			<xsd:enumeration value="passengerCar"/>
 			<xsd:enumeration value="largeCar"/>
@@ -453,8 +484,10 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="carWithTrailer"/>
 			<xsd:enumeration value="carWithCaravan"/>
 			<xsd:enumeration value="minibus"/>
+			<xsd:enumeration value="minivan"/>
 			<xsd:enumeration value="bus"/>
 			<xsd:enumeration value="van"/>
+			<xsd:enumeration value="transporter"/>
 			<xsd:enumeration value="largeVan"/>
 			<xsd:enumeration value="highSidedVehicle"/>
 			<xsd:enumeration value="lightGoodsVehicle"/>
@@ -467,6 +500,7 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="vehicleWithTrailer"/>
 			<xsd:enumeration value="lightGoodsVehicleWithTrailer"/>
 			<xsd:enumeration value="heavyGoodsVehicleWithTrailer"/>
+			<xsd:enumeration value="snowmobile"/>
 			<xsd:enumeration value="undefined"/>
 			<xsd:enumeration value="other"/>
 			<xsd:enumeration value="allPassengerVehicles"/>
@@ -481,13 +515,20 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="allUsers"/>
 			<xsd:enumeration value="staff"/>
 			<xsd:enumeration value="visitors"/>
+			<xsd:enumeration value="customers"/>
+			<xsd:enumeration value="guests"/>
 			<xsd:enumeration value="registeredDisabled"/>
+			<xsd:enumeration value="impairedMobility"/>
 			<xsd:enumeration value="registered"/>
 			<xsd:enumeration value="rental"/>
 			<xsd:enumeration value="doctors"/>
 			<xsd:enumeration value="residentsWithPermits"/>
 			<xsd:enumeration value="reservationHolders"/>
 			<xsd:enumeration value="emergencyServices"/>
+			<xsd:enumeration value="taxi"/>
+			<xsd:enumeration value="vehicleSharing"/>
+			<xsd:enumeration value="women"/>
+			<xsd:enumeration value="families"/>
 			<xsd:enumeration value="other"/>
 			<xsd:enumeration value="all"/>
 		</xsd:restriction>
@@ -497,6 +538,31 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Allowed values for list of PARKING User types.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:list itemType="ParkingUserEnumeration"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="BayGeometryEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for PARKING Geometry.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="unspecified"/>
+			<xsd:enumeration value="orthogonal"/>
+			<xsd:enumeration value="angled"/>
+			<xsd:enumeration value="parallel"/>
+			<xsd:enumeration value="freeFormat"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ParkingVisibilityEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for PARKING Visibility</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="unmarked"/>
+			<xsd:enumeration value="signageOnly"/>
+			<xsd:enumeration value="demarcated"/>
+			<xsd:enumeration value="docks"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="ParkingReservationEnumeration">
 		<xsd:annotation>
@@ -510,6 +576,31 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<!-- ======================================================================= -->
+	<!-- ==== TYPE OF FLEET ================================================== -->
+	<xsd:simpleType name="TypeOfParkingIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF PARKING. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfParkingRef" type="TypeOfParkingRefStructure" abstract="false" substitutionGroup="TypeOfValueRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF PARKING.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfParkingRefStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TYPE OF PARKING.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfParkingIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF PARKING.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
 	<!-- ======================================================================= -->
 </xsd:schema>

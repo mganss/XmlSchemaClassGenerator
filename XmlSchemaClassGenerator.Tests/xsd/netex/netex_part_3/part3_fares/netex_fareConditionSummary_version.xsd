@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2013 (x64) (http://www.altova.com) by Nicholas JS Knowles (Trapeze Group Limited) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_fareConditionSummary_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_fareConditionSummary_version">
 	<xsd:include schemaLocation="netex_fareConditionSummary_support.xsd"/>
 	<xsd:include schemaLocation="netex_fareStructureElement_support.xsd"/>
 	<!-- ======================================================================= -->
@@ -12,18 +11,19 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2015-11-24</Modified>Add  RequiresAccount id to CardConditions
+				<Date><Modified>2015-11-24</Modified>Add  RequiresAccount id to CardConditions
 				</Date>
-				<Date>
-					<Modified>2018-06-07</Modified>Correct typo on enum ZoneSequence
+				<Date><Modified>2018-06-07</Modified>Correct typo on enum ZoneSequence
 				</Date>
-				<Date>
-					<Modified>2013-02-13</Modified>Add  Charging summary options. PenaltyIfWithoutTicket and AvailableOnSubscription.
+				<Date><Modified>2019-02-13</Modified>Add  Charging summary options. PenaltyIfWithoutTicket and AvailableOnSubscription.
+				</Date>
+				<Date><Modified>2020-10-16</Modified>New Modes 
+							Add __RequiresDepost__ and __noCashPayment__ to CommercialCondition summary.
+							Add __VehicleCOlelction_
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -41,14 +41,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -97,6 +97,8 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="ConditionSummaryTravelGroup"/>
 			<xsd:group ref="ConditionSummaryCommercialGroup"/>
 			<xsd:group ref="ConditionSummaryReservationGroup"/>
+			<xsd:group ref="ConditionSummaryChargingGroup"/>
+			<xsd:group ref="ConditionSummaryRentalGroup"/>
 		</xsd:sequence>
 	</xsd:complexType>
 	<xsd:group name="ConditionSummaryCardGroup">
@@ -255,6 +257,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether if combined with  other products on the same smart card, requires an overall balance for any product to work. Eg a Travel Pass may be disabled if the Pay as you go for other areas in in arrears.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="RequiresDeposit" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Requires a deposit +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NoCashPayment" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Cash payment not accepted +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="ConditionSummaryReservationGroup">
@@ -302,6 +314,28 @@ Rail transport, Roads and Road transport
 			<xsd:element name="AvailableOnSubscription" type="xsd:boolean" default="false" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether the product is available on subscription. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="ConditionSummaryRentalGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements relating to Rental restrictions on  CONDITION SUMMARY. +V1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="UnlimitedMileage" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether mileage is unlimited. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LikeForLikeRefuelling" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Refuelling Policy +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VehicleCollection" type="VehicleCollectionEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Vehicle collection process +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

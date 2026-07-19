@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:netexWs="http://www.siri.org.uk/siriWS" xmlns:netex="http://www.netex.org.uk/netex" xmlns:ns="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.siri.org.uk/siriWS">
+	<types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.siri.org.uk/siri">
+			<xsd:include schemaLocation="../netex_siri.xsd"/>
+		</xsd:schema>
+	</types>
+	<message name="HeartbeatNotify">
+		<part name="HeartbeatNotifyInfo" type="siri:ProducerRequestEndpointStructure"/>
+		<part name="Notification" type="siri:CheckStatusResponseBodyStructure"/>
+		<part name="SiriExtension" type="siri:ExtensionsStructure"/>
+	</message>
+	<message name="DataReadyNotify">
+		<part name="Notification" type="siri:DataReadyRequestStructure"/>
+		<part name="SiriExtension" type="siri:ExtensionsStructure"/>
+	</message>
+	<message name="NetexNotify">
+		<part name="Notification" type="siri:SiriResponseStructure"/>
+	</message>
+	<portType name="NetexConsumerRpcPort">
+		<documentation>Defines all the netex SOAP notifications</documentation>
+		<operation name="NotifyDataReady">
+			<input message="netexWs:DataReadyNotify"/>
+		</operation>
+		<operation name="NotifyHeartbeat">
+			<input message="netexWs:HeartbeatNotify"/>
+		</operation>
+		<!-- == Service Specific == -->
+		<operation name="NotifyNetex">
+			<input message="netexWs:NetexNotify"/>
+		</operation>
+	</portType>
+	<binding name="NetexConsumerRpcBinding" type="netexWs:NetexConsumerRpcPort">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="NotifyDataReady">
+			<soap:operation soapAction="NotifyDataReady"/>
+			<input>
+				<soap:body use="literal" namespace="http://www.siri.org.uk/siriWS"/>
+			</input>
+		</operation>
+		<operation name="NotifyHeartbeat">
+			<soap:operation soapAction="NotifyHeartbeat"/>
+			<input>
+				<soap:body use="literal" namespace="http://www.siri.org.uk/siriWS"/>
+			</input>
+		</operation>
+		<operation name="NotifyNetex">
+			<soap:operation soapAction="GetNetex"/>
+			<input>
+				<soap:body use="literal" namespace="http://www.siri.org.uk/siriWS"/>
+			</input>
+		</operation>
+	</binding>
+	<service name="NetexConsumerRpcServices">
+		<port name="NetexWSPort" binding="netexWs:NetexConsumerRpcBinding">
+			<soap:address location="http://www.netex-service-location.com"/>
+		</port>
+	</service>
+</definitions>

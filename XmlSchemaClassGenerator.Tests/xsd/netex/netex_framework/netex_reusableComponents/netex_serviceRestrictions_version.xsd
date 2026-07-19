@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- edited with XMLSpy v2013 (x64) (http://www.altova.com) by Nicholas JS Knowles (Trapeze Group Limited) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_serviceRestrictions_version">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_serviceRestrictions_version">
 	<xsd:include schemaLocation="../netex_responsibility/netex_typeOfValue_version.xsd"/>
+	<xsd:include schemaLocation="../netex_genericFramework/netex_organisation_support.xsd"/>
 	<xsd:include schemaLocation="netex_serviceRestrictions_support.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -12,27 +12,29 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified> Name Space changes 
+				<Date><Modified>2011-02-05</Modified> Name Space changes 
 				</Date>
-				<Date>
-					<Modified>2017-06-11</Modified> CR005  Add BookingContact to Booking Arrangements
+				<Date><Modified>2017-06-11</Modified> CR005  Add BookingContact to Booking Arrangements
 				</Date>
 				<Date>
 					<Modified>2019-02-21 Make ValidityCondition etc visible on ClassOfUse</Modified>
 				</Date>
-				<Date>
-					<Modified>2019-03-02</Modified>UK-24 Add open PaymentMethod as first class object . Revise to be TypeOfPaymentMethod soas to avoid name class with enumerated value.
+				<Date><Modified>2019-03-02</Modified>UK-24 Add open PaymentMethod as first class object . Revise to be TypeOfPaymentMethod soas to avoid name class with enumerated value.
 				</Date>
-				<Date>
-					<Modified>2019-03-26</Modified>NL-27 CD #58 Add default  TypeOfProductCategory and TypeOfService to Line:
+				<Date><Modified>2019-03-26</Modified>NL-27 CD #58 Add default  TypeOfProductCategory and TypeOfService to Line:
 					Move TypeOfProductCategory amnd TypeOfService from netex_journey_version  to  Framework reusable components (netex_travelRights_version)  so they are visible from part 1	
 					Rename netex_travel_rights to netext_serviceRestrictions so as to align with TM6		 
 				</Date>
+				<Date><Modified>2020-10-07</Modified>NewModes Booking arrangements add further attributes
+ 				         MaximumBookingPeriod, MinimBookingDuration, MaximumBookingDuration, DepositRequired,
+ 				         Add  ServiceBookimngArrangements.
+				</Date>
+				<Date><Modified>2020-11-06</Modified>NewModes Allow reusable contacts.
+ 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
 					<p>This sub-schema describes the Common  Service Restriction Types.</p>
@@ -49,14 +51,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-				 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				 <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -176,6 +178,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Minimum interval in advance of departure day or time that Service may be ordered.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="MaximumBookingPeriod" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum interval in advance of departure day or time that Service may be ordered. +V1.2..2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="BookingUrl" type="xsd:anyURI" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>URL for booking. +V1.1</xsd:documentation>
@@ -184,6 +191,43 @@ Rail transport, Roads and Road transport
 			<xsd:element name="BookingNote" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Note about booking the FLEXIBLE LINE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="ServiceBookingArrangementsStructure" abstract="false">
+		<xsd:annotation>
+			<xsd:documentation>Type for SERVICE BOOKING ARRANGEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="BookingArrangementsStructure">
+				<xsd:group ref="ServiceBookingArrangementsGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ServiceBookingArrangementsGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for SERVICE BOOKING ARRANGEMENTs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MinimumBookingDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Minimum period for which a booking can be mad +v.1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumBookingDuration" type="xsd:duration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum period for which a booking can be mad +v.1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DepositRequired" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether a deposit is required. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BookingChargeType" type="BookingChargeTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Nature of booking fee. v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -348,6 +392,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="ExternalProductCategoryRef" type="ExternalObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>An alternative code that uniquely identifies the PRODUCT CATEGORY. Specifically for use in AVMS systems that require an alias, if code is different from main identifier. For VDV compatibility.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Presentation" type="PresentationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The presentation colours to use for this TYPE OF PRODUCT CATEGORY. +v2.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

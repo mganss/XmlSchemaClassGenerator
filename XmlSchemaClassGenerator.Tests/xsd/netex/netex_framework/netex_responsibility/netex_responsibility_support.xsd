@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_responsibility_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_responsibility_support">
 	<xsd:annotation>
 		<xsd:appinfo>
 			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -18,6 +18,8 @@
 				</Date>
 				<Date>
 					<Modified>2017-12-01 Add FareManagement Data Roles and   SecurityManagement, Data Regfistrat secures etc</Modified>
+				</Date>
+				<Date><Modified>2020-10-04</Modified>NewModes: Add DataRoleType and StakholderRole enum values 
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines RESPONSIBILITY data administration base types.</p>
@@ -31,14 +33,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -50,7 +52,7 @@ Rail transport, Roads and Road transport
 </Category>
 					<Project>CEN TC278 WG3 SG9.</Project>
 				</Subject>
-				<Title>NeTEx Network Exchange - REPSONSIBILITY identifier types.</Title>
+				<Title>NeTEx Network Exchange - RESPONSIBILITY identifier types.</Title>
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
@@ -95,7 +97,9 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="Reservation"/>
 			<xsd:enumeration value="EntityLegalOwnership"/>
 			<xsd:enumeration value="FareManagement"/>
+			<xsd:enumeration value="Financing"/>
 			<xsd:enumeration value="SecurityManagement"/>
+			<xsd:enumeration value="CustomerService"/>
 			<xsd:enumeration value="DataRegistrar"/>
 			<xsd:enumeration value="Other"/>
 		</xsd:restriction>
@@ -120,6 +124,7 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="distributes"/>
 			<xsd:enumeration value="secures"/>
 			<xsd:enumeration value="redistributes"/>
+			<xsd:enumeration value="supports"/>
 			<xsd:enumeration value="owns"/>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
@@ -164,7 +169,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="oneToManyRelationshipStructure">
 				<xsd:sequence>
-					<xsd:element ref="OrganisationRef" maxOccurs="unbounded"/>
+					<xsd:element ref="OrganisationRef_" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -175,9 +180,14 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="ObjectIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="OrganisationRef" type="OrganisationRefStructure" substitutionGroup="VersionOfObjectRef">
+	<xsd:element name="OrganisationRef_" type="OrganisationRefStructure" abstract="true" substitutionGroup="VersionOfObjectRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to an ORGANISATION.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="OrganisationRef" type="OrganisationRefStructure" substitutionGroup="OrganisationRef_">
+		<xsd:annotation>
+			<xsd:documentation>DEPRECATED reference to any ORGANISATION meeting the substitutiongroup. -v2.0</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="OrganisationRefStructure">
@@ -209,11 +219,11 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="OneOrAllOrganisationsRefGroup">
 		<xsd:annotation>
-			<xsd:documentation>One or all ORGANISATIONs.</xsd:documentation>
+			<xsd:documentation>One or all ORGANISATIONs. Revised +V1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:choice>
 			<xsd:element ref="AllOrganisationsRef"/>
-			<xsd:element ref="OrganisationRef"/>
+			<xsd:element ref="OrganisationRef_"/>
 		</xsd:choice>
 	</xsd:group>
 	<!-- ======================================================================= -->

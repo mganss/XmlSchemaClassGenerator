@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_travelSpecificationSummary_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_travelSpecificationSummary_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_trainElement_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_transportOrganisation_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_vehicleSeating_support.xsd"/>
@@ -10,6 +10,9 @@
 	<xsd:include schemaLocation="../part3_fares/netex_fareSeries_support.xsd"/>
 	<xsd:include schemaLocation="../part3_fares/netex_fareProduct_support.xsd"/>
 	<xsd:include schemaLocation="../part3_fares/netex_usageParameterEligibility_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_5/part5_nd/netex_nm_vehicleMeetingPoint_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_5/part5_nd/netex_nm_vehicleMeetingPlace_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_part_5/part5_sj/netex_nm_singleJourneyService_support.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -19,12 +22,17 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
-				<Date>
-					<Created>2019-03-12</Created>From TravelSpecifcation
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date><Created>2019-03-12</Created>From TravelSpecifcation
 				</Date>
 				<Date>
 					<Modified>2019-03-12</Modified>
+				</Date>
+				<Date><Modified>2020-10-11</Modified>New Modes: 
+					      * Add SingleJourneyRef					    
+					      * Add VehicleMeetingPointRef and ehicleMeetingPlaceRef to  TravelSpecificationSummaryEndpoint .
+						  * Revise reference:  TravelSpecificationSummaryEndpoint  widen to use TransportOrganinisationRef rather than OperatorRef.
+						  * ADd equipment
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -49,7 +57,7 @@
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -70,7 +78,7 @@ Rail transport, Roads and Road transport
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceRestrictions_support.xsd"/>
 	<xsd:element name="TravelSpecificationSummaryView" type="TravelSpecificationSummaryViewStructure">
 		<xsd:annotation>
-			<xsd:documentation>Summary of key aspects of TRAVEL SPECIFICATION. +V1.1. This data should all be derivable from the PARAMATER ASSIGMENTs.  v+1.1</xsd:documentation>
+			<xsd:documentation>Summary of key aspects of TRAVEL SPECIFICATION. +V1.1. This data should all be derivable from the PARAMATER ASSIGNMENTs.  v+1.1</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:complexType name="TravelSpecificationSummaryViewStructure">
@@ -104,6 +112,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:group ref="TravelSpecificationSummaryEndPointPlaceGroup"/>
 			<xsd:element ref="ScheduledStopPointView" minOccurs="0"/>
+			<xsd:element ref="VehicleMeetingPointRef" minOccurs="0"/>
 			<xsd:element ref="QuayRef" minOccurs="0"/>
 			<xsd:element ref="BoardingPositionRef" minOccurs="0"/>
 			<xsd:element ref="TariffZoneRef" minOccurs="0" maxOccurs="unbounded"/>
@@ -115,6 +124,7 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="TopographicPlaceView" minOccurs="0"/>
+			<xsd:element ref="SiteRef" minOccurs="0"/>
 			<xsd:element ref="AddressRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
@@ -125,7 +135,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="Start" type="xsd:dateTime" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Start tiem for trip or pass.</xsd:documentation>
+					<xsd:documentation>Start timw for trip or pass.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="End" type="xsd:dateTime" minOccurs="0">
@@ -149,7 +159,7 @@ Rail transport, Roads and Road transport
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:choice minOccurs="0">
-				<xsd:element ref="OperatorRef"/>
+				<xsd:element ref="TransportOrganisationRef"/>
 				<xsd:element ref="GroupOfOperatorsRef"/>
 			</xsd:choice>
 		</xsd:sequence>
@@ -163,6 +173,7 @@ Rail transport, Roads and Road transport
 				<xsd:choice minOccurs="0" maxOccurs="unbounded">
 					<xsd:sequence>
 						<xsd:element ref="ServiceJourneyRef" minOccurs="0"/>
+						<xsd:element ref="SingleJourneyRef" minOccurs="0"/>
 						<xsd:element ref="TrainNumberRef" minOccurs="0"/>
 					</xsd:sequence>
 				</xsd:choice>
@@ -196,6 +207,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="TrainComponentLabelAssignmentRef" minOccurs="0"/>
 			<xsd:element ref="PassengerSeatRef" minOccurs="0"/>
 			<xsd:element ref="ServiceFacilitySet" minOccurs="0"/>
+			<xsd:element ref="EquipmentRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->

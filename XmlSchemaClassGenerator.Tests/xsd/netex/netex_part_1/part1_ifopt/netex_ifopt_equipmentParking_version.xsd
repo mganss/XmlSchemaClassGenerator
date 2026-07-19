@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
 <xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_ifopt_equipmentParking_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_vehicleType_support.xsd"/>
 	<xsd:include schemaLocation="netex_ifopt_equipmentParking_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipmentPlace_version.xsd"/>
 	<!-- ======================================================================= -->
@@ -10,7 +10,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -22,8 +22,13 @@
 				</Date>
 				<Date><Modified>2017-05-25</Modified> Definition of CycleStorage number of spaces corrected. Doc change only.
 				</Date>
+				<Date><Modified>2020-10-05</Modified>New Modes: 
+					Add  lockers and freestanding sycle storage enum values.
+					Move ReChargingEquiopment  to separate En	ergy equipment
+					Add VEHICLE RELEASE EQUIPMENT.
+				</Date>
 				<Description>
-					<p>NeTEx - Network Exchange. This subschema defines EQUIPMENT base types.</p>
+					<p>NeTEx - Network Exchange. This subschema defines PARKING EQUIPMENT base types.</p>
 				</Description>
 				<Format>
 					<MediaType>text/xml</MediaType>
@@ -41,7 +46,7 @@
 						<li>Derived from the TransModel standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -59,7 +64,7 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>PARKING EQUIPMENT types for IFOPT Fixed Objects in Public Transport.</xsd:documentation>
 	</xsd:annotation>
-	<!-- ======================================================================= -->
+	<!-- === CYCLE STORAGE EQUIPMENT ================================================== -->
 	<xsd:element name="CycleStorageEquipment" substitutionGroup="PlaceEquipment">
 		<xsd:annotation>
 			<xsd:documentation>Specialisation of PLACE EQUIPMENT for cycle storage.</xsd:documentation>
@@ -129,14 +134,14 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
-	<xsd:element name="VehicleChargingEquipment" substitutionGroup="PlaceEquipment">
+	<!-- === VEHICLE CHARGING EQUIPMENT ============================================ -->
+	<xsd:element name="VehicleReleaseEquipment" substitutionGroup="InstalledEquipment">
 		<xsd:annotation>
-			<xsd:documentation>Specialisation of PLACE EQUIPMENT for vehicle charging.</xsd:documentation>
+			<xsd:documentation>Specialisation of PLACE EQUIPMENT for VEHICLE RELEASE. +v1.2.2</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:restriction base="VehicleChargingEquipment_VersionStructure">
+				<xsd:restriction base="VehicleReleaseEquipment_VersionStructure">
 					<xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
@@ -148,10 +153,10 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="EquipmentGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
-							<xsd:group ref="VehicleChargingEquipmentGroup"/>
+							<xsd:group ref="VehicleReleaseEquipmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleChargingEquipmentIdType" use="optional">
+					<xsd:attribute name="id" type="VehicleReleaseEquipmentIdType" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -160,36 +165,36 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleChargingEquipment_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleReleaseEquipment_VersionStructure" abstract="false">
 		<xsd:annotation>
-			<xsd:documentation>Type for a VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
+			<xsd:documentation>Type for a VEHICLE RELEASE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="PlaceEquipment_VersionStructure">
+			<xsd:extension base="InstalledEquipment_VersionStructure">
 				<xsd:sequence>
-					<xsd:group ref="VehicleChargingEquipmentGroup"/>
+					<xsd:group ref="VehicleReleaseEquipmentGroup"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:group name="VehicleChargingEquipmentGroup">
+	<xsd:group name="VehicleReleaseEquipmentGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
+			<xsd:documentation>Elements for VEHICLE RELEASE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="FreeRecharging" type="xsd:boolean" minOccurs="0">
+			<xsd:element name="RemoteControl" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>whether shelter is enclosed.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="ReservationRequired" type="xsd:boolean" minOccurs="0">
+			<xsd:element name="LocalControl" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether reservation is required.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="ReservationUrl" type="xsd:anyURI" minOccurs="0">
+			<xsd:element name="LockingMechanism" type="LockingMechanismEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Type of storage.</xsd:documentation>
+					<xsd:documentation>Type of locking mechnaism.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

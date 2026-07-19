@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<description xmlns="http://www.w3.org/ns/wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:netexWs="http://www.siri.org.uk/siriWS" xmlns:netex="http://www.netex.org.uk/netex" xmlns:ns="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" xmlns:wsoap="http://www.w3.org/ns/wsdl/soap" targetNamespace="http://www.siri.org.uk/siriWS">
+	<types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" xmlns:netexWs="http://www.siri.org.uk/siriWS" targetNamespace="http://www.siri.org.uk/siriWS">
+			<xsd:include schemaLocation="../wsdl_model/siri_wsConsumer-Framework.xsd"/>
+		</xsd:schema>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" xmlns:netexWs="http://www.siri.org.uk/siriWS" targetNamespace="http://www.siri.org.uk/siriWS">
+			<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="../netex_siri.xsd"/>
+			<xsd:element name="SiriResponseStructureElement" type="siri:SiriResponseStructure"/>
+		</xsd:schema>
+	</types>
+	<interface name="NetexConsumerDocPort">
+		<operation name="NotifyDataReady" pattern="http://www.w3.org/ns/wsdl/in-only">
+			<input element="netexWs:NotifyDataReady"/>
+		</operation>
+		<operation name="NotifyHeartbeat" pattern="http://www.w3.org/ns/wsdl/in-only">
+			<input element="netexWs:NotifyHeartbeat"/>
+		</operation>
+		<!-- == Service Specific == -->
+		<operation name="NotifyNetex" pattern="http://www.w3.org/ns/wsdl/in-only">
+			<input element="netexWs:SiriResponseStructureElement"/>
+		</operation>
+	</interface>
+	<binding name="NetexConsumerDocBinding" interface="netexWs:NetexConsumerDocPort" type="http://www.w3.org/ns/wsdl/soap" wsoap:version="1.1" wsoap:protocol="http://www.w3.org/2006/01/soap11/bindings/HTTP/">
+		<operation ref="netexWs:NotifyDataReady">
+			<input/>
+		</operation>
+		<operation ref="netexWs:NotifyHeartbeat">
+			<input/>
+		</operation>
+		<operation ref="netexWs:NotifyNetex">
+			<input/>
+		</operation>
+	</binding>
+	<service name="NetexConsumerDocServices" interface="netexWs:NetexConsumerDocPort">
+		<endpoint name="NetexiWSPort" binding="netexWs:NetexConsumerDocBinding" address="http://www.netex-service-location.com"/>
+	</service>
+</description>

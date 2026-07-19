@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_trainElement">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_trainElement_version">
 	<xsd:include schemaLocation="netex_vehicleType_version.xsd"/>
 	<xsd:include schemaLocation="netex_trainElement_support.xsd"/>
+	<xsd:include schemaLocation="netex_nm_chargingEquipmentProfile_version.xsd"/>
+	<xsd:include schemaLocation="netex_nm_fleetEquipment_version.xsd"/>
 	<xsd:group name="ServiceRequirementTypeGroup">
 		<xsd:annotation>
 			<xsd:documentation>SERVICE REQUIEMENTS for  SERVICE JOURNEY. These are the normal planned values, not necessarily the ACTUAL VEHICLE EQUIPMENT.</xsd:documentation>
@@ -31,24 +33,20 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified>Name Space changes
+				<Date><Modified>2011-02-05</Modified>Name Space changes
 				</Date>
-				<Date>
-					<Modified>2017-04-27</Modified>1.1 CR0039 Add Width to TRAIN ELEMENT
+				<Date><Modified>2017-04-27</Modified>1.1 CR0039 Add Width to TRAIN ELEMENT
 				</Date>
-				<Date>
-					<Modified>2019-02-21</Modified>Make ValidityCondition etc visible on TrainElement
+				<Date><Modified>2019-02-21</Modified>Make ValidityCondition etc visible on TrainElement
 				</Date>
-				<Date>
-					<Modified>2019-03-27</Modified>Fix add missing TrainSize attribute to TrainElement
+				<Date><Modified>2019-03-27</Modified>Fix add missing TrainSize attribute to TrainElement
 				</Date>
-				<Date>
-					<Modified>2019-04-18</Modified>Fix add missing orientation to  TrainComponent
+				<Date><Modified>2019-04-18</Modified>Fix add missing orientation to  TrainComponent				</Date>
+				<Date><Modified>2021-09-018</Modified>NewModes: revise to allow chargingEquipmentProfile
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -66,14 +64,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -124,6 +122,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>VEHICLE EQUIPMENT PROFILEs in frame.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="vehicleModelProfiles" type="vehicleModelProfilesInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>VEHICLE MODEL PROFILEs in frame. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="vehicles" type="vehiclesInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>VEHICLEs in frame.</xsd:documentation>
@@ -131,29 +134,16 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:complexType name="vehicleTypesInFrame_RelStructure">
+	<xsd:complexType name="vehicleEquipmenProfilesInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of VEHICLE TYPEs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of VEHICLE EQUIPMENT PROFILEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
-					<xsd:element ref="CompoundTrain"/>
-					<xsd:element ref="Train"/>
-					<xsd:element ref="VehicleType"/>
+					<xsd:element ref="VehicleEquipmentProfile"/>
+					<xsd:element ref="ChargingEquipmentProfile"/>
 				</xsd:choice>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-	<xsd:complexType name="vehicleModelsInFrame_RelStructure">
-		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of VEHICLE MODELs.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="containmentAggregationStructure">
-				<xsd:sequence>
-					<xsd:element ref="VehicleModel" maxOccurs="unbounded"/>
-				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -170,15 +160,18 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:complexType name="vehicleEquipmenProfilesInFrame_RelStructure">
+	<xsd:complexType name="vehicleTypesInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for containment in frame of VEHICLE EQUIPMENT PROFILEs.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of VEHICLE TYPEs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
-				<xsd:sequence>
-					<xsd:element ref="VehicleEquipmentProfile" maxOccurs="unbounded"/>
-				</xsd:sequence>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="CompoundTrain"/>
+					<xsd:element ref="Train"/>
+					<xsd:element ref="VehicleType"/>
+					<xsd:element ref="SimpleVehicleType"/>
+				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -196,6 +189,9 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TransportTypeGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="VehicleTypeGroup"/>
@@ -267,6 +263,9 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TransportTypeGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="VehicleTypeGroup"/>
