@@ -33,9 +33,6 @@ public class NamespaceModel(NamespaceKey key, GeneratorConfiguration configurati
             }
         }
 
-        foreach (var choiceEnum in partsList.SelectMany(x => x.ChoiceIdentifierEnums.Values))
-            codeNamespace.Types.Add(choiceEnum);
-
         return codeNamespace;
     }
 }

@@ -478,7 +478,6 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         var attributes = GetAttributes(isArray).ToArray();
         member.CustomAttributes.AddRange(attributes);
 
-        CodeStatement choiceIdentifierInitStatement = null;
         if (!IsPrimitiveType && !IsAny && !Configuration.SeparateSubstitutes && Substitutes.Count > 0)
         {
             // A flattened substitution group maps several elements with different CLR types onto one
@@ -490,11 +489,6 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             // backing field / initializer, so this only applies to single-valued members.
             if (!isEnumerable && Substitutes.Any(sub => !IsAssignableTo(sub.Type, Type)))
                 RetypeChoiceMemberAsObject(member);
-
-            // When the head element and a substitute share the same CLR type, the element name is
-            // ambiguous on serialization and XmlSerializer requires a choice identifier to disambiguate.
-            if (Substitutes.Any(sub => sub.Type == Type))
-                choiceIdentifierInitStatement = AddChoiceIdentifier(typeDeclaration, member, isEnumerable);
         }
 
         // initialize List<>
@@ -533,11 +527,6 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             }
 
             constructor.Statements.Add(new CodeAssignStatement(listReference, initExpression));
-
-            if (choiceIdentifierInitStatement != null)
-            {
-                constructor.Statements.Add(choiceIdentifierInitStatement);
-            }
         }
 
         if (isArray)
@@ -703,79 +692,5 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         headElement?.Arguments.Add(new CodeAttributeArgument(nameof(XmlElementAttribute.Type), new CodeTypeOfExpression(headElementType)));
 
         memberField.Type = new CodeTypeReference(typeof(object));
-    }
-
-    private CodeStatement AddChoiceIdentifier(CodeTypeDeclaration typeDeclaration, CodeMemberField memberField, bool isArray)
-    {
-        var enumName = Name + "Enum";
-        var propertyName = enumName + "Identifier";
-
-        var xmlElementNames = memberField.CustomAttributes
-            .OfType<CodeAttributeDeclaration>()
-            .Where(attribute => attribute.AttributeType.BaseType == typeof(XmlElementAttribute).FullName)
-            .Select(attribute => attribute.Arguments
-                .OfType<CodeAttributeArgument>()
-                .Where(argument => string.IsNullOrEmpty(argument.Name))
-                .Select(argument => argument.Value)
-                .OfType<CodePrimitiveExpression>()
-                .Select(primitive => primitive.Value?.ToString())
-                .FirstOrDefault(name => name != null))
-            .Where(name => name != null)
-            .ToList();
-
-        var namespaceModel = OwningType.Namespace;
-        var choiceEnum = FindOrCreateChoiceEnum(namespaceModel, ref enumName, xmlElementNames);
-
-        var choiceProperty = new CodeMemberField
-        {
-            Name = propertyName + " { get; set; }",
-            Type = new CodeTypeReference(enumName, isArray ? 1 : 0),
-            Attributes = MemberAttributes.Public | MemberAttributes.Final
-        };
-        choiceProperty.CustomAttributes.Add(AttributeDecl<XmlIgnoreAttribute>());
-
-        memberField.CustomAttributes.Add(AttributeDecl<XmlChoiceIdentifierAttribute>(
-            new CodeAttributeArgument(new CodePrimitiveExpression(propertyName))));
-
-        typeDeclaration.Members.Add(choiceProperty);
-
-        if (!isArray)
-            return null;
-
-        var choiceReference = new CodePropertyReferenceExpression(new CodeThisReferenceExpression(), propertyName);
-        var emptyArray = new CodeMethodInvokeExpression(new(TypeRefExpr<Array>(), nameof(Array.Empty), new CodeTypeReference(enumName)));
-        return new CodeAssignStatement(choiceReference, emptyArray);
-    }
-
-    private static CodeTypeDeclaration FindOrCreateChoiceEnum(NamespaceModel namespaceModel, ref string enumName, List<string> memberNames)
-    {
-        bool NameTaken(string n) => namespaceModel.Types.ContainsKey(n) || namespaceModel.ChoiceIdentifierEnums.ContainsKey(n);
-
-        if (namespaceModel.ChoiceIdentifierEnums.TryGetValue(enumName, out var existingEnum))
-        {
-            var existingMemberNames = existingEnum.Members.OfType<CodeMemberField>().Select(m => m.Name).ToList();
-            if (existingMemberNames.SequenceEqual(memberNames))
-                return existingEnum;
-        }
-
-        if (NameTaken(enumName))
-        {
-            var baseName = enumName;
-            var i = 2;
-            do
-            {
-                enumName = baseName + i;
-                i++;
-            } while (NameTaken(enumName));
-        }
-
-        var choiceEnum = new CodeTypeDeclaration { Name = enumName, IsEnum = true };
-
-        foreach (var elementName in memberNames)
-            choiceEnum.Members.Add(new CodeMemberField(enumName, elementName));
-
-        namespaceModel.ChoiceIdentifierEnums.Add(enumName, choiceEnum);
-
-        return choiceEnum;
     }
 }
