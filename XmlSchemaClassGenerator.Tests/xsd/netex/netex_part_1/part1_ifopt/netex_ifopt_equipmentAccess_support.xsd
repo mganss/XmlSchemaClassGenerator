@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_ifopt_equipmentAccess_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_ifopt_equipmentAccess_support">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_equipment_support.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -8,15 +8,14 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2007-06-12</Created>
 				</Date>
 				<Date>
 					<Modified>2007-06-12</Modified>
 				</Date>
-				<Date>
-					<Modified>2019-03-25</Modified>FR49 CD #65  Accessibility changes
+				<Date><Modified>2019-03-25</Modified>FR49 CD #65  Accessibility changes
 					CD add NecessaryForceEnumeration with values noForce, lightForce, mediumForce,  heavyForce, unknown
 					CD add LightingMethodEnumeration with values movementDetector, stepDetector, switchOnTheWall, atDoorOpening, onlyAtNight, other
 						NJSK Review:  correct typo on stepDetector Add value_alwaysOn_ to LightingMethodEnumeration. Rename to LightinOnMethod.
@@ -25,6 +24,12 @@
 					CD add BorderTypeEnumeration  with values _wall, grass, dirt, barrier, road, cyclingLane, step, rail, plants, trees, mud, solidEdge, water, gravel, noPhysicalBorder, otherPhysicalBorder, unknown, other,_	
 							NJSK Review:  Move TactileWarningStripEnumeration,   here from netex_path_support , use lower camel case for values.							
  				</Date>
+				<Date><Modified>2021-07-14</Modified>Fix catch up - Make Access Equipment Abstarct
+				</Date>
+				<Date><Modified>2024-01-17</Modified>DECK PLAN and EPIA add DoorType
+				</Date>
+				<Date><Modified>2024-02-05</Modified>Path refactoring: Move	TactileWarningStripEnumeration to path_support. Also cdrop unusued LightingMethod - shoudl be LightingOnMethod
+				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines ACCESS EQUIPMENT types for Place access.</p>
 				</Description>
@@ -37,14 +42,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the TransModel standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -67,9 +72,9 @@ Rail transport, Roads and Road transport
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of an ACCESS EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="InstalledEquipmentIdType"/>
+		<xsd:restriction base="PlaceEquipmentIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="AccessEquipmentRef" type="AccessEquipmentRefStructure" substitutionGroup="EquipmentRef">
+	<xsd:element name="AccessEquipmentRef" type="AccessEquipmentRefStructure" abstract="true" substitutionGroup="PlaceEquipmentRef">
 		<xsd:annotation>
 			<xsd:documentation>Identifier of an ACCESS EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -79,12 +84,33 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for a reference to an ACCESS EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="EquipmentRefStructure">
+			<xsd:restriction base="PlaceEquipmentRefStructure">
 				<xsd:attribute name="ref" type="AccessEquipmentIdType" use="required">
 					<xsd:annotation>
-						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
+						<xsd:documentation>Identifier of a ACCESS EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for AccessEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -111,9 +137,84 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassEntranceEquipmentRefStructureType" default="EntranceEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for EntranceEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<xsd:simpleType name="DoorTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for DOOR TYPE +2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="hingedSingle">
+				<xsd:annotation>
+					<xsd:documentation>Single door, hinged at one side.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hingedPair">
+				<xsd:annotation>
+					<xsd:documentation>Pair of doors, hinged at either side of ENTRANCE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="slidingSingle">
+				<xsd:annotation>
+					<xsd:documentation>Single door, sliding to one side.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="slidingPair">
+				<xsd:annotation>
+					<xsd:documentation>Pair of sliding doors, sliding apart to each side.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="foldingSingle">
+				<xsd:annotation>
+					<xsd:documentation>Single door, folding to one side.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="foldingPair">
+				<xsd:annotation>
+					<xsd:documentation>Pair of folding doors, folding to each side.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="hingedRamp">
+				<xsd:annotation>
+					<xsd:documentation>Door hinged at bottom to drop down as boarding ramp.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="revolving">
+				<xsd:annotation>
+					<xsd:documentation>Revolving door. Which might be an obstacle for wheelchairs.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Other type of door</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
 	<!-- ======================================================================= -->
 	<xsd:simpleType name="RampEquipmentIdType">
 		<xsd:annotation>
@@ -137,6 +238,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="RampEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -163,6 +285,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="CrossingEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -186,9 +329,77 @@ Rail transport, Roads and Road transport
 			<xsd:restriction base="AccessEquipmentRefStructure">
 				<xsd:attribute name="ref" type="LiftEquipmentIdType" use="required">
 					<xsd:annotation>
-						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
+						<xsd:documentation>Identifier of a LIFT EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="LiftEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="LiftCallEquipmentIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a LIFT call EQUIPMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="AccessEquipmentIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="LiftCallEquipmentRef" type="AccessEquipmentRefStructure" substitutionGroup="AccessEquipmentRef">
+		<xsd:annotation>
+			<xsd:documentation>Identifier of an LIFT call EQUIPMENT.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="LiftCallEquipmentRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to an LIFT call EQUIPMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="AccessEquipmentRefStructure">
+				<xsd:attribute name="ref" type="LiftCallEquipmentIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a LIFT call EQUIPMENT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="LiftCallEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -215,6 +426,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="EscalatorEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -241,6 +473,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTravelatorEquipmentRefStructureType" default="TravelatorEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TravelatorEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -267,6 +520,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="QueueingEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -293,6 +567,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassStaircaseEquipmentRefStructureType" default="StaircaseEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for StaircaseEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -319,22 +614,30 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassRoughSurfaceRefStructureType" default="RoughSurface">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for RoughSurfaceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
-	<xsd:simpleType name="TactileWarningStripEnumeration">
-		<xsd:annotation>
-			<xsd:documentation>Allowed values for TactileWarningStrip </xsd:documentation>
-		</xsd:annotation>
-		<xsd:restriction base="xsd:NMTOKEN">
-			<xsd:enumeration value="tactileStripAtBeginning"/>
-			<xsd:enumeration value="tactileStripAtEnd"/>
-			<xsd:enumeration value="tactileStripAtBothEnds"/>
-			<xsd:enumeration value="noTactileStrip"/>
-			<xsd:enumeration value="unknown"/>
-		</xsd:restriction>
-	</xsd:simpleType>
 	<!-- ======================================================================= -->
 	<xsd:simpleType name="PlaceLightingIdType">
 		<xsd:annotation>
@@ -358,6 +661,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TICKETING EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAccessEquipmentRefStructureType" use="optional" default="PlaceLighting">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -370,18 +694,6 @@ Rail transport, Roads and Road transport
 		<xsd:restriction base="ObjectIdType"/>
 	</xsd:simpleType>
 	<!-- ======================================================================= -->
-	<xsd:simpleType name="LightingEnumeration">
-		<xsd:annotation>
-			<xsd:documentation>Allowed value for Lighting.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:restriction base="xsd:normalizedString">
-			<xsd:enumeration value="wellLit"/>
-			<xsd:enumeration value="poorlyLit"/>
-			<xsd:enumeration value="unlit"/>
-			<xsd:enumeration value="unknown"/>
-			<xsd:enumeration value="other"/>
-		</xsd:restriction>
-	</xsd:simpleType>
 	<xsd:simpleType name="LightingOnMethodEnumeration">
 		<xsd:annotation>
 			<xsd:documentation>Allowed values for lighting method.</xsd:documentation>
@@ -392,7 +704,7 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="switchOnTheWall"/>
 			<xsd:enumeration value="atDoorOpening"/>
 			<xsd:enumeration value="onlyAtNight"/>
-					<xsd:enumeration value="alwaysOn"/>
+			<xsd:enumeration value="alwaysOn"/>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
 	</xsd:simpleType>
@@ -433,18 +745,6 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="bothSides"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="GradientEnumeration">
-		<xsd:annotation>
-			<xsd:documentation>Allowed values for Gradient steepness.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="verySteep"/>
-			<xsd:enumeration value="steep"/>
-			<xsd:enumeration value="medium"/>
-			<xsd:enumeration value="gentle"/>
-			<xsd:enumeration value="level"/>
-		</xsd:restriction>
-	</xsd:simpleType>
 	<xsd:simpleType name="EntranceAttentionEnumeration">
 		<xsd:annotation>
 			<xsd:documentation>Allowed values for entrance attention device.</xsd:documentation>
@@ -482,4 +782,217 @@ Rail transport, Roads and Road transport
 		</xsd:restriction>
 	</xsd:simpleType>
 	<!-- ======================================================================= -->
+	<xsd:simpleType name="LightingMethodEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for lighting method</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="movementDetector"/>
+			<xsd:enumeration value="steppingDetector"/>
+			<xsd:enumeration value="switchOnTheWall"/>
+			<xsd:enumeration value="atDoorOpening"/>
+			<xsd:enumeration value="onlyAtNight"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="MarkingStatusEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the status of the ground marking</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="good"/>
+			<xsd:enumeration value="worn"/>
+			<xsd:enumeration value="hazardous"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="VisualObstacleEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the visual obstacles on crossings</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="carParking"/>
+			<xsd:enumeration value="vegetation"/>
+			<xsd:enumeration value="building"/>
+			<xsd:enumeration value="streetFurniture"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="BollardCrossingEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the bollards on crossings</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="contrasted">
+				<xsd:annotation>
+					<xsd:documentation>Bollards on both sides and well contrasted with the environment.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="yes">
+				<xsd:annotation>
+					<xsd:documentation>Bollards on either side of the crossing (with no information about the contrast).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="partial">
+				<xsd:annotation>
+					<xsd:documentation>Bollards only on one side of the crossing.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="limited">
+				<xsd:annotation>
+					<xsd:documentation>Bollards present but too low or poorly positioned in relation to the crossing.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="EntranceTurningSpacePositionEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the positions of a turning space for an Entrance.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="outside"/>
+			<xsd:enumeration value="inside"/>
+			<xsd:enumeration value="insideAndOutside"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="DoorHandleEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the type of handle for a door.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="lever">
+				<xsd:annotation>
+					<xsd:documentation>Lever handle</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="button"/>
+			<xsd:enumeration value="knob"/>
+			<xsd:enumeration value="crashBar">
+				<xsd:annotation>
+					<xsd:documentation>Panic bar</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="doorHandle">
+				<xsd:annotation>
+					<xsd:documentation>Door handle</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="grabRail">
+				<xsd:annotation>
+					<xsd:documentation>Grab rail or grab handle</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="windowLever">
+				<xsd:annotation>
+					<xsd:documentation>Window lever</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="vertical">
+				<xsd:annotation>
+					<xsd:documentation>Marshal's baton, vertical bar</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="SafetyEdgeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Sides of Safety Edge.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="oneSide"/>
+			<xsd:enumeration value="bothSides"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="RampTurningSpacePositionEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the positions of a turning space for a ramp.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="bottom"/>
+			<xsd:enumeration value="top"/>
+			<xsd:enumeration value="topAndBottom"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="StepConditionEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values forthe Step Condition</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="even">
+				<xsd:annotation>
+					<xsd:documentation>The staircase has regular steps, all of the same height and depth.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="uneven">
+				<xsd:annotation>
+					<xsd:documentation>The steps are not all the same size.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="rough">
+				<xsd:annotation>
+					<xsd:documentation>The steps are very different in size, some may be missing or steeply sloped.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="StairRampEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the stair ramp.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="bicycle">
+				<xsd:annotation>
+					<xsd:documentation>A narrow ramp on the side, designed to push a bicycle.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="luggage">
+				<xsd:annotation>
+					<xsd:documentation>A ramp on the side, designed to roll a suitcase.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="stroller">
+				<xsd:annotation>
+					<xsd:documentation>A pair of ramps with steps in between, intended for pushing a stroller.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Another type of handrail included in the staircase itself.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="ReachedFloorAnnouncementEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for the Reached Floor Announcement</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="visual"/>
+			<xsd:enumeration value="tactile"/>
+			<xsd:enumeration value="audio"/>
+			<xsd:enumeration value="visualAndAudio"/>
+			<xsd:enumeration value="visualAndAudioAndTactile"/>
+		</xsd:restriction>
+	</xsd:simpleType>
 </xsd:schema>

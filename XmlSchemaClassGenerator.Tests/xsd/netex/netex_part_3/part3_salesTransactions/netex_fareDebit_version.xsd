@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_fareDebit_version">
+	<xsd:include schemaLocation="netex_fareDebit_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceRestrictions_version.xsd"/>
+	<xsd:include schemaLocation="../part3_fares/netex_farePrice_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_loggable_version.xsd"/>
+	<!-- ======================================================================= -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date>
+					<Created>2023-12-18</Created>
+				</Date>
+				<Date>
+					<Modified>2023-12-18</Modified>
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the FARE DEBIT types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/part3_FareDebits}netex_FareDebit_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx FARE DEBIT    types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: FARE DEBIT types.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ====FARE DEBIT ================================================ -->
+	<xsd:group name="PaymentAmountGroup">
+		<xsd:annotation>
+			<xsd:documentation>Amount Elements for a FARE PRICE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="FarePriceAmountWithDerivationGroup">
+				<xsd:annotation>
+					<xsd:documentation>Amount Elements Step Calculation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
+			<xsd:element name="PaymentMethod" type="PaymentMethodEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Method of payment used.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfPaymentMethodRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== FARE DEBIT ================================================ -->
+	<xsd:element name="FareDebit_Dummy" abstract="true" type="DataManagedObjectStructure" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy type for FARE DEBIT</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="FareDebit" abstract="true" substitutionGroup="FareDebit_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A LOG ENTRY recording data about a debiting action relating to a fare or use of a fare.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareDebit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareDebitGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareDebitIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareDebit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LogEntry_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareDebitGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareDebitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for FARE DEBIT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="PaymentAmountGroup"/>
+			<xsd:element name="CardNumber" type="PrivateCodeStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Card number used,</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== BOOKING DEBIT ================================================ -->
+	<xsd:element name="BookingDebit" substitutionGroup="FareDebit_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A LOG ENTRY recording data about a debiting action for a booking fee.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="BookingDebit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BookingDebitGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="BookingDebitIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BookingDebit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for BOOKING DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FareDebit_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="BookingDebitGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="BookingDebitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for BOOKING DEBIT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ==== TRIP  DEBIT ================================================ -->
+	<xsd:element name="TripDebit" substitutionGroup="FareDebit_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A LOG ENTRY recording data about a debiting action for post-payment for a specific trip.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TripDebit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TripDebitGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TripDebitIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TripDebit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for TRIP DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FareDebit_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="TripDebitGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TripDebitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for TRIP DEBIT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ==== OTHER   DEBIT ================================================ -->
+	<xsd:element name="OtherDebit" substitutionGroup="FareDebit_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A LOG ENTRY recording data about a debiting action for a payment type other than a FARE PRODUCT SALE DEBIT, TRIP DEBIT, OFFENCE DEBIT or BOOKING DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="OtherDebit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="OtherDebitGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="OtherDebitIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="OtherDebit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for OTHER DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FareDebit_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="OtherDebitGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="OtherDebitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for OTHER DEBIT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ==== FARE PRODUCT SALES DEBIT ================================================ -->
+	<xsd:element name="FareProductSaleDebit" substitutionGroup="FareDebit_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A LOG ENTRY recording data about a debiting action made to purchase a FARE PRODUCT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="FareProductSaleDebit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="FareProductSaleDebitGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="FareProductSaleDebitIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="FareProductSaleDebit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for FARE PRODUCT SALES DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FareDebit_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="FareProductSaleDebitGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="FareProductSaleDebitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for FARE PRODUCT SALES DEBIT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ==== OFFENCE  DEBIT ================================================ -->
+	<xsd:element name="OffenceDebit" substitutionGroup="FareDebit_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A LOG ENTRY recording data about a debiting action for a fine for an OFFENCE or penalty fare.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="OffenceDebit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LogEntryGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="OffenceDebitGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="OffenceDebitIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="OffenceDebit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for OFFENCE DEBIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="FareDebit_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="OffenceDebitGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="OffenceDebitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for OFFENCE DEBIT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+</xsd:schema>

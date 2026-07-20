@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_usageParameterCharging_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_usageParameterCharging_version">
 	<xsd:include schemaLocation="netex_usageParameterCharging_support.xsd"/>
 	<xsd:include schemaLocation="netex_timeStructureFactor_support.xsd"/>
 	<xsd:include schemaLocation="netex_usageParameter_version.xsd"/>
@@ -12,19 +12,18 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified>Name Space changes 
+				<Date><Modified>2011-02-05</Modified>Name Space changes 
 				</Date>
-				<Date>
-					<Modified>2019-03-11</Modified>EURA-40 Add Subscribing  Usage Parameter with various attributes.
+				<Date><Modified>2019-03-11</Modified>EURA-40 Add Subscribing  Usage Parameter with various attributes.
 						Add GracePeriod to ChargingPolicy
 				</Date>
-				<Date>
-					<Modified>2019-03-11</Modified>EURA-90 Add a MaximumNumberOfFailToCheckOutEvents  to PenaltyPolicy  
+				<Date><Modified>2019-03-11</Modified>EURA-90 Add a MaximumNumberOfFailToCheckOutEvents  to PenaltyPolicy  
+				</Date>
+				<Date><Modified>2020-10-16</Modified>Add a DepositPolicyAttribute to ChargingPolicy
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -42,14 +41,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/xsd/netex_part_3/fares/netex_usageParameterEligibility_support</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -65,10 +64,10 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEX: Charging USAGE PARAMETER  types.</xsd:documentation>
+		<xsd:documentation>NeTEX: Charging USAGE PARAMETER types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ==== CHARGING POLICY USER PARAMETER ================================================ -->
-	<xsd:element name="ChargingPolicy" abstract="false" substitutionGroup="UsageParameter_">
+	<xsd:element name="ChargingPolicy" substitutionGroup="UsageParameter_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Policy regarding different aspects of charging such as credit limits.</xsd:documentation>
 		</xsd:annotation>
@@ -92,7 +91,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ChargingPolicyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ChargingPolicyIdType"/>
+					<xsd:attribute name="id" type="ChargingPolicyIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -121,7 +120,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="ExpireAfterPeriod" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Any expiry period on the right to  collec a rebate or adjustment.</xsd:documentation>
+					<xsd:documentation>Any expiry period on the right to collec a rebate or adjustment.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="PaymentGracePeriod" type="xsd:duration" minOccurs="0">
@@ -134,12 +133,17 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Policy for billing frequency.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="DepositPolicy" type="DepositPolicyEnumeration" default="none" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Policy for deposits. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== PENALTY POLICY USER PARAMETER ================================================ -->
-	<xsd:element name="PenaltyPolicy" abstract="false" substitutionGroup="UsageParameter_">
+	<xsd:element name="PenaltyPolicy" substitutionGroup="UsageParameter_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>Policy regarding different aspects of penalty charges, for example  repeated entry at the same station, no ticket etc.</xsd:documentation>
+			<xsd:documentation>Policy regarding different aspects of penalty charges, for example repeated entry at the same station, no ticket etc.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -161,7 +165,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PenaltyPolicyGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PenaltyPolicyIdType"/>
+					<xsd:attribute name="id" type="PenaltyPolicyIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -200,13 +204,13 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="MaximumNumberOfFailToCheckOutEvents" type="xsd:integer" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Lmit on the  number of fail-to-checkout events allowed before suspension. +v1.1</xsd:documentation>
+					<xsd:documentation>Lmit on the number of fail-to-checkout events allowed before suspension. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ==== SUBSCRIBING USER PARAMETER ================================================ -->
-	<xsd:element name="Subscribing" abstract="false" substitutionGroup="UsageParameter_">
+	<xsd:element name="Subscribing" substitutionGroup="UsageParameter_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Parameters relating to paying by Subscribing for a product. +v1.1</xsd:documentation>
 		</xsd:annotation>
@@ -230,7 +234,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SubscribingGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SubscribingIdType"/>
+					<xsd:attribute name="id" type="SubscribingIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

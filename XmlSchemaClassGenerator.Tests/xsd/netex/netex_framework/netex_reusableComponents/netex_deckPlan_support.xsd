@@ -1,0 +1,1087 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_deckPlan_support">
+	<!-- ======================================================================= -->
+	<xsd:include schemaLocation="netex_seatingPlan_support.xsd"/>
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Nicholas Knowles</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
+				<Date>
+					<Created>2023-01-30</Created>
+				</Date>
+				<Date><Modified>2023-12-08</Modified>Move SENSOR IN ENTRANCE to here
+				</Date>
+				<Date><Modified>2024-01-11</Modified>Revise enum values
+				</Date>
+				<Date><Modified>2024-02-18</Modified>Norway review comment - Add Window types.
+				</Date>
+				<Date><Modified>2025-04-26</Modified>Rename EquipableSpace to  OnboardSpace.
+				</Date>
+				<Description>
+					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
+					<p>This sub-schema describes the DECK PLAN types.</p>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_framework/netex_reusableComponents}netex_deckPlan_support.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
+				</Relation>
+				<Rights>
+          Unclassified
+          <Copyright>CEN, Crown Copyright 2023-2023</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Derived from the Transmodel  standards.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+            Air transport, Airports,
+            Ports and maritime transport, Ferries (marine),
+            Public transport, Bus services, Coach
+            services, Bus stops and stations,
+            Rail transport, Railway stations and track, Train services, Underground trains,
+            Business and industry, Transport, Air transport , Ports and maritime
+            transport, Public transport,
+            Rail transport, Roads and Road transport
+          </Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx DECK PLAN types.</Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>DECK PLAN identifier types</xsd:documentation>
+	</xsd:annotation>
+	<!-- ==== DECK PLAN==================================================== -->
+	<xsd:complexType name="deckPlanRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of DECK PLANs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="DeckPlanRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="DeckPlanIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK PLAN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckPlanRef" type="DeckPlanRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK PLAN. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckPlanRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK PLAN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="DeckPlanIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK PLAN.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckPlanRefStructureType" default="DeckPlan">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckPlanRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:group name="DeckSpaceReferenceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements to reference a Dec SPACE</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="DeckPlanRef" minOccurs="0"/>
+			<xsd:element ref="DeckRef" minOccurs="0"/>
+			<xsd:element ref="DeckSpaceRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== DECK  ==================================================== -->
+	<xsd:complexType name="deckRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of DECKs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="DeckRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="DeckIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckRef" type="DeckRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="DeckIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckRefStructureType" default="Deck">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ===== DECK COMPONENT ======================================================== -->
+	<xsd:simpleType name="DeckComponentIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK COMPONENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="OnboardSpaceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckComponentRef" type="DeckComponentRefStructure" abstract="true" substitutionGroup="OnboardSpaceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK COMPONENT. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckComponentRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK COMPONENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="OnboardSpaceRefStructure">
+				<xsd:attribute name="ref" type="DeckComponentIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckComponentRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckComponentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== DECK SPACE ======================================= -->
+	<xsd:simpleType name="DeckSpaceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckComponentIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckSpaceRef" type="DeckSpaceRefStructure" abstract="true" substitutionGroup="DeckComponentRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK SPACE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckSpaceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckComponentRefStructure">
+				<xsd:attribute name="ref" type="DeckSpaceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK SPACE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckSpaceRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckSpaceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== PASSENGER SPACE ======================================= -->
+	<xsd:simpleType name="PassengerSpaceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PASSENGER SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckSpaceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PassengerSpaceRef" type="PassengerSpaceRefStructure" substitutionGroup="DeckSpaceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PASSENGER SPACE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PassengerSpaceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PASSENGER SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckSpaceRefStructure">
+				<xsd:attribute name="ref" type="PassengerSpaceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PASSENGER SPACE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPassengerSpaceRefStructureType" default="PassengerSpace">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PassengerSpaceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="PassengerSpaceTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for TYPE OF PASSENGER SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="seatingArea"/>
+			<xsd:enumeration value="passengerCabin"/>
+			<xsd:enumeration value="vehicleArea"/>
+			<xsd:enumeration value="luggageStore"/>
+			<xsd:enumeration value="corridor"/>
+			<xsd:enumeration value="restaurant"/>
+			<xsd:enumeration value="toilet"/>
+			<xsd:enumeration value="bathroom"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OtherDeckSpaceTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for TYPE OF OTHER OTHER SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="driverArea"/>
+			<xsd:enumeration value="crewSpace"/>
+			<xsd:enumeration value="staffToilet"/>
+			<xsd:enumeration value="galley"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ====== OTHER DECK SPACE ======================================= -->
+	<xsd:simpleType name="OtherDeckSpaceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a OTHER DECK SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckSpaceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="OtherDeckSpaceRef" type="OtherDeckSpaceRefStructure" substitutionGroup="DeckSpaceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a OTHER DECK SPACE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OtherDeckSpaceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a OTHER DECK SPACE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckSpaceRefStructure">
+				<xsd:attribute name="ref" type="OtherDeckSpaceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a OTHER DECK SPACE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassOtherDeckSpaceRefStructureType" default="OtherDeckSpace">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for OtherDeckSpaceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== DECK ENTRANCE ======================================= -->
+	<xsd:simpleType name="DeckEntranceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckComponentIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckEntranceRef" type="DeckEntranceRefStructure" abstract="true" substitutionGroup="DeckComponentRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK ENTRANCE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckEntranceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckComponentRefStructure">
+				<xsd:attribute name="ref" type="DeckEntranceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK ENTRANCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckEntranceRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckEntranceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="DeckEntranceTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for type of DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="external">
+				<xsd:annotation>
+					<xsd:documentation>Door gives external access to VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="communicating"/>
+			<xsd:enumeration value="internal"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VehicleSideEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for Relation to vehicle of Entrance.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="leftSide">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is on left side of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="rightSide">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is on right side of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="frontEnd">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is on front end of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="backEnd">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is on back end of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="internal">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is interior to VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="above">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is above VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="below">
+				<xsd:annotation>
+					<xsd:documentation>Entrance is below VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ====== PASSENGER ENTRANCE ======================================= -->
+	<xsd:simpleType name="PassengerEntranceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a PASSENGER ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckEntranceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="PassengerEntranceRef" type="PassengerEntranceRefStructure" substitutionGroup="DeckEntranceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a PASSENGER ENTRANCE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="PassengerEntranceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a PASSENGER ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckEntranceRefStructure">
+				<xsd:attribute name="ref" type="PassengerEntranceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a PASSENGER ENTRANCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPassengerEntranceRefStructureType" default="PassengerEntrance">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PassengerEntranceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== DECK VEHICLE ENTRANCE ======================================= -->
+	<xsd:simpleType name="DeckVehicleEntranceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK VEHICLE ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckEntranceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckVehicleEntranceRef" type="DeckVehicleEntranceRefStructure" substitutionGroup="DeckEntranceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK VEHICLE ENTRANCE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckVehicleEntranceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK VEHICLE ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckEntranceRefStructure">
+				<xsd:attribute name="ref" type="DeckVehicleEntranceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK VEHICLE ENTRANCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckVehicleEntranceRefStructureType" default="DeckVehicleEntrance">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckVehicleEntranceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== OTHER DECK ENTRANCE ======================================= -->
+	<xsd:simpleType name="OtherDeckEntranceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a OTHER DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckEntranceIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="OtherDeckEntranceRef" type="OtherDeckEntranceRefStructure" substitutionGroup="DeckEntranceRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to an OTHER DECK ENTRANCE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="OtherDeckEntranceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a OTHER DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckEntranceRefStructure">
+				<xsd:attribute name="ref" type="OtherDeckEntranceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a OTHER DECK ENTRANCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassOtherDeckEntranceRefStructureType" default="OtherDeckEntrance">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for OtherDeckEntranceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== DECK ENTRANCE USAGE======================================= -->
+	<xsd:simpleType name="DeckEntranceUsageIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK ENTRANCE USAGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckEntranceUsageRef" type="DeckEntranceUsageRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK ENTRANCE USAGE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckEntranceUsageRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK ENTRANCE USAGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="DeckEntranceUsageIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK ENTRANCE USAGE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckEntranceUsageRefStructureType" default="DeckEntranceUsage">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckEntranceUsageRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="EntranceUsageEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for type of DECK ENTRANCE Usage..</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="entryAndExit"/>
+			<xsd:enumeration value="entry"/>
+			<xsd:enumeration value="exit"/>
+			<xsd:enumeration value="emergencyExit"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="EntranceSettingEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for type of DECK ENTRANCE setting..</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="open"/>
+			<xsd:enumeration value="shut"/>
+			<xsd:enumeration value="lockedShut"/>
+			<xsd:enumeration value="openWhenLoading"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ====== DECK ENTRANCE COUPLE ====================================== -->
+	<xsd:simpleType name="DeckEntranceCoupleIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK ENTRANCE COUPLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckEntranceCoupleRef" type="DeckEntranceCoupleRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK ENTRANCE COUPLE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckEntranceCoupleRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK ENTRANCE COUPLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="DeckEntranceCoupleIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK ENTRANCE COUPLE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckEntranceCoupleRefStructureType" default="DeckEntranceCouple">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckEntranceCoupleRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ====== DECK WINDOW ======================================= -->
+	<xsd:simpleType name="DeckWindowIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK WINDOW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="DeckComponentIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckWindowRef" type="DeckWindowRefStructure" substitutionGroup="DeckComponentRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK WINDOW. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckWindowRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK WINDOW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="DeckComponentRefStructure">
+				<xsd:attribute name="ref" type="DeckWindowIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK WINDOW.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckWindowRefStructureType" default="DeckWindow">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckWindowRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="DeckWindowTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for TYPE OF DECK WINDOW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="interspaced">
+				<xsd:annotation>
+					<xsd:documentation>Window is interspaced by solid separators.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="continuous">
+				<xsd:annotation>
+					<xsd:documentation>Window is interspaced by solid separators.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="panorama">
+				<xsd:annotation>
+					<xsd:documentation>Window is a large panorama window.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="porthole">
+				<xsd:annotation>
+					<xsd:documentation>Window is a porthole shaped window.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>WOther type of Window.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ====== DECK WINDOW ======================================= -->
+	<xsd:simpleType name="DeckLevelIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK LEVEL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckLevelRef" type="DeckLevelRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK LEVEL. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckLevelRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK LEVEL.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="DeckLevelIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK LEVEL.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckLevelRefStructureType" default="DeckLevel">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckLevelRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======= DECK SPACE CAPACITY =========================================== -->
+	<xsd:simpleType name="DeckSpaceCapacityIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a DECK SPACE CAPACITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="DeckSpaceCapacityRef" type="DeckSpaceCapacityRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a DECK SPACE CAPACITY. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="DeckSpaceCapacityRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a DECK SPACE CAPACITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="DeckSpaceCapacityIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a DECK SPACE CAPACITY.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDeckSpaceCapacityRefStructureType" default="DeckSpaceCapacity">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DeckSpaceCapacityRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--==== PURPOSE OF EQUIPMENT =========================================================-->
+	<xsd:simpleType name="TypeOfDeckSpaceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF DECK SPACE PROFILE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfDeckSpaceRef" type="TypeOfDeckSpaceProfileRefStructure" substitutionGroup="TypeOfValueRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF DECK SPACE PROFILE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfDeckSpaceProfileRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TYPE OF DECK SPACE PROFILE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfDeckSpaceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF DECK SPACE PROFILE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfValueRefStructureType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--==== TYPE OF DECK ENTRANCE  =========================================================-->
+	<xsd:simpleType name="TypeOfDeckEntranceIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfDeckEntranceRef" type="TypeOfDeckEntranceRefStructure" substitutionGroup="TypeOfValueRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF DECK ENTRANCE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfDeckEntranceRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TYPE OF DECK ENTRANCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfDeckEntranceIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF DECK ENTRANCE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfDeckEntranceRefStructureType" default="TypeOfDeckEntrance">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfDeckEntranceRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--==== TYPE OF DECK ENTRANCE  USAGE ===============================================-->
+	<xsd:simpleType name="TypeOfDeckEntranceUsageIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a TYPE OF DECK VEHICLE ENTRANCE USAGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="TypeOfValueIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="TypeOfDeckEntranceUsageRef" type="TypeOfDeckEntranceUsageRefStructure" substitutionGroup="TypeOfValueRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a TYPE OF DECK VEHICLE ENTRANCE USAGE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="TypeOfDeckEntranceUsageRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to a TYPE OF DECK VEHICLE ENTRANCE USAGE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="TypeOfValueRefStructure">
+				<xsd:attribute name="ref" type="TypeOfDeckEntranceUsageIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Reference to a TYPE OF DECK VEHICLE ENTRANCE USAGE.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfDeckEntranceUsageRefStructureType" default="TypeOfDeckEntranceUsage">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfDeckEntranceUsageRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- ======================================================================= -->
+</xsd:schema>

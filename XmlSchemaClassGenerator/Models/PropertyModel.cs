@@ -142,6 +142,11 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
 
     private bool IsPrivateSetter => IsEnumerable && Configuration.CollectionSettersMode == CollectionSettersMode.Private;
 
+    private bool IsPrimitiveType => Type is SimpleModel simpleModel
+        && (simpleModel.ValueType.IsPrimitive
+            || simpleModel.ValueType == typeof(string)
+            || simpleModel.ValueType == typeof(decimal));
+
     private CodeTypeReference TypeReference => PropertyType.GetReferenceFor(OwningType.Namespace, collection: IsEnumerable, attribute: IsAttribute);
 
     private void AddDocs(CodeTypeMember member)
@@ -473,6 +478,19 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         var attributes = GetAttributes(isArray).ToArray();
         member.CustomAttributes.AddRange(attributes);
 
+        if (!IsPrimitiveType && !IsAny && !Configuration.SeparateSubstitutes && Substitutes.Count > 0)
+        {
+            // A flattened substitution group maps several elements with different CLR types onto one
+            // member. In valid XSD every substitute derives from the head element's type, but NeTEx (and
+            // others) contain substitutes whose CLR type is unrelated to the head's. When any element
+            // type is not assignable to the member type, XmlSerializer can only hold them all if the
+            // member is typed as object (as xsd.exe does for a choice). Collection members are already
+            // generated with an object item type where needed, and retyping them here would break the
+            // backing field / initializer, so this only applies to single-valued members.
+            if (!isEnumerable && Substitutes.Any(sub => !IsAssignableTo(sub.Type, Type)))
+                RetypeChoiceMemberAsObject(member);
+        }
+
         // initialize List<>
         if (isEnumerable && (Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)
             && (Configuration.CollectionSettersMode != CollectionSettersMode.InitWithoutConstructorInitialization))
@@ -647,5 +665,32 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         }
 
         return attributes;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="from"/> is the same type as, or derives from, <paramref name="to"/>,
+    /// i.e. a value of <paramref name="from"/> can be stored in a member typed as <paramref name="to"/>.
+    /// </summary>
+    private static bool IsAssignableTo(TypeModel from, TypeModel to)
+        => from == to || (from is ClassModel classModel && classModel.AllBaseTypes.Contains(to));
+
+    /// <summary>
+    /// Retypes a single-valued flattened-substitution-group member as object so XmlSerializer can assign
+    /// any of its choice element types, and gives the substitution group head element (the only
+    /// XmlElement without an explicit Type) an explicit Type now that the member type no longer
+    /// identifies it.
+    /// </summary>
+    private void RetypeChoiceMemberAsObject(CodeMemberField memberField)
+    {
+        var headElementType = PropertyType.GetReferenceFor(OwningType.Namespace);
+        var headElement = memberField.CustomAttributes
+            .OfType<CodeAttributeDeclaration>()
+            .Where(attribute => attribute.AttributeType.BaseType == typeof(XmlElementAttribute).FullName)
+            .FirstOrDefault(attribute => !attribute.Arguments
+                .OfType<CodeAttributeArgument>()
+                .Any(argument => argument.Name == nameof(XmlElementAttribute.Type)));
+        headElement?.Arguments.Add(new CodeAttributeArgument(nameof(XmlElementAttribute.Type), new CodeTypeOfExpression(headElementType)));
+
+        memberField.Type = new CodeTypeReference(typeof(object));
     }
 }

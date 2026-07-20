@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.10" id="netex_occupancy_version">
+	<xsd:include schemaLocation="netex_oc_occupancy_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_utility/netex_units.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_utility/netex_utility_types.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_serviceRestrictions_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_trainElement_version.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_dayType_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_dayType_version.xsd"/>
+	<xsd:group name="OccupancyScopeFilterGroup">
+		<xsd:annotation>
+			<xsd:documentation>The intersection of supplied elements describes the extent that the Occupancy values applies to. (since SIRI 2.1)
+Only vehicle-centric filter (measurement in a part or at an entrance of a TRAIN) are available here, but a stop-centric filtering (measurement in a sector or at a position on a QUAY) can be achieved indirectly via Arrival-/DepartureFormationAssignment.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="TrainComponentGroup" minOccurs="0"/>
+			<xsd:element name="FareClass" type="FareClassEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Fare class in VEHICLE for which occupancy or capacities are specified.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PassengerCategory" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Adult, child, wheelchair etc.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="OccupancyValuesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Occupancy values applying to indicated scope. (since SIRI 2.1)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="OccupancyLevel" type="OccupancyEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>An approximate figure of how occupied or full a VEHICLE and its parts are, e.g. 'manySeatsAvailable' or 'standingRoomOnly'.  
+More accurate data can be provided by the individual occupancies or capacities below.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OccupancyPercentage" type="PercentageType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Utilised percentage of maximum payload after departing the STOP POINT. 100 means that no further passengers can be added.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="AlightingCount" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of alighting passengers for this vehicle journey at this STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BoardingCount" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of boarding passengers for this vehicle journey at this STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="OnboardCount" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of passengers on-board after departing the STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SpecialPlacesOccupied" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of special places, e.g. seats for the disabled or lounge seats, that are occupied after departing the STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PushchairsOnboardCount" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of pushchairs on-board after departing the STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="WheelchairsOnboardCount" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of wheelchairs on-board after departing the STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PramsOnboardCount" type="xsd:nonNegativeInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of prams on-board after departing the STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BicycleOnboardCount" type="xsd:nonNegativeInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of bicycles on-board, i.e., number of bicycle racks that are occupied after departing the STOP POINT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="GroupReservationStructure">
+		<xsd:annotation>
+			<xsd:documentation>Used to specify that a travel group has booked a section of the vehicle for a part of the journey, and if so under what name. (since SIRI 2.1)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="NameOfGroup" type="MultilingualString">
+				<xsd:annotation>
+					<xsd:documentation>Name for which the travel group has made the reservation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NumberOfReservedSeats" type="NumberOfPassengers">
+				<xsd:annotation>
+					<xsd:documentation>Number of seats that the group has booked.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="OccupancyView">
+		<xsd:annotation>
+			<xsd:documentation>A simple VIEW of OCCUPANCY as a first implementation without full support of DECK PLAN.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="OccupancyView_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="OccupancyGroup">
+								<xsd:annotation>
+									<xsd:documentation>Details of an Occupancy.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="OccupancyViewIdType"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="OccupancyView_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an Occupancy.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="OccupancyGroup">
+						<xsd:annotation>
+							<xsd:documentation>Details for OCCUPANCY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="OccupancyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Real-time occupancies of a VEHICLE (by fare class). Could be feedback from an automatic passenger counting system (APC) or estimated values from statistics. (since SIRI 2.1)</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="dayTypeRefs" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DAY TYPEs for BLOCK.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="dayTypeRefs_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="dayTypes" type="dayTypes_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reusable DAY TYPE in SERVICE CALENDAR FRAME.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="OccupancyScopeFilterGroup"/>
+			<xsd:group ref="OccupancyValuesGroup"/>
+			<xsd:element name="TotalNumberOfReservedSeats" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Total number of booked seats from individual and group reservations.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GroupReservation" type="GroupReservationStructure" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Reservations of travel groups, i.e., name of group and number of seats booked.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="OccupancyViewInFrameGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a OCCUPANCY in frame.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="occupancies" type="OccupancyViewInFrame_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>OCCUPANCYs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="OccupancyViewRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a reference to an OCCUPANCY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="OccupancyViewIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassOccupancyViewRefStructureType" default="OccupancyView">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for OccupancyViewRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="OccupancyViewIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a OCCUPANCY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:complexType name="OccupancyView_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment for multiple OCCUPANCYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="OccupancyView" type="OccupancyView_VersionStructure"/>
+					<xsd:element name="OccupancyViewRef" type="OccupancyViewRefStructure"/>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="OccupancyViewInFrame_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in FRAME of OCCUPANCYs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element name="OccupancyView" type="OccupancyView_VersionStructure"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+</xsd:schema>

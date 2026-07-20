@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2009 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
 <!-- 2007 03 23 Add repeating name -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_ifopt_flexibleStopPlace_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_ifopt_flexibleStopPlace_version">
 	<xsd:include schemaLocation="netex_ifopt_flexibleStopPlace_support.xsd"/>
 	<xsd:include schemaLocation="netex_ifopt_stopPlace_version.xsd"/>
 	<!-- ======================================================================= -->
@@ -20,6 +19,8 @@
 				<Date>
 					<Modified>2007-03-22</Modified>
 				</Date>
+				<Date><Modified>2020-10-05</Modified> New Modes: Allow all vehicle modes fo mode.
+				</Date>
 				<Description>
 					<Title>NeTEx Network Exchange - FLEXIBLE STOP PLACE types.</Title>
 				</Description>
@@ -35,14 +36,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/ifopt/netex_ifopt_FlexibleStopPlaceModel.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Evolved from NaPTAN, SIRI and other schemas.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -118,15 +119,15 @@ Rail transport, Roads and Road transport
 						<xsd:group ref="PlaceGroup"/>
 						<xsd:sequence>
 							<xsd:group ref="SiteElementNamesGroup"/>
-							<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+							<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 								<xsd:annotation>
-									<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+									<xsd:documentation>Primary PT MODE.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:element>
 							<xsd:group ref="FlexibleStopPlaceGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FlexibleStopPlaceIdType" use="optional">
+					<xsd:attribute name="id" type="FlexibleStopPlaceIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -143,9 +144,9 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="Place_VersionStructure">
 				<xsd:sequence>
 					<xsd:group ref="SiteElementNamesGroup"/>
-					<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+					<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 						<xsd:annotation>
-							<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+							<xsd:documentation>Primary PT MODE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:group ref="FlexibleStopPlaceGroup"/>
@@ -162,7 +163,7 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="FlexibleAreasGroup"/>
 			<xsd:element name="lines" type="lineRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Lines  for  FLEXIBLE STOP PLACE.</xsd:documentation>
+					<xsd:documentation>Lines for FLEXIBLE STOP PLACE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -246,7 +247,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FlexibleQuayGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FlexibleQuayIdType"/>
+					<xsd:attribute name="id" type="FlexibleQuayIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -279,7 +280,7 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether space can be used for alighting or en route to boarding. Default is true.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="PublicCode" type="PublicCodeType" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Public identifier code of FLEXIBLE QUAY.</xsd:documentation>
 				</xsd:annotation>
@@ -297,9 +298,9 @@ Rail transport, Roads and Road transport
 				</xsd:annotation>
 			</xsd:group>
 			<xsd:element ref="FlexibleStopPlaceRef" minOccurs="0"/>
-			<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Primary MODE of Vehicle transport.</xsd:documentation>
+					<xsd:documentation>Primary PT MODE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -332,7 +333,7 @@ Rail transport, Roads and Road transport
 					<xsd:element ref="FlexibleAreaRef"/>
 					<xsd:element ref="FlexibleArea">
 						<xsd:annotation>
-							<xsd:documentation>Specialisation of a FLEXIBLE QUAY (which is abstract) to identify what is the catchment area for a flexible service (so that a stop finder can find  the nearest available types of transport). It is a named zone visited by a particular mode of transport.  It is part of the SITE data set rather than the service data set, since it can be defined and exists independently of an actual service.</xsd:documentation>
+							<xsd:documentation>Specialisation of a FLEXIBLE QUAY (which is abstract) to identify what is the catchment area for a flexible service (so that a stop finder can find the nearest available types of transport). It is a named zone visited by a particular mode of transport. It is part of the SITE data set rather than the service data set, since it can be defined and exists independently of an actual service.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:choice>
@@ -341,7 +342,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:element name="FlexibleArea" substitutionGroup="Place">
 		<xsd:annotation>
-			<xsd:documentation>Specialisation of a FLEXIBLE QUAY (which is abstract) to identify what is the catchment area for a flexible service (so that a stop finder can find  the nearest available types of transport). It is a named zone visited by a particular mode of transport.  It is part of the SITE data set rather than the service data set, since it can be defined and exists independently of an actual service.</xsd:documentation>
+			<xsd:documentation>Specialisation of a FLEXIBLE QUAY (which is abstract) to identify what is the catchment area for a flexible service (so that a stop finder can find the nearest available types of transport). It is a named zone visited by a particular mode of transport. It is part of the SITE data set rather than the service data set, since it can be defined and exists independently of an actual service.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -370,7 +371,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="FlexibleAreaGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FlexibleAreaIdType"/>
+					<xsd:attribute name="id" type="FlexibleAreaIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -444,7 +445,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="HailAndRideAreaGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="HailAndRideAreaIdType"/>
+					<xsd:attribute name="id" type="HailAndRideAreaIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2006 sp2 U (http://www.altova.com) by christophe duquesne (Dryade SARL) -->
 <xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_validityCondition_version">
 	<xsd:include schemaLocation="netex_validityCondition_support.xsd"/>
 	<xsd:include schemaLocation="netex_responsibility_version.xsd"/>
@@ -9,7 +8,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -18,6 +17,8 @@
 				</Date>
 				<Date>
 					<Modified>217-03-27   Change to use responsibility  1.1 with AlternativeText</Modified>
+				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines Time base types.</p>
@@ -38,7 +39,7 @@
 						<li>Derived from the Transmodel standard.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -67,19 +68,19 @@ Rail transport, Roads and Road transport
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="ValidityConditionRef"/>
 					<xsd:element ref="ValidBetween"/>
-					<xsd:element ref="ValidityCondition_"/>
+					<xsd:element ref="ValidityCondition_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="ValidityCondition_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+	<xsd:element name="ValidityCondition_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Condition used in order to characterise a given VERSION of a VERSION FRAME. A VALIDITY CONDITION consists of a parameter (e.g. date, triggering event, etc) and its type of application (e.g. for, from, until, etc.).</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<!-- ======================================================================= -->
-	<xsd:element name="ValidityCondition" abstract="false" substitutionGroup="ValidityCondition_">
+	<xsd:element name="ValidityCondition" substitutionGroup="ValidityCondition_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Condition used in order to characterise a given VERSION of a VERSION FRAME. A VALIDITY CONDITION consists of a parameter (e.g. date, triggering event, etc) and its type of application (e.g. for, from, until, etc.).</xsd:documentation>
 		</xsd:annotation>
@@ -113,7 +114,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ValidityConditionIdType" use="optional"/>
+					<xsd:attribute name="id" type="ValidityConditionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -172,7 +173,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ValidityTrigger" abstract="false" substitutionGroup="ValidityCondition_">
+	<xsd:element name="ValidityTrigger" substitutionGroup="ValidityCondition_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>External event defining a VALIDITY CONDITION. E.g. exceptional flow of a river, bad weather, Road closure for works.</xsd:documentation>
 		</xsd:annotation>
@@ -209,7 +210,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ValidityTriggerGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ValidityTriggerIdType" use="optional"/>
+					<xsd:attribute name="id" type="ValidityTriggerIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -236,7 +237,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Entity on which Trigger is based - Trigger value is taken from it.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
@@ -256,7 +261,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ValidityRuleParameter" abstract="false" substitutionGroup="ValidityCondition_">
+	<xsd:element name="ValidityRuleParameter" substitutionGroup="ValidityCondition_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A user defined VALIDITY CONDITION used by a rule for selecting versions. E.g. river level &gt; 1,5 m and bad weather.</xsd:documentation>
 		</xsd:annotation>
@@ -293,7 +298,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ValidityRuleParameterGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ValidityRuleParameterIdType" use="optional"/>
+					<xsd:attribute name="id" type="ValidityRuleParameterIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -329,7 +334,7 @@ Rail transport, Roads and Road transport
 					</xsd:element>
 					<xsd:element name="ComparisonOperator" type="RelativeOperatorEnumeration">
 						<xsd:annotation>
-							<xsd:documentation>Comparison operator to be used when comparing the referenced attribute of  to the Attribute Value : EQ, NE,GE, GT, LE,LT (equal, not equal, greater equal, greater than, lower equal, lower than).</xsd:documentation>
+							<xsd:documentation>Comparison operator to be used when comparing the referenced attribute of to the Attribute Value : EQ, NE,GE, GT, LE,LT (equal, not equal, greater equal, greater than, lower equal, lower than).</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 					<xsd:choice>
@@ -354,7 +359,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="SimpleValidityCondition" abstract="false">
+	<xsd:element name="SimpleValidityCondition">
 		<xsd:annotation>
 			<xsd:documentation>OPTIMISATION Simple version of a VALIDITY CONDITION used in order to characterise a given VERSION of a VERSION FRAME. Comprises a simple period.Deprecated.</xsd:documentation>
 		</xsd:annotation>
@@ -375,7 +380,7 @@ Rail transport, Roads and Road transport
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ValidityConditionIdType" use="optional">
+					<xsd:attribute name="id" type="ValidityConditionIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
 						</xsd:annotation>
@@ -384,7 +389,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:element name="ValidBetween" abstract="false">
+	<xsd:element name="ValidBetween">
 		<xsd:annotation>
 			<xsd:documentation>OPTIMISATION. Simple version of a VALIDITY CONDITION. Comprises a simple period. NO UNIQUENESS CONSTRAINT.</xsd:documentation>
 		</xsd:annotation>

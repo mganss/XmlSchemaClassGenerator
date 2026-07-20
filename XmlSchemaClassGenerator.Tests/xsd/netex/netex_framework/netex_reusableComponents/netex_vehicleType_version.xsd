@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_vehicleType_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_vehicleType_version">
 	<xsd:include schemaLocation="netex_vehicleType_support.xsd"/>
+	<xsd:include schemaLocation="netex_nm_fleetEquipment_support.xsd"/>
+	<xsd:include schemaLocation="netex_nm_equipmentEnergy_support.xsd"/>
+	<xsd:include schemaLocation="netex_nm_fleet_support.xsd"/>
+	<xsd:include schemaLocation="netex_mode_support.xsd"/>
 	<xsd:include schemaLocation="netex_transportOrganisation_support.xsd"/>
+	<xsd:include schemaLocation="netex_deckPlan_support.xsd"/>
+	<xsd:include schemaLocation="../netex_reusableComponents/netex_mode_support.xsd"/>
 	<xsd:include schemaLocation="netex_equipmentVehiclePassenger_version.xsd"/>
 	<!-- ======================================================================= -->
 	<xsd:annotation>
@@ -12,19 +18,36 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified>Name Space changes
+				<Date><Modified>2011-02-05</Modified>Name Space changes
 				</Date>
-				<Date>
-					<Modified>2017-03-27</Modified>CR0001 - Vehicle Dimensions added.
+				<Date><Modified>2017-03-27</Modified>CR0001 - Vehicle Dimensions added.
 				</Date>
-				<Date>
-					<Modified>2019-03-25</Modified>NL31 CD #60 Add new attributes BoardingHeight and GapToPlatform attributes to VehicleType. 
+				<Date><Modified>2019-03-25</Modified>NL31 CD #60 Add new attributes BoardingHeight and GapToPlatform attributes to VehicleType.
 					 NJSK Review correct data types of new attributes to be of LengthType
+				</Date>
+				<Date><Modified>2021-07-07</Modified>NewModes-Power Description attribute to NVehicleEquipmentProfile
+				</Date>
+				<Date><Modified>2020-10-05</Modified> New Modes: Add Vehicle  mode  to VehicleType
+					 Refactor VehicleType into TarnsportType, VehicleType and PesonalVehicleType
+					   Replace Vehicle OperatorRef with TransportOrganisationRef.
+					   Add VehicleModelRef to Vehicle.
+					   Add ModelProfileRef to VehicleModel
+					   Add Description to Vehicle.
+					   Add PropulsionType . and MaximumRange to TransportType
+				</Date>
+				<Date><Modified>2021-07-08</Modified>NewModes: Correction Add missing VehicleEquipmentProfile relationship to VehicleModel
+				</Date>
+				<Date><Modified>2023-01-30</Modified>TM CR: Enhancement Add Accepted Driver Permit
+				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
+				<Date><Modified>2023-11-21</Modified>CR0545 Add AcceptedDriverPermit.
+				</Date>
+				<Date><Modified>2024-02-07</Modified>Fix - allow default DEck Plan or TRANSPORT TYPE, move VehiclesInFramegroup her
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -42,14 +65,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -68,9 +91,161 @@ Rail transport, Roads and Road transport
 		<xsd:documentation>VEHICLE TYPE data types</xsd:documentation>
 	</xsd:annotation>
 	<!-- ======================================================================= -->
-	<xsd:element name="VehicleType" substitutionGroup="DataManagedObject">
+	<xsd:complexType name="vehicleModelsInFrame_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type of VEHICLe.</xsd:documentation>
+			<xsd:documentation>Type for containment in frame of VEHICLE MODELs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehicleModel" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ==== TRANSPORT TYPE ==================================================== -->
+	<xsd:element name="TransportType_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Dummy type to work around SG limitations</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:element name="TransportType" substitutionGroup="TransportType_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A classification of any type of VEHICLE according to its properties.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TransportType_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TransportTypeGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TransportTypeIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of TRANSPORT TYPE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TransportType_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TRANSPORT TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="TransportTypeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="TransportTypeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a TRANSPORT TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of TRANSPORT TYPE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Short Name of TRANSPORT TYPE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of TRANSPORT TYPE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="TransportTypePropertiesGroup"/>
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PT MODE associated with VEHICLE TYPE. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="VehicleTypeTotalCapacityGroup"/>
+			<xsd:element ref="DeckPlanRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="TransportTypePropertiesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Property Elements for a TRANSPORT TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="EuroClass" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Euroclass of the vehicle type.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ReversingDirection" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether vehicles of the type have a reversing direction.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SelfPropelled" type="xsd:boolean" default="true" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether vehicles of the type are self-propelled.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PropulsionTypes" type="PropulsionTypeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>List of types of power used +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PropulsionType" type="PropulsionTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Type of power used. DEPRECATED -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FuelTypes" type="FuelTypeListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The list of types of fuel used by a vehicle of the type. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="FuelType" type="FuelTypeEnumeration" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The type of fuel used by a vehicle of the type. DEPRECATED -v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="TypeOfFuel" type="FuelTypeEnumeration" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>The type of fuel used by a vehicle of the type. DEPRECATED NAME 1.2.2. Use FuelType. -v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="MaximumRange" type="DistanceType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum range between refuelling. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MaximumVelocity" type="SpeedType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Maximum velocity in m/s. +v2.0.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== VEHICLE TYPE ==================================================== -->
+	<xsd:element name="VehicleType" substitutionGroup="TransportType_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A classification of public transport vehicles according to the vehicle scheduling requirements in mode and capacity (e.g. standard bus, double-deck, ...).</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -83,10 +258,13 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DataManagedObjectGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
+							<xsd:group ref="TransportTypeGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
 							<xsd:group ref="VehicleTypeGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleTypeIdType">
+					<xsd:attribute name="id" type="VehicleTypeIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE TYPE.</xsd:documentation>
 						</xsd:annotation>
@@ -97,10 +275,10 @@ Rail transport, Roads and Road transport
 	</xsd:element>
 	<xsd:complexType name="VehicleType_VersionStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a VEHICLE. TYPE.</xsd:documentation>
+			<xsd:documentation>Type for a VEHICLE TYPE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="DataManagedObjectStructure">
+			<xsd:extension base="TransportType_VersionStructure">
 				<xsd:sequence>
 					<xsd:group ref="VehicleTypeGroup"/>
 				</xsd:sequence>
@@ -109,25 +287,9 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="VehicleTypeGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for a VEHICLE. TYPE.</xsd:documentation>
+			<xsd:documentation>Elements for a VEHICLE TYPE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Name of VEHICLE TYPE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Short Name of VEHICLE TYPE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Description of VEHICLE TYPE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
 			<xsd:group ref="VehicleTypePropertiesGroup"/>
 			<xsd:element name="IncludedIn" type="VehicleTypeRefStructure" minOccurs="0">
 				<xsd:annotation>
@@ -141,42 +303,29 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="facilities" type="serviceFacilitySets_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Facilities of VEHICLE.</xsd:documentation>
+					<xsd:documentation>Facilities of VEHICLE TYPE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="VehicleRequirementsGroup"/>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:group name="VehicleTypePropertiesGroup">
+	<xsd:group name="VehicleTypeTotalCapacityGroup">
 		<xsd:annotation>
-			<xsd:documentation>Prooprty Elements for a VEHICLE. TYPE.</xsd:documentation>
+			<xsd:documentation>Total Capacity elements for a VEHICLE TYPE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="ReversingDirection" type="xsd:boolean" default="true" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether vehicles of the type have a reversing direction.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="SelfPropelled" type="xsd:boolean" default="true" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Whether vehicles of the type are self-propelled.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="TypeOfFuel" type="TypeOfFuelEnumeration" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>The type of fuel used by a vehicle of the type.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="EuroClass" type="xsd:normalizedString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Euroclass of the vehicle type.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
 			<xsd:element name="PassengerCapacity" type="PassengerCapacityStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Total Number of passengers that VEHICLE TYPE. can carry.</xsd:documentation>
+					<xsd:documentation>Total Number of passengers that VEHICLE TYPE can carry.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="VehicleTypePropertiesGroup">
+		<xsd:annotation>
+			<xsd:documentation>Property elements for a VEHICLE TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
 			<xsd:element name="capacities" type="passengerCapacities_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Break down of Capacities by FARE CLASS.</xsd:documentation>
@@ -184,16 +333,21 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:group ref="VehicleAccessibilityRequirementsGroup"/>
 			<xsd:group ref="VehicleDimensionsGroup"/>
+			<xsd:element name="Monitored" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether real-time data is normally available for the VEHICLE TYPE (this can be the vehicle position, but also the speed, charging level, passenger counting, etc.).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="VehicleDimensionsGroup">
 		<xsd:annotation>
-			<xsd:documentation>DimensionElements for a VEHICLE TYPE.</xsd:documentation>
+			<xsd:documentation>Dimension elements for a VEHICLE TYPE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="Length" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>The length of a VEHICLE of the type.  </xsd:documentation>
+					<xsd:documentation>The length of a VEHICLE of the type.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Width" type="LengthType" minOccurs="0">
@@ -203,7 +357,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="Height" type="LengthType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>The length of a VEHICLE of the type. +v1.1</xsd:documentation>
+					<xsd:documentation>The height of a VEHICLE of the type. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Weight" type="WeightType" minOccurs="0">
@@ -211,11 +365,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>The weight of a VEHICLE of the type. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="FirstAxleHeight" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The height of the first axle of a VEHICLE of the type.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="VehicleRequirementsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements specifying Requirement properties of VEHICLE TYPE. Vehicle should satisfy all of these requirements.</xsd:documentation>
+			<xsd:documentation>General Requirement properties of VEHICLE TYPE. Vehicle should satisfy all of these requirements.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="canCarry" type="passengerCarryingRequirements_RelStructure" minOccurs="0">
@@ -237,7 +396,7 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="VehicleAccessibilityRequirementsGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements specifying Requirement properties of VEHICLE TYPE. Vehicle should satisfy these requirements.</xsd:documentation>
+			<xsd:documentation>Accessibility Requirement properties of VEHICLE TYPE. Vehicle should satisfy these requirements.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="LowFloor" type="xsd:boolean" minOccurs="0">
@@ -255,6 +414,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Whether vehicle has hoist for wheelchair access.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="HoistOperatingRadius" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Distance from VEHICLE needed to operate hoist.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="BoardingHeight" type="LengthType" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Maximum step height to board. +v1.1</xsd:documentation>
@@ -267,7 +431,158 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ==== VEHICLE TYPE ==================================================== -->
+	<xsd:element name="SimpleVehicleType" substitutionGroup="TransportType_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A classification of personal use vehicles according to their properties, +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="SimpleVehicleType_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TransportTypeGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="SimpleVehicleTypeGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="SimpleVehicleTypeIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of PERSONAL TRANSPORT TYPE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="SimpleVehicleType_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PERSONAL TRANSPORT TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TransportType_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="SimpleVehicleTypeGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="SimpleVehicleTypeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a PERSONAL TRANSPORT TYPE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="VehicleDimensionsGroup"/>
+			<xsd:element name="LicenceRequirements" type="LicenceRequirementsEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Licence requirements to use.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VehicleCategory" type="SimpleVehicleCategoryEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Category of vehicle.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NumberOfWheels" type="xsd:nonNegativeInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of wheels of the vehicle. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MinimumAge" type="xsd:nonNegativeInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Minumum age to use TRANSPORT TYPE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Portable" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether vehicle can be carried easily, e.g. scooter, skateboard, foldable bicycle.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="acceptedDriverPermits" type="acceptedDriverPermits_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Required permit to operate the vehicle. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- =======ACCEPTED DRIVER PERMIT ================================================== -->
+	<xsd:complexType name="acceptedDriverPermits_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of ACCEPTED DRIVER PERMITs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="AcceptedDriverPermit" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="AcceptedDriverPermit" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Accepted TYPE OF DRIVER PERMIT for a given SIMPLE VEHICLE TYPE. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="AcceptedDriverPermit_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="AcceptedDriverPermitGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="AcceptedDriverPermitIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ACCEPTED DRIVER PERMIT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="AcceptedDriverPermit_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an ACCEPTED DRIVER PERMIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:group ref="AcceptedDriverPermitGroup">
+					<xsd:annotation>
+						<xsd:documentation>Elements for an ACCEPTED DRIVER PERMIT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:group>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="AcceptedDriverPermitGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a ACCEPTED DRIVER PERMIT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of ACCEPTED DRIVER PERMIT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfDriverPermitRef" minOccurs="0"/>
+			<xsd:element name="acceptedDriverPermits" type="acceptedDriverPermits_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Types of Driver Licence that are accepted for Simple Vehicle Type. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== VEHICLE REQUIREMENT ======================================================= -->
 	<xsd:element name="VehicleRequirement" type="VehicleRequirement_VersionStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Requirements for service.</xsd:documentation>
@@ -301,7 +616,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ====== PASSENGER CARRYING REQUIREMENTs =================================== -->
 	<xsd:complexType name="passengerCarryingRequirements_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of PASSENGER CARRYING Requirements.</xsd:documentation>
@@ -336,7 +651,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PassengerCarryingRequirementGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PassengerCarryingRequirementIdType" use="optional">
+					<xsd:attribute name="id" type="PassengerCarryingRequirementIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of PASSENGER CARRYING REQUIREMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -366,22 +681,24 @@ Rail transport, Roads and Road transport
 			<xsd:group ref="VehicleAccessibilityRequirementsGroup"/>
 		</xsd:sequence>
 	</xsd:group>
+	<!-- ====== PASSENGER CAPACITY =================================== -->
 	<xsd:complexType name="passengerCapacities_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a list of PASSENGER CAPACITY REQUIREMENTs.</xsd:documentation>
+			<xsd:documentation>Type for a list of PASSENGER and PASSENGER VEHICLE CAPACITies.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="oneToManyRelationshipStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="PassengerCapacityRef"/>
 					<xsd:element ref="PassengerCapacity" maxOccurs="1"/>
+					<xsd:element ref="PassengerVehicleCapacity"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<xsd:element name="PassengerCapacity">
 		<xsd:annotation>
-			<xsd:documentation>Capacity for a VEHICLE TYPE and Class.</xsd:documentation>
+			<xsd:documentation>Total number of passengers that can be carried by a VEHICLE of this type.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -397,7 +714,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PassengerCapacityGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PassengerCapacityIdType" use="optional">
+					<xsd:attribute name="id" type="PassengerCapacityIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of PASSENGER CAPACITY.</xsd:documentation>
 						</xsd:annotation>
@@ -408,7 +725,7 @@ Rail transport, Roads and Road transport
 	</xsd:element>
 	<xsd:complexType name="PassengerCapacityStructure">
 		<xsd:annotation>
-			<xsd:documentation>Capacity for a VEHICLE TYPE and Class.</xsd:documentation>
+			<xsd:documentation>Type for a PASSENGER CAPACITY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="DataManagedObjectStructure">
@@ -420,12 +737,12 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="PassengerCapacityGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for a PASSENGER CAPACITY REQUIREMENT. relevant for passenger systems.</xsd:documentation>
+			<xsd:documentation>Elements for a PASSENGER CAPACITY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="FareClass" type="FareClassEnumeration" default="any" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Edit care class for which capacity is specifyed. Default is any, i.e. capacity is for all classes.</xsd:documentation>
+					<xsd:documentation>Fare class for which capacity is specifyed. Default is any, i.e. capacity is for all FARE CLASSes.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="CapacityGroup"/>
@@ -433,12 +750,12 @@ Rail transport, Roads and Road transport
 	</xsd:group>
 	<xsd:group name="CapacityGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for a PASSENGER CAPACITY REQUIREMENT. relevant for passenger systems.</xsd:documentation>
+			<xsd:documentation>Capacity type Elements for a PASSENGER CAPACITY REQUIREMENT. Relevant for passenger systems.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="TotalCapacity" type="NumberOfPassengers" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>The total capacity of vehicles of the type.  For a requirement this is the minimum needed.</xsd:documentation>
+					<xsd:documentation>The total capacity of vehicles of the type. For a requirement this is the minimum needed.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="SeatingCapacity" type="NumberOfPassengers" minOccurs="0">
@@ -448,7 +765,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="StandingCapacity" type="NumberOfPassengers" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>The standing capacity of vehicles of the type.  For a requirement this is the minimum needed.</xsd:documentation>
+					<xsd:documentation>The standing capacity of vehicles of the type. For a requirement this is the minimum needed.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="SpecialPlaceCapacity" type="NumberOfPassengers" minOccurs="0">
@@ -466,9 +783,76 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>The number of wheelchairs places on vehicles of the type. For a requirement this is the minimum needed.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="PramPlaceCapacity" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The number of places on the vehicle that are suitable for prams. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BicycleRackCapacity" type="NumberOfPassengers" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The number of bicycle racks on the vehicle. Also non-rack places should be counted here. The name might change in future to BicycleCapacity. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ====== PASSENGER VEHICLE CAPACITY =================================== -->
+	<xsd:element name="PassengerVehicleCapacity">
+		<xsd:annotation>
+			<xsd:documentation>Total number of passenger vehicles s that can be carried by a VEHICLE of this type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PassengerVehicleCapacityStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PassengerVehicleCapacityGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PassengerVehicleCapacityIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of PASSENGER VEHICLE CAPACITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PassengerVehicleCapacityStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PASSENGER VEHICLE CAPACITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="PassengerVehicleCapacityGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PassengerVehicleCapacityGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a PASSENGER VEHICLE CAPACITY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="VehicleCategories" type="AllRoadVehicleCategoriesListOfEnumerations" default="allPassengerVehicles" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Vehicle categories for which capacity is specified. Default is allPassengerVehicles i.e. capacity is for all VEHICLE CATEGORIES</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VehicleCapacity" type="NumberOfVehicles" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The total capacity of passenger VEHICLES of the type. F</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======= PASSENGER CARRYING REQUIREMENTs============================== -->
 	<xsd:element name="PassengerCarryingRequirementsView" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Requirements for carrying passengers.</xsd:documentation>
@@ -504,7 +888,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
+	<!-- ===== VEHICLE MANOEUVRING REQUIREMENTS================================== -->
 	<xsd:complexType name="vehicleManoeuvringRequirements_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of PASSENGER CARRYING REQUIREMENTs.</xsd:documentation>
@@ -547,7 +931,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="VehicleManoeuvringRequirementGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleManoeuvringRequirementIdType">
+					<xsd:attribute name="id" type="VehicleManoeuvringRequirementIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE MANOEVRING REQUIREMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -617,7 +1001,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ===== FACILITY REQUIREMENTS ========================================= -->
 	<xsd:complexType name="facilityRequirements_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of FACILITY REQUIREMENTs.</xsd:documentation>
@@ -660,7 +1044,7 @@ Rail transport, Roads and Road transport
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="FacilityRequirementIdType" use="optional">
+					<xsd:attribute name="id" type="FacilityRequirementIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of FACILITY REQUIREMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -693,90 +1077,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
-	<xsd:element name="Vehicle" substitutionGroup="DataManagedObject">
-		<xsd:annotation>
-			<xsd:documentation>A public transport vehicle used for carrying passengers.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:restriction base="Vehicle_VersionStructure">
-					<xsd:sequence>
-						<xsd:sequence>
-							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
-						</xsd:sequence>
-						<xsd:sequence>
-							<xsd:group ref="DataManagedObjectGroup"/>
-						</xsd:sequence>
-						<xsd:sequence>
-							<xsd:group ref="VehicleGroup"/>
-						</xsd:sequence>
-					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleIdType">
-						<xsd:annotation>
-							<xsd:documentation>Identifier of VEHICLE.</xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
-				</xsd:restriction>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
-	<xsd:complexType name="Vehicle_VersionStructure" abstract="false">
-		<xsd:annotation>
-			<xsd:documentation>Type for a VEHICLE.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="DataManagedObjectStructure">
-				<xsd:sequence>
-					<xsd:group ref="VehicleGroup"/>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-	<xsd:group name="VehicleGroup">
-		<xsd:annotation>
-			<xsd:documentation>Elements for VEHICLE.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:sequence>
-			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Name of VEHICLE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Short Name of VEHICLE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element name="RegistrationNumber" type="xsd:normalizedString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Licence plate of VEHICLE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:group ref="VehicleCodeGroup"/>
-			<xsd:element ref="OperatorRef" minOccurs="0"/>
-			<xsd:element ref="VehicleTypeRef" minOccurs="0"/>
-			<xsd:element name="actualVehicleEquipments" type="equipments_RelStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>ACTUAL EQUIPMENT found in VEHICLE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-		</xsd:sequence>
-	</xsd:group>
-	<xsd:group name="VehicleCodeGroup">
-		<xsd:annotation>
-			<xsd:documentation>Alternative Code Elements for VEHICLE.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:sequence>
-			<xsd:element name="OperationalNumber" type="xsd:normalizedString" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Operational Number of VEHICLE.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
-		</xsd:sequence>
-	</xsd:group>
-	<!-- ======================================================================= -->
+	<!-- ====== VEHICLE MODEL ====================================================== -->
 	<xsd:element name="VehicleModel" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>A classification of public transport vehicles according to the vehicle scheduling requirements in MODE and capacity (e.g. standard bus, double-deck, ...).</xsd:documentation>
@@ -793,7 +1094,7 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:group ref="VehicleModelGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleModelIdType">
+					<xsd:attribute name="id" type="VehicleModelIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of VEHICLE MODEL.</xsd:documentation>
 						</xsd:annotation>
@@ -802,7 +1103,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleModel_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleModel_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a VEHICLE MODEL.</xsd:documentation>
 		</xsd:annotation>
@@ -819,7 +1120,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Name of VEHCILE MODEL.</xsd:documentation>
+					<xsd:documentation>Name of VEHICLE MODEL.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
@@ -832,10 +1133,48 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Manufacturer of VEHICLE MODEL.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="VehicleTypeRef" minOccurs="0"/>
+			<xsd:element ref="TransportTypeRef" minOccurs="0"/>
+			<xsd:element name="Range" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Range when fully fuelled or charged. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FullCharge" type="WattHoursType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Energy required for a full charge. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="equipmentProfiles" type="vehicleEquipmentProfileRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Equipment profiles assoicated with model. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="VehicleModelProfileRef" minOccurs="0"/>
+			<xsd:element name="CustomerServiceContactDetails" type="ContactStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Especially very large vehicles and also some ALTERNATIVE MODE OF OPERATION offers need the possibility to contact the VEHICLE directly.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
+	<xsd:group name="VehicleCodeGroup">
+		<xsd:annotation>
+			<xsd:documentation>Alternative code elements for VEHICLE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="OperationalNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Operational number of VEHICLE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Private code of the vehicle. DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- =======VEHICLE EQUIPMENT ================================================== -->
 	<xsd:element name="VehicleEquipmentProfile" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Each instantiation of this ENTITY gives the number of items of one TYPE OF EQUIPMENT a VEHICLE MODEL should contain for a given PURPOSE OF EQUIPMENT PROFILE. The set of instantiations for one VEHICLE MODEL and one purpose gives one complete 'profile'.</xsd:documentation>
@@ -852,16 +1191,16 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:group ref="VehicleEquipmentProfileGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="VehicleEquipmentProfileIdType">
+					<xsd:attribute name="id" type="VehicleEquipmentProfileIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of VEHICLE EQUIPMENT PROILE.</xsd:documentation>
+							<xsd:documentation>Identifier of VEHICLE EQUIPMENT PROFILE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="VehicleEquipmentProfile_VersionStructure" abstract="false">
+	<xsd:complexType name="VehicleEquipmentProfile_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a VEHICLE EQUIPMENT PROFILE.</xsd:documentation>
 		</xsd:annotation>
@@ -881,6 +1220,11 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Name of VEHICLE EQUIPMENT PROFILE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of VEHICLE EQUIPMENT PROFILE. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="EquipmentRef" minOccurs="0"/>
 			<xsd:element name="Units" type="xsd:integer" minOccurs="0">
 				<xsd:annotation>
@@ -892,11 +1236,93 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Manufacturer VEHICLE MODEL.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element ref="TypeOfEquipmentRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>TYPE of EQUIPMENT. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="PurposeOfEquipmentProfileRef" minOccurs="0"/>
+			<xsd:element name="vehicleEquipmentProfileMembers" type="vehicleEquipmentProfileMembers_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Members of Vehicle Profile. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
-	<xsd:element name="PurposeOfEquipmentProfile" abstract="false" substitutionGroup="TypeOfValue">
+	<!-- ======VEHICLE EQUIPMENT PROFILE MEMBER ====================================================== -->
+	<xsd:complexType name="vehicleEquipmentProfileMembers_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of VEHICLE EQUIPMENT PROFILE MEMBERs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="VehicleEquipmentProfileMember" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="VehicleEquipmentProfileMember" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>A element within a VEHICLE EQUIPMENT PROFILE specifying the number of units of a given a TYPE OF EQUIPMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="VehicleEquipmentProfileMember_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:group ref="VehicleEquipmentProfileMemberGroup"/>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="VehicleEquipmentProfileMemberIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of VEHICLE EQUIPMENT PROILE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="VehicleEquipmentProfileMember_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a VEHICLE EQUIPMENT PROFILE MEMBER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:group ref="VehicleEquipmentProfileMemberGroup"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="VehicleEquipmentProfileMemberGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a VEHICLE EQUIPMENT PROFILE MEMBER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of VEHICLE EQUIPMENT PROFILE MEMBER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of VEHICLE EQUIPMENT PROFILE MEMBER.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="EquipmentRef" minOccurs="0"/>
+			<xsd:element name="MinimumUnits" type="xsd:integer" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Number of units of EQUIPMENT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="TypeOfEquipmentRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ========= PURPOSE OF EQUIPMENT ============================================ -->
+	<xsd:element name="PurposeOfEquipmentProfile" substitutionGroup="TypeOfValue">
 		<xsd:annotation>
 			<xsd:documentation>A functional purpose which requires a certain set of EQUIPMENT of different types put together in a VEHICLE EQUIPMENT PROFILE or STOP POINT EQUIPMENT PROFILE.</xsd:documentation>
 		</xsd:annotation>
@@ -914,18 +1340,54 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PurposeOfEquipmentProfileIdType">
+					<xsd:attribute name="id" type="PurposeOfEquipmentProfileIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of PURPOSE OF EQUIMENT PROFILE.</xsd:documentation>
+							<xsd:documentation>Identifier of PURPOSE OF EQUIPMENT PROFILE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="PurposeOfEquipmentProfile_ValueStructure" abstract="false">
+	<xsd:complexType name="PurposeOfEquipmentProfile_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a PURPOSE OF EQUIPMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TypeOfValue_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- =========TYPE OF DRIVER PERMIT. ============================================ -->
+	<xsd:element name="TypeOfDriverPermit" substitutionGroup="TypeOfValue">
+		<xsd:annotation>
+			<xsd:documentation>A type of driving license (e.g. https://en.wikipedia.org/wiki/European_driving_licence ). +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="TypeOfDriverPermit_ValueStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TypeOfValueGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="TypeOfDriverPermitIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of TYPE OF DRIVER PERMIT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TypeOfDriverPermit_ValueStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a TYPE OF DRIVER PERMIT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="TypeOfValue_VersionStructure"/>

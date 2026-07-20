@@ -138,9 +138,23 @@ internal class ModelBuilder
                     order++;
                 }
 
-                if (prop.XmlSchemaName != null)
+                // Substitution groups apply only to elements referenced via ref= (which resolve to a
+                // global head element). A local element declaration that merely shares a name with a
+                // global substitution-group head is a distinct element and must not inherit its members,
+                // otherwise those members collide with the real ref-based expansion of the same group.
+                if (prop.XmlSchemaName != null && prop.XmlParticle is XmlSchemaElement { RefName.IsEmpty: false })
                 {
-                    var substitutes = GetSubstitutedElements(prop.XmlSchemaName);
+                    // A substitution-group member can also appear as an explicit sibling element in the
+                    // same content model (e.g. NeTEx EntranceRef, which is both a member of the
+                    // SiteElementRef group and a trailing element). XmlSerializer requires element names
+                    // to be unique within a type, so drop substitutes that duplicate a sibling element;
+                    // the explicit sibling declaration wins.
+                    var siblingElementNames = new HashSet<XmlQualifiedName>(classProps
+                        .Where(p => p != prop && p.XmlSchemaName != null)
+                        .Select(p => p.XmlSchemaName));
+
+                    var substitutes = GetSubstitutedElements(prop.XmlSchemaName)
+                        .Where(s => !siblingElementNames.Contains(s.Element.QualifiedName));
 
                     if (_configuration.SeparateSubstitutes)
                     {
@@ -421,7 +435,7 @@ internal class ModelBuilder
     {
         if (SubstitutionGroups.TryGetValue(name, out var substitutes))
         {
-            foreach (var substitute in substitutes.Where(s => s.Element.QualifiedName != name))
+            foreach (var substitute in substitutes.Where(s => !s.Element.IsAbstract && s.Element.QualifiedName != name))
             {
                 yield return substitute;
                 foreach (var recursiveSubstitute in GetSubstitutedElements(substitute.Element.QualifiedName))

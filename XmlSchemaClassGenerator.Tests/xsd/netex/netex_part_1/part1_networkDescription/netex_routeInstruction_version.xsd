@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_route_version">
-	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_path_support.xsd"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_routeInstruction_version">
+	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_path_support.xsd"/>
 	<xsd:include schemaLocation="netex_routeInstruction_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_genericFramework/netex_spatialFeature_version.xsd"/>
 	<xsd:annotation>
@@ -12,7 +11,7 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -21,7 +20,10 @@
 					<!-- Name Space changes -->
 				</Date>
 				<Date>
-					<Modified>2017-03-28  CR_038  Add missing type of value tsubst group o DIRECTION </Modified>
+					<Modified>2017-03-28  CR_038  Add missing type of value to subst group of DIRECTION </Modified>
+				</Date>
+				<Date>
+					<Modified>2024-02-16  Revesie to use  generic deck_plan_support   , not ifopt </Modified>
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -32,21 +34,21 @@
 					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
 					<Description>XML schema, W3C Recommendation 2001</Description>
 				</Format>
-				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_networkDescription}netex_route_version.xsd</Identifier>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_networkDescription}netex_routeInstruction_version.xsd</Identifier>
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX </Publisher>
 				<Relation>
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -62,46 +64,32 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEx ROUTE types.</xsd:documentation>
+		<xsd:documentation>NeTEx ROUTE INSTRUCTION types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
-	<!-- ==Route============================================================ -->
-	<!-- ======================================================================= -->
+	<!-- ===== ROUTE INSTRUCTION================================================= -->
 	<xsd:complexType name="routeInstructions_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ROUTE INSTRUCTIONs.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="strictContainmentAggregationStructure">
-				<xsd:sequence>
-					<xsd:element name="RouteInstruction" maxOccurs="unbounded">
+				<xsd:choice>
+					<xsd:element ref="RouteInstructionRef" maxOccurs="unbounded">
 						<xsd:annotation>
-							<xsd:documentation>A POINT used to define the shape of a ROUTE through the network.</xsd:documentation>
+							<xsd:documentation>A reference to an instruction on how to follow a ROUTE through the network.</xsd:documentation>
 						</xsd:annotation>
-						<xsd:complexType>
-							<xsd:complexContent>
-								<xsd:restriction base="RouteInstruction_VersionStructure">
-									<xsd:sequence>
-										<xsd:sequence>
-											<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
-										</xsd:sequence>
-										<xsd:sequence>
-											<xsd:group ref="DataManagedObjectGroup"/>
-										</xsd:sequence>
-										<xsd:sequence>
-											<xsd:group ref="RouteInstructionGroup"/>
-										</xsd:sequence>
-									</xsd:sequence>
-									<xsd:attribute name="id" type="RouteInstructionIdType"/>
-								</xsd:restriction>
-							</xsd:complexContent>
-						</xsd:complexType>
 					</xsd:element>
-				</xsd:sequence>
+					<xsd:element ref="RouteInstruction" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>An instruction on how to follow a ROUTE through the network.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="RouteInstruction" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="RouteInstruction" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>An Instruction on how to follow a ROUTE through the network.</xsd:documentation>
 		</xsd:annotation>
@@ -119,12 +107,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="RouteInstructionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="RouteInstructionIdType"/>
+					<xsd:attribute name="id" type="RouteInstructionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="RouteInstruction_VersionStructure" abstract="false">
+	<xsd:complexType name="RouteInstruction_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for ROUTE a POINT.</xsd:documentation>
 		</xsd:annotation>
@@ -133,9 +121,9 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="RouteInstructionGroup"/>
 				</xsd:sequence>
-				<xsd:attribute name="order" type="xsd:integer">
+				<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 					<xsd:annotation>
-						<xsd:documentation>Relative order</xsd:documentation>
+						<xsd:documentation>Relative order -v2.0</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 			</xsd:extension>
@@ -149,27 +137,27 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="PointOnRouteRef" minOccurs="0"/>
 			<xsd:element name="Instruction" type="MultilingualString" default="false" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Directions for following path step.  </xsd:documentation>
+					<xsd:documentation>Directions for following path step.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="PathHeading" type="PathHeadingEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Relative heading for Instruction</xsd:documentation>
+					<xsd:documentation>Relative heading for Instruction.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="Heading" type="CompassBearing16Enumeration"  minOccurs="0">
+			<xsd:element name="Heading" type="CompassBearing16Enumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Heading for Instructioni nternational boundary between two countries may be crossed.</xsd:documentation>
+					<xsd:documentation>Heading for instruction.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Bearing" type="AbsoluteBearingType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Compass Bearing for Instruction</xsd:documentation>
+					<xsd:documentation>Compass Bearing for Instruction.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Distance" type="DistanceType" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Distance for step.  </xsd:documentation>
+					<xsd:documentation>Distance for step.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Transition" type="TransitionEnumeration" minOccurs="0">
@@ -179,12 +167,11 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="RoadName" type="MultilingualString" default="false" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Directions for following path staep.  </xsd:documentation>
+					<xsd:documentation>Directions for following path step.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="SimpleFeatureRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
 	<!-- ======================================================================= -->
 </xsd:schema>

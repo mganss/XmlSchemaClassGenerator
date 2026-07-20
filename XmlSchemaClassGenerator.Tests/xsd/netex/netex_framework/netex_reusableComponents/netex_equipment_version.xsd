@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
 <xsd:schema xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_equipment_version">
 	<xsd:include schemaLocation="../netex_utility/netex_utility_types.xsd"/>
 	<xsd:include schemaLocation="netex_equipment_support.xsd"/>
@@ -11,7 +10,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -21,8 +20,9 @@
 				<Date>
 					<Modified>2010-11-05</Modified>
 				</Date>
-				<Date>
-					<Modified>2019-04-05</Modified>Add back missing infolinks
+				<Date><Modified>2019-04-05</Modified>Add back missing infolinks
+				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines EQUIPMENT base types.</p>
@@ -43,7 +43,7 @@
 						<li>Derived from the TransModel standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -127,8 +127,12 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Name of EQUIPMENT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="PublicCode" type="PrivateCodeStructure" minOccurs="0">
+			<xsd:element ref="PrivateCode" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>A Public code which may be displayed on equipment to identify it.</xsd:documentation>
 				</xsd:annotation>
@@ -157,6 +161,11 @@ Rail transport, Roads and Road transport
 			<xsd:element name="OutOfService" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Whether the EQUIPMENT is out of service for protracted time. A separate Real time services should be used for short term outages. e.g. SIRI FM.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Monitored" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether real-time data is normally available for the EQUIPMENT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -243,10 +252,28 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="InstalledEquipment_VersionStructure"/>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="OtherPlaceEquipment" type="PlaceEquipment_VersionStructure">
+	<xsd:element name="OtherPlaceEquipment">
 		<xsd:annotation>
 			<xsd:documentation>Equipment that may be in a fixed within a SITE.</xsd:documentation>
 		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PlaceEquipment_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EquipmentGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="OtherPlaceEquipmentIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
 	</xsd:element>
 	<!-- ======================================================================= -->
 	<xsd:complexType name="typesOfEquipment_RelStructure">
@@ -262,7 +289,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TypeOfEquipment" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfEquipment" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>A classification of a EQUIPMENT according to its functional purpose.</xsd:documentation>
 		</xsd:annotation>
@@ -280,12 +307,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfEquipmentIdType"/>
+					<xsd:attribute name="id" type="TypeOfEquipmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfEquipment_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfEquipment_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>

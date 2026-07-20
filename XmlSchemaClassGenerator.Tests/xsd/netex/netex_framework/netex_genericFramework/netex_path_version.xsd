@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 2007 03 23 Add repeating name -->
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_path_version">
+	<xsd:include schemaLocation="netex_path_support.xsd"/>
+	<xsd:include schemaLocation="netex_place_version.xsd"/>
+	<xsd:include schemaLocation="netex_pointAndLinkSequence_version.xsd"/>
+	<xsd:include schemaLocation="netex_accessibility/netex_acsb_accessibility.xsd"/>
+	<!-- ============================================== -->
+	<xsd:annotation>
+		<xsd:appinfo>
+			<Metadata xmlns="http://www.govtalk.gov.uk/CM/gms-xs">
+				<Aggregation>main schema</Aggregation>
+				<Audience>e-service developers</Audience>
+				<Contributor>V1.0 Nicholas Knowles</Contributor>
+				<Contributor>Roger Slevin [Roger.Slevin@dft.gsi.gov.uk]</Contributor>
+				<Coverage>Europe</Coverage>
+				<Creator>Created as W3C .xsd schema by Nicholas Knowles. as 1.0 XML schema </Creator>
+				<Date><Created>2024-02-05</Created>Factored out from ifopt_path_link
+				</Date>
+				<Date><Modified>2024-02-18</Modified>Rename NAVIGATION PATH to NAVIGATION
+				</Date>
+				<Description>
+					<Title>NeTEx Network Exchange - Generic PATH types.</Title>
+				</Description>
+				<Format>
+					<MediaType>text/xml</MediaType>
+					<Syntax>http://www.w3.org/2001/XMLSchema</Syntax>
+					<Description>XML schema, W3C Recommendation 2001</Description>
+				</Format>
+				<Identifier>{http://www.netex.org.uk/schemas/1.0/xsd/netex_part_1/part1_ifopt}netex_Ifopt_path_version.xsd</Identifier>
+				<Language>[ISO 639-2/B] ENG</Language>
+				<Publisher>CEN TC278 SG6 and Department for Transport, Great Minster House, 76 Marsham Street, London SW1P 4DR</Publisher>
+				<Relation>
+					<Requires>http://www.netex.org.uk/schemas/1.0/ifopt/netex_ifopt_xxxxx.xsd</Requires>
+				</Relation>
+				<Rights>Unclassified
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
+				</Rights>
+				<Source>
+					<ul>
+						<li>Evolved from NaPTAN, SIRI and other schemas.</li>
+					</ul>
+				</Source>
+				<Status>Version 1.0</Status>
+				<Subject>
+					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
+Air transport, Airports,
+Ports and maritime transport, Ferries (marine),
+Public transport, Bus services, Coach services, Bus stops and stations,
+Rail transport, Railway stations and track, Train services, Underground trains,
+Business and industry, Transport, Air transport , Ports and maritime transport, Public transport,
+Rail transport, Roads and Road transport
+</Category>
+					<Project>CEN TC278 WG3 SG9.</Project>
+				</Subject>
+				<Title>NeTEx Network Exchange (IFOPT subset) - STOP PLACE Schema Place . </Title>
+				<Type>Standard</Type>
+			</Metadata>
+		</xsd:appinfo>
+		<xsd:documentation>NeTEx: GENERIC PATH LINK Model.</xsd:documentation>
+	</xsd:annotation>
+	<!-- ===============GENERIC PATH LINK======================================================== -->
+	<xsd:element name="GenericPathLink" abstract="true" substitutionGroup="Link">
+		<xsd:annotation>
+			<xsd:documentation>A link between any two places that represents a step in a possible route for pedestrians, cyclists or other out of vehicle passengers . Note: a place may be fixed PLACE, that is STOP PLACEs, ACCESS SPACE or QUAY, BOARDING POSITION, POINTs OF INTEREST etc or PATH JUNCTIONs, or a place within a DECK, e.g. DECK, SPACE, DECK ENTRANCE, DECK PATH JUNCTION etc.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GenericPathLink_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GenericPathLinkGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GenericPathLinkIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GenericPathLink_VersionStructure" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation>Type for a GENERIC PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Link_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GenericPathLinkGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GenericPathLinkGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a GENERIC PATH LINK.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="pathInstructions" type="pathInstructions_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Instructions for following PATH LINK. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:group name="GenericPathLinkDurationGroup">
+		<xsd:annotation>
+			<xsd:documentation>Duration properties of a GENERIC PATH LINK. NB Cant be move up to on PATH LINK without breakage. revise in V3.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TransferDuration" type="TransferDurationStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Timings for the transfer.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:complexType name="PathLinkEndStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PATH LINK END.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element name="PlaceRef" type="PlaceRefStructure">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a PLACE, including QUAY, ACCESS SPACE, BOARDING POSITION or other node of a SITE.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="GenericPathJunctionRef"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:group name="PathLinkElementGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a PATH SITE ELEMENT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice>
+			<xsd:element ref="AccessibilityAssessmentRef"/>
+			<xsd:element ref="AccessibilityAssessment" minOccurs="0"/>
+		</xsd:choice>
+	</xsd:group>
+	<!-- ====== GENERIC PATH JUNCTION =========================================== -->
+	<xsd:complexType name="GeneralPathJunctionRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of PATH JUNCTIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element ref="GenericPathJunctionRef"/>
+					<xsd:element ref="GenericPathJunction">
+						<xsd:annotation>
+							<xsd:documentation>PATH JUNCTION for a SITE.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="GenericPathJunction" abstract="true" substitutionGroup="Point">
+		<xsd:annotation>
+			<xsd:documentation>A designated point, inside or outside of a STOP PLACE or POINT OF INTEREST, at which two or more PATH LINKs may connect or branch.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GenericPathJunction_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PointGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GenericPathJunctionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GenericPathJunctionIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GenericPathJunction_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a GENERIC PATH JUNCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="Point_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GenericPathJunctionGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GenericPathJunctionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a GENERIC PATH JUNCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="pathInstructions" type="pathInstructions_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Instructions for following PATH LINK. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
+	<xsd:element name="PathLinkView" substitutionGroup="DerivedView">
+		<xsd:annotation>
+			<xsd:documentation>A VIEW of a PATH LINK used to select items for presentation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GenericPathLink_DerivedViewStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DerivedViewGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:element name="HideLink" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether link should be hidden in the PATH LINK VIEW.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="HideDestination" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether destination of PATH LINK should be hidden.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ShowEntranceSeparately" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether ENTRANCE on beginning of PATH LINK should be shown as separate step in view.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ShowExitSeparately" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether exit at end of PATH LINK should be shown as separate step in view.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ShowHeadingSeparately" type="xsd:boolean" minOccurs="0">
+								<xsd:annotation>
+									<xsd:documentation>Whether Heading element should be shown as separate step in view e.g. turn left right.</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GenericPathLinkIdType">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of Object of which this is a view.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GenericPathLink_DerivedViewStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PATH LINK VIEW.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DerivedViewStructure">
+				<xsd:sequence>
+					<xsd:element name="HideLink" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether link should be hidden in the PATH LINK VIEW.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="HideDestination" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether destination of PATH LINK should be hidden.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ShowEntranceSeparately" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether ENTRANCE on beginning of PATH LINK should be shown as separate step in view.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ShowExitSeparately" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether exit at end of PATH LINK should be shown as separate step in view.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+					<xsd:element name="ShowHeadingSeparately" type="xsd:boolean" minOccurs="0">
+						<xsd:annotation>
+							<xsd:documentation>Whether Heading element should be shown as separate step in view e.g. turn left right.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ====== PATH INSTRUCTION =========================================== -->
+	<xsd:complexType name="pathInstructions_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of PATH INSTRUCTIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PathInstruction" maxOccurs="unbounded">
+						<xsd:annotation>
+							<xsd:documentation>PATH INSTRUCTION for a PATH LINK.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PathInstruction" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>An instruction to a passenger for an individual step when following a PATH LINK. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PathInstruction_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PathInstructionGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PathInstructionIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PathInstruction_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PATH INSTRUCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="PathInstructionGroup"/>
+				</xsd:sequence>
+				<xsd:attribute name="order" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>order of instructions -v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PathInstructionGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a PATH INSTRUCTION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="GenericPathLinkRef" minOccurs="0"/>
+			<xsd:element name="PathHeading" type="PathHeadingEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Heding used in Instruction.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Distance" type="LengthType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Distance to use in instruction</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Transition" type="TransitionEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Transition used in instruction.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Instruction" type="MultilingualString">
+				<xsd:annotation>
+					<xsd:documentation>Instruction for using path as text.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====== PATH LINK IN SEQUENCE =============================================== -->
+	<xsd:complexType name="pathLinksInSequence_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>A collection of one or more PATH LINKs in SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PathLinkInSequence" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PathLinkInSequence" substitutionGroup="LinkInLinkSequence">
+		<xsd:annotation>
+			<xsd:documentation>A step of a NAVIGATION PATH indicating traversal of a particular PATH LINK as part of a recommended route.
+The same PATH LINK may occur in different sequences in different NAVIGATION PATHs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PathLinkInSequence_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkInLinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PathLinkInSequenceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PathLinkInSequenceIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PathLinkInSequence_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PATH LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LinkInLinkSequence_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="PathLinkInSequenceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PathLinkInSequenceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a PATH LINK IN SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element ref="GenericPathLinkRef"/>
+			<xsd:element name="Reverse" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether link is navigated in to / from, i.e. reverse direction . Default is false, i.e. from to.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Heading" type="PathHeadingEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether step is left right or forward.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Transition" type="TransitionEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether step is up down or level in direction of use.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Instruction" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Instruction for following path</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Label" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Label on step.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="views" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Instructions on how step view should be presented.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="PathLinkView"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======= PLACES IN SEQUENCE ======================================= -->
+	<xsd:complexType name="placesInSequence_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>A collection of one or more PLACEs in SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="strictContainmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="PlaceInSequence" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="PlaceInSequence" substitutionGroup="PointInLinkSequence">
+		<xsd:annotation>
+			<xsd:documentation>Point traversed by a NAVIGATION PATH in sequence. May be a PLACE PATH JUNCTION or POINT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="PlaceInSequence_VersionedChildStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PointInLinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PlaceInSequenceGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="PlaceInSequenceIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of ENTITY.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="PlaceInSequence_VersionedChildStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a PLACE in SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="PointInLinkSequence_VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="PlaceInSequenceGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="PlaceInSequenceGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of PLACE in SEQUENCE.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PlaceRef" type="PlaceRefStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a Place or Site Component , that is QUAY, ACCESS SPACE or BOARDING POSITION or PATH JUNCTION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BranchLevel" type="xsd:NMTOKEN" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Branching level of place.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="onwardLinks" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Onward links from this point.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="pathLinksInSequence_RelStructure"/>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- =======NAVIGATION=============================================== -->
+	<xsd:element name="GenericNavigationPath" abstract="true" substitutionGroup="LinkSequence">
+		<xsd:annotation>
+			<xsd:documentation>A designated path between two places. May include an ordered sequence of PATH LINKs. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="GenericNavigationPath_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="LinkSequenceGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="GenericNavigationPathGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="GenericNavigationPathIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GenericNavigationPath_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for NAVIGATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="LinkSequence_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="GenericNavigationPathGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="GenericNavigationPathGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of a GENERIC NAVIGATION PATH. +v2.0</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ======================================================================= -->
+</xsd:schema>

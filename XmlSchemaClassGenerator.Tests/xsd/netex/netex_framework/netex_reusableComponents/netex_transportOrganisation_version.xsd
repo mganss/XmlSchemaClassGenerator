@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_transportOrganisation_version">
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_transportOrganisation_version">
 	<xsd:include schemaLocation="netex_transportOrganisation_support.xsd"/>
+	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_modeOfOperation_support.xsd"/>
 	<xsd:include schemaLocation="../netex_reusableComponents/netex_mode_version.xsd"/>
-	<xsd:include schemaLocation="../netex_genericFramework/netex_organisation_version.xsd"/>
 	<xsd:include schemaLocation="netex_address_version.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -11,18 +10,30 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
 				<Date>
 					<Modified>2014-03-31</Modified>
 				</Date>
-				<Date>
-					<Modified>2019-02-23</Modified>Make TransportOrganisation_ abstract
+				<Date><Modified>2019-02-23</Modified>Make TransportOrganisation_ abstract
 				</Date>
-				<Date>
-					<Modified>2019-03-08</Modified>Improve _Network_  etc for large tariff definitions: 		Add UseToExclude flag to GroupOfOperators
+				<Date><Modified>2019-03-08</Modified>Improve _Network_  etc for large tariff definitions: 		Add UseToExclude flag to GroupOfOperators
+				</Date>
+				<Date><Modified>2020-10-05</Modified> New Modes: Add mode of operation to operator.
+					 Allow selfdrive and taximodes
+					 Insert TransportOrganisation and PublicTransportOrganisation in hierarch
+					 Add additional modes relationship to PublicTransportOperator
+					 Add AlternativeTransportOperator
+					 Add selfDrive and Taxi  TransportMode
+				</Date>
+				<Date><Modified>2020-11-06</Modified>NewModes (Norway) Allow reusable contact details.
+				</Date>
+				<Date><Modified>2020-11-27</Modified>NewModes: Drop  PublicTransportOperator,   alternativeTransportOperator.
+						  Revis TransportAdministrativeZone to apply to list of all mdo0es rather than just vehicle modes.
+				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines  NetEX:TRANSPORT  ORGANISATION    types.</p>
@@ -43,7 +54,7 @@
 						<li>Derived from the SIRI standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -59,14 +70,20 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NetEX:TRANSPORT ORGANISATION  types for NeTEx Network Exchange.</xsd:documentation>
+		<xsd:documentation>NetEX:TRANSPORT ORGANISATION types for NeTEx Network Exchange.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ===ENTIITY IN VERSION IN FRAME====Used in SERVICE FRAME)=================================================== -->
+	<xsd:include schemaLocation="../netex_genericFramework/netex_organisation_version.xsd"/>
 	<xsd:group name="OrganisationInFrameGroup">
 		<xsd:annotation>
 			<xsd:documentation>ORGANISATION elements in frame.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
+			<xsd:element name="contacts" type="contacts_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reusable CONTACTs in frame.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="organisations" type="organisationsInFrame_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>ORGANISATIONs in frame.</xsd:documentation>
@@ -146,19 +163,19 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="TransportOrganisation_" type="Organisation_VersionStructure" abstract="true" substitutionGroup="Organisation_">
+	<xsd:element name="TransportOrganisation_Dummy" type="Organisation_VersionStructure" abstract="true" substitutionGroup="Organisation_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A company  providing public transport services.</xsd:documentation>
+			<xsd:documentation>A company providing public transport services.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<!-- ====Operator========================================================== -->
-	<xsd:element name="Operator" substitutionGroup="TransportOrganisation_">
+	<!-- ==== PUBLIC TRANSPORT ORGANISATION ================================================== -->
+	<xsd:element name="TransportOrganisation" abstract="true" substitutionGroup="TransportOrganisation_Dummy">
 		<xsd:annotation>
-			<xsd:documentation>A company  providing public transport services.</xsd:documentation>
+			<xsd:documentation>A company providing transport services.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:restriction base="Operator_VersionStructure">
+				<xsd:restriction base="TransportOrganisation_VersionStructure">
 					<xsd:sequence>
 						<xsd:sequence>
 							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
@@ -170,39 +187,39 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="OrganisationGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
-							<xsd:group ref="OperatorGroup"/>
+							<xsd:group ref="TransportOrganisationGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OperatorIdType">
+					<xsd:attribute name="id" type="TransportOrganisationIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of  OPERATOR.</xsd:documentation>
+							<xsd:documentation>Identifier of TRANSPORT ORGANISATION.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="Operator_VersionStructure">
+	<xsd:complexType name="TransportOrganisation_VersionStructure" abstract="true">
 		<xsd:annotation>
-			<xsd:documentation>Type for an OPERATOR.</xsd:documentation>
+			<xsd:documentation>Type for an TRANSPORT ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="Organisation_VersionStructure">
 				<xsd:sequence>
-					<xsd:group ref="OperatorGroup"/>
+					<xsd:group ref="TransportOrganisationGroup"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:group name="OperatorGroup">
+	<xsd:group name="TransportOrganisationGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements of an OPERATOR.</xsd:documentation>
+			<xsd:documentation>Elements of an TRANSPORT ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element ref="CountryRef" minOccurs="0"/>
 			<xsd:element name="Address" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Address of OPERATOR.</xsd:documentation>
+					<xsd:documentation>Address of TRANSPORT ORGANISATION.</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:complexContent>
@@ -210,6 +227,9 @@ Rail transport, Roads and Road transport
 							<xsd:sequence>
 								<xsd:sequence>
 									<xsd:group ref="GroupOfEntitiesGroup"/>
+								</xsd:sequence>
+								<xsd:sequence>
+									<xsd:group ref="ZoneGroup"/>
 								</xsd:sequence>
 								<xsd:group ref="PlaceGroup"/>
 								<xsd:sequence>
@@ -228,11 +248,7 @@ Rail transport, Roads and Road transport
 					</xsd:complexContent>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="PrimaryMode" type="VehicleModeEnumeration" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Primary transport MODE of OPERATOR</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:group ref="TransportOrganisationModeGroup"/>
 			<xsd:element name="OperatorActivities" type="ListOfOperatorActivities" default="passenger" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Activities undertaken by OPERATOR.</xsd:documentation>
@@ -248,10 +264,74 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Departments of OPERATOR.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="otherModes" type="modeRefs_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Additional transport MODEs for OPERATOR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
-	<xsd:element name="Authority" substitutionGroup="TransportOrganisation_">
+	<xsd:group name="TransportOrganisationModeGroup">
+		<xsd:annotation>
+			<xsd:documentation>MODE elements of an TRANSPORT ORGANISATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PrimaryMode" type="AllModesEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Primary MODE of TRANSPORT ORGANISATION</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:group ref="AllSubmodeChoiceGroup" minOccurs="0"/>
+			<xsd:element ref="ModeOfOperationRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ==== OPERATOR ========================================================= -->
+	<xsd:element name="Operator" substitutionGroup="TransportOrganisation_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>A company providing public transport services.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Operator_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="OrganisationGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="TransportOrganisationGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="OperatorIdType" use="required">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of OPERATOR.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Operator_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an OPERATOR.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TransportOrganisation_VersionStructure"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="OperatorGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements of an OPERATOR.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence/>
+	</xsd:group>
+	<!-- ===== AUTHORITY ========================================================== -->
+	<xsd:element name="Authority" substitutionGroup="TransportOrganisation_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The ORGANISATION under which the responsibility of organising the transport service in a certain area is placed.</xsd:documentation>
 		</xsd:annotation>
@@ -269,10 +349,13 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="OrganisationGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
+							<xsd:group ref="TransportOrganisationGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
 							<xsd:group ref="AuthorityGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AuthorityIdType">
+					<xsd:attribute name="id" type="AuthorityIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of AUTHORITY.</xsd:documentation>
 						</xsd:annotation>
@@ -286,7 +369,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for an AUTHORITY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="Organisation_VersionStructure">
+			<xsd:extension base="TransportOrganisation_VersionStructure">
 				<xsd:sequence>
 					<xsd:group ref="AuthorityGroup"/>
 				</xsd:sequence>
@@ -298,22 +381,16 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements of an AUTHORITY.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element ref="CountryRef" minOccurs="0"/>
-			<xsd:element name="Address" type="PostalAddress_VersionStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Address of AUTHORITY.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
 			<xsd:element name="authorityTypes" type="typeOfOrganisationRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Classification of Zone. Used for arbitrary documentation -.</xsd:documentation>
+					<xsd:documentation>Classification of AUTHORITY.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<!-- ==GROUP OF OPERATORs============================================================ -->
-	<xsd:element name="GroupOfOperators" abstract="false" substitutionGroup="GroupOfEntities">
+	<!-- ==== GROUP OF OPERATORs ========================================================== -->
+	<xsd:element name="GroupOfOperators" substitutionGroup="GroupOfEntities">
 		<xsd:annotation>
 			<xsd:documentation>A grouping of OPERATORs.</xsd:documentation>
 		</xsd:annotation>
@@ -334,9 +411,9 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="GroupOfOperatorsGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="GroupOfOperatorsIdType">
+					<xsd:attribute name="id" type="GroupOfOperatorsIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of  GROUP OF OPERATORs.</xsd:documentation>
+							<xsd:documentation>Identifier of GROUP OF OPERATORs.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
@@ -362,7 +439,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="UseToExclude" type="xsd:boolean" default="false" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include  (i.e.false) </xsd:documentation>
+					<xsd:documentation>Whether contents of Group should be used to exclude (true) from a large list . The default is include (i.e.false)</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="members" type="transportOrganisationRefs_RelStructure" minOccurs="0">
@@ -372,7 +449,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ====Operator========================================================== -->
+	<!-- ==== OPERATIONAL CONTEXT ======================================================= -->
 	<xsd:element name="OperationalContext" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Characterization of a set of operational objects, such as timing or links determined either by a DEPARTMENT or by an ORGANISATIONAL UNIT.</xsd:documentation>
@@ -391,9 +468,9 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="OperationalContextGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OperationalContextIdType">
+					<xsd:attribute name="id" type="OperationalContextIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of  OPERATIONAL CONTEXT.</xsd:documentation>
+							<xsd:documentation>Identifier of OPERATIONAL CONTEXT.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
@@ -427,14 +504,22 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>A short name of the OPERATIONAL CONTEXT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="OrganisationPartRef" minOccurs="0"/>
-			<xsd:element ref="VehicleMode" minOccurs="0"/>
+			<xsd:element name="VehicleMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>PT MODE to which context applies.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="TransportSubmode" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ====OperatingDepartment========================================================= -->
-	<xsd:element name="OperatingDepartment" substitutionGroup="OrganisationPart_">
+	<!-- ==== OPERATOR DEPARTMENT t========================================================= -->
+	<xsd:element name="OperatingDepartment" substitutionGroup="OrganisationPart_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A specific DEPARTMENT which administers certain LINEs.</xsd:documentation>
 		</xsd:annotation>
@@ -458,9 +543,9 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="OperatingDepartmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OperatingDepartmentIdType">
+					<xsd:attribute name="id" type="OperatingDepartmentIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of  OPERATING DEPARTMENT.</xsd:documentation>
+							<xsd:documentation>Identifier of OPERATING DEPARTMENT.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
@@ -515,7 +600,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
+	<!-- === CONTROL CENTRE ====================================================== -->
 	<xsd:complexType name="ControlCentres_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>A list of CONTROL CENTREs.</xsd:documentation>
@@ -529,7 +614,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="ControlCentre" substitutionGroup="OrganisationPart_">
+	<xsd:element name="ControlCentre" substitutionGroup="OrganisationPart_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>An ORGANISATION PART for an operational team who are responsible for issuing commands to control the services.</xsd:documentation>
 		</xsd:annotation>
@@ -550,9 +635,9 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="ControlCentreGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ControlCentreIdType" use="optional">
+					<xsd:attribute name="id" type="ControlCentreIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Identifier of  CONTROL CENTRE.</xsd:documentation>
+							<xsd:documentation>Identifier of CONTROL CENTRE.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:restriction>
@@ -583,14 +668,14 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="ControlCentreCode" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Unique alphanumeric identification of CONTROL CENTRE  used to identify source  of request to external systems.</xsd:documentation>
+					<xsd:documentation>Unique alphanumeric identification of CONTROL CENTRE used to identify source of request to external systems.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="DepartmentRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
-	<!-- ======================================================================= -->
-	<xsd:element name="TransportAdministrativeZone" abstract="false" substitutionGroup="AdministrativeZone_">
+	<!-- ===== TRANSPORT ADMINISTRATIVE ZONE ================================================ -->
+	<xsd:element name="TransportAdministrativeZone" substitutionGroup="AdministrativeZone_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A ZONE relating to the management responsibilities of an ORGANISATION. For example to allocate bus stop identifiers for a region.</xsd:documentation>
 		</xsd:annotation>
@@ -620,7 +705,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TransportAdministrativeZoneGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TransportAdministrativeZoneIdType">
+					<xsd:attribute name="id" type="TransportAdministrativeZoneIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of TRANSPORT ADMINISTRATIVE ZONE.</xsd:documentation>
 						</xsd:annotation>
@@ -629,9 +714,9 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TransportAdministrativeZone_VersionStructure" abstract="false">
+	<xsd:complexType name="TransportAdministrativeZone_VersionStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for an TRANSPORT ADMINISTRATIVE  ZONE.</xsd:documentation>
+			<xsd:documentation>Type for an TRANSPORT ADMINISTRATIVE ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="AdministrativeZone_VersionStructure">
@@ -643,12 +728,12 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="TransportAdministrativeZoneGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for an TRANSPORT ADMINISTRATIVE  ZONE.</xsd:documentation>
+			<xsd:documentation>Elements for an TRANSPORT ADMINISTRATIVE ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="VehicleModes" type="AllVehicleModesListOfEnumeration" default="all" minOccurs="0">
+			<xsd:element name="VehicleModes" type="AllPublicTransportModesListOfEnumerations" default="all" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>TRANSPORT MODE for which this zone applies. Default is all.</xsd:documentation>
+					<xsd:documentation>PUBLIC TRANSPORT MODEs for which this zone applies. Default is all.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>

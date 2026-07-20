@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_siteConnection_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_siteConnection_version">
 	<xsd:include schemaLocation="netex_siteConnection_support.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_pointOfInterest_support.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_parking_support.xsd"/>
@@ -14,13 +14,18 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified>
-					<!-- Name Space changes -->
+				<Date><Modified>2011-02-05</Modified> Name Space changes
+				</Date>
+				<Date><Modified>2020-10-05</Modified> New modes  
+					 Allow selfDrive and TAxi modes for component mode 
+					 Change OperatorRef to be wider TransportOrganisationRef
+				</Date>
+				<Date><Modified>2020-12-10</Modified> New modes  
+					 Allow meetingPointRef 
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -38,14 +43,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -64,7 +69,7 @@ Rail transport, Roads and Road transport
 		<xsd:documentation>neTEX: SITE CONNECTION types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ======================================================================= -->
-	<xsd:element name="SiteConnection" abstract="false" substitutionGroup="Transfer">
+	<xsd:element name="SiteConnection" substitutionGroup="Transfer">
 		<xsd:annotation>
 			<xsd:documentation> The physical (spatial) possibility to connect from one point to another in a SITE.</xsd:documentation>
 		</xsd:annotation>
@@ -85,12 +90,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="SiteConnectionGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="SiteConnectionIdType"/>
+					<xsd:attribute name="id" type="SiteConnectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="SiteConnection_VersionStructure" abstract="false">
+	<xsd:complexType name="SiteConnection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a SITE CONNECTION.</xsd:documentation>
 		</xsd:annotation>
@@ -124,14 +129,14 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:complexType name="SiteConnectionEndStructure" abstract="false">
+	<xsd:complexType name="SiteConnectionEndStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a SITE CONNECTION End.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="TransportMode" type="AllVehicleModesOfTransportEnumeration" default="all" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" default="all" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>MODE of end point of TRANSFER . Default is all modes, i.e. all modes of referenced stop place and or stop point.</xsd:documentation>
+					<xsd:documentation>PT MODE of end point of TRANSFER . Default is all modes, i.e. all modes of referenced stop place and or stop point.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="StopAreaRef" type="StopAreaRefStructure" minOccurs="0">
@@ -139,18 +144,25 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Identifier of a Place at end point of transfer.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="ScheduledStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Identifier of end SCHEDULED STOP POINT of TRANSFER.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="ScheduledStopPointRef" type="ScheduledStopPointRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Specific SCHEDULED STOP POINT at end of CONNECTION.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="VehicleMeetingPointRef" type="PointRefStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>VEHICLE MEETING POINT at END OF CONENCTION. +V1.2.2. NB This is typed only to POINT to avoid forward dependency</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
 			<xsd:choice minOccurs="0">
 				<xsd:group ref="StopPlaceEndGroup"/>
 				<xsd:group ref="PointOfInterestEndGroup"/>
 				<xsd:group ref="ParkingEndGroup"/>
 			</xsd:choice>
 			<xsd:choice>
-				<xsd:element ref="OperatorRef" minOccurs="0"/>
+				<xsd:element ref="TransportOrganisationRef" minOccurs="0"/>
 				<xsd:element ref="OperatorView" minOccurs="0"/>
 			</xsd:choice>
 			<xsd:element name="Label" type="MultilingualString" minOccurs="0">
@@ -195,7 +207,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="DefaultConnection" abstract="false" substitutionGroup="Transfer">
+	<xsd:element name="DefaultConnection" substitutionGroup="Transfer">
 		<xsd:annotation>
 			<xsd:documentation>Specifies the default transfer times to transfer between MODEs and / or OPERATORs within a region.</xsd:documentation>
 		</xsd:annotation>
@@ -214,12 +226,12 @@ Rail transport, Roads and Road transport
 						</xsd:sequence>
 						<xsd:group ref="DefaultConnectionGroup"/>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DefaultConnectionIdType"/>
+					<xsd:attribute name="id" type="DefaultConnectionIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="DefaultConnection_VersionStructure" abstract="false">
+	<xsd:complexType name="DefaultConnection_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for DEFAULT TRANSFER.</xsd:documentation>
 		</xsd:annotation>
@@ -253,14 +265,14 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="SiteElementRef" minOccurs="0"/>
 		</xsd:sequence>
 	</xsd:group>
-	<xsd:complexType name="DefaultConnectionEndStructure" abstract="false">
+	<xsd:complexType name="DefaultConnectionEndStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a DEFAULT TRANSFER.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="TransportMode" type="VehicleModeEnumeration" minOccurs="0">
+			<xsd:element name="TransportMode" type="AllPublicTransportModesEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Identifier of MODE of end point of TRANSFER.</xsd:documentation>
+					<xsd:documentation>Identifier of PT MODE of end point of TRANSFER.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="OperatorView" minOccurs="0"/>

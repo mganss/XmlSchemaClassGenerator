@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_usageParameterBooking_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_usageParameterBooking_support">
 	<!-- ======================================================================= -->
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -9,18 +9,17 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2013-04-14</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified>Name Space changes 
+				<Date><Modified>2011-02-05</Modified>Name Space changes 
 				</Date>
-				<Date>
-					<Modified>2019-03-14</Modified>Eura-50  *FARES* Add new PurchaseAction attribute to  PurchaseWindow    with values purchase,  reserve,  orderWithoutPaying,  payForPreviousOrder, other   
+				<Date><Modified>2019-03-14</Modified>Eura-50  *FARES* Add new PurchaseAction attribute to  PurchaseWindow    with values purchase,  reserve,  orderWithoutPaying,  payForPreviousOrder, other   
 				</Date>
-					<Date>
-					<Modified>2019-04-10</Modified>Eura-50  *FARES* Add new values subscribe and payInstallment to PurchaseAction attribute to  PurchaseWindow    
+				<Date><Modified>2019-04-10</Modified>Eura-50  *FARES* Add new values subscribe and payInstallment to PurchaseAction attribute to  PurchaseWindow    
+				</Date>
+				<Date><Modified>2020-10-07</Modified>NewModes Factor out Booking Policy and add further attributes
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -38,14 +37,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -98,6 +97,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a PURCHASE WINDOW PARAMETER.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassPurchaseWindowRefStructureType" default="PurchaseWindow">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for PurchaseWindowRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -113,7 +133,7 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 			<xsd:enumeration value="orderWithoutPayment">
 				<xsd:annotation>
-					<xsd:documentation>Purchase with deferred  payment.</xsd:documentation>
+					<xsd:documentation>Purchase with deferred payment.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
 			<xsd:enumeration value="reserve">
@@ -132,13 +152,60 @@ Rail transport, Roads and Road transport
 		</xsd:restriction>
 	</xsd:simpleType>
 	<!-- === RESERVING PARAMETER====================================================== -->
+	<xsd:simpleType name="BookingPolicyIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a BOOKING POLICY PARAMETER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="UsageParameterIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="BookingPolicyRef" type="BookingPolicyRefStructure" substitutionGroup="UsageParameterRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a BOOKING POLICY USAGE PARAMETER.</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="BookingPolicyRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a BOOKING POLICY USAGE PARAMETER.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="UsageParameterRefStructure">
+				<xsd:attribute name="ref" type="BookingPolicyIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of a BOOKING POLICY USAGE PARAMETER.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassBookingPolicyRefStructureType">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for BookingPolicyRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- === RESERVING PARAMETER====================================================== -->
 	<xsd:simpleType name="ReservingIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a RESERVING PARAMETER.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="UsageParameterIdType"/>
+		<xsd:restriction base="BookingPolicyIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="ReservingRef" type="ReservingRefStructure" substitutionGroup="UsageParameterRef">
+	<xsd:element name="ReservingRef" type="ReservingRefStructure" substitutionGroup="BookingPolicyRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a RESERVING USAGE PARAMETER.</xsd:documentation>
 		</xsd:annotation>
@@ -148,12 +215,33 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for Reference to a RESERVING USAGE PARAMETER.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="UsageParameterRefStructure">
+			<xsd:restriction base="BookingPolicyRefStructure">
 				<xsd:attribute name="ref" type="ReservingIdType" use="required">
 					<xsd:annotation>
 						<xsd:documentation>Identifier of a RESERVING USAGE PARAMETER.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassReservingRefStructureType" default="Reserving">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for ReservingRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -162,9 +250,9 @@ Rail transport, Roads and Road transport
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a CANCELLING PARAMETER.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="UsageParameterIdType"/>
+		<xsd:restriction base="BookingPolicyIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="CancellingRef" type="CancellingRefStructure" substitutionGroup="UsageParameterRef">
+	<xsd:element name="CancellingRef" type="CancellingRefStructure" substitutionGroup="BookingPolicyRef">
 		<xsd:annotation>
 			<xsd:documentation>Reference to a CANCELLING PARAMETER.</xsd:documentation>
 		</xsd:annotation>
@@ -174,13 +262,35 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for Reference to a CANCELLING USAGE PARAMETER.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="UsageParameterRefStructure">
+			<xsd:restriction base="BookingPolicyRefStructure">
 				<xsd:attribute name="ref" type="CancellingIdType" use="required">
 					<xsd:annotation>
 						<xsd:documentation>Identifier of a CANCELLING USAGEPARAMETER.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassCancellingRefStructureType" default="Cancelling">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for CancellingRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<!-- === BOOKING============================================ -->
 </xsd:schema>

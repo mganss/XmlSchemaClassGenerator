@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_organisation_support">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_organisation_support">
 	<xsd:include schemaLocation="../netex_responsibility/netex_responsibility_support.xsd"/>
 	<xsd:include schemaLocation="../netex_responsibility/netex_relationship_support.xsd"/>
+	<xsd:include schemaLocation="../netex_responsibility/netex_responsibilitySet_support.xsd"/>
+	<xsd:include schemaLocation="../netex_utility/netex_utility_contact.xsd"/>
 	<xsd:include schemaLocation="netex_zone_support.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -9,7 +11,7 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
@@ -21,6 +23,13 @@
 				</Date>
 				<Date>
 					<Modified>2017-03-28 CR0032   Add Codespace range and TypeOf Assignment Value .   add PrivateCode to AdministrativeZone.  Add Subzones</Modified>
+				</Date>
+				<Date>
+					<Modified>2020-10-16 New Modes: Add onlineProvider, alternativeModeOperator to enumeration types</Modified>
+				</Date>
+				<Date>
+					<Modified>2020-11-06 New Modes: Add support for related organisations, with role type enuemration
+				    		Add external Contact details</Modified>
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines ORGANISATION types.</p>
@@ -34,14 +43,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom, 109-123 Clifton Street, London EC4A 4LD</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2020</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -59,7 +68,7 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>ORGANISATION part identifier types for NeTEx.</xsd:documentation>
 	</xsd:annotation>
-	<!-- ======================================================================= -->
+	<!-- ======= DEPARTMENT ==================================================== -->
 	<xsd:complexType name="departmentRefs_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of DEPARTMENTs.</xsd:documentation>
@@ -83,6 +92,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of DEPARTMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassDepartmentRefStructureType" default="Department">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for DepartmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -97,7 +127,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Reference to a DEPARTMENT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<!-- ======================================================================= -->
+	<!-- ======= ORGANISATIIONAL UNIT ================================================= -->
 	<xsd:complexType name="organisationalUnitRefs_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ORGANISATIONAL UNITs.</xsd:documentation>
@@ -121,6 +151,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of ORGANISATIONAL UNIT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassOrganisationalUnitRefStructureType" default="OrganisationalUnit">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for OrganisationalUnitRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -135,7 +186,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Reference to a ORGANISATIONAL UNIT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<!-- ======================================================================= -->
+	<!-- ======== ADMINISTRATIVE ZONE ============================================ -->
 	<xsd:complexType name="administrativeZoneRefs_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ADMINISTRATIVE ZONEs.</xsd:documentation>
@@ -168,11 +219,38 @@ Rail transport, Roads and Road transport
 		<xsd:annotation>
 			<xsd:documentation>Type for Reference to an ADMINISTRATIVE ZONE. Left untyped so as to avoid forwards dependency.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="ZoneRefStructure"/>
-		</xsd:complexContent>
+		<xsd:simpleContent>
+			<xsd:restriction base="ZoneRefStructure">
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassAdministrativeZoneRefStructureType" default="AdministrativeZone">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for AdministrativeZoneRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="ref" type="GroupOfPointsIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of referenced entity.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
+	<!-- ======== CODESPACE ASSIGNMENT =============================================== -->
 	<xsd:simpleType name="CodespaceAssignmentIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a CODESPACE ASSIGNMENT.</xsd:documentation>
@@ -184,7 +262,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Reference to a CODESPACE ASSIGNMENT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<!-- ======================================================================= -->
+	<!-- ====== TYPE OF CODESPACE ASSIGNMENT   ======================= -->
 	<xsd:simpleType name="TypeOfCodespaceAssignmentIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a TYPE OF CODESPACE ASSIGNMENT</xsd:documentation>
@@ -207,10 +285,31 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TYPE OF VALUE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfCodespaceAssignmentRefStructureType" default="TypeOfCodespaceAssignment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfCodespaceAssignmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
+	<!-- ====== TYPE OF ORGANISATION =========================================== -->
 	<xsd:complexType name="typeOfOrganisationRefs_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of TYPEs OF ORGANISATION.</xsd:documentation>
@@ -245,10 +344,31 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TYPE OF VALUE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfOrganisationRefStructureType" default="TypeOfOrganisation">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfOrganisationRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
+	<!-- ====== TYPE OF ORGANISATION PART ========================================= -->
 	<xsd:simpleType name="TypeOfOrganisationPartIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a TYPE OF ORGANISATION PART.</xsd:documentation>
@@ -264,9 +384,30 @@ Rail transport, Roads and Road transport
 				<xsd:restriction base="TypeOfOrganisationPartRefStructure">
 					<xsd:attribute name="ref" type="TypeOfOrganisationPartIdType" use="required">
 						<xsd:annotation>
-							<xsd:documentation>Reference to a TYPE OF  ORGANIZATION.</xsd:documentation>
+							<xsd:documentation>Reference to a TYPE OF ORGANIZATION.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfOrganisationPartRefStructureType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Name of Class of the referenced entity. Allows reflection. Fixed for each entity type.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 				</xsd:restriction>
 			</xsd:simpleContent>
 		</xsd:complexType>
@@ -282,10 +423,31 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TYPE OF VALUE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfOrganisationPartRefStructureType" default="TypeOfOrganisationPart">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfOrganisationPartRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<!-- ======================================================================= -->
+	<!-- ======= TYPE OF OPERATION =========================================== -->
 	<xsd:simpleType name="TypeOfOperationIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of a TYPE OF OPERATION.</xsd:documentation>
@@ -308,6 +470,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of a TYPE OF VALUE.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassTypeOfOperationRefStructureType" default="TypeOfOperation">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for TypeOfOperationRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -362,6 +545,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>ORGANISATION is a trade association representing independent retailers.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
+			<xsd:enumeration value="alternativeModeOperator">
+				<xsd:annotation>
+					<xsd:documentation>ORGANISATION is a transport OPERATOR.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="onlineProvider">
+				<xsd:annotation>
+					<xsd:documentation>ORGANISATION is a third party online service.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="other">
 				<xsd:annotation>
 					<xsd:documentation>Other type of ORGANISATION.</xsd:documentation>
@@ -369,5 +562,155 @@ Rail transport, Roads and Road transport
 			</xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
+	<!-- ======================================================================= -->
+	<xsd:simpleType name="RelatedOrganisationIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a RELATED ORGANISATION. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="OrganisationRoleEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for RELATED ORGANISATION role. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="subsidiary">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION is a subsidiary of this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="owner">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION owns this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="collaborator">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION collaborates with this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="contractIssuer">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION contracts to this organisation to supply it.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="subcontractor">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION services contracts for this organisation..</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="regulator">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION regulates this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="statutoryResponsibility">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION is subject to regulation by this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="distributor">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION distributes products for this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="supplier">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGANISATION supplies products or services to this organisation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Other role type ORGANISATION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ===== CONTACT ======================================================== -->
+	<xsd:complexType name="contactRefs_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of REUSABLE CONTACT. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="oneToManyRelationshipStructure">
+				<xsd:sequence>
+					<xsd:element ref="ContactRef" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ContactIdType">
+		<xsd:annotation>
+			<xsd:documentation>Type for identifier of a CONTACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="ObjectIdType"/>
+	</xsd:simpleType>
+	<xsd:element name="ContactRef" type="ContactRefStructure" substitutionGroup="VersionOfObjectRef">
+		<xsd:annotation>
+			<xsd:documentation>Reference to a CONTACT. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+	<xsd:complexType name="ContactRefStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for Reference to a CONTACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:restriction base="VersionOfObjectRefStructure">
+				<xsd:attribute name="ref" type="ContactIdType" use="required">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of CONTACT.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassContactRefStructureType" default="Contact">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for ContactRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ContactTypeEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed values for CONTACT role. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="any"/>
+			<xsd:enumeration value="information"/>
+			<xsd:enumeration value="reservations"/>
+			<xsd:enumeration value="lostProperty"/>
+			<xsd:enumeration value="publicRelations"/>
+			<xsd:enumeration value="complaints"/>
+			<xsd:enumeration value="emergency"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ContactStructure">
+		<xsd:annotation>
+			<xsd:documentation>Contact details with reference to CONTACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ContactDetailsStructure">
+				<xsd:sequence>
+					<xsd:element ref="ContactRef" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 	<!-- ======================================================================= -->
 </xsd:schema>

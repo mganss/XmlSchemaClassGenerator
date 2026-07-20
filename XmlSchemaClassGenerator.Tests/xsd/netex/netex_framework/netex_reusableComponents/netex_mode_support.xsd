@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_mode_support">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_mode_support">
 	<xsd:include schemaLocation="../netex_responsibility/netex_relationship.xsd"/>
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -7,20 +7,26 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
-				<Date>
-					<Modified>2014-03-31</Modified>Add cableway and lift
+				<Date><Modified>2014-03-31</Modified>Add cableway and lift
 				</Date>
-				<Date>
-					<Modified>2019-02-20</Modified>CR50 CD add SnowAndIce mode and submodes
+				<Date><Modified>2019-02-20</Modified>CR50 CD add SnowAndIce mode and submodes
 				</Date>
-				<Date>
-					<Modified>2019-03-25</Modified>NJSK  Revise - correct camel casing of snowAndIce,
+				<Date><Modified>2019-03-25</Modified>NJSK  Revise - correct camel casing of snowAndIce,
 								Add snowAndIce to AllModes
 								Add ski and skate as access submodes and continuous submodes 
+				</Date>
+				<Date><Modified>2020-10-05</Modified>New Modes;
+								Add scooter and motorcycle to AccessModes and AllModes
+								Add independent mode for self drive, taxi etc 
+								Add scooter and motorcycle to ContinuousModes
+								FIX: add taxiRank for stopPlace types
+				</Date>
+				<Date><Modified>27-11-26</Modified>New Modes;
+								Drop ContinuousModes 
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines common MODE types.</p>
@@ -34,14 +40,13 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
-							 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
-				</Rights>
+							 <Copyright>CEN, Crown Copyright 2009-2019</Copyright></Rights>
 				<Source>
 					<ul>
 						<li>Derived from the SIRI standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -57,27 +62,51 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>MODE  identifier types for NeTEx Network Exchange.</xsd:documentation>
+		<xsd:documentation>MODE identifier types for NeTEx Network Exchange.</xsd:documentation>
 	</xsd:annotation>
 	<!--======Out of Vehicle==================================================================================-->
 	<xsd:element name="AccessMode" type="AccessModeEnumeration">
 		<xsd:annotation>
-			<xsd:documentation>Access MODE for SITEs.</xsd:documentation>
+			<xsd:documentation>Access MODE for SITEs and VEHICLE MEETING POINTs. Also used for TRANSFER and if in OTHER LEG of the TRIP a monomodal non-public transport is used.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:simpleType name="AccessModeEnumeration">
 		<xsd:annotation>
-			<xsd:documentation>Allowed values for Access MODEs for SITEs.</xsd:documentation>
+			<xsd:documentation>Allowed values for Access MODEs for SITEs, VEHICLE MEETING POINTS and TRANSFER and for monomodal non-public transport OTHER LEG in TRIP.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="foot"/>
 			<xsd:enumeration value="bicycle"/>
 			<xsd:enumeration value="boat"/>
 			<xsd:enumeration value="car"/>
-			<xsd:enumeration value="taxi"/>
+			<xsd:enumeration value="taxi">
+				<xsd:annotation>
+					<xsd:documentation>Taxi can now be modeled as VEHICLE MODE as well.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="shuttle"/>
 			<xsd:enumeration value="ski"/>
 			<xsd:enumeration value="skate"/>
+			<xsd:enumeration value="motorcycle">
+				<xsd:annotation>
+					<xsd:documentation>+v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="scooter">
+				<xsd:annotation>
+					<xsd:documentation>+v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="wheelchair">
+				<xsd:annotation>
+					<xsd:documentation>+v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="animalRide">
+				<xsd:annotation>
+					<xsd:documentation>+v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="AccessModeListOfEnumerations">
@@ -87,63 +116,13 @@ Rail transport, Roads and Road transport
 		<xsd:list itemType="AccessModeEnumeration"/>
 	</xsd:simpleType>
 	<!--======Vehicle===================================================================================-->
-	<xsd:element name="VehicleMode" type="AllModesEnumeration">
+	<xsd:element name="VehicleMode" type="AllPublicTransportModesEnumeration">
 		<xsd:annotation>
-			<xsd:documentation>VEHICLE MODE: a characterisation of the operation according to the means of transport (bus, tram, metro, train, ferry, ship).</xsd:documentation>
+			<xsd:documentation>PUBLIC TRANSPORT MODE: a characterisation of the operation according to the means of transport (bus, tram, metro, train, ferry, ship).</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:simpleType name="VehicleModeEnumeration">
-		<xsd:annotation>
-			<xsd:documentation>Allowed values for MODES of Public Transport applicable to timetabled public transport.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:restriction base="xsd:NMTOKEN">
-			<xsd:enumeration value="air"/>
-			<xsd:enumeration value="bus"/>
-			<xsd:enumeration value="coach"/>
-			<xsd:enumeration value="ferry"/>
-			<xsd:enumeration value="metro"/>
-			<xsd:enumeration value="rail"/>
-			<xsd:enumeration value="trolleyBus"/>
-			<xsd:enumeration value="tram"/>
-			<xsd:enumeration value="water"/>
-			<xsd:enumeration value="cableway"/>
-			<xsd:enumeration value="funicular"/>
-			<xsd:enumeration value="lift"/>
-			<xsd:enumeration value="snowAndIce"/>
-			<xsd:enumeration value="other"/> 
-		</xsd:restriction>
-	</xsd:simpleType>
-	<xsd:simpleType name="VehicleModeListOfEnumerations">
-		<xsd:annotation>
-			<xsd:documentation>Allowed values for List of PT MODES of transport applicable to timetabled public transport.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:list itemType="VehicleModeEnumeration"/>
-	</xsd:simpleType>
 	<!--======Modes===================================================================================-->
-	<xsd:simpleType name="ContinuousModeEnumeration">
-		<xsd:annotation>
-			<xsd:documentation>Allowed values for continuous MODES of transport applicable to private and non-timetabled transport.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:restriction base="xsd:NMTOKEN">
-			<xsd:enumeration value="walk"/>
-			<xsd:enumeration value="car"/>
-			<xsd:enumeration value="taxi"/>
-			<xsd:enumeration value="cycle"/>
-			<xsd:enumeration value="drt"/>
-			<xsd:enumeration value="movingWalkway"/>
-			<xsd:enumeration value="through"/>
-			<xsd:enumeration value="ski"/>
-			<xsd:enumeration value="skate"/>
-		</xsd:restriction>
-	</xsd:simpleType>
-	<xsd:simpleType name="ContinuousModeListOfEnumerations">
-		<xsd:annotation>
-			<xsd:documentation>Allowed values for List of continuous MODES of transport applicable to timetabled public transport.</xsd:documentation>
-		</xsd:annotation>
-		<xsd:list itemType="ContinuousModeEnumeration"/>
-	</xsd:simpleType>
-	<!--======Modes===================================================================================-->
-	<xsd:element name="RoadVehicleMode" type="AllModesEnumeration">
+	<xsd:element name="RoadVehicleMode" type="RoadVehicleModeEnumeration">
 		<xsd:annotation>
 			<xsd:documentation>Road Vehicle MODE: a characterisation of the operation according to the means of transport (bus, tram, coach).</xsd:documentation>
 		</xsd:annotation>
@@ -166,17 +145,18 @@ Rail transport, Roads and Road transport
 		<xsd:list itemType="RoadVehicleModeEnumeration"/>
 	</xsd:simpleType>
 	<!--======Modes===================================================================================-->
-	<xsd:element name="AllVehicleModes" type="AllVehicleModesOfTransportEnumeration">
+	<xsd:element name="AllVehicleModes" type="AllPublicTransportModesEnumeration">
 		<xsd:annotation>
-			<xsd:documentation>All MODEs including vehicle transport and self drive.</xsd:documentation>
+			<xsd:documentation>All PUBLIC TRANSPORT MODEs including self drive.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
 	<xsd:simpleType name="AllModesEnumeration">
 		<xsd:annotation>
-			<xsd:documentation>Allowed values for r MODES: TPEG pti_table 01.</xsd:documentation>
+			<xsd:documentation>All MODEs (PUBLIC TRANSPORT MODEs and PERSONAL MODEs).</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:NMTOKEN">
 			<xsd:enumeration value="all"/>
+			<xsd:enumeration value="anyMode"/>
 			<xsd:enumeration value="unknown"/>
 			<xsd:enumeration value="air"/>
 			<xsd:enumeration value="bus"/>
@@ -184,10 +164,19 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="tram"/>
 			<xsd:enumeration value="coach"/>
 			<xsd:enumeration value="rail"/>
-			<xsd:enumeration value="intercityRail"/>
-			<xsd:enumeration value="urbanRail"/>
+			<xsd:enumeration value="intercityRail">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED. Use mode rail with RailSubmode longDistance. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="urbanRail">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED. Use mode metro with MetroSubmode urbanRail (or in some few cases rail with RailSubmode local). -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="metro"/>
 			<xsd:enumeration value="water"/>
+			<xsd:enumeration value="ferry"/>
 			<xsd:enumeration value="cableway"/>
 			<xsd:enumeration value="funicular"/>
 			<xsd:enumeration value="lift"/>
@@ -201,45 +190,117 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="foot"/>
 			<xsd:enumeration value="bicycle"/>
 			<xsd:enumeration value="motorcycle"/>
+			<xsd:enumeration value="scooter"/>
 			<xsd:enumeration value="car"/>
 			<xsd:enumeration value="shuttle"/>
-			<!-- NOT IN tpeg -->
-			<!-- NOT IN tpeg -->
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="AllVehicleModesListOfEnumeration">
+	<xsd:simpleType name="AllModesListOfEnumerations">
 		<xsd:annotation>
-			<xsd:documentation>Allowed values for List of PT MODES of transport applicable to timetabled public transport.</xsd:documentation>
+			<xsd:documentation>Allowed values for List of ALL MODES.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:list itemType="AllVehicleModesOfTransportEnumeration"/>
+		<xsd:list itemType="AllModesEnumeration"/>
 	</xsd:simpleType>
-	<xsd:simpleType name="AllVehicleModesOfTransportEnumeration">
+	<xsd:simpleType name="AllPublicTransportModesListOfEnumerations">
 		<xsd:annotation>
-			<xsd:documentation>Allowed values for MODES of Transport : TPEG pti_table 01.</xsd:documentation>
+			<xsd:documentation>Allowed values for List of PT MODES applicable to timetabled public transport.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:list itemType="AllPublicTransportModesEnumeration"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AllPublicTransportModesEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>PUBLIC TRANSPORT MODE: A MODE used for public transport services (e.g., by bus, by tram, by metro, by train, by ferry, by ship, by shared taxi car, by shared car) under either a CONVENTIONAL MODE OF OPERATION or an ALTERNATIVE MODE OF OPERATION (i.e., excluding a PERSONAL MODE OF OPERATION). Note: Prior to TM 6.2 this was named VEHICLE MODE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:NMTOKEN">
-			<xsd:enumeration value="all"/>
-			<xsd:enumeration value="unknown"/>
-			<xsd:enumeration value="bus"/>
-			<xsd:enumeration value="trolleyBus"/>
-			<xsd:enumeration value="tram"/>
-			<xsd:enumeration value="coach"/>
-			<xsd:enumeration value="rail"/>
-			<xsd:enumeration value="intercityRail"/>
-			<xsd:enumeration value="urbanRail"/>
-			<xsd:enumeration value="metro"/>
-			<xsd:enumeration value="air"/>
-			<xsd:enumeration value="water"/>
-			<xsd:enumeration value="cableway"/>
-			<xsd:enumeration value="funicular"/>
-			<xsd:enumeration value="snowAndIce"/>
-			<xsd:enumeration value="taxi"/>
-			<xsd:enumeration value="selfDrive">
+			<xsd:enumeration value="all">
 				<xsd:annotation>
-					<xsd:documentation>See pti12_x.</xsd:documentation>
+					<xsd:documentation>If all modes are meant.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:enumeration>
-			<!-- NOT IN tpeg -->
+			<xsd:enumeration value="unknown">
+				<xsd:annotation>
+					<xsd:documentation>Use only when no other entry applies.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="bus"/>
+			<xsd:enumeration value="trolleyBus">
+				<xsd:annotation>
+					<xsd:documentation>Special type of bus with two overhead wires using spring-loaded trolley poles.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="tram"/>
+			<xsd:enumeration value="coach">
+				<xsd:annotation>
+					<xsd:documentation>Bus for longer-distance service. This value specialises from bus through regulation, that the cross multiple metropolitan regions and that all passenger area seating. Also the seating layout is different.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="rail"/>
+			<xsd:enumeration value="intercityRail">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED. Use mode rail with RailSubmode longDistance.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="urbanRail">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED. Use mode metro with MetroSubmode urbanRail (or in some few cases rail with RailSubmode local).</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="metro">
+				<xsd:annotation>
+					<xsd:documentation>Within an urban area. For underground and railway.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="air">
+				<xsd:annotation>
+					<xsd:documentation>All air related mode. No special distinction is made.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="water">
+				<xsd:annotation>
+					<xsd:documentation>Most water related modes. The only specialisation is the mode ferry. In Transmodel also ship was used for this mode.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="cableway">
+				<xsd:annotation>
+					<xsd:documentation>Can be only two cabines or multiple.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="funicular">
+				<xsd:annotation>
+					<xsd:documentation>Cable railway on steep slope using two counterbalanced carriages.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="snowAndIce">
+				<xsd:annotation>
+					<xsd:documentation>A collection for all modes involving snow and ice.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="taxi"/>
+			<xsd:enumeration value="ferry">
+				<xsd:annotation>
+					<xsd:documentation>Ferry can be passenger ferries and/or car ferries. The specialisation from water is the detailed schedule and usually the very rigid pattern with only a few stops on the route.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="lift">
+				<xsd:annotation>
+					<xsd:documentation>General Mode for elevators and for Modes moved by cable. Especially lifts are not only vertical elevators. If a better specialisation applies (like cableway) use that.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="selfDrive">
+				<xsd:annotation>
+					<xsd:documentation>For all alternative modes where a vehicle is driven by the user. See pti12_x.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="anyMode">
+				<xsd:annotation>
+					<xsd:documentation>To be avoided.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="other">
+				<xsd:annotation>
+					<xsd:documentation>Use only when no other entry applies.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 		</xsd:restriction>
 	</xsd:simpleType>
 	<!--========================================================================================-->
@@ -278,6 +339,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of MODe.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassOpenTransportModeRefStructureType" default="OpenTransportMode">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for OpenTransportModeRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -304,6 +386,27 @@ Rail transport, Roads and Road transport
 						<xsd:documentation>Identifier of SUBMODe.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassSubmodeRefStructureType" default="Submode">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for SubmodeRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -329,11 +432,11 @@ Rail transport, Roads and Road transport
 		<xsd:annotation>
 			<xsd:documentation>Type for a reference to a MODE and SUBMODE.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexContent>
+		<xsd:simpleContent>
 			<xsd:extension base="SubmodeRefStructure">
-				<xsd:attribute name="mode" type="AllVehicleModesOfTransportEnumeration" use="required"/>
+				<xsd:attribute name="mode" type="AllPublicTransportModesEnumeration" use="required"/>
 			</xsd:extension>
-		</xsd:complexContent>
+		</xsd:simpleContent>
 	</xsd:complexType>
 	<!--======STOP PLACE Types for different modes ======================================================================================-->
 	<xsd:simpleType name="StopTypeEnumeration">
@@ -354,6 +457,7 @@ Rail transport, Roads and Road transport
 			<xsd:enumeration value="ferryStop"/>
 			<xsd:enumeration value="liftStation"/>
 			<xsd:enumeration value="vehicleRailInterchange"/>
+			<xsd:enumeration value="taxiRank"/>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
 	</xsd:simpleType>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2010 rel. 3 sp1 (http://www.altova.com) by Nicholas Knowles (Kizoom) -->
 <xsd:schema xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0" id="netex_passengerInformationEquipment_version">
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_mode_support.xsd"/>
 	<xsd:include schemaLocation="../part1_networkDescription/netex_line_support.xsd"/>
 	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_stopPlace_support.xsd"/>
+	<xsd:include schemaLocation="../part1_ifopt/netex_ifopt_equipmentTicketing_version.xsd"/>
 	<xsd:include schemaLocation="../part1_networkDescription/netex_route_support.xsd"/>
 	<xsd:include schemaLocation="netex_passengerInformationEquipment_support.xsd"/>
 	<xsd:include schemaLocation="netex_servicePattern_support.xsd"/>
@@ -17,16 +17,16 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
 				<Date>
 					<Modified>2011-02-05</Modified>
 				</Date>
-
-				<Date>
-					<Modified>2019-04-15</Modified>Add missing element from TypeofPassengerInformationEquipment
+				<Date><Modified>2019-04-15</Modified>Add missing element from TypeofPassengerInformationEquipment
+				</Date>
+				<Date><Modified>2023-11-21</Modified>CR0545 PassengerInformationEquipment: added PassengerInformationEquipmentList.
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines PASSENGER INFORMATION EQUIPMENT  types.</p>
@@ -47,7 +47,7 @@
 						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -126,7 +126,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="LogicalDisplay" abstract="false" substitutionGroup="DataManagedObject">
+	<xsd:element name="LogicalDisplay" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Represents a set of data that can be assembled for assignment to a physical PASSENGER INFORMATION EQUIPMENT or to a logical channel such as web or media. It is independent of any physical embodiment 
 
@@ -146,7 +146,7 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 							<xsd:group ref="LogicalDisplayGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="LogicalDisplayIdType"/>
+					<xsd:attribute name="id" type="LogicalDisplayIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -186,7 +186,7 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="PassengerInformationEquipment" abstract="false" substitutionGroup="PassengerEquipment">
+	<xsd:element name="PassengerInformationEquipment" substitutionGroup="PassengerEquipment">
 		<xsd:annotation>
 			<xsd:documentation>A public transport information facility, as for instance terminals (on street, at information desks, telematic, ...) or printed material (leaflets displayed at stops, booklets, ...).</xsd:documentation>
 		</xsd:annotation>
@@ -214,7 +214,7 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 							<xsd:group ref="PassengerInformationEquipmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PassengerInformationEquipmentIdType"/>
+					<xsd:attribute name="id" type="PassengerInformationEquipmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -243,10 +243,20 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 			<xsd:element ref="LogicalDisplayRef" minOccurs="0"/>
 			<xsd:element ref="StopPlaceRef" minOccurs="0"/>
 			<xsd:element ref="SiteComponentRef" minOccurs="0"/>
+			<xsd:element name="PassengerInformationEquipmentList" type="PassengerInformationEquipmentListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>List of PASSENGER INFORMATION Equipments. +2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element ref="TypeOfPassengerInformationEquipmentRef" minOccurs="0"/>
+			<xsd:group ref="TicketingEquipmentAccessibilityGroup" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Detailed information about accessibility uses. Borrowed from TicketOffice. +v1.3.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:group>
 			<xsd:element ref="PassengerInformationFacilityList" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>List of predefined Passenger Info EQUIPMENT f.</xsd:documentation>
+					<xsd:documentation>List of predefined Passenger Info EQUIPMENT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element ref="AccessibilityInfoFacilityList" minOccurs="0"/>
@@ -263,14 +273,14 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 					<xsd:element ref="DisplayAssignmentRef"/>
 					<xsd:element ref="DisplayAssignment">
 						<xsd:annotation>
-							<xsd:documentation>The assignment of one SCHEDULED STOP POINT and one JOURNEY PATTERN to a PASSENGER INFORMATION EQUIPMENTI  specifying that information on the SCHEDULED STOP POINT and the JOURNEY PATTERN will be provided (e.g. displayed, printed).</xsd:documentation>
+							<xsd:documentation>The assignment of one SCHEDULED STOP POINT and one JOURNEY PATTERN to a PASSENGER INFORMATION EQUIPMENTI specifying that information on the SCHEDULED STOP POINT and the JOURNEY PATTERN will be provided (e.g. displayed, printed).</xsd:documentation>
 						</xsd:annotation>
 					</xsd:element>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="DisplayAssignment" abstract="false" substitutionGroup="Assignment_">
+	<xsd:element name="DisplayAssignment" substitutionGroup="Assignment_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The assignment of one STOP POINT and one JOURNEY PATTERN to a PASSENGER INFORMATION EQUIPMENT, specifying that information on this STOP POINT and this JOURNEY PATTERN will be provided (e.g. displayed, printed).</xsd:documentation>
 		</xsd:annotation>
@@ -325,7 +335,7 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 					</xsd:attribute>
 					<xsd:attribute name="status" type="StatusEnumeration" use="optional" default="active">
 						<xsd:annotation>
-							<xsd:documentation>Whether ENTITY is currently in use. Default is "released"</xsd:documentation>
+							<xsd:documentation>Whether ENTITY is currently in use. Default is "active".</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="derivedFromVersionRef" type="VersionIdType" use="optional">
@@ -348,12 +358,12 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 							<xsd:documentation>Reference to RESPONSIBILITY SET for managing the object. If absent, then responsibility is same as for containing context of this object.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="order" type="xsd:integer">
+					<xsd:attribute name="order" type="xsd:positiveInteger" use="optional">
 						<xsd:annotation>
-							<xsd:documentation>Order in which to show  ASSIGNMENT,</xsd:documentation>
+							<xsd:documentation>Order in which to show ASSIGNMENT. -v2.0</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="id" type="DisplayAssignmentIdType">
+					<xsd:attribute name="id" type="DisplayAssignmentIdType" use="required">
 						<xsd:annotation>
 							<xsd:documentation>Identifier of DISPLAY ASSIGNMENT.</xsd:documentation>
 						</xsd:annotation>
@@ -432,7 +442,7 @@ LOGICAL DISPLAY corresponds to a SIRI STOP MONITORING point.</xsd:documentation>
 							<xsd:group ref="TypeOfPassengerInformationEquipmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfPassengerInformationEquipmentIdType"/>
+					<xsd:attribute name="id" type="TypeOfPassengerInformationEquipmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>

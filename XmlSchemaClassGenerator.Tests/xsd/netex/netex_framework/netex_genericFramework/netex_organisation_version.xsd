@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_organisation_version">
-	<xsd:include schemaLocation="../netex_utility/netex_utility_contact.xsd"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:core="http://www.govtalk.gov.uk/core" xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.2.2" id="netex_organisation_version">
 	<xsd:include schemaLocation="../netex_responsibility/netex_responsibilitySet_version.xsd"/>
 	<xsd:include schemaLocation="netex_alternativeName_version.xsd"/>
 	<xsd:include schemaLocation="netex_organisation_support.xsd"/>
@@ -11,21 +10,30 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First Drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2010-09-04</Created>
 				</Date>
 				<Date>
 					<Modified>2011-02-05</Modified>
 				</Date>
-				<Date>
-					<Modified>2020-07-12</Modified>Fix for Issue OrganisationalUnit #100
+				<Date><Modified>2020-07-12</Modified>Fix for Issue OrganisationalUnit #100
 					 Correct the Susbtitution group on OrganisationUnit to be OrganizationPart_
 				</Date>
 				<Date>
 					<Modified>2017-03-28 CR0031  Organisation  and OrganisationalPart Add  OwnResponsibilitySets and delegatedResponsibilitySets </Modified>
 					<Modified>2017-03-28 CR0032   Add Codespace range and TypeOf Assignment Value .   add PrivateCode to AdministrativeZone.  Add Subzones</Modified>
 					<Modified>2017-05-06 CR0032   Add Maximum Length to Codespace</Modified>
+				</Date>
+				<Date>
+					<Modified>2020-11-06 New Modes (Norway): Add related organisations.
+								Add external Contact details</Modified>
+				</Date>
+				<Date><Modified>2023-11-07</Modified>CR0544 Deprecate PrivateCode.
+				</Date>
+				<Date><Modified>2023-11-21</Modified>CR0545 Organisation: add VATNumber.
+				</Date>
+				<Date><Modified>2024-06-26</Modified>CR0594 Deprecate ExternalOperatorRef.
 				</Date>
 				<Description>
 					<p>NeTEx - Network Exchange. This subschema defines ORGANISATION types.</p>
@@ -39,14 +47,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2017</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2024</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NaPTAN, NOPTIS, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -72,7 +80,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:sequence>
-					<xsd:element ref="Organisation_" maxOccurs="unbounded"/>
+					<xsd:element ref="Organisation_Dummy" maxOccurs="unbounded"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
@@ -90,12 +98,12 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="Organisation_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+	<xsd:element name="Organisation_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Dummy supertype for ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="Organisation" abstract="true" substitutionGroup="Organisation_">
+	<xsd:element name="Organisation" abstract="true" substitutionGroup="Organisation_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>An legally incorporated body associated with any aspect of the transport system.</xsd:documentation>
 		</xsd:annotation>
@@ -112,12 +120,12 @@ Rail transport, Roads and Road transport
 						<xsd:sequence>
 							<xsd:group ref="OrganisationGroup">
 								<xsd:annotation>
-									<xsd:documentation>Details for Organisation.</xsd:documentation>
+									<xsd:documentation>Details for ORGANISATION.</xsd:documentation>
 								</xsd:annotation>
 							</xsd:group>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OrganisationIdType"/>
+					<xsd:attribute name="id" type="OrganisationIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -131,7 +139,7 @@ Rail transport, Roads and Road transport
 				<xsd:sequence>
 					<xsd:group ref="OrganisationGroup">
 						<xsd:annotation>
-							<xsd:documentation>Details for Organisation.</xsd:documentation>
+							<xsd:documentation>Details for ORGANISATION.</xsd:documentation>
 						</xsd:annotation>
 					</xsd:group>
 				</xsd:sequence>
@@ -187,6 +195,11 @@ Rail transport, Roads and Road transport
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:group ref="OrganisationDelegationGroup"/>
+			<xsd:element name="relatedOrganisations" type="relatedOrganisations_RelStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Related ORGABISATIONs +v1.2,2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="OrganisationCodeGroup">
@@ -194,20 +207,29 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Code details for an ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="PrivateCodeStructure" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Public code to use for ORGANISATION.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="CompanyNumber" type="xsd:normalizedString" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Company registration number including Country prefix.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
+			<xsd:element name="VATNumber" type="xsd:normalizedString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Company registered tax number including Country prefix. +v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="ExternalOperatorRef" type="ExternalObjectRefStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>An alternative  code that uniquely identifies the OPERATOR. Specifically for use in AVMS systems. For VDV compatibility.</xsd:documentation>
+					<xsd:documentation>An alternative code that uniquely identifies the OPERATOR. Specifically for use in AVMS systems. For VDV compatibility. DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -294,12 +316,12 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="delegatedResponsibilitySets" type="responsibilitySets_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Delegated responsibility SETS. </xsd:documentation>
+					<xsd:documentation>Delegated responsibility SETS.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="delegatedFrom" type="organisationRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Other Organisations that delegate to this Organisation  ORGANISATION. (TAP TSI B1.)</xsd:documentation>
+					<xsd:documentation>Other ORGANISATIONs that delegate to this ORGANISATION. (TAP TSI B1.)</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -313,17 +335,17 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="OrganisationPartRef"/>
-					<xsd:element ref="OrganisationPart_"/>
+					<xsd:element ref="OrganisationPart_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="OrganisationPart_" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
+	<xsd:element name="OrganisationPart_Dummy" type="DataManagedObjectStructure" abstract="true" substitutionGroup="DataManagedObject">
 		<xsd:annotation>
 			<xsd:documentation>Dummy supertype for ORGANISATION PART.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="OrganisationPart" abstract="false" substitutionGroup="OrganisationPart_">
+	<xsd:element name="OrganisationPart" substitutionGroup="OrganisationPart_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A named subdivision of an ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
@@ -341,12 +363,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="OrganisationPartGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OrganisationPartIdType"/>
+					<xsd:attribute name="id" type="OrganisationPartIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="OrganisationPart_VersionStructure" abstract="false">
+	<xsd:complexType name="OrganisationPart_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for an ORGANISATION PART.</xsd:documentation>
 		</xsd:annotation>
@@ -365,36 +387,40 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Name of ORGANISATION PART.</xsd:documentation>
+					<xsd:documentation>NAME of ORGANISATION PART.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="ShortName" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Name of DEPARTMENT.</xsd:documentation>
+					<xsd:documentation>SHORT NAME of ORGANISATION PART.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Name of ORGANISATIONAL UNIT.</xsd:documentation>
+					<xsd:documentation>Description of ORGANISATION PART.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element name="PublicCode" type="PrivateCodeStructure" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Additional public code used for department.</xsd:documentation>
+					<xsd:documentation>Additional public code used for ORGANISATION PART.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="PrivateCode" minOccurs="0"/>
+			<xsd:element ref="PrivateCode" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>DEPRECATED - use privateCodes. -v2.0</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 			<xsd:element name="ContactDetails" type="ContactStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Contact details for ORGANISATION PART for Public use.</xsd:documentation>
+					<xsd:documentation>Contact details for ORGANISATION PART for public use.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="Location" type="LocationStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Coordinates of ORGANISATIONAL UNIT.</xsd:documentation>
+					<xsd:documentation>Coordinates of ORGANISATION PART.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="OrganisationRef" minOccurs="0"/>
+			<xsd:element ref="OrganisationRef_Dummy" minOccurs="0"/>
 			<xsd:element ref="TypeOfOrganisationPartRef" minOccurs="0"/>
 			<xsd:element name="administrativeZones" type="administrativeZones_RelStructure" minOccurs="0">
 				<xsd:annotation>
@@ -418,7 +444,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="Department" abstract="false" substitutionGroup="OrganisationPart_">
+	<xsd:element name="Department" substitutionGroup="OrganisationPart_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>Department of an ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
@@ -439,12 +465,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="DepartmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="DepartmentIdType"/>
+					<xsd:attribute name="id" type="DepartmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="Department_VersionStructure" abstract="false">
+	<xsd:complexType name="Department_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a DEPARTMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -464,7 +490,7 @@ Rail transport, Roads and Road transport
 			<xsd:element ref="TypeOfOperationRef" minOccurs="0"/>
 			<xsd:element name="units" type="organisationalUnitRefs_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Name of DEPARTMENT.</xsd:documentation>
+					<xsd:documentation>ORGANISATIONAL UNITs.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -483,7 +509,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="OrganisationalUnit" abstract="false" substitutionGroup="OrganisationPart_">
+	<xsd:element name="OrganisationalUnit" substitutionGroup="OrganisationPart_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>OrganisationalUnit of an ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
@@ -504,12 +530,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="OrganisationalUnitGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="OrganisationalUnitIdType"/>
+					<xsd:attribute name="id" type="OrganisationalUnitIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="OrganisationalUnit_VersionStructure" abstract="false">
+	<xsd:complexType name="OrganisationalUnit_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a ORGANISATIONAL UNIT.</xsd:documentation>
 		</xsd:annotation>
@@ -530,6 +556,78 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
+	<xsd:complexType name="relatedOrganisations_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a list of RELATED ORGANISATIONs.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="RelatedOrganisation" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="RelatedOrganisation" substitutionGroup="VersionedChild">
+		<xsd:annotation>
+			<xsd:documentation>A formal relationship with another ORGANISATION. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="RelatedOrganisation_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="VersionedChildGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="RelatedOrganisationGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="RelatedOrganisationIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="RelatedOrganisation_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for an RELATED ORGANISATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="VersionedChildStructure">
+				<xsd:sequence>
+					<xsd:group ref="RelatedOrganisationGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="RelatedOrganisationGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for an RELATED ORGANISATION.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Name of RELATED ORGANISATION.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Description" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Description of the nature pf the Relationship.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="OrganisationRef_Dummy" minOccurs="0"/>
+			<xsd:element name="OrganisationRoleType" type="OrganisationRoleEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Role of the related Organbisation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element ref="ResponsibilityRoleRef" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ======================================================================= -->
 	<xsd:complexType name="administrativeZones_RelStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a list of ADMINISTRATIVE ZONEs.</xsd:documentation>
@@ -538,17 +636,17 @@ Rail transport, Roads and Road transport
 			<xsd:extension base="containmentAggregationStructure">
 				<xsd:choice maxOccurs="unbounded">
 					<xsd:element ref="AdministrativeZoneRef"/>
-					<xsd:element ref="AdministrativeZone_"/>
+					<xsd:element ref="AdministrativeZone_Dummy"/>
 				</xsd:choice>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="AdministrativeZone_" type="Zone_VersionStructure" abstract="true" substitutionGroup="Zone">
+	<xsd:element name="AdministrativeZone_Dummy" type="Zone_VersionStructure" abstract="true" substitutionGroup="Zone">
 		<xsd:annotation>
 			<xsd:documentation>Dummy supertype for ADMINISTRATIVE ZONE.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:element name="AdministrativeZone" abstract="false" substitutionGroup="AdministrativeZone_">
+	<xsd:element name="AdministrativeZone" substitutionGroup="AdministrativeZone_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>A ZONE relating to the management responsibilities of an ORGANISATION. For example to allocate bus stop identifiers for a region.</xsd:documentation>
 		</xsd:annotation>
@@ -575,12 +673,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="AdministrativeZoneGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="AdministrativeZoneIdType"/>
+					<xsd:attribute name="id" type="AdministrativeZoneIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="AdministrativeZone_VersionStructure" abstract="false">
+	<xsd:complexType name="AdministrativeZone_VersionStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for an ADMINISTRATIVE ZONE.</xsd:documentation>
 		</xsd:annotation>
@@ -597,12 +695,12 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements for an ADMINISTRATIVE ZONE.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="PublicCode" type="PrivateCodeStructure" minOccurs="0">
+			<xsd:element name="PublicCode" type="PublicCodeStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Public Code assosociated with Zone</xsd:documentation>
+					<xsd:documentation>Public Code assosociated with ADMINISTRATIVE ZONE.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="OrganisationRef" minOccurs="0"/>
+			<xsd:element ref="OrganisationRef_Dummy" minOccurs="0"/>
 			<xsd:element name="responsibilities" type="responsibilitySets_RelStructure" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>RESPONSIBILITY SETs allocated to ADMINISTRATIVE ZONE.</xsd:documentation>
@@ -615,7 +713,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="subzones" type="administrativeZones_RelStructure" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Subzones of  ADMINISTRATIVE Zone; ie. strict subzones that are administrative subdivisions of the parent.  These should not contradict Parent ZONE references..</xsd:documentation>
+					<xsd:documentation>Subzones of ADMINISTRATIVE Zone; ie. strict subzones that are administrative subdivisions of the parent. These should not contradict Parent ZONE references..</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -623,7 +721,7 @@ Rail transport, Roads and Road transport
 	<!-- ======================================================================= -->
 	<xsd:complexType name="codespaceAssignments_RelStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a list of CODESPACE  ASSIGNMENT.</xsd:documentation>
+			<xsd:documentation>Type for a list of CODESPACE ASSIGNMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="strictContainmentAggregationStructure">
@@ -637,7 +735,7 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-	<xsd:element name="CodespaceAssignment" abstract="false" substitutionGroup="VersionedChild">
+	<xsd:element name="CodespaceAssignment" substitutionGroup="VersionedChild">
 		<xsd:annotation>
 			<xsd:documentation>Assignment of use of a CODESPACE to identify data within a given ZONE.</xsd:documentation>
 		</xsd:annotation>
@@ -652,12 +750,12 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CodespaceAssignmentGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CodespaceAssignmentIdType" use="optional"/>
+					<xsd:attribute name="id" type="CodespaceAssignmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="CodespaceAssignment_VersionedChildStructure" abstract="false">
+	<xsd:complexType name="CodespaceAssignment_VersionedChildStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a CODESPACE ASSIGNMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -671,7 +769,7 @@ Rail transport, Roads and Road transport
 	</xsd:complexType>
 	<xsd:group name="CodespaceAssignmentGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for a CODESPACE  ASSIGNMENT.</xsd:documentation>
+			<xsd:documentation>Elements for a CODESPACE ASSIGNMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:choice>
@@ -702,7 +800,7 @@ Rail transport, Roads and Road transport
 			<xsd:choice>
 				<xsd:group ref="CodeRangeGroup">
 					<xsd:annotation>
-						<xsd:documentation>Elements for a CODESPACE  RANGE. +v1.1</xsd:documentation>
+						<xsd:documentation>Elements for a CODESPACE RANGE. +v1.1</xsd:documentation>
 					</xsd:annotation>
 				</xsd:group>
 			</xsd:choice>
@@ -716,12 +814,16 @@ Rail transport, Roads and Road transport
 					<xsd:documentation>Description of CODESPACE ASSIGNMENT.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
-			<xsd:element ref="TypeOfCodespaceAssignmentRef" minOccurs="0"/>
+			<xsd:element ref="TypeOfCodespaceAssignmentRef" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Reference to a TYPE OF CODESPACE ASSIGNMENT. +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<xsd:group name="CodeRangeGroup">
 		<xsd:annotation>
-			<xsd:documentation>Elements for a CODESPACE  RANGE</xsd:documentation>
+			<xsd:documentation>Elements for a CODESPACE RANGE</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
 			<xsd:element name="StartValue" type="xsd:normalizedString" minOccurs="0">
@@ -737,9 +839,9 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfCodespaceAssignment" abstract="false" substitutionGroup="TypeOfValue">
+	<xsd:element name="TypeOfCodespaceAssignment" substitutionGroup="TypeOfValue">
 		<xsd:annotation>
-			<xsd:documentation>Classification of an CODESPACE  ASSIGNMENT </xsd:documentation>
+			<xsd:documentation>Classification of an CODESPACE ASSIGNMENT</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
@@ -755,21 +857,21 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfCodespaceAssignmentIdType"/>
+					<xsd:attribute name="id" type="TypeOfCodespaceAssignmentIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfCodespaceAssignment_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfCodespaceAssignment_ValueStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a TYPE OF CODESPACE ASSIGNMENT </xsd:documentation>
+			<xsd:documentation>Type for a TYPE OF CODESPACE ASSIGNMENT</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
 			<xsd:extension base="TypeOfValue_VersionStructure"/>
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfOrganisation" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfOrganisation" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>Classification of an ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
@@ -787,8 +889,8 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfOrganisationIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Organisation">
+					<xsd:attribute name="id" type="TypeOfOrganisationIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -797,7 +899,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfOrganisation_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfOrganisation_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF ORGANISATION.</xsd:documentation>
 		</xsd:annotation>
@@ -806,7 +908,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfOrganisationPart" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfOrganisationPart" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>Classification of an ORGANISATION PART.</xsd:documentation>
 		</xsd:annotation>
@@ -824,8 +926,8 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfOrganisationPartIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="OrganisationPart">
+					<xsd:attribute name="id" type="TypeOfOrganisationPartIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -834,7 +936,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfOrganisationPart_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfOrganisationPart_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF ORGANISATION PART.</xsd:documentation>
 		</xsd:annotation>
@@ -843,7 +945,7 @@ Rail transport, Roads and Road transport
 		</xsd:complexContent>
 	</xsd:complexType>
 	<!-- ======================================================================= -->
-	<xsd:element name="TypeOfOperation" abstract="false" substitutionGroup="TypeOfEntity">
+	<xsd:element name="TypeOfOperation" substitutionGroup="TypeOfEntity">
 		<xsd:annotation>
 			<xsd:documentation>Classification of an OPERATION.</xsd:documentation>
 		</xsd:annotation>
@@ -861,8 +963,8 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="TypeOfValueGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="TypeOfOperationIdType"/>
-					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional" fixed="Operation">
+					<xsd:attribute name="id" type="TypeOfOperationIdType" use="required"/>
+					<xsd:attribute name="nameOfClassifiedEntityClass" type="NameOfClass" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>Name of Class of the ENTITY. Allows reflection. Fixed for each ENTITY type.</xsd:documentation>
 						</xsd:annotation>
@@ -871,7 +973,7 @@ Rail transport, Roads and Road transport
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="TypeOfOperation_ValueStructure" abstract="false">
+	<xsd:complexType name="TypeOfOperation_ValueStructure">
 		<xsd:annotation>
 			<xsd:documentation>Type for a TYPE OF OPERATION.</xsd:documentation>
 		</xsd:annotation>
@@ -904,7 +1006,7 @@ Rail transport, Roads and Road transport
 		<xsd:complexContent>
 			<xsd:extension base="DerivedViewStructure">
 				<xsd:sequence>
-					<xsd:element ref="OrganisationRef" minOccurs="0"/>
+					<xsd:element ref="OrganisationRef_Dummy" minOccurs="0"/>
 					<xsd:group ref="OrganisationNameGroup"/>
 					<xsd:element name="ContactDetails" type="ContactStructure" minOccurs="0">
 						<xsd:annotation>
@@ -915,5 +1017,84 @@ Rail transport, Roads and Road transport
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
+	<!-- ======================================================================= -->
+	<!-- ===CONTACTS =================================================== -->
+	<xsd:complexType name="contacts_RelStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for containment in frame of reusable CONTACT details. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="containmentAggregationStructure">
+				<xsd:sequence>
+					<xsd:element ref="Contact" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="Contact" substitutionGroup="DataManagedObject">
+		<xsd:annotation>
+			<xsd:documentation>Reusable CONTACT details for an ORGANISATION or other entity. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="Contact_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="ContactGroup">
+								<xsd:annotation>
+									<xsd:documentation>Details for CONTACT</xsd:documentation>
+								</xsd:annotation>
+							</xsd:group>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="ContactIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Contact_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for a CONTACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="DataManagedObjectStructure">
+				<xsd:sequence>
+					<xsd:group ref="ContactGroup">
+						<xsd:annotation>
+							<xsd:documentation>Details for resuable CONTACT.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:group>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="ContactGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for a CONTACT.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Name" type="MultilingualString" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>The name of the CONTACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ContactDetails" type="ContactDetailsStructure" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Contact details for CONTACT.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ContactType" type="ContactTypeEnumeration" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Classification of ContactType. Used for arbitrary documentation.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
 	<!-- ======================================================================= -->
 </xsd:schema>

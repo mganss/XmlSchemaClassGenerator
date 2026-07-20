@@ -8,15 +8,24 @@
 				<Aggregation>main schema</Aggregation>
 				<Audience>e-service developers</Audience>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for version 1.0 CEN TC278 WG3 SG6 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2007-06-12</Created>
 				</Date>
 				<Date>
 					<Modified>2014-06-12</Modified>
 				</Date>
+				<Date><Modified>2020-10-05</Modified>New Modes: 
+					Add  lockers and freestanding sycle storage enum values.
+					Move ReChargingEquiopment  to separate En	ergy equipment
+					Add VEHICLE RELEASE EQUIPMENT.
+				</Date>
+				<Date><Modified>2020-11-20</Modified>New Modes: Correct supertypes.
+				</Date>
+				<Date><Modified>2021-04-15</Modified>New Modes: Add docks to CycleStorage enum
+				</Date>
 				<Description>
-					<p>NeTEx - Network Exchange. This subschema defines EQUIPMENT types for Place access.</p>
+					<p>NeTEx - Network Exchange. This subschema defines PARKING EQUIPMENT types for Place access.</p>
 				</Description>
 				<Format>
 					<MediaType>text/xml</MediaType>
@@ -27,14 +36,14 @@
 				<Language>[ISO 639-2/B] ENG</Language>
 				<Publisher>Kizoom Software Ltd, 16 High Holborn, London WC1V 6BX</Publisher>
 				<Rights>Unclassified
- <Copyright>CEN, Crown Copyright 2009-2014</Copyright>
+ <Copyright>CEN, Crown Copyright 2009-2021</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the TransModel standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -52,14 +61,14 @@ Rail transport, Roads and Road transport
 		</xsd:appinfo>
 		<xsd:documentation>PARKING EQUIPMENT identifier types for IFOPT Fixed Objects in Public Transport.</xsd:documentation>
 	</xsd:annotation>
-	<!-- ==== PARKING EQUIPMENT========================================= -->
+	<!-- ==== CYCLE STORAGE ========================================= -->
 	<xsd:simpleType name="CycleStorageEquipmentIdType">
 		<xsd:annotation>
 			<xsd:documentation>Type for identifier of CYCLE STORAGE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="EquipmentIdType"/>
+		<xsd:restriction base="InstalledEquipmentIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="CycleStorageEquipmentRef" type="CycleStorageEquipmentRefStructure" substitutionGroup="EquipmentRef">
+	<xsd:element name="CycleStorageEquipmentRef" type="CycleStorageEquipmentRefStructure" substitutionGroup="InstalledEquipmentRef">
 		<xsd:annotation>
 			<xsd:documentation>Identifier of an CYCLE STORAGE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
@@ -69,12 +78,33 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for a reference to an CYCLE STORAGE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="EquipmentRefStructure">
+			<xsd:restriction base="InstalledEquipmentRefStructure">
 				<xsd:attribute name="ref" type="CycleStorageEquipmentIdType" use="required">
 					<xsd:annotation>
 						<xsd:documentation>Identifier of a CYCLE STORAGE EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassCycleStorageEquipmentRefStructureType" default="CycleStorageEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for CycleStorageEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -84,37 +114,89 @@ Rail transport, Roads and Road transport
 		</xsd:annotation>
 		<xsd:restriction base="xsd:normalizedString">
 			<xsd:enumeration value="racks"/>
+			<xsd:enumeration value="docks">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="bars"/>
 			<xsd:enumeration value="railings"/>
-			<xsd:enumeration value="cycleScheme"/>
+			<xsd:enumeration value="cycleScheme">
+				<xsd:annotation>
+					<xsd:documentation/>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="lockers">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="freestanding">
+				<xsd:annotation>
+					<xsd:documentation>+v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
 			<xsd:enumeration value="other"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<!-- ======================================================================= -->
-	<xsd:simpleType name="VehicleChargingEquipmentIdType">
+	<!-- ==== VEHICLE RELEASE EQUIPMENT =========================================== -->
+	<xsd:simpleType name="VehicleReleaseEquipmentIdType">
 		<xsd:annotation>
-			<xsd:documentation>Type for identifier of VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
+			<xsd:documentation>Type for identifier of VEHICLE RELEASE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
-		<xsd:restriction base="EquipmentIdType"/>
+		<xsd:restriction base="InstalledEquipmentIdType"/>
 	</xsd:simpleType>
-	<xsd:element name="VehicleChargingEquipmentRef" type="VehicleChargingEquipmentRefStructure" substitutionGroup="EquipmentRef">
+	<xsd:element name="VehicleReleaseEquipmentRef" type="VehicleReleaseEquipmentRefStructure" substitutionGroup="EquipmentRef">
 		<xsd:annotation>
-			<xsd:documentation>Identifier of an VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
+			<xsd:documentation>Identifier of an VEHICLE RELEASE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 	</xsd:element>
-	<xsd:complexType name="VehicleChargingEquipmentRefStructure">
+	<xsd:complexType name="VehicleReleaseEquipmentRefStructure">
 		<xsd:annotation>
-			<xsd:documentation>Type for a reference to an VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
+			<xsd:documentation>Type for a reference to an VEHICLE RELEASE EQUIPMENT.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:simpleContent>
-			<xsd:restriction base="EquipmentRefStructure">
-				<xsd:attribute name="ref" type="VehicleChargingEquipmentIdType" use="required">
+			<xsd:restriction base="InstalledEquipmentRefStructure">
+				<xsd:attribute name="ref" type="VehicleReleaseEquipmentIdType" use="required">
 					<xsd:annotation>
-						<xsd:documentation>Identifier of a VEHICLE CHARGING EQUIPMENT.</xsd:documentation>
+						<xsd:documentation>Identifier of a VEHICLE RELEASE EQUIPMENT.</xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="nameOfRefClass" type="NameOfClassVehicleReleaseEquipmentRefStructureType" default="VehicleReleaseEquipment">
+					<xsd:annotation>
+						<xsd:documentation>Automatic reference class for VehicleReleaseEquipmentRefStructure</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="modification" type="ModificationEnumeration" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Nature of last modification: new, revise, delete, unchanged.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="versionRef" type="VersionIdType" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Identifier of version of referenced entity. For use when reference is External and a specific version is required. Mutually exclusive with version</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="uri" type="xsd:anyURI" use="optional">
+					<xsd:annotation>
+						<xsd:documentation>Location of the external entity. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attributeGroup ref="ReferenceModificationDetailsGroup"/>
 			</xsd:restriction>
 		</xsd:simpleContent>
 	</xsd:complexType>
+	<xsd:simpleType name="LockingMechanismEnumeration">
+		<xsd:annotation>
+			<xsd:documentation>Allowed value for LOCKING MECHANISM. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:normalizedString">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="dock"/>
+			<xsd:enumeration value="immobilisingLock"/>
+			<xsd:enumeration value="separateLockingDevice"/>
+			<xsd:enumeration value="other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
 	<!-- ======================================================================= -->
 </xsd:schema>

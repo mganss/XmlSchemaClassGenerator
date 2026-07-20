@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:netexWs="http://www.siri.org.uk/siriWS" xmlns:netex="http://www.netex.org.uk/netex" xmlns:ns="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" targetNamespace="http://www.siri.org.uk/siriWS">
+	<types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" xmlns:netexWs="http://www.siri.org.uk/siriWS" targetNamespace="http://www.siri.org.uk/siriWS">
+			<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="../netex_siri.xsd"/>
+			<xsd:element name="GetNeTexService">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Request" type="siri:SiriRequestStructure"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetNeTexServiceResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Answer" type="siri:SiriResponseStructure"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" xmlns:netexWs="http://www.siri.org.uk/siriWS" targetNamespace="http://www.siri.org.uk/siriWS">
+			<xsd:include schemaLocation="../wsdl_model/siri_wsProducer-Framework.xsd"/>
+		</xsd:schema>
+	</types>
+	<message name="CheckStatusRequest">
+		<part name="CheckStatusRequestParameters" element="netexWs:CheckStatus"/>
+	</message>
+	<message name="CheckStatusAnswer">
+		<part name="CheckStatusAnswerParameters" element="netexWs:CheckStatusResponse"/>
+	</message>
+	<message name="CheckStatusError">
+		<documentation>SOAP Fault deprecated from Siri 2.0</documentation>
+		<part name="SiriError" element="siri:ErrorConditionElement"/>
+	</message>
+	<message name="SubscriptionRequest">
+		<part name="SubscriptionRequestParameters" element="netexWs:Subscribe"/>
+	</message>
+	<message name="SubscriptionAnswer">
+		<part name="SubscriptionAnswerParameters" element="netexWs:SubscribeResponse"/>
+	</message>
+	<message name="SubscriptionError">
+		<documentation>SOAP Fault deprecated from Siri 2.0</documentation>
+		<part name="SiriError" element="siri:ErrorConditionElement"/>
+	</message>
+	<message name="DeleteSubscriptionRequest">
+		<part name="DeleteSubscriptionRequestParameters" element="netexWs:DeleteSubscription"/>
+	</message>
+	<message name="DeleteSubscriptionAnswer">
+		<part name="DeleteSubscriptionAnswerParameters" element="netexWs:DeleteSubscriptionResponse"/>
+	</message>
+	<message name="DeleteSubscriptionError">
+		<documentation>SOAP Fault deprecated from Siri 2.0</documentation>
+		<part name="SiriError" element="siri:ErrorConditionElement"/>
+	</message>
+	<message name="DataSupplyRequest">
+		<part name="DataSupplyRequestParameters" element="netexWs:DataSupply"/>
+	</message>
+	<message name="DataSupplyAnswer">
+		<part name="DataSupplyAnswerParameters" element="netexWs:DataSupplyResponse"/>
+	</message>
+	<message name="DataSupplyError">
+		<documentation>SOAP Fault deprecated from Siri 2.0</documentation>
+		<part name="SiriError" element="siri:ErrorConditionElement"/>
+	</message>
+	<message name="netexRequest">
+		<part name="Request" element="netexWs:GetNeTexService"/>
+	</message>
+	<message name="netexAnswer">
+		<part name="Answer" element="netexWs:GetNeTexServiceResponse"/>
+	</message>
+	<portType name="NetexProducerDocPort">
+		<!-- ====PORTS ================================================================================== -->
+		<operation name="Subscribe">
+			<input message="netexWs:SubscriptionRequest"/>
+			<output message="netexWs:SubscriptionAnswer"/>
+			<fault name="FaultName" message="netexWs:SubscriptionError"/>
+		</operation>
+		<operation name="DeleteSubscription">
+			<input message="netexWs:DeleteSubscriptionRequest"/>
+			<output message="netexWs:DeleteSubscriptionAnswer"/>
+			<fault name="FaultName" message="netexWs:DeleteSubscriptionError"/>
+		</operation>
+		<operation name="DataSupply">
+			<input message="netexWs:DataSupplyRequest"/>
+			<output message="netexWs:DataSupplyAnswer"/>
+			<fault name="FaultName" message="netexWs:DataSupplyError"/>
+		</operation>
+		<operation name="CheckStatus">
+			<input message="netexWs:CheckStatusRequest"/>
+			<output message="netexWs:CheckStatusAnswer"/>
+			<fault name="FaultName" message="netexWs:CheckStatusError"/>
+		</operation>
+		<operation name="GetNetex">
+			<documentation>Single access to any NeTEx Publication</documentation>
+			<input message="netexWs:netexRequest"/>
+			<output message="netexWs:netexAnswer"/>
+		</operation>
+	</portType>
+	<binding name="NetexProducerDocBinding" type="netexWs:NetexProducerDocPort">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+		<!-- ====BINDINGS  ================================================================================== -->
+		<!-- ====general  services ===== -->
+		<operation name="Subscribe">
+			<soap:operation soapAction="Subscribe"/>
+			<input>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</output>
+			<fault name="FaultName">
+				<soap:fault name="FaultName" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="DeleteSubscription">
+			<soap:operation soapAction="DeleteSubscription"/>
+			<input>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</output>
+			<fault name="FaultName">
+				<soap:fault name="FaultName" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="DataSupply">
+			<soap:operation soapAction="DataSupply"/>
+			<input>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</output>
+			<fault name="FaultName">
+				<soap:fault name="FaultName" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="CheckStatus">
+			<soap:operation soapAction="CheckStatus"/>
+			<input>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</output>
+			<fault name="FaultName">
+				<soap:fault name="FaultName" use="literal"/>
+			</fault>
+		</operation>
+		<!-- ====NeTEx services ===== -->
+		<operation name="GetNetex">
+			<soap:operation soapAction="GetNetexService"/>
+			<input>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://wsdl.netex.org.uk/netex"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="NetexProducerDocServices">
+		<port name="SiriWSPort" binding="netexWs:NetexProducerDocBinding">
+			<soap:address location="http://www.netex-service-location.com"/>
+		</port>
+	</service>
+</definitions>

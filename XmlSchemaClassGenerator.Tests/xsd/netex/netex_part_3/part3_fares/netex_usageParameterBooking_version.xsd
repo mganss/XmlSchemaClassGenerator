@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2008 (http://www.altova.com) by Nicholas Knowles Knowles (Kizoom Ltd) -->
-<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.1" id="netex_usageParameterBooking_version">
+<xsd:schema xmlns="http://www.netex.org.uk/netex" xmlns:netex="http://www.netex.org.uk/netex" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://www.netex.org.uk/netex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0" id="netex_usageParameterBooking_version">
 	<xsd:include schemaLocation="netex_usageParameterBooking_support.xsd"/>
 	<xsd:include schemaLocation="../../netex_framework/netex_reusableComponents/netex_vehicleSeating_support.xsd"/>
 	<xsd:include schemaLocation="netex_timeStructureFactor_support.xsd"/>
@@ -15,22 +14,24 @@
 				<Contributor>V1.0 Christophe Duquesne</Contributor>
 				<Contributor>Nicholas Knowles</Contributor>
 				<Coverage>Europe</Coverage>
-				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.  mailto:schemer@netex.org.uk</Creator>
+				<Creator>First drafted for NeTEx version 1.0 CEN TC278 WG3 SG9 Editor Nicholas Knowles.</Creator>
 				<Date>
 					<Created>2013-04-14</Created>
 				</Date>
-				<Date>
-					<Modified>2011-02-05</Modified> Name Space changes
+				<Date><Modified>2011-02-05</Modified> Name Space changes
 				</Date>
-				<Date>
-					<Modified>2019-03-11</Modified>EURA-76 Add IsFeeRefundable attribute to Reserving .
+				<Date><Modified>2019-03-11</Modified>EURA-76 Add IsFeeRefundable attribute to Reserving .
 				</Date>
-				<Date>
-					<Modified>2019-03-12</Modified>Norway 100 Add Reservation type with valies autoAssigned, seatMap  and openSeating.
+				<Date><Modified>2019-03-12</Modified>Norway 100 Add Reservation type with valies autoAssigned, seatMap  and openSeating.
 				</Date>
-				<Date>
-					<Modified>2019-03-14</Modified>Eura-50  *FARES* Add new PurchaseAction attribute to  PurchaseWindow    with values purchase,  reserve,  orderWithoutPaying,  payForPreviousOrder, other   
+				<Date><Modified>2019-03-14</Modified>Eura-50  *FARES* Add new PurchaseAction attribute to  PurchaseWindow    with values purchase,  reserve,  orderWithoutPaying,  payForPreviousOrder, other   
 			      * Also add ReservationExpiryPeriod
+				</Date>
+				<Date><Modified>2020-10-07</Modified>NewModes Factor out Booking Policy and add further attribute
+					   Canncellation: CancellationALlowed
+					   Reservation: MinimumResrevationDUration MaximumReservationDuration
+				</Date>
+				<Date><Modified>2023-12-18</Modified>FIX: Correct the  documentatiion on #525 implementation of BOOKING ARRANGEMENT and SERVICE BOOKING ARRANGEMENT.
 				</Date>
 				<Description>
 					<p>NeTEx is a European CEN standard for the exchange of Public Transport data including timetables.</p>
@@ -48,14 +49,14 @@
 					<Requires>http://www.netex.org.uk/schemas/1.0/PATH/netex_prereqfile.xsd</Requires>
 				</Relation>
 				<Rights>Unclassified
-					 <Copyright>CEN, Crown Copyright 2009-2019</Copyright>
+					 <Copyright>CEN, Crown Copyright 2009-2023</Copyright>
 				</Rights>
 				<Source>
 					<ul>
 						<li>Derived from the Transmodel, VDV, TransXChange, NEPTUNE, BISON and Trident standards.</li>
 					</ul>
 				</Source>
-				<Status>Version 1.0 Draft for approval</Status>
+				<Status>Version 1.0</Status>
 				<Subject>
 					<Category>Arts, recreation and travel, Tourism, Travel (tourism), Transport,
 Air transport, Airports,
@@ -71,10 +72,10 @@ Rail transport, Roads and Road transport
 				<Type>Standard</Type>
 			</Metadata>
 		</xsd:appinfo>
-		<xsd:documentation>NeTEX: Booking USAGE PARAMETER  types.</xsd:documentation>
+		<xsd:documentation>NeTEX: Booking USAGE PARAMETER types.</xsd:documentation>
 	</xsd:annotation>
 	<!-- ====  PURCHASE  WINDOW================================================ -->
-	<xsd:element name="PurchaseWindow" abstract="false" substitutionGroup="UsageParameter_">
+	<xsd:element name="PurchaseWindow" substitutionGroup="UsageParameter_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The number and characteristics of persons entitled to use the public transport service instead of the original customer.</xsd:documentation>
 		</xsd:annotation>
@@ -98,7 +99,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="PurchaseWindowGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="PurchaseWindowIdType"/>
+					<xsd:attribute name="id" type="PurchaseWindowIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -122,8 +123,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="PurchaseAction" type="PurchaseActionEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Action governed by Purchase Window. default is purchase. See allowed values.+v1.1
-</xsd:documentation>
+					<xsd:documentation>Action governed by Purchase Window. default is purchase. See allowed values.+v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="PurchaseWhen" type="PurchaseWhenEnumeration" default="advanceAndDayOfTravel" minOccurs="0">
@@ -133,7 +133,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="LatestTime" type="xsd:time" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Latest time on specified last day when ticket  can be purchased.</xsd:documentation>
+					<xsd:documentation>Latest time on specified last day when ticket can be purchased.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="MinimumPeriodBeforeDeparture" type="xsd:duration" minOccurs="0">
@@ -158,13 +158,67 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="PurchaseMoment" type="PurchaseMomentListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Permitted  moments of purchase. See allowed values +v1.1 </xsd:documentation>
+					<xsd:documentation>Permitted moments of purchase. See allowed values +v1.1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- ====BOOKING POLICY=================================================== -->
+	<xsd:element name="BookingPolicy" abstract="true" substitutionGroup="UsageParameter_Dummy">
+		<xsd:annotation>
+			<xsd:documentation>The number and characteristics of persons entitled to use the public transport service instead of the original customer. +v1.2.2</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:restriction base="BookingPolicy_VersionStructure">
+					<xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="EntityInVersionGroup" minOccurs="0"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="DataManagedObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="PriceableObjectGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="UsageParameterGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
+							<xsd:group ref="BookingPolicyGroup"/>
+						</xsd:sequence>
+					</xsd:sequence>
+					<xsd:attribute name="id" type="BookingPolicyIdType" use="required"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="BookingPolicy_VersionStructure">
+		<xsd:annotation>
+			<xsd:documentation>Type for BOOKING POLICY.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="UsageParameter_VersionStructure">
+				<xsd:sequence>
+					<xsd:group ref="BookingPolicyGroup"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:group name="BookingPolicyGroup">
+		<xsd:annotation>
+			<xsd:documentation>Elements for BOOKING POLICY Group.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="BookingMethods" type="BookingMethodListOfEnumerations" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Booking methods allowed. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====RESERVING=================================================== -->
-	<xsd:element name="Reserving" abstract="false" substitutionGroup="UsageParameter_">
+	<xsd:element name="Reserving" substitutionGroup="UsageParameter_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The number and characteristics of persons entitled to use the public transport service instead of the original customer.</xsd:documentation>
 		</xsd:annotation>
@@ -185,10 +239,13 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="UsageParameterGroup"/>
 						</xsd:sequence>
 						<xsd:sequence>
+							<xsd:group ref="BookingPolicyGroup"/>
+						</xsd:sequence>
+						<xsd:sequence>
 							<xsd:group ref="ReservingGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="ReservingIdType"/>
+					<xsd:attribute name="id" type="ReservingIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -198,7 +255,7 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Type for RESERVING.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexContent>
-			<xsd:extension base="UsageParameter_VersionStructure">
+			<xsd:extension base="BookingPolicy_VersionStructure">
 				<xsd:sequence>
 					<xsd:group ref="ReservingGroup"/>
 				</xsd:sequence>
@@ -212,7 +269,7 @@ Rail transport, Roads and Road transport
 		<xsd:sequence>
 			<xsd:element name="ReservingRequirements" type="ServiceReservationFacilityListOfEnumerations" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Nature of resrevation requried.</xsd:documentation>
+					<xsd:documentation>Nature of resrevation required.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="MinimumNumberToReserve" type="NumberOfPassengers" minOccurs="0">
@@ -231,11 +288,18 @@ Rail transport, Roads and Road transport
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:group ref="ReservingCalculationGroup"/>
-			<xsd:element name="BookingArrangements" type="BookingArrangementsStructure" minOccurs="0">
-				<xsd:annotation>
-					<xsd:documentation>Booking Arrangements for Reservations.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice>
+				<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Set of possible Booking Arrangements for Reservations +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="BookingArrangements" type="BookingArrangementsStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Booking Arrangements for Reservations. DEPRECATED: use bookingArrangements</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
 			<xsd:element name="SeatAllocationMethod" type="SeatAllocationMethodEnumeration" minOccurs="0">
 				<xsd:annotation>
 					<xsd:documentation>Method of Seat allocation that is used. +V1.1</xsd:documentation>
@@ -243,7 +307,7 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="ReservationExpiryPeriod" type="xsd:duration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Period after which reservation without  payment  will expire if not  paid for.  +v1.1</xsd:documentation>
+					<xsd:documentation>Period after which reservation without payment will expire if not paid for. +v1.1</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
@@ -260,17 +324,17 @@ Rail transport, Roads and Road transport
 			</xsd:element>
 			<xsd:element name="FeeBasis" type="PerBasisEnumeration" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether there is  a fee for reselling.</xsd:documentation>
+					<xsd:documentation>Whether there is a fee for reselling.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="HasFreeConnectingReservations" type="xsd:boolean" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether there is an additional  fee for connecting reservations.</xsd:documentation>
+					<xsd:documentation>Whether there is an additional fee for connecting reservations.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="NumberOfFreeConnectingReservations" type="xsd:integer" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Whether there is an additional  fee for connecting reservations.</xsd:documentation>
+					<xsd:documentation>Whether there is an additional fee for connecting reservations.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 			<xsd:element name="IsFeeRefundable" type="xsd:boolean" default="false" minOccurs="0">
@@ -281,7 +345,7 @@ Rail transport, Roads and Road transport
 		</xsd:sequence>
 	</xsd:group>
 	<!-- ====RESERVING=================================================== -->
-	<xsd:element name="Cancelling" abstract="false" substitutionGroup="UsageParameter_">
+	<xsd:element name="Cancelling" substitutionGroup="UsageParameter_Dummy">
 		<xsd:annotation>
 			<xsd:documentation>The number and characteristics of persons entitled to use the public transport service instead of the original customer.</xsd:documentation>
 		</xsd:annotation>
@@ -305,7 +369,7 @@ Rail transport, Roads and Road transport
 							<xsd:group ref="CancellingGroup"/>
 						</xsd:sequence>
 					</xsd:sequence>
-					<xsd:attribute name="id" type="CancellingIdType"/>
+					<xsd:attribute name="id" type="CancellingIdType" use="required"/>
 				</xsd:restriction>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -327,9 +391,26 @@ Rail transport, Roads and Road transport
 			<xsd:documentation>Elements for CANCELLING Group.</xsd:documentation>
 		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="BookingArrangements" type="BookingArrangementsStructure" minOccurs="0">
+			<xsd:choice>
+				<xsd:element name="bookingArrangements" type="bookingArrangements_RelStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Set of possible Booking Arrangements for Cancellations. +v2.0</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="BookingArrangements" type="BookingArrangementsStructure" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Booking Arrangements for Cancellations. DEPRECATED: use bookingArrangements</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:element name="CancellationAllowed" type="xsd:boolean" default="true" minOccurs="0">
 				<xsd:annotation>
-					<xsd:documentation>Booking Arrangements for Cancellations.</xsd:documentation>
+					<xsd:documentation>Whether Cancellation is allowed. +v1.2.2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="BookingDepositRefundable" type="xsd:boolean" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Whether a booking deposit is refunded on cancellation. +v1.2.2</xsd:documentation>
 				</xsd:annotation>
 			</xsd:element>
 		</xsd:sequence>
