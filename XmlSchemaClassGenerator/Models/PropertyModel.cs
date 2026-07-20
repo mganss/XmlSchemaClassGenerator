@@ -155,15 +155,28 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
 
         AddDescription(member.CustomAttributes, docs);
 
-        if (PropertyType is SimpleModel simpleType && !IsEnumerable)
+        if (PropertyType is SimpleModel simpleType)
         {
-            docs.AddRange(simpleType.Documentation);
-            docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
-            member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
+            if (!IsEnumerable)
+            {
+                docs.AddRange(simpleType.Documentation);
+                docs.AddRange(simpleType.Restrictions.Select(r => new DocumentationModel { Language = English, Text = r.Description }));
+                member.CustomAttributes.AddRange(simpleType.GetRestrictionAttributes().ToArray());
+            }
+            else if (simpleType.GetCollectionItemStringLengthAttribute() is { } collectionAttribute)
+            {
+                member.CustomAttributes.Add(collectionAttribute);
+                docs.AddRange(simpleType.Restrictions
+                    .Where(r => r is MinLengthRestrictionModel or MaxLengthRestrictionModel or MinMaxLengthRestrictionModel)
+                    .Select(r => new DocumentationModel { Language = English, Text = r.Description }));
+            }
         }
 
         member.Comments.AddRange(GetComments(docs).ToArray());
     }
+
+    internal bool HasCollectionItemStringLengthAttribute
+        => IsEnumerable && PropertyType is SimpleModel simpleType && simpleType.GetCollectionItemStringLengthAttribute() != null;
 
     private CodeAttributeDeclaration CreateDefaultValueAttribute(CodeTypeReference typeReference, CodeExpression defaultValueExpression)
     {

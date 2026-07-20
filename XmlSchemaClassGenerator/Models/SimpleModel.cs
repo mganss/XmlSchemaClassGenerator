@@ -203,4 +203,29 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
             yield return rangeAttribute;
         }
     }
+
+    public CodeAttributeDeclaration GetCollectionItemStringLengthAttribute()
+    {
+        if (!Configuration.EmitMetadataAttributes)
+            return null;
+
+        var minMax = Restrictions.OfType<MinMaxLengthRestrictionModel>().FirstOrDefault();
+        var minLength = Restrictions.OfType<MinLengthRestrictionModel>().FirstOrDefault();
+        var maxLength = Restrictions.OfType<MaxLengthRestrictionModel>().FirstOrDefault();
+
+        var min = minMax?.Min ?? minLength?.Value ?? 0;
+        var max = minMax?.Max ?? maxLength?.Value ?? 0;
+
+        if (min <= 0 && max <= 0)
+            return null;
+
+        var attribute = new CodeAttributeDeclaration(
+            CodeUtilities.CreateTypeReference(Attributes.CollectionItemStringLength(Configuration.MetadataNamespace), Configuration),
+            new CodeAttributeArgument(max > 0 ? new CodePrimitiveExpression(max) : new CodeSnippetExpression("int.MaxValue")));
+
+        if (min > 0)
+            attribute.Arguments.Add(new CodeAttributeArgument("MinimumLength", new CodePrimitiveExpression(min)));
+
+        return attribute;
+    }
 }

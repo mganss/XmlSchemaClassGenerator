@@ -71,8 +71,77 @@ public class MetadataHelperEmitterTests
         var emitterType = typeof(Generator).Assembly.GetType("XmlSchemaClassGenerator.Metadata.MetadataHelperEmitter", throwOnError: true);
         var emitter = Activator.CreateInstance(emitterType, configuration);
         Assert.NotNull(emitter);
-        
+
         var method = emitterType.GetMethod("EnsureFractionDigitsAttributeEmitted", BindingFlags.Instance | BindingFlags.Public);
+        Assert.NotNull(method);
+
+        method.Invoke(emitter, [codeNamespaces]);
+    }
+
+    [Fact]
+    public void EnsureCollectionItemStringLengthAttributeEmitted_AddsType_WhenNamespaceAlreadyExistsAndTypeIsMissing()
+    {
+        var configuration = new GeneratorConfiguration
+        {
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+        };
+
+        var metadataNamespace = new CodeNamespace("Shared.Metadata");
+        var codeNamespaces = new List<CodeNamespace> { metadataNamespace };
+
+        EnsureCollectionItemStringLengthAttributeEmitted(configuration, codeNamespaces);
+
+        Assert.Single(metadataNamespace.Types.OfType<CodeTypeDeclaration>(), t => t.Name == "CollectionItemStringLengthAttribute");
+    }
+
+    [Fact]
+    public void EnsureCollectionItemStringLengthAttributeEmitted_DoesNotDuplicateType_WhenTypeAlreadyExists()
+    {
+        var configuration = new GeneratorConfiguration
+        {
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+        };
+
+        var metadataNamespace = new CodeNamespace("Shared.Metadata");
+        metadataNamespace.Types.Add(new CodeTypeDeclaration("CollectionItemStringLengthAttribute"));
+        var codeNamespaces = new List<CodeNamespace> { metadataNamespace };
+
+        EnsureCollectionItemStringLengthAttributeEmitted(configuration, codeNamespaces);
+
+        Assert.Single(metadataNamespace.Types.OfType<CodeTypeDeclaration>(), t => t.Name == "CollectionItemStringLengthAttribute");
+    }
+
+    [Fact]
+    public void EnsureCollectionItemStringLengthAttributeEmitted_AddsConfiguredImports_WhenCreatingMetadataNamespace()
+    {
+        var configuration = new GeneratorConfiguration
+        {
+            EmitMetadataAttributes = true,
+            MetadataNamespace = "Shared.Metadata",
+            CompactTypeNames = true,
+            DataAnnotationMode = DataAnnotationMode.All,
+        };
+
+        var codeNamespaces = new List<CodeNamespace>();
+
+        EnsureCollectionItemStringLengthAttributeEmitted(configuration, codeNamespaces);
+
+        var metadataNamespace = Assert.Single(codeNamespaces);
+        var imports = metadataNamespace.Imports.Cast<CodeNamespaceImport>().Select(i => i.Namespace).ToList();
+
+        Assert.Contains("System", imports);
+        Assert.Contains("System.ComponentModel.DataAnnotations", imports);
+    }
+
+    private static void EnsureCollectionItemStringLengthAttributeEmitted(GeneratorConfiguration configuration, ICollection<CodeNamespace> codeNamespaces)
+    {
+        var emitterType = typeof(Generator).Assembly.GetType("XmlSchemaClassGenerator.Metadata.MetadataHelperEmitter", throwOnError: true);
+        var emitter = Activator.CreateInstance(emitterType, configuration);
+        Assert.NotNull(emitter);
+
+        var method = emitterType.GetMethod("EnsureCollectionItemStringLengthAttributeEmitted", BindingFlags.Instance | BindingFlags.Public);
         Assert.NotNull(method);
 
         method.Invoke(emitter, [codeNamespaces]);

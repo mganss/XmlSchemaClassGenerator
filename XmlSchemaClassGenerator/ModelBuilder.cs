@@ -1252,6 +1252,12 @@ internal class ModelBuilder
             metadataHelperEmitter.EnsureFractionDigitsAttributeEmitted(codeNamespaces);
         }
 
+        if (HasSupportedCollectionItemStringLengthRestrictions())
+        {
+            var metadataHelperEmitter = new MetadataHelperEmitter(_configuration);
+            metadataHelperEmitter.EnsureCollectionItemStringLengthAttributeEmitted(codeNamespaces);
+        }
+
         return codeNamespaces;
     }
 
@@ -1259,6 +1265,12 @@ internal class ModelBuilder
         => Types.Values
             .OfType<SimpleModel>()
             .Any(model => model.Restrictions.OfType<FractionDigitsRestrictionModel>().Any(restriction => restriction.IsSupported));
+
+    private bool HasSupportedCollectionItemStringLengthRestrictions()
+        => Types.Values
+            .OfType<ReferenceTypeModel>()
+            .SelectMany(model => model.Properties)
+            .Any(property => property.HasCollectionItemStringLengthAttribute);
 
     private string BuildNamespace(Uri source, string xmlNamespace)
     {
