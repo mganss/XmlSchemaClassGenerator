@@ -714,7 +714,12 @@ internal class ModelBuilder
             // if EnumCollection flag is enabled and the simpleType is a list, check if the item type is an enum and
             // set the model's ListItemType to that enum, so that the generated collection can be of the enum type instead of string
             TypeModel enumListItemTypeModel = null;
-            var itemTypeModel = builder.CreateTypeModel(listItemType.QualifiedName, listItemType);
+            var listItemTypeQualifiedName = listItemType.QualifiedName;
+            if (listItemTypeQualifiedName.IsEmpty)
+            {
+                listItemTypeQualifiedName = new XmlQualifiedName(qualifiedName.Name + "List", qualifiedName.Namespace);
+            }
+            var itemTypeModel = builder.CreateTypeModel(listItemTypeQualifiedName, listItemType);
             if (itemTypeModel is EnumModel)
             {
                 enumListItemTypeModel = itemTypeModel;
