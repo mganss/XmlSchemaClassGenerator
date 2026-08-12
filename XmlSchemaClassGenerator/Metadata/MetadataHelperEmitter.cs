@@ -53,6 +53,9 @@ internal sealed class MetadataHelperEmitter
         return codeNamespace;
     }
 
+    private const string FractionDigitsParameterName = "fractionDigits";
+    private const string MaximumLengthParameterName = "maximumLength";
+
     private CodeTypeDeclaration CreateFractionDigitsAttributeType()
     {
         var attribute = CreateAttributeTypeShell(Attributes.FractionDigitsAttributeName);
@@ -66,13 +69,13 @@ internal sealed class MetadataHelperEmitter
         {
             Attributes = MemberAttributes.Public,
         };
-        constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "fractionDigits"));
+        constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), FractionDigitsParameterName));
         constructor.Statements.Add(new CodeConditionStatement(
-            new CodeBinaryOperatorExpression(new CodeArgumentReferenceExpression("fractionDigits"), CodeBinaryOperatorType.LessThan, new CodePrimitiveExpression(0)),
-            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(typeof(ArgumentOutOfRangeException), new CodePrimitiveExpression("fractionDigits")))));
+            new CodeBinaryOperatorExpression(new CodeArgumentReferenceExpression(FractionDigitsParameterName), CodeBinaryOperatorType.LessThan, new CodePrimitiveExpression(0)),
+            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(typeof(ArgumentOutOfRangeException), new CodePrimitiveExpression(FractionDigitsParameterName)))));
         constructor.Statements.Add(new CodeAssignStatement(
             new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_fractionDigits"),
-            new CodeArgumentReferenceExpression("fractionDigits")));
+            new CodeArgumentReferenceExpression(FractionDigitsParameterName)));
         attribute.Members.Add(constructor);
 
         var valueProperty = new CodeMemberProperty
@@ -106,13 +109,13 @@ internal sealed class MetadataHelperEmitter
         {
             Attributes = MemberAttributes.Public,
         };
-        constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "maximumLength"));
+        constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), MaximumLengthParameterName));
         constructor.Statements.Add(new CodeConditionStatement(
-            new CodeBinaryOperatorExpression(new CodeArgumentReferenceExpression("maximumLength"), CodeBinaryOperatorType.LessThan, new CodePrimitiveExpression(0)),
-            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(typeof(ArgumentOutOfRangeException), new CodePrimitiveExpression("maximumLength")))));
+            new CodeBinaryOperatorExpression(new CodeArgumentReferenceExpression(MaximumLengthParameterName), CodeBinaryOperatorType.LessThan, new CodePrimitiveExpression(0)),
+            new CodeThrowExceptionStatement(new CodeObjectCreateExpression(typeof(ArgumentOutOfRangeException), new CodePrimitiveExpression(MaximumLengthParameterName)))));
         constructor.Statements.Add(new CodeAssignStatement(
             new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_maximumLength"),
-            new CodeArgumentReferenceExpression("maximumLength")));
+            new CodeArgumentReferenceExpression(MaximumLengthParameterName)));
         attribute.Members.Add(constructor);
 
         var maximumLengthProperty = new CodeMemberProperty

@@ -491,18 +491,16 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
         var attributes = GetAttributes(isArray).ToArray();
         member.CustomAttributes.AddRange(attributes);
 
-        if (!IsPrimitiveType && !IsAny && !Configuration.SeparateSubstitutes && Substitutes.Count > 0)
-        {
-            // A flattened substitution group maps several elements with different CLR types onto one
-            // member. In valid XSD every substitute derives from the head element's type, but NeTEx (and
-            // others) contain substitutes whose CLR type is unrelated to the head's. When any element
-            // type is not assignable to the member type, XmlSerializer can only hold them all if the
-            // member is typed as object (as xsd.exe does for a choice). Collection members are already
-            // generated with an object item type where needed, and retyping them here would break the
-            // backing field / initializer, so this only applies to single-valued members.
-            if (!isEnumerable && Substitutes.Any(sub => !IsAssignableTo(sub.Type, Type)))
-                RetypeChoiceMemberAsObject(member);
-        }
+        // A flattened substitution group maps several elements with different CLR types onto one
+        // member. In valid XSD every substitute derives from the head element's type, but NeTEx (and
+        // others) contain substitutes whose CLR type is unrelated to the head's. When any element
+        // type is not assignable to the member type, XmlSerializer can only hold them all if the
+        // member is typed as object (as xsd.exe does for a choice). Collection members are already
+        // generated with an object item type where needed, and retyping them here would break the
+        // backing field / initializer, so this only applies to single-valued members.
+        if (!IsPrimitiveType && !IsAny && !Configuration.SeparateSubstitutes && Substitutes.Count > 0
+            && !isEnumerable && Substitutes.Any(sub => !IsAssignableTo(sub.Type, Type)))
+            RetypeChoiceMemberAsObject(member);
 
         // initialize List<>
         if (isEnumerable && (Configuration.CollectionSettersMode != CollectionSettersMode.PublicWithoutConstructorInitialization)

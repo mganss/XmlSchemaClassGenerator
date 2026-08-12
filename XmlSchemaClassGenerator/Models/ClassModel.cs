@@ -122,10 +122,7 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                     var ignoreAttribute = AttributeDecl<XmlIgnoreAttribute>();
                     enumValueProperty.CustomAttributes.Add(ignoreAttribute);
 
-                    // Getter: Try to parse the Value property to enum
-                    // if (System.Enum.TryParse<EnumType>(this.Value, true, out result))
-                    //     return result;
-                    // return null;
+                    // Getter: Try to parse the Value property to enum, returning null if that fails.
                     //
                     // CodeMethodReferenceExpression accepts type parameters, which causes the C# code
                     // provider to emit the generic Enum.TryParse<T> form. This is available since
@@ -157,8 +154,7 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                     enumValueProperty.GetStatements.Add(ifTryParse);
                     enumValueProperty.GetStatements.Add(new CodeMethodReturnStatement(new CodePrimitiveExpression(null)));
 
-                    // Setter: Value = value?.ToString();
-                    // Since CodeDOM doesn't support null-conditional operator, we need to check and set
+                    // Setter: Value = value?.ToString(); (equivalent to, since CodeDOM has no null-conditional operator)
                     var valueNotNull = new CodeBinaryOperatorExpression(
                         new CodePropertySetValueReferenceExpression(),
                         CodeBinaryOperatorType.IdentityInequality,
@@ -181,8 +177,8 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                     enumValueProperty.SetStatements.Add(
                         new CodeConditionStatement(
                             valueNotNull,
-                            new CodeStatement[] { setToString },
-                            new CodeStatement[] { setToNull }));
+                            [setToString],
+                            [setToNull]));
 
                     var docs = new List<DocumentationModel> {
                         new() { Language = English, Text = "Gets or sets the typed value of the text content." },
@@ -351,14 +347,14 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
 
         if (rootClass is SimpleModel || rootClass is EnumModel || IsMixed)
         {
+            // Explicitly typed as CodeExpression[] (rather than an inline array literal argument) so the
+            // call unambiguously binds to the CodeArrayCreateExpression(Type, CodeExpression[]) initializers
+            // overload instead of the single-CodeExpression CodeArrayCreateExpression(Type, CodeExpression size) overload.
+            CodeExpression[] mixedDefaultInitializers = [new CodePrimitiveExpression(defaultString)];
+
             var defaultVal = IsMixed switch
             {
-                true => new CodeArrayCreateExpression(
-                    typeof(string),
-                    [
-                        new CodePrimitiveExpression(defaultString)
-                    ]
-                ),
+                true => new CodeArrayCreateExpression(typeof(string), mixedDefaultInitializers),
                 _ => rootClass.GetDefaultValueFor(defaultString, attribute)
             };
             var val = GenerateCSharpCodeFromExpression(defaultVal);

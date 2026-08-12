@@ -309,10 +309,9 @@ internal class ModelBuilder
 
         if (imports.Any())
         {
-            foreach (var importSchema in imports.Select(i => i.Schema))
+            foreach (var importSchema in imports.Select(i => i.Schema).Where(importSchema => importSchema != null))
             {
-                if (importSchema != null)
-                    ResolveDependencies(importSchema, dependencyOrder, seenSchemas);
+                ResolveDependencies(importSchema, dependencyOrder, seenSchemas);
             }
         }
 
@@ -896,6 +895,47 @@ internal class ModelBuilder
                 .Select(a => (InterfaceModel)builder.CreateTypeModel(a.RefName, builder.AttributeGroups[a.RefName].First()));
             refTypeModel.AddInterfaces(interfaces);
         }
+
+        /// <summary>
+        /// <para>
+        /// Follows the <see cref="XmlSchemaSimpleType.BaseXmlSchemaType"/> chain to find the item type
+        /// of an <c>xs:list</c>. Returns <c>null</c> if no list content is found.
+        /// </para>
+        /// <para>
+        /// Direct — the simpleType's Content is the list itself, matched on the first iteration:
+        /// <code>
+        ///   &lt;xs:simpleType&gt;
+        ///     &lt;xs:list itemType="my:enumType" /&gt;
+        ///   &lt;/xs:simpleType&gt;
+        /// </code>
+        /// </para>
+        /// <para>
+        /// Wrapped — the simpleType's Content is a restriction.
+        /// The restriction's <see cref="XmlSchemaSimpleType.BaseXmlSchemaType"/> points to an
+        /// anonymous inner simpleType whose Content is the list, reached on the second iteration:
+        /// <code>
+        ///   &lt;xs:simpleType&gt;
+        ///     &lt;xs:restriction&gt;
+        ///       &lt;xs:simpleType&gt;&lt;xs:list itemType="my:enumType" /&gt;&lt;/xs:simpleType&gt;
+        ///       &lt;xs:minLength value="1" /&gt;
+        ///     &lt;/xs:restriction&gt;
+        ///   &lt;/xs:simpleType&gt;
+        /// </code>
+        /// </para>
+        /// </summary>
+        /// <param name="type">The simple type to inspect.</param>
+        /// <returns>The resolved item type of the list, or <c>null</c> if no list content was found.</returns>
+        private static XmlSchemaSimpleType FindListItemType(XmlSchemaSimpleType type)
+        {
+            for (var current = type; current != null; current = current.BaseXmlSchemaType as XmlSchemaSimpleType)
+            {
+                if (current.Content is XmlSchemaSimpleTypeList list)
+                {
+                    return list.BaseItemType ?? list.ItemType;
+                }
+            }
+            return null;
+        }
     }
 
     private IEnumerable<PropertyModel> CreatePropertiesForAttributes(Uri source, TypeModel owningTypeModel, IEnumerable<XmlSchemaObject> items)
@@ -1285,44 +1325,4 @@ internal class ModelBuilder
             : throw new ArgumentException(string.Format("Namespace {0} not provided through map or generator.", xmlNamespace));
     }
 
-    /// <summary>
-    /// <para>
-    /// Follows the <see cref="XmlSchemaSimpleType.BaseXmlSchemaType"/> chain to find the item type
-    /// of an <c>xs:list</c>. Returns <c>null</c> if no list content is found.
-    /// </para>
-    /// <para>
-    /// Direct — the simpleType's Content is the list itself, matched on the first iteration:
-    /// <code>
-    ///   &lt;xs:simpleType&gt;
-    ///     &lt;xs:list itemType="my:enumType" /&gt;
-    ///   &lt;/xs:simpleType&gt;
-    /// </code>
-    /// </para>
-    /// <para>
-    /// Wrapped — the simpleType's Content is a restriction.
-    /// The restriction's <see cref="XmlSchemaSimpleType.BaseXmlSchemaType"/> points to an
-    /// anonymous inner simpleType whose Content is the list, reached on the second iteration:
-    /// <code>
-    ///   &lt;xs:simpleType&gt;
-    ///     &lt;xs:restriction&gt;
-    ///       &lt;xs:simpleType&gt;&lt;xs:list itemType="my:enumType" /&gt;&lt;/xs:simpleType&gt;
-    ///       &lt;xs:minLength value="1" /&gt;
-    ///     &lt;/xs:restriction&gt;
-    ///   &lt;/xs:simpleType&gt;
-    /// </code>
-    /// </para>
-    /// </summary>
-    /// <param name="type">The simple type to inspect.</param>
-    /// <returns>The resolved item type of the list, or <c>null</c> if no list content was found.</returns>
-    private static XmlSchemaSimpleType FindListItemType(XmlSchemaSimpleType type)
-    {
-        for (var current = type; current != null; current = current.BaseXmlSchemaType as XmlSchemaSimpleType)
-        {
-            if (current.Content is XmlSchemaSimpleTypeList list)
-            {
-                return list.BaseItemType ?? list.ItemType;
-            }
-        }
-        return null;
-    }
 }
