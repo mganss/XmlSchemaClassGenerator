@@ -18,6 +18,12 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
     public bool IsSubstitution { get; set; }
     public TypeModel BaseClass { get; set; }
     public TypeModel TextValueType { get; set; }
+
+    /// <summary>
+    /// Default for the text value of a simple-content class, taken from the default of the
+    /// (only) element that uses this anonymous type.
+    /// </summary>
+    public string TextValueDefault { get; set; }
     public List<ClassModel> DerivedTypes { get; set; } = [];
     public override bool IsSubtype => BaseClass != null;
 
@@ -199,12 +205,15 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
                 var enableDataBinding = Configuration.EnableDataBinding;
                 var typeReference = BaseClass.GetReferenceFor(Namespace);
 
+                var textDefaultExpression = TextValueDefault != null ? BaseClass.GetDefaultValueFor(TextValueDefault, false) : null;
+
                 CodeMemberField backingFieldMember = null;
-                if (enableDataBinding)
+                if (enableDataBinding || textDefaultExpression != null)
                 {
                     backingFieldMember = new CodeMemberField(typeReference, textName.ToBackingField(Configuration.PrivateMemberPrefix))
                     {
-                        Attributes = MemberAttributes.Private
+                        Attributes = MemberAttributes.Private,
+                        InitExpression = textDefaultExpression
                     };
                     classDeclaration.Members.Add(backingFieldMember);
                 }
@@ -221,6 +230,14 @@ public class ClassModel(GeneratorConfiguration configuration) : ReferenceTypeMod
 
                 var attribute = AttributeDecl<XmlTextAttribute>();
                 var valuePropertyModel = new PropertyModel(Configuration, textName, BaseClass, this);
+
+                if (textDefaultExpression != null)
+                {
+                    valuePropertyModel.SetDefaultValue(TextValueDefault);
+
+                    if (textDefaultExpression is CodePrimitiveExpression or CodeFieldReferenceExpression)
+                        text.CustomAttributes.Add(valuePropertyModel.CreateDefaultValueAttribute(typeReference, textDefaultExpression));
+                }
 
                 if (BaseClass is SimpleModel simpleModel)
                 {

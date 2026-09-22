@@ -178,7 +178,9 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
     internal bool HasCollectionItemStringLengthAttribute
         => IsEnumerable && PropertyType is SimpleModel simpleType && simpleType.GetCollectionItemStringLengthAttribute() != null;
 
-    private CodeAttributeDeclaration CreateDefaultValueAttribute(CodeTypeReference typeReference, CodeExpression defaultValueExpression)
+    internal void SetDefaultValue(string defaultValue) => DefaultValue = defaultValue;
+
+    internal CodeAttributeDeclaration CreateDefaultValueAttribute(CodeTypeReference typeReference, CodeExpression defaultValueExpression)
     {
         var defaultValueAttribute = AttributeDecl<DefaultValueAttribute>();
 

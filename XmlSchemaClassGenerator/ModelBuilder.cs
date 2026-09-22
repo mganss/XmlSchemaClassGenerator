@@ -1186,6 +1186,16 @@ internal class ModelBuilder
         property.SetFromNode(originalName, isRequired, element);
         property.SetSchemaNameAndNamespace(owningTypeModel, effectiveElement);
 
+        // The default of an optional element with simple content applies to its text value, not to the element:
+        // move it there so the element stays null when absent. Only possible if the anonymous type belongs to this element alone.
+        if (!isRequired && substitute == null && property.DefaultValue != null
+            && typeModel is ClassModel { IsAnonymous: true, IsMixed: false, DerivedTypes.Count: 0, BaseClass: not null and not ClassModel } textClass
+            && !string.IsNullOrEmpty(_configuration.TextValuePropertyName))
+        {
+            textClass.TextValueDefault = property.DefaultValue;
+            property.SetDefaultValue(null);
+        }
+
         if (property.IsArray && !_configuration.GenerateComplexTypesForCollections)
             property.Type.Namespace.Types.Remove(property.Type.Name);
 
