@@ -388,6 +388,15 @@ public class Generator
     }
 
     /// <summary>
+    /// Generate xsd.exe-style Item and ItemElementName properties for choice elements.
+    /// </summary>
+    public bool GenerateChoiceItemProperty
+    {
+        get { return _configuration.GenerateChoiceItemProperty; }
+        set { _configuration.GenerateChoiceItemProperty = value; }
+    }
+
+    /// <summary>
     /// Namespace where generated metadata helper attributes are emitted.
     /// </summary>
     public string MetadataNamespace

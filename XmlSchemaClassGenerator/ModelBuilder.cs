@@ -1090,6 +1090,9 @@ internal class ModelBuilder
 
                     properties.AddRange(groupProperties);
                     break;
+                case XmlSchemaChoice choice when _configuration.GenerateChoiceItemProperty:
+                  property = CreateChoiceItemProperty(owningTypeModel, particle, item, choice);
+                  break;
             }
 
             // Discard duplicate property names. This is most likely due to:
@@ -1156,6 +1159,38 @@ internal class ModelBuilder
         }
         return false;
     }
+
+    private PropertyModel CreateChoiceItemProperty(TypeModel owningTypeModel, Particle particle, Particle item, XmlSchemaChoice choice)
+    {
+        if (owningTypeModel is not ClassModel)
+            return null;
+
+        var valueType = new SimpleModel(_configuration)
+        {
+            ValueType = typeof(object),
+            UseDataTypeAttribute = false
+        };
+
+        var choiceProperty = new PropertyModel(_configuration, "Item", valueType, owningTypeModel);
+
+        choiceProperty.SetFromParticles(particle, item, false);
+        
+        if (choiceProperty.IsCollection)
+            choiceProperty.Name = "Items";
+        
+        choiceProperty.Documentation.AddRange(GetDocumentation(choice));
+
+        foreach (var element in choice.Items.OfType<XmlSchemaElement>())
+        {
+            if (element.ElementSchemaType == null)
+                continue;
+
+            var typeModel = CreateTypeModel(GetQualifiedName(owningTypeModel, choice, element), element.ElementSchemaType);
+            choiceProperty.ChoiceItems.Add((element.QualifiedName.Name, typeModel));
+        }
+
+        return choiceProperty;
+    }  
 
     private PropertyModel PropertyFromElement(TypeModel owningTypeModel, XmlSchemaElementEx element, Particle particle, Particle item, Substitute substitute,
         IList<PropertyModel> properties)
@@ -1276,6 +1311,8 @@ internal class ModelBuilder
                 yield return new Particle(any, parent); break;
             case XmlSchemaGroupRef groupRef:
                 yield return new Particle(groupRef, parent); break;
+            case XmlSchemaChoice choice when _configuration.GenerateChoiceItemProperty:
+                yield return new Particle(choice, parent); break;
             case XmlSchemaGroupBase itemGroupBase:
                 foreach (var groupBaseElement in GetElements(itemGroupBase))
                     yield return groupBaseElement;

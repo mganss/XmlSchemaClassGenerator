@@ -74,6 +74,7 @@ static class Program
         NamingScheme? namingScheme = null;
         var forceUriScheme = "none";
         var emitMetadataAttributes = false;
+        var generateChoiceItemProperty = false;
         var metadataNamespace = GeneratorConfiguration.DefaultMetadataNamespace;
 
 
@@ -221,6 +222,7 @@ with or without backing field initialization for collections
             },
             { "fu|forceUriScheme=", "force URI scheme when resolving URLs (default is none; can be: none, same, or any defined value for scheme, like https or http)", v => forceUriScheme = v },
             { "ema|emitMetadataAttributes", "emit metadata helper attributes (default is false)", v => emitMetadataAttributes = v != null },
+            { "gi|generateChoiceItemProperty", "generate xsd.exe-style Item and ItemElementName properties for choice elements", v => generateChoiceItemProperty = v != null },
             { "mn|metadataNamespace=", $"namespace for generated metadata helper attributes (default is {GeneratorConfiguration.DefaultMetadataNamespace})", v => metadataNamespace = v }
         };
 
@@ -314,6 +316,7 @@ with or without backing field initialization for collections
             EnumCollection = enumCollection,
             ForceUriScheme = forceUriScheme,
             EmitMetadataAttributes = emitMetadataAttributes,
+            GenerateChoiceItemProperty = generateChoiceItemProperty,
             MetadataNamespace = metadataNamespace
         };
 

@@ -18,6 +18,7 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
     private const string Namespace = nameof(XmlRootAttribute.Namespace);
 
     // ctor
+    public List<(string Name, TypeModel Type)> ChoiceItems { get; } = [];
     public List<DocumentationModel> Documentation { get; } = [];
     public List<Substitute> Substitutes { get; } = [];
     public TypeModel OwningType { get; } = owningType;
@@ -600,6 +601,23 @@ public class PropertyModel(GeneratorConfiguration configuration, string name, Ty
             }
             else
             {
+                if (ChoiceItems.Count > 0)
+                {
+                    owningType ??= OwningType;
+
+                    foreach (var choiceItem in ChoiceItems)
+                    {
+                        var choiceAttribute = AttributeDecl<XmlElementAttribute>(new(new CodePrimitiveExpression(choiceItem.Name)),
+                            new(nameof(XmlElementAttribute.Type),new CodeTypeOfExpression(choiceItem.Type.GetReferenceFor(owningType.Namespace))));
+
+                        if (Order != null)
+                            choiceAttribute.Arguments.Add(new(nameof(Order), new CodePrimitiveExpression(Order.Value)));
+
+                        attributes.Add(choiceAttribute);
+                    }
+
+                    return attributes;
+                }
                 if (!Configuration.SeparateSubstitutes && Substitutes.Count > 0)
                 {
                     owningType ??= OwningType;
