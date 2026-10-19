@@ -740,15 +740,14 @@ internal class ModelBuilder
                 var baseFacets = MergeRestrictions(type.BaseXmlSchemaType as XmlSchemaSimpleType);
                 if (type.Content is XmlSchemaSimpleTypeRestriction typeRestriction)
                 {
+                    // Facets of the same type within one restriction (e.g. several xs:pattern) are alternatives
+                    // and must be kept together; only facets inherited from the base type are replaced.
                     var facets = typeRestriction.Facets.Cast<XmlSchemaFacet>().ToList();
-                    foreach (var facet in facets)
+                    foreach (var facetsOfType in facets.GroupBy(f => f.GetType()))
                     {
-                        var baseFacet = baseFacets
-                            .SingleOrDefault(f => f is not XmlSchemaEnumerationFacet
-                                && f.GetType() == facet.GetType());
-                        if (baseFacet != null)
-                            baseFacets.Remove(baseFacet);
-                        baseFacets.Add(facet);
+                        if (facetsOfType.Key != typeof(XmlSchemaEnumerationFacet))
+                            baseFacets.RemoveAll(f => f.GetType() == facetsOfType.Key);
+                        baseFacets.AddRange(facetsOfType);
                     }
                 }
                 return baseFacets;
