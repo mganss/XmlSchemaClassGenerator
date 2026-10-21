@@ -186,7 +186,7 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
         var type = XmlSchemaType != null
             ? XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, XmlSchemaType)
             : ValueType;
-        return PatternAttributeTypes.Contains(Nullable.GetUnderlyingType(type) ?? type);
+        return PatternAttributeTypes.Contains(type);
     }
 
     public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()
