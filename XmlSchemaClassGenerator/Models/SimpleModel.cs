@@ -174,10 +174,33 @@ public class SimpleModel(GeneratorConfiguration configuration) : TypeModel(confi
         return new CodePrimitiveExpression(Convert.ChangeType(defaultString, ValueType, CultureInfo.InvariantCulture));
     }
 
+    private static readonly HashSet<Type> PatternAttributeTypes =
+    [
+        typeof(string), typeof(Guid),
+        typeof(byte), typeof(sbyte), typeof(short), typeof(ushort), typeof(int), typeof(uint),
+        typeof(long), typeof(ulong), typeof(decimal), typeof(float), typeof(double),
+    ];
+
+    private bool IsPatternAttributeSupported()
+    {
+        var type = XmlSchemaType != null
+            ? XmlSchemaType.Datatype.GetEffectiveType(Configuration, Restrictions, XmlSchemaType)
+            : ValueType;
+        return PatternAttributeTypes.Contains(Nullable.GetUnderlyingType(type) ?? type);
+    }
+
     public IEnumerable<CodeAttributeDeclaration> GetRestrictionAttributes()
     {
-        foreach (var attribute in Restrictions.Where(x => x.IsSupported).Select(r => r.GetAttribute()).Where(a => a != null))
-            yield return attribute;
+        var patternAttributeSupported = IsPatternAttributeSupported();
+
+        foreach (var restriction in Restrictions.Where(x => x.IsSupported))
+        {
+            if (restriction is PatternRestrictionModel && !patternAttributeSupported)
+                continue;
+
+            if (restriction.GetAttribute() is { } attribute)
+                yield return attribute;
+        }
 
         var minInclusive = Restrictions.OfType<MinInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
         var maxInclusive = Restrictions.OfType<MaxInclusiveRestrictionModel>().FirstOrDefault(x => x.IsSupported);
