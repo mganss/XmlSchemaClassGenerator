@@ -2,8 +2,9 @@ XmlSchemaClassGenerator
 =======================
 
 [![Nuget](https://img.shields.io/nuget/v/XmlSchemaClassGenerator-beta)](https://www.nuget.org/packages/XmlSchemaClassGenerator-beta/)
-[![Build status](https://ci.appveyor.com/api/projects/status/yhxiw0stmv5y7f6n/branch/master?svg=true)](https://ci.appveyor.com/project/mganss/xmlschemaclassgenerator/branch/master)
-[![codecov.io](https://codecov.io/github/mganss/XmlSchemaClassGenerator/coverage.svg?branch=master)](https://codecov.io/github/mganss/XmlSchemaClassGenerator?branch=master)
+[![Build status](https://github.com/mganss/XmlSchemaClassGenerator/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/mganss/XmlSchemaClassGenerator/actions/workflows/build.yml)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mganss_XmlSchemaClassGenerator&metric=coverage)](https://sonarcloud.io/dashboard?id=mganss_XmlSchemaClassGenerator)
+[![Sonarcloud Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=mganss_XmlSchemaClassGenerator&metric=alert_status)](https://sonarcloud.io/dashboard?id=mganss_XmlSchemaClassGenerator)
 [![netstandard2.0](https://img.shields.io/badge/netstandard-2.0-brightgreen.svg)](https://img.shields.io/badge/netstandard-2.0-brightgreen.svg)
 [![net462](https://img.shields.io/badge/net-462-brightgreen.svg)](https://img.shields.io/badge/net-462-brightgreen.svg)
 
