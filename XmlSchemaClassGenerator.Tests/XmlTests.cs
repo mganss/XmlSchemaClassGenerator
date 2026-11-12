@@ -320,7 +320,7 @@ public class XmlTests(ITestOutputHelper output)
             }
         }";
 
-        Assert.Contains(expectedEnumValueProperty, writer.Content.First());
+        Assert.Contains(expectedEnumValueProperty.ReplaceLineEndings(), writer.Content.First().ReplaceLineEndings());
     }
 
 
